@@ -1,12 +1,7 @@
 {
-  "name": "threadi/lw-simple-language",
+  "name": "threadi/easy-language",
   "require-dev": {
     "wp-coding-standards/wpcs": "^2.3"
-  },
-  "autoload": {
-    "psr-4": {
-      "Threadi\\Eml\\": "src/"
-    }
   },
   "scripts": {
     "post-install-cmd": [

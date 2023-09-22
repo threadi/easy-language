@@ -12,11 +12,44 @@
     <!-- check for necessary vars -->
     <fail unless="plugin.slug" />
     <fail unless="plugin.version" />
+    <fail unless="npm.path" />
     <fail message="Do not run as root!">
         <condition>
             <equals arg1="root" arg2="${user.name}"/>
         </condition>
     </fail>
+
+    <!-- install npm -->
+    <target name="npm-install">
+        <delete file="${log.dir}/npm-install1.txt"/>
+        <delete file="${log.dir}/npm-install2.txt"/>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install1.txt">
+            <arg line="i"/>
+        </exec>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install2.txt">
+            <arg line="i concurrently"/>
+        </exec>
+    </target>
+
+    <!-- build the Blocks via npm -->
+    <target name="npm-build" depends="npm-install">
+        <delete file="${log.dir}/npm-build1.txt"/>
+        <delete file="${log.dir}/npm-build2.txt"/>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build1.txt">
+            <arg line="run build:switcher"/>
+        </exec>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build2.txt">
+            <arg line="run build:navigation-switcher"/>
+        </exec>
+    </target>
+
+    <!-- generate json-translations -->
+    <target name="json-translations" depends="npm-build">
+        <delete file="${src.dir}/languages/*.json"/>
+        <exec dir="${src.dir}" failonerror="true" executable="wp">
+            <arg line="i18n make-json languages --no-purge"/>
+        </exec>
+    </target>
 
     <!-- set version number in plugin-file for the release -->
     <target name="setVersionNumber">
@@ -25,20 +58,41 @@
         <replace file="${src.dir}/${plugin.slug}-release.php">
             <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
         </replace>
+
+        <copy file="${src.dir}/languages/easy-language.pot" tofile="${log.dir}/languages/easy-language.pot"/>
+        <replace file="${src.dir}/languages/easy-language.pot">
+            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
+        </replace>
+
+        <copy file="${src.dir}/languages/easy-language-de_DE.po" tofile="${log.dir}/languages/easy-language-de_DE.po"/>
+        <replace file="${src.dir}/languages/easy-language-de_DE.po">
+            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
+        </replace>
+
+        <copy file="${src.dir}/languages/easy-language-de_DE_formal.po" tofile="${log.dir}/languages/easy-language-de_DE_formal.po"/>
+        <replace file="${src.dir}/languages/easy-language-de_DE_formal.po">
+            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
+        </replace>
     </target>
 
+    <!-- init project -->
+    <target name="init" description="initialize the project" depends="npm-build" />
+
     <!-- create release-zip -->
-    <target name="build" description="builds a new release" depends="setVersionNumber">
+    <target name="build" description="builds a new release" depends="init,npm-build,json-translations,setVersionNumber">
         <delete file="${build.dir}/${plugin.slug}_${plugin.version}.zip"/>
         <zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip">
             <zipfileset dir="${src.dir}/classes" prefix="${plugin.slug}/classes" />
-            <zipfileset dir="${src.dir}/gfx" prefix="${plugin.slug}/gfx" />
-            <zipfileset dir="${src.dir}/inc" prefix="${plugin.slug}/inc" />
+            <zipfileset dir="${src.dir}/inc" includes="admin.php,autoload.php,constants.php,index.php" prefix="${plugin.slug}/inc" />
+            <zipfileset dir="${src.dir}/inc/multilingual-plugins" includes="translatepress.php" prefix="${plugin.slug}/inc/multilingual-plugins" />
             <zipfileset dir="${src.dir}/languages" prefix="${plugin.slug}/languages" />
             <zipfileset dir="${src.dir}" includes="uninstall.php,readme.txt" prefix="${plugin.slug}" />
             <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
         </zip>
         <delete file="${src.dir}/${plugin.slug}-release.php"/>
+        <copy file="${log.dir}/languages/easy-language.pot" tofile="${src.dir}/languages/easy-language.pot" overwrite="true" />
+        <copy file="${log.dir}/languages/easy-language-de_DE.po" tofile="${src.dir}/languages/easy-language-de_DE.po" overwrite="true" />
+        <copy file="${log.dir}/languages/easy-language-de_DE_formal.po" tofile="${src.dir}/languages/easy-language-de_DE_formal.po" overwrite="true" />
     </target>
 
     <target name="help">

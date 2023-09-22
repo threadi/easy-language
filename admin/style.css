@@ -1,0 +1,154 @@
+:root {
+    --lwel-pro-bg: yellow;
+    --lwel-pro-font: #000;
+    --lwel-hint-bg: #c45602;
+    --lwel-hint-font: #fff;
+    --lwel-pro-hint-bg: #fca15b;
+    --lwel-pro-hint-font: #000;
+}
+
+.settings_page_easy_language_settings .highlight {
+    background-color: var(--lwel-hint-bg);
+    color: var(--lwel-hint-font);
+    padding: 12px;
+}
+
+.settings_page_easy_language_settings .highlight a {
+    color: var(--lwel-hint-font);
+}
+
+.settings_page_easy_language_settings .highlight a:after, .post-type-personioposition .personio-pro-hint a:after {
+    content: "\f504";
+    display: inline-block;
+    font-family: "dashicons", sans-serif;
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+.form-table .easy-language-checkbox > p, .form-table .easy-language-radio > p {
+    margin-left: 24px;
+    margin-bottom: 4px;
+}
+
+#easy-language table {
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+
+#easy-language table th {
+    padding-right: 8px;
+    text-align: left;
+}
+
+#easy-language table a {
+    text-decoration: none;
+}
+
+td.easy-language .easy-language-trash { color: #b32d2e; }
+
+td.easy-language a, td.easy-language span {
+    display: inline-block;
+    margin-right: 0.8em;
+}
+
+.easy-language-transient {
+    position: relative;
+    z-index: 1;
+}
+
+.easy-language-transient h3 img {
+    vertical-align: middle;
+    display: inline-block;
+    margin-right: 8px;
+    width: 32px;
+}
+
+.easy-language-translate-object span {
+    display: inline-block;
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+body .button.easy-language-settings-button {
+    display: inline-block;
+    margin-right: 8px;
+}
+
+body .text-translations-table #options { width: 42px; }
+
+body .text-translations-table #used_api { width: 64px; }
+
+body .text-translations-table #user { width: 100px }
+
+body .text-translations-table #source_language, body .text-translations-table #target_language { width: 110px; }
+
+.postbox-container #easy-language .alert {
+    background-color: #cc1818;
+    color: #fff;
+    padding: 2px 8px;
+}
+
+.easy-api-radios {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+
+.easy-api-radio {
+    flex: 1 0 20%;
+    margin: 6px;
+    max-width: 320px;
+}
+
+.easy-api-radio:first-child { margin-left: 0 }
+
+.easy-api-radio h2 {
+    margin-top: 0;
+}
+
+.easy-api-radio img {
+    float: right;
+    width: 120px;
+}
+
+.easy-api-radios input[type='radio'] { display: none }
+
+.easy-api-radios input[type='radio'] + label {
+    background-color: #dcdcde;
+    border: 1px solid #c3c4c7;
+    border-radius: 8px;
+    display: block;
+    padding: 18px 12px 8px;
+    position: relative;
+    z-index: 1;
+}
+
+.easy-api-radios input[type='radio'] + label:before {
+    background-color: #c45602;
+    border-radius: 8px;
+    color: #fff;
+    content: attr(data-active-title);
+    display: none;
+    padding: 4px 12px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.easy-api-radios input[type='radio']:checked + label {
+    background-color: #fff;
+}
+
+.easy-api-radios input[type='radio']:checked + label:before {
+    display: inline-block;
+}
+
+.easy-language-choose-api .form-table .easy-api-radios p {
+	margin-bottom: 8px;
+}
+
+.easy-language-choose-api .form-table th { display: none }
+
+.easy-language-choose-api .form-table td { padding-left: 0 }

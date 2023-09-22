@@ -9,17 +9,20 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-05-31T13:54:32+02:00\n"
+"POT-Creation-Date: 2023-09-22T12:15:05+02:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: easy-language\n"
 
 #. Plugin Name of the plugin
+#: classes/multilingual-plugins/easy-language/class-init.php:1018
+#: inc/settings/settings.php:17
+#: inc/settings/settings.php:43
 msgid "Easy Language"
 msgstr ""
 
 #. Description of the plugin
-msgid "Provides easy language for several multilingual plugins."
+msgid "Provides possibility to translate texts to easy and plain language."
 msgstr ""
 
 #. Author of the plugin
@@ -28,4 +31,792 @@ msgstr ""
 
 #. Author URI of the plugin
 msgid "https://laolaweb.com"
+msgstr ""
+
+#: classes/apis/no-api/class-no-api.php:76
+msgid "<p>Do not use any API for translations.</p>"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:131
+msgid "<p>The SUMM AI API allows you to automatically translate the entire website into plain and simple language via quota-limited API. You need a key to use the API. You can get an API key from SUMM AI: <a href=\"%1$s\">%1$s</a>.</p>"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:152
+#: doc/api-base/class-your-api.php:69
+msgid "German"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:154
+#: doc/api-base/class-your-api.php:71
+msgid "Informal german spoken in Germany."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:157
+#: doc/api-base/class-your-api.php:74
+msgid "German (Formal)"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:159
+#: doc/api-base/class-your-api.php:76
+msgid "Formal german spoken in Germany."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:162
+#: doc/api-base/class-your-api.php:79
+msgid "Suisse german"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:164
+#: doc/api-base/class-your-api.php:81
+msgid "Formal german spoken in Suisse."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:167
+#: doc/api-base/class-your-api.php:84
+msgid "Suisse german (Informal)"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:169
+#: doc/api-base/class-your-api.php:86
+msgid "Informal german spoken in Suisse."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:172
+#: doc/api-base/class-your-api.php:89
+msgid "Austria German"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:174
+#: doc/api-base/class-your-api.php:91
+msgid "German spoken in Austria."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:177
+#: doc/api-base/class-your-api.php:94
+msgid "British English"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:179
+#: doc/api-base/class-your-api.php:96
+msgid "Englisch spoken in Great Britain."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:182
+#: doc/api-base/class-your-api.php:99
+msgid "American English"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:184
+#: doc/api-base/class-your-api.php:101
+msgid "Englisch spoken in the USA."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:187
+#: doc/api-base/class-your-api.php:104
+msgid "French"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:189
+#: doc/api-base/class-your-api.php:106
+msgid "French spoken in France."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:203
+#: classes/class-languages.php:109
+#: doc/api-base/class-your-api.php:119
+#: inc/multilingual-plugins/translatepress.php:212
+msgid "Leichte Sprache"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:205
+#: classes/class-languages.php:111
+#: doc/api-base/class-your-api.php:121
+msgid "The Leichte Sprache used in Germany, Suisse and Austria."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:210
+#: classes/class-languages.php:115
+msgid "Einfache Sprache"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:212
+#: classes/class-languages.php:117
+msgid "The Einfache Sprache used in Germany, Suisse and Austria."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:217
+#: classes/class-languages.php:121
+msgid "Easy Read"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:219
+#: classes/class-languages.php:123
+msgid "The easy read language used in englisch-based countries."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:224
+#: classes/class-languages.php:127
+msgid "Plain Englisch"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:226
+#: classes/class-languages.php:129
+msgid "The plain englisch used in englisch-based countries."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:231
+#: classes/class-languages.php:133
+#: doc/api-base/class-your-api.php:131
+msgid "FALC"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:233
+#: classes/class-languages.php:135
+#: doc/api-base/class-your-api.php:133
+msgid "The FALC used in french-based countries."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:309
+#: inc/multilingual-plugins/translatepress.php:74
+msgid "SUMM AI"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:339
+msgid "SUMM AI Quota"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:347
+msgid "No quota consumed so far"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:365
+msgid "Quota"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:366
+msgid "Update now"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:371
+msgid "Info about quota will be available until the API token is set"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:386
+msgid "SUMM AI Settings"
+msgstr ""
+
+#. translators: %1$s will be replaced by the SUMM AI URL
+#: classes/apis/summ-ai/class-summ-ai.php:393
+msgid "Get your SUMM AI API Token <a href=\"%1$s\" target=\"_blank\">here (opens new window)</a>.<br>If you have any questions about the token provided by SUMM AI, please contact their support: <a href=\"%1$s\" target=\"_blank\">%1$s (opens new window)</a>"
+msgstr ""
+
+#. translators: %1$s will be replaced by the SUMM AI URL
+#: classes/apis/summ-ai/class-summ-ai.php:415
+msgid "If you have any questions about the token provided by SUMM AI, please contact their support: <a href=\"%1$s\" target=\"_blank\">%1$s (opens new window)</a>"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:416
+msgid "Test token"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:416
+msgid "Remove token"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:422
+#: inc/multilingual-plugins/translatepress.php:115
+msgid "SUMM AI API Key"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:430
+msgid "Enter token here"
+msgstr ""
+
+#. translators: %1$s will be replaced by the URL for general WordPress-settings
+#: classes/apis/summ-ai/class-summ-ai.php:447
+msgid "You can change the admin-email in <a href=\"%1$s\">General Settings for your WordPress</a>."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:453
+msgid "Choose email-mode"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:462
+msgid "Custom"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:464
+msgid "Enter a custom email in the field bellow."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:467
+msgid "Use the admin-email"
+msgstr ""
+
+#. translators: %1$s is replaced with a hint for admins only.
+#: classes/apis/summ-ai/class-summ-ai.php:470
+msgid "The WordPress-Admin-email will be used. %1$s"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:473
+msgid "Use editor email"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:475
+msgid "The email of the actual user, which requests the translation, will be used."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:480
+msgid "An email will be used for each request to the SUMM AI API. It is used as contact or identifier email for SUMM AI if question for translations arise."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:488
+msgid "Contact email for SUMM AI"
+msgstr ""
+
+#. translators: %1$s is replaced with the admin email.
+#: classes/apis/summ-ai/class-summ-ai.php:496
+msgid "If this field is empty, the admin-email <i>%1$s</i> will be used for each request to the API."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:497
+msgid "Enter contact email here"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:509
+msgid "Choose source languages"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:516
+msgid "These are the possible source languages for SUMM AI-translations. This language has to be the language which you use for any texts in your website."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:526
+msgid "Choose target languages"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:533
+msgid "These are the possible target languages for SUMM AI-translations."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:543
+msgid "Choose translation-mode"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:552
+msgid "Disabled"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:554
+msgid "You have to write all translations manually. The API will not be used."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:557
+msgid "Automatic translation of each text."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:559
+msgid "Each untranslated but in translation-objects saved text will be translated automatic in the intervall set below."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:562
+msgid "Translate texts manually, use API as helper."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:564
+msgid "The system will not check automatically for translations. Its your decision."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:580
+msgid "Interval for automatic translation"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:589
+msgid "The interval is only used for automatic translations."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:597
+msgid "Interval for quota request"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:606
+msgid "The actual API quota will be requested in this interval."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:614
+msgid "Enable test-marker"
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:623
+msgid "If this is enabled no really translation will be run through the API. No characters will be counted on your quota. Each text will be translated with a given default-text by SUMM AI API."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:650
+msgid "You did not enter an API token. All translation options via the SUMM AI API have been disabled. "
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:657
+msgid "The API key does not seem to be valid."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:678
+msgid "The given email is not a valid email-address."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:717
+msgid "You have to set a target-language for translations."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:720
+msgid "At least one language cannot (currently) be translated into the selected target languages by the API."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:1083
+msgid "Token could be successfully verified."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:1088
+msgid "Token could not be verified. Please take a look in the log to check the reason."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:1095
+msgid "Token or contact email missing."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:1189
+msgid "<strong>Your quota for the SUMM AI API is completely depleted.</strong> You will not be able to use any translation from SUMM AI. Please contact the <a href=\"%1$s\" target=\"_blank\">SUMM AI support (opens new window)</a> about extending the quota."
+msgstr ""
+
+#: classes/apis/summ-ai/class-summ-ai.php:1198
+msgid "<strong>More than 80%% of your quota for the SUMM AI API has already been used.</strong> Please contact the <a href=\"%1$s\" target=\"_blank\">SUMM AI support (opens new window)</a> about extending the quota."
+msgstr ""
+
+#. translators: %1$s will be replaced by the name of the multilingual-plugin
+#: classes/class-init.php:143
+msgid "You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy Language to this plugin as additional language. Due to limitations of this plugin, it is unfortunately not possible for us to provide automatic translation for plain language. If you want to use this, deactivate %1$s and use only our plugin for this."
+msgstr ""
+
+#. translators: %1$s will be replaced by the name of the multilingual-plugin
+#: classes/class-init.php:147
+msgid "You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy Language to this plugin as additional language."
+msgstr ""
+
+#: classes/class-install.php:141
+msgid "Translator for Easy Language"
+msgstr ""
+
+#: classes/class-languages.php:87
+msgid "Deutsch"
+msgstr ""
+
+#: classes/class-languages.php:91
+msgid "Deutsch (Sie)"
+msgstr ""
+
+#: classes/class-languages.php:95
+msgid "English (US)"
+msgstr ""
+
+#: classes/class-log-api-table.php:59
+msgid "state"
+msgstr ""
+
+#: classes/class-log-api-table.php:60
+#: classes/multilingual-plugins/easy-language/class-texts-table.php:73
+msgid "date"
+msgstr ""
+
+#: classes/class-log-api-table.php:61
+msgid "log"
+msgstr ""
+
+#: classes/class-log-api-table.php:62
+msgid "request"
+msgstr ""
+
+#: classes/class-log-api-table.php:63
+msgid "response"
+msgstr ""
+
+#. translators: %1$d will be replaced by the days this message will be hidden.
+#: classes/class-transient.php:174
+msgid "Hide this message for %1$d days."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:242
+#: classes/multilingual-plugins/easy-language/class-init.php:1221
+msgid "Used page builder %s not available"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:302
+#: classes/multilingual-plugins/easy-language/class-init.php:403
+msgid "Original content has been changed!"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:578
+msgid "Translate page"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:847
+msgid "Easy Language settings"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:867
+msgid "Choose supported post-types"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:895
+msgid "Choose supported taxonomies"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:918
+msgid "Choose supported languages"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:925
+msgid "Go to API-settings to choose the languages you want to use."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:925
+msgid "Choose the language you want to use for manual translation."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:935
+msgid "Set object state on plugin deactivation"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:942
+msgid "If plugin is disabled your translated objects will get the state set here. If plugin is reactivated they will be set to their state before.<br><strong>Hint:</strong> During uninstallation all translated objects will be deleted regardless of the setting here."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:944
+msgid "Do not change anything"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:945
+msgid "Set to draft"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:946
+msgid "Set to trash"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:956
+msgid "Generate permalink for translated objects"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:963
+msgid "If enabled an individual permalink will be generated from title after translation of the title."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:973
+msgid "Frontend Settings"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:981
+msgid "Choose link-mode for language switcher"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:990
+msgid "Do not link translated pages"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:992
+msgid "The links in the switcher will general link to the language-specific homepage."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:995
+msgid "Link translated pages."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:997
+msgid "The Links in the switcher will link to the translated page. If a page is not translated, the link will target the language-specific homepage."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:1034
+#: classes/multilingual-plugins/easy-language/class-init.php:1569
+msgid "Translations"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:1278
+msgid "Filter easy language"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:1279
+msgid "show translated content"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:1280
+msgid "show not translated content"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:1281
+msgid "show changed content"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:1282
+msgid "show not changed content"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:1510
+msgid "Translation in progress"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:1511
+msgid "OK"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:1512
+msgid "Please wait"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:1515
+msgid "Translation has been run."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:1553
+msgid "Do you really want to delete this translated object?"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:1571
+msgid "You can here delete the translations to force a new translation of the original text if requested. In objects saved translations will not be deleted."
+msgstr ""
+
+#. translators: %1$d will be replaced by a percentage value between 0 and 100.
+#: classes/multilingual-plugins/easy-language/class-init.php:1620
+msgid "Quota for the used API is used for %1$d%%!"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-pagebuilder-support.php:75
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:52
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:93
+msgid "Language"
+msgstr ""
+
+#. translators: %1$s will be replaced by the object name (post or page), %2$s will be replaced by the name of the current language of this page/post
+#: classes/multilingual-plugins/easy-language/class-pagebuilder-support.php:120
+msgid "You are editing this %1$s in the language <strong>%2$s</strong>."
+msgstr ""
+
+#. translators: %1$s will be replaced by the API-title
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:180
+msgid "There would be %1$d characters to translate in this %2$s. That is more than the %3$d available in quota."
+msgstr ""
+
+#. translators: %1$d will be replaced by the amount of characters in this page/post, %2$s will be replaced by the name of this page-type (post or page)
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:192
+msgid "There would be %1$d characters translated in this %2$s."
+msgstr ""
+
+#. translators: %1$s will be replaced by the API-title
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:198
+#: classes/multilingual-plugins/easy-language/pagebuilder/divi.php:111
+msgid "Translate via %1$s"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:200
+msgid "Quota for the used API is used for %f percent!"
+msgstr ""
+
+#. translators: %1$s will be replaced by the API-title
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:211
+msgid "No quota for automatic translation with %1$s available."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:222
+#: classes/multilingual-plugins/easy-language/pagebuilder/divi.php:119
+msgid "No translation-API active."
+msgstr ""
+
+#. translators: %1$s will be replaced by the language title
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:237
+msgid "Add translation in %1$s"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:243
+msgid "Original Content in %1$s"
+msgstr ""
+
+#. translators: %1$s will be replaced by the language title
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:273
+msgid "Edit translation in %1$s"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-switcher.php:86
+#: classes/multilingual-plugins/easy-language/class-switcher.php:145
+#: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/index.js:1
+#: classes/multilingual-plugins/easy-language/blocks/switcher/build/index.js:1
+msgid "Language Switcher"
+msgstr ""
+
+#. translators: %1$s will be replaced by the name of the language
+#: classes/multilingual-plugins/easy-language/class-switcher.php:223
+msgid "Show this site in %1$s"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-texts-table.php:74
+msgid "used API"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-texts-table.php:75
+msgid "requesting user"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-texts-table.php:76
+msgid "source language"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-texts-table.php:77
+msgid "target language"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-texts-table.php:78
+msgid "original"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-texts-table.php:79
+msgid "translation"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-texts-table.php:205
+msgid "without login"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/pagebuilder/divi.php:71
+msgid "Languages"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:65
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:106
+msgid "You are editing this page in the language <strong>%1$s</strong>."
+msgstr ""
+
+#: classes/multilingual-plugins/translatepress/class-translatepress-summ-ai-machine-translator.php:199
+msgid "Please enter your summ ai key."
+msgstr ""
+
+#: doc/api-base/class-your-api.php:125
+msgid "easy-to-read"
+msgstr ""
+
+#: doc/api-base/class-your-api.php:127
+msgid "The easy language used in englisch-based countries."
+msgstr ""
+
+#. translators: %1$s is replaced with the SUMM AI URL
+#: inc/multilingual-plugins/translatepress.php:145
+msgid "You can get the SUMM AI API Key from the provider <a href=\"%1$s\">here</a>."
+msgstr ""
+
+#: inc/settings/advanced.php:24
+msgid "Advanced"
+msgstr ""
+
+#: inc/settings/advanced.php:64
+msgid "Advanced Settings"
+msgstr ""
+
+#: inc/settings/advanced.php:72
+msgid "Set max age for log entries"
+msgstr ""
+
+#: inc/settings/advanced.php:79
+msgid "Older log-entries will be deleted automatically."
+msgstr ""
+
+#: inc/settings/advanced.php:87
+msgid "Debug-Mode"
+msgstr ""
+
+#: inc/settings/advanced.php:94
+msgid "If enabled the plugin will log every API action."
+msgstr ""
+
+#: inc/settings/api-logs.php:25
+#: inc/settings/api-logs.php:45
+msgid "API Logs"
+msgstr ""
+
+#: inc/settings/general.php:47
+msgid "Choose API for translations"
+msgstr ""
+
+#: inc/settings/general.php:75
+msgid "Choose API"
+msgstr ""
+
+#: inc/settings/general.php:82
+msgid "Please choose the API you want to use to translate your website."
+msgstr ""
+
+#: inc/settings/general.php:130
+msgid "Activated"
+msgstr ""
+
+#: inc/settings/settings.php:16
+#: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/index.js:1
+#: classes/multilingual-plugins/easy-language/blocks/switcher/build/index.js:1
+msgid "Settings"
+msgstr ""
+
+#: inc/settings/settings.php:45
+msgid "General Settings"
+msgstr ""
+
+#: inc/settings/settings.php:416
+#: inc/settings/settings.php:476
+msgid "Check to enable this language."
+msgstr ""
+
+#. translators: %1$s is replaced with "string"
+#. translators: %1$s is replaced with the name of the Pro-plugin
+#: inc/settings/settings.php:449
+#: inc/settings/settings.php:511
+msgid "Use all languages supported by SUMM AI with %s."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/index.js:1
+msgid "Provides a Block for Language Switcher in navigation."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/index.js:1
+#: classes/multilingual-plugins/easy-language/blocks/switcher/build/index.js:1
+msgid "Show icons"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/index.js:1
+#: classes/multilingual-plugins/easy-language/blocks/switcher/build/index.js:1
+msgid "Hide actual language"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/blocks/switcher/build/index.js:1
+msgid "Provides a Block for Language Switcher."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/block.json
+#: classes/multilingual-plugins/easy-language/blocks/switcher/block.json
+msgctxt "block title"
+msgid "Language Switcher"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/block.json
+msgctxt "block description"
+msgid "Provides a Block for Language Switcher in navigation."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/block.json
+#: classes/multilingual-plugins/easy-language/blocks/switcher/block.json
+msgctxt "block keyword"
+msgid "easy language"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/block.json
+#: classes/multilingual-plugins/easy-language/blocks/switcher/block.json
+msgctxt "block keyword"
+msgid "switcher"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/blocks/switcher/block.json
+msgctxt "block description"
+msgid "Provides a Block for Language Switcher."
 msgstr ""

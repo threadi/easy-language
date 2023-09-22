@@ -3,3 +3,6 @@ plugin.slug=easy-language
 
 # version number to use
 plugin.version=
+
+# set path to npm-binary
+npm.path=

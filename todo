@@ -1,0 +1,17 @@
+ToDo
+===================================
+
+Funktionales
+------------
+* parallel andere Übersetzungsplugins erlauben für Mehrsprachigkeit (Englisch + Deutsch + Leichte Sprache)
+* Sprachwechsel für Elementor und andere PageBuilder
+* Kompatibilität mit Plugins testen
+-> Caching-Plugins
+-> Order-Plugins
+-> WooCommerce
+-> TablePress
+-> ..
+* PageBuilder-Support:
+-> Beaver
+-> SiteOrigin
+-> Themify

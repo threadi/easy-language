@@ -2,10 +2,11 @@
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Easy Language @@VersionNumber@@\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/easy-language\n"
-"POT-Creation-Date: 2023-05-31T13:54:32+02:00\n"
-"PO-Revision-Date: 2023-05-31 15:52+0200\n"
+"Project-Id-Version: Simple Language 0.5.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lw-simple-"
+"language\n"
+"POT-Creation-Date: 2023-05-05T13:46:42+02:00\n"
+"PO-Revision-Date: 2023-05-05 13:48+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -14,15 +15,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.1\n"
-"X-Domain: easy-language\n"
+"X-Domain: lw-simple-language\n"
 
 #. Plugin Name of the plugin
-msgid "Easy Language"
+msgid "Simple Language"
 msgstr "Leichte Sprache"
 
 #. Description of the plugin
-msgid "Provides easy language for several multilingual plugins."
-msgstr "Bietet Leichte Sprache für verschiedene Mehrsprachen-Plugins."
+msgid "Provides possibility to translate any texts to simple language."
+msgstr ""
+"Bietet die Möglichkeit, beliebige Texte in Leichte Sprache zu übersetzen."
 
 #. Author of the plugin
 msgid "laOlaWeb"
@@ -31,3 +33,24 @@ msgstr "laOlaWeb"
 #. Author URI of the plugin
 msgid "https://laolaweb.com"
 msgstr "https://laolaweb.com"
+
+#: classes/multilingual-plugins/class-translatepress-summ-ai-machine-translator.php:195
+msgid "Please enter your summ ai key."
+msgstr "Bitte geben Sie Ihren summ ai Key ein."
+
+#: inc/multilingual-plugins/translatepress.php:46
+msgid "SUMM AI"
+msgstr "SUMM AI"
+
+#: inc/multilingual-plugins/translatepress.php:88
+msgid "SUMM AI API Key"
+msgstr "SUMM AI API Key"
+
+#. translators: %1$s is replaced with the SUMM AI URL"
+#: inc/multilingual-plugins/translatepress.php:111
+msgid ""
+"You can get the SUMM AI API Key from the provider <a href=\"%1$s\" target="
+"\"_blank\">here</a>."
+msgstr ""
+"Sie können den SUMM AI API-Schlüssel vom Anbieter <a href=\"%1$s\" target="
+"\"_blank\">hier</a> erhalten."
