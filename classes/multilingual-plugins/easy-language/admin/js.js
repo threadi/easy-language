@@ -3,7 +3,7 @@ jQuery(document).ready(function($) {
     $('.easy-language-translate-object').on('click', function (e) {
         e.preventDefault();
 
-        easy_language_get_translation();
+        easy_language_get_translation( $(this).data('id') );
     });
 
     // confirm deletion of translated object.

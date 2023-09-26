@@ -105,7 +105,7 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_description(): string {
 		/* translators: %1$d will be replaced by a number, %2$s will be replaced by the URL for the Pro, %3$s will be replaced by the URL for SUMM AI-product-info */
-		return sprintf( __( '<p>The SUMM AI API allows you to automatically translate the entire website into plain and/or simple language via quota-limited API.</p>In the free Easy Language plugin you have a quota of %1$d characters you will be able to translate.</p><p>You need <a href="%2$s" target="_blank">Easy Language Pro (opens new window)</a> and a SUMM AI API key to translate more texts: <a href="%3$s" target="_blank">%3$s</a>.</p><p><strong>Actual character spent:</strong> %4$d</p>', 'easy-language' ), EASY_LANGUAGE_SUMM_AI_QUOTA, 'todo', esc_url($this->get_language_specific_support_page()), $this->get_quota()['character_spent'] );
+		return sprintf( __( '<p>The SUMM AI API allows you to automatically translate the entire website into plain and/or simple language via quota-limited API.</p>In the free Easy Language plugin you have a quota of %1$d characters you will be able to translate.</p><p>You need <a href="%2$s" target="_blank">Easy Language Pro (opens new window)</a> and a SUMM AI API key to translate more texts: <a href="%3$s" target="_blank">%3$s</a>.</p><p><strong>Actual character spent:</strong> %4$d<br><strong>Your Quota:</strong> %1$d<br><strong>Rest:</strong> %5$d</strong></p>', 'easy-language' ), EASY_LANGUAGE_SUMM_AI_QUOTA, 'todo', esc_url($this->get_language_specific_support_page()), $this->get_quota()['character_spent'], absint(EASY_LANGUAGE_SUMM_AI_QUOTA - $this->get_quota()['character_spent']) );
 	}
 
 	/**
@@ -161,19 +161,19 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_supported_target_languages(): array {
 		return array(
-			'de_LS' => array(
-				'label' => __( 'Leichte Sprache', 'easy-language'),
-				'enabled' => true,
-				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language'),
-				'url' => 'de_ls',
-                'api_value' => 'easy',
-			),
 			'de_EL' => array(
 				'label' => __( 'Einfache Sprache', 'easy-language'),
 				'enabled' => true,
 				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language'),
 				'url' => 'de_el',
 				'api_value' => 'plain',
+			),
+			'de_LS' => array(
+				'label' => __( 'Leichte Sprache', 'easy-language'),
+				'enabled' => true,
+				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language'),
+				'url' => 'de_ls',
+                'api_value' => 'easy',
 			)
 		);
 	}
@@ -222,10 +222,8 @@ class Summ_AI extends Base implements Api_Base {
 			$mappings = $this->get_mapping_languages();
 			foreach( $source_languages as $source_language => $enabled ) {
 				if( !empty($mappings[$source_language]) ) {
-					foreach( $mappings[$source_language] as $languages ) {
-						foreach( $languages as $language ) {
-							$languages[ $language ] = "1";
-						}
+					foreach( $mappings[$source_language] as $language ) {
+						$languages[ $language ] = "1";
 					}
 				}
 			}

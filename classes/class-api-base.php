@@ -63,6 +63,13 @@ interface Api_Base {
 	public function add_settings(): void;
 
 	/**
+	 * Return whether this API has settings for this plugin.
+	 *
+	 * @return bool
+	 */
+	public function has_settings(): bool;
+
+	/**
 	 * Return whether this API is active regarding all its settings.
 	 *
 	 * @return bool

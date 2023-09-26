@@ -13,6 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * Add Undetected-object to list of supported pagebuilder.
  *
+ * Must be last index in list of supported pagebuilder, so we use PHP_INT_MAX for position.
+ *
  * @param $list
  *
  * @return array

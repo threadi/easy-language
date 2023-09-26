@@ -242,6 +242,7 @@ class Text
 	 *
 	 * @param int $object_id The object-ID where the text should be replaced.
 	 * @param string $target_language The target language for the translated text.
+	 * @param string $taxonomy
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
@@ -256,7 +257,6 @@ class Text
 	    }
 
 	    // get object.
-		$object = null;
 		if( !empty($taxonomy) ) {
 			$object = Init::get_instance()->get_object_by_wp_object( get_term( $object_id, $taxonomy ), $object_id, $taxonomy );
 		}

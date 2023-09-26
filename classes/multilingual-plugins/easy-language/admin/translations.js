@@ -1,7 +1,7 @@
 /**
  * Start loading of translations of actual object.
  */
-function easy_language_get_translation() {
+function easy_language_get_translation( obj_id ) {
     // create dialog if it does not exist atm
     if( jQuery('#easylanguage-translate-dialog').length === 0 ) {
         jQuery('<div id="easylanguage-translate-dialog" title="' + easyLanguageTranslationsJsVars.label_translate_is_running + '"><div id="easylanguage-translate-dialog-step-description"></div><div id="easylanguage-translate-dialog-progressbar"></div></div>').dialog({
@@ -38,18 +38,18 @@ function easy_language_get_translation() {
         value: 0
     }).removeClass("hidden");
 
-    // start import
+    // start translation.
     jQuery.ajax({
         type: "POST",
         url: easyLanguageTranslationsJsVars.ajax_url,
         data: {
             'action': 'easy_language_run_translation',
-            'post': jQuery('#easy-language-post-id').val(),
+            'post': obj_id,
             'nonce': easyLanguageTranslationsJsVars.run_translate_nonce
         },
         beforeSend: function() {
             // get import-infos
-            setTimeout(function() { easy_language_get_translation_info(progressbar, stepDescription); }, 1000);
+            setTimeout(function() { easy_language_get_translation_info(obj_id, progressbar, stepDescription); }, 1000);
         }
     });
 }
@@ -57,16 +57,17 @@ function easy_language_get_translation() {
 /**
  * Get import info until import is done.
  *
+ * @param obj_id
  * @param progressbar
  * @param stepDescription
  */
-function easy_language_get_translation_info(progressbar, stepDescription) {
+function easy_language_get_translation_info(obj_id, progressbar, stepDescription) {
     jQuery.ajax({
         type: "POST",
         url: easyLanguageTranslationsJsVars.ajax_url,
         data: {
             'action': 'easy_language_get_info_translation',
-            'post': jQuery('#easy-language-post-id').val(),
+            'post': obj_id,
             'nonce': easyLanguageTranslationsJsVars.get_translate_nonce
         },
         success: function(data) {
@@ -82,7 +83,7 @@ function easy_language_get_translation_info(progressbar, stepDescription) {
 
             // get next info until running is not 1
             if( running >= 1 ) {
-                setTimeout(function() { easy_language_get_translation_info(progressbar, stepDescription) }, 500);
+                setTimeout(function() { easy_language_get_translation_info(obj_id, progressbar, stepDescription) }, 500);
             }
             else {
                 progressbar.addClass("hidden");

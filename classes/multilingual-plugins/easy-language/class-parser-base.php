@@ -185,14 +185,13 @@ class Parser_Base {
                 elseif( 'exceeded' !== $quota_state['status'] ) {
                     // output.
                     ?>
-                    <input type="hidden" name="easy-language-post-id" id="easy-language-post-id" value="<?php echo $post_object->get_id(); ?>">
                     <p>
                         <?php
                         /* translators: %1$d will be replaced by the amount of characters in this page/post, %2$s will be replaced by the name of this page-type (post or page)  */
                         echo wp_kses_post(sprintf(__('There would be %1$d characters translated in this %2$s.', 'easy-language'), esc_html($quota_state['chars_count']), esc_html($object_type) ));
                         ?>
                     </p>
-                    <p><a href="<?php echo esc_url($do_translation); ?>" class="button button-secondary easy-language-translate-object">
+                    <p><a href="<?php echo esc_url($do_translation); ?>" class="button button-secondary easy-language-translate-object" data-id="<?php echo absint($post_object->get_id()); ?>">
                         <?php
                             /* translators: %1$s will be replaced by the API-title */
                             echo sprintf(__( 'Translate via %1$s', 'easy-language' ), esc_html($api_obj->get_title() ));

@@ -88,8 +88,15 @@ class No_Api extends Base implements Api_Base {
 		return array();
 	}
 
+	/**
+	 * Set mapping languages.
+	 *
+	 * @return array[]
+	 */
 	public function get_mapping_languages(): array {
-		return array();
+		return array(
+			'de_DE' => array( 'de_EL' )
+		);
 	}
 
 	public function add_settings_tab( $tab ): void {}

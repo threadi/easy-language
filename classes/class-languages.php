@@ -49,7 +49,7 @@ class Languages {
 	/**
 	 * Get actual supported languages.
      *
-     * If an API is active, use their supported languages.
+     * If an API is active, use their supported languages if they can be configured.
      * If no API is active, use settings.
 	 *
 	 * @return array
@@ -57,8 +57,8 @@ class Languages {
 	public function get_active_languages(): array {
         // get active api.
         $api_obj = Apis::get_instance()->get_active_api();
-        if( false !== $api_obj ) {
-            // get the supported target languages of this api.
+        if( false !== $api_obj && $api_obj->has_settings() ) {
+            // get the supported target languages of this api if it has settings for it.
 			return $api_obj->get_active_target_languages();
 		}
 
@@ -82,19 +82,28 @@ class Languages {
 	 * @return array
 	 */
 	public function get_possible_source_languages(): array {
-		return array(
-			'de_DE' => array(
-				'label' => __( 'Deutsch', 'easy-language'),
-				'enabled' => true
-			),
-			'de_DE-formal' => array(
-				'label' => __( 'Deutsch (Sie)', 'easy-language'),
-				'enabled' => true
-			),
-			'en_US' => array(
-				'label' => __( 'English (US)', 'easy-language'),
-				'enabled' => true
-			),
+		return apply_filters( 'easy_language_possible_source_languages', array(
+				'de_DE' => array(
+					'label' => __( 'German', 'easy-language'),
+					'enabled' => true
+				),
+				'de_DE-formal' => array(
+					'label' => __( 'German (formal)', 'easy-language'),
+					'enabled' => true
+				),
+				'de_AT' => array(
+					'label' => __( 'German (Austria)', 'easy-language'),
+					'enabled' => true
+				),
+				'de_CH' => array(
+					'label' => __( 'German (Suisse)', 'easy-language'),
+					'enabled' => true
+				),
+				'de_CH_informal' => array(
+					'label' => __( 'German (Suisse, informal)', 'easy-language'),
+					'enabled' => true
+				)
+			)
 		);
 	}
 
@@ -105,31 +114,19 @@ class Languages {
      */
     public function get_possible_target_languages(): array {
         return apply_filters( 'easy_language_supported_target_languages', array(
+		        'de_EL' => array(
+			        'label' => __( 'Einfache Sprache', 'easy-language'),
+			        'enabled' => true,
+			        'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language'),
+			        'url' => 'de_el',
+		        ),
 	            'de_LS' => array(
 	                'label' => __( 'Leichte Sprache', 'easy-language'),
 	                'enabled' => true,
 	                'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language'),
 	                'url' => 'de_ls',
-	            ),
-	            'de_EL' => array(
-		            'label' => __( 'Einfache Sprache', 'easy-language'),
-		            'enabled' => true,
-		            'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language'),
-		            'url' => 'de_el',
 	            )
 	        )
         );
     }
-
-	/**
-	 * Return whether the given language is active or not.
-	 *
-	 * @param string $language
-	 *
-	 * @return bool
-	 */
-	public function is_language_active( string $language ): bool {
-		$languages = $this->get_active_languages();
-		return !empty($languages[$language]);
-	}
 }

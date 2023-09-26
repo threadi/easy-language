@@ -25,10 +25,12 @@
     vertical-align: middle;
 }
 
-.form-table .easy-language-checkbox > p, .form-table .easy-language-radio > p {
+.form-table div.easy-language-checkbox > p, .form-table .easy-language-radio > p {
     margin-left: 24px;
     margin-bottom: 4px;
 }
+
+.form-table p.easy-language-checkbox { margin-bottom: 8px }
 
 #easy-language table {
     border-collapse: collapse;
@@ -46,7 +48,7 @@
 
 td.easy-language .easy-language-trash { color: #b32d2e; }
 
-td.easy-language a, td.easy-language span {
+td[class^="easy-language"] a, td[class^="easy-language"] span {
     display: inline-block;
     margin-right: 0.8em;
 }
@@ -89,18 +91,24 @@ body .text-translations-table #source_language, body .text-translations-table #t
 }
 
 .easy-api-radios {
-    display: flex;
-    flex-wrap: wrap;
-    margin-top: 24px;
+	display: block;
+    margin: 24px 0 0;
 }
 
 .easy-api-radio {
-    flex: 1 0 20%;
-    margin: 6px;
-    max-width: 320px;
+	margin-bottom: 12px;
 }
 
-.easy-api-radio:first-child { margin-left: 0 }
+@media only screen and (min-width: 600px) {
+	.easy-api-radios {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		grid-gap: 12px;
+		grid-auto-rows: 1fr;
+		margin-right: 12px;
+	}
+	.easy-api-radio { margin: 12px 0; }
+}
 
 .easy-api-radio h2 {
     margin-top: 0;
@@ -118,6 +126,7 @@ body .text-translations-table #source_language, body .text-translations-table #t
     border: 1px solid #c3c4c7;
     border-radius: 8px;
     display: block;
+	height: 100%;
     padding: 18px 12px 8px;
     position: relative;
     z-index: 1;

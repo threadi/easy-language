@@ -34,19 +34,19 @@ const EASY_LANGUAGE_LANGUAGE_EMERGENCY = 'en_US';
 /**
  * options-list of transients.
  */
-const EASY_LANGUAGE_TRANSIENT_LIST = 'el_transients';
+const EASY_LANGUAGE_TRANSIENT_LIST = 'easy_language_transients';
 
 /**
  * Define names for progressbar during translation.
  */
-const EASY_LANGUAGE_OPTION_TRANSLATE_COUNT = 'elTranslateCount';
-const EASY_LANGUAGE_OPTION_TRANSLATE_MAX = 'elTranslateMax';
-const EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING = 'elTranslateRunning';
+const EASY_LANGUAGE_OPTION_TRANSLATE_COUNT = 'easy_language_translate_count';
+const EASY_LANGUAGE_OPTION_TRANSLATE_MAX = 'easy_language_translate_max';
+const EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING = 'easy_language_translate_running';
 
 /**
  * Hash for plugin-installation.
  */
-const EASY_LANGUAGE_HASH = 'elHash';
+const EASY_LANGUAGE_HASH = 'easy_language_hash';
 
 /**
  * Quota for free plugin.

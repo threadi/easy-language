@@ -132,4 +132,13 @@ class Base {
 	 * @return void
 	 */
 	public function disable(): void {}
+
+	/**
+	 * API has no settings per default.
+	 *
+	 * @return bool
+	 */
+	public function has_settings(): bool {
+		return false;
+	}
 }

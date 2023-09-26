@@ -1,6 +1,6 @@
 <?php
 /**
- * File for general settings functions for this plugin.
+ * File for settings functions of this plugin.
  *
  * @package easy-language
  */
@@ -14,7 +14,7 @@ function easy_language_admin_add_settings_menu(): void {
 	// add our settings-page in menu.
 	add_options_page(
 		__( 'Settings', 'easy-language' ),
-		__( 'Easy Language', 'easy-language' ),
+		__( 'Easy Language Settings', 'easy-language' ),
 		'manage_options',
 		'easy_language_settings',
 		'easy_language_admin_add_settings_content',
@@ -35,14 +35,13 @@ function easy_language_admin_add_settings_content(): void {
 	}
 
 	// get the active tab from the $_GET param.
-	$default_tab = null;
-	$tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : $default_tab;
+	$tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']) : null;
 
 	?>
 	<div class="wrap">
-		<h1><?php esc_html_e( 'Easy Language', 'easy-language' ); ?></h1>
+		<h1><?php esc_html_e( 'Easy Language Plugin', 'easy-language' ); ?></h1>
 		<nav class="nav-tab-wrapper">
-			<a href="<?php echo admin_url(); ?>options-general.php?page=easy_language_settings" class="nav-tab <?php if($tab===null):?>nav-tab-active<?php endif; ?>"><?php esc_html_e('General Settings', 'easy-language'); ?></a>
+			<a href="<?php echo admin_url(); ?>options-general.php?page=easy_language_settings" class="nav-tab <?php if($tab===null):?>nav-tab-active<?php endif; ?>"><?php esc_html_e('API', 'easy-language'); ?></a>
 			<?php
 				do_action('easy_language_settings_add_tab', $tab);
 			?>
@@ -50,8 +49,8 @@ function easy_language_admin_add_settings_content(): void {
 
 		<div class="tab-content">
 			<?php
-			// get the content of the actual tab
-			do_action('easy_language_settings_'.($tab == null ? 'general' : $tab).'_page');
+			// get the content of the actual tab.
+			do_action('easy_language_settings_'.($tab == null ? 'api' : $tab).'_page');
 			?>
 		</div>
 	</div>
@@ -407,6 +406,10 @@ function easy_language_admin_multiselect_field( $attr ): void {
  */
 function easy_language_admin_multiple_checkboxes_field( $attr ): void {
 	if( !empty($attr['options']) ) {
+		if( !empty($attr['description']) ) {
+			echo '<p class="easy-language-checkbox">'.wp_kses_post($attr['description']).'</p>';
+		}
+
 		foreach( $attr['options'] as $key => $settings ) {
 			// get checked-marker.
 			$actual_values = get_option( $attr['fieldId'], array() );
@@ -438,10 +441,6 @@ function easy_language_admin_multiple_checkboxes_field( $attr ): void {
 				?>
 			</div>
 			<?php
-		}
-
-		if( !empty($attr['description']) ) {
-			echo "<p>".wp_kses_post($attr['description'])."</p>";
 		}
 
 		// show pro hint.

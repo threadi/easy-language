@@ -132,7 +132,15 @@ class Rewrite {
 	 */
 	public function set_rules_on_objects( $rules ): array {
 		global $wp_rewrite;
-		$slug = $wp_rewrite->root . '(de_ls|en_ls)/';
+
+		// get the slugs for each actual enabled language.
+		$slugs = array();
+		foreach( Languages::get_instance()->get_active_languages() as $language ) {
+			$slugs[] = $language['url'];
+		}
+
+		// define slug for rules.
+		$slug = $wp_rewrite->root . '('.implode('|', $slugs ).')/';
 		$new_rules = array();
 		foreach ( $rules as $key => $rule ) {
 			// bail if something went wrong

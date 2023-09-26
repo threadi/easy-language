@@ -1,6 +1,6 @@
 <?php
 /**
- * File for general settings for this plugin.
+ * File for api settings for this plugin.
  *
  * @package easy-language
  */
@@ -9,7 +9,7 @@ use easyLanguage\Apis;
 use easyLanguage\Multilingual_Plugins;
 
 /**
- * Page for general settings.
+ * Page for API settings.
  *
  * @return void
  * @noinspection PhpUnused
@@ -23,14 +23,14 @@ function easy_language_admin_add_menu_content_settings(): void {
 	?>
 	<form method="POST" action="<?php echo get_admin_url(); ?>options.php">
 		<?php
-		settings_fields( 'easyLanguageFields' );
-		do_settings_sections( 'easyLanguagePage' );
+		settings_fields( 'easyLanguageApiFields' );
+		do_settings_sections( 'easyLanguageApiPage' );
 		submit_button();
 		?>
 	</form>
 	<?php
 }
-add_action('easy_language_settings_general_page', 'easy_language_admin_add_menu_content_settings' );
+add_action('easy_language_settings_api_page', 'easy_language_admin_add_menu_content_settings' );
 
 /**
  * Get general options.
@@ -38,7 +38,7 @@ add_action('easy_language_settings_general_page', 'easy_language_admin_add_menu_
  * @return void
  * @noinspection PhpUnused
  */
-function easy_language_admin_add_settings_general(): void {
+function easy_language_admin_add_settings_api(): void {
 	/**
 	 * General Section
 	 */
@@ -46,7 +46,7 @@ function easy_language_admin_add_settings_general(): void {
 		'settings_section_main',
 		__( 'Choose API for translations', 'easy-language' ),
 		'__return_true',
-		'easyLanguagePage',
+		'easyLanguageApiPage',
         array(
             'before_section' => '<div class="%s">',
             'after_section' => '</div>',
@@ -74,7 +74,7 @@ function easy_language_admin_add_settings_general(): void {
 			'easy_language_api',
 			__('Choose API', 'easy-language'),
 			'easy_language_admin_choose_api',
-			'easyLanguagePage',
+			'easyLanguageApiPage',
 			'settings_section_main',
 			array(
 				'label_for' => 'easy_language_api',
@@ -85,10 +85,10 @@ function easy_language_admin_add_settings_general(): void {
 				'disable_empty' => true
 			)
 		);
-		register_setting( 'easyLanguageFields', 'easy_language_api' );
+		register_setting( 'easyLanguageApiFields', 'easy_language_api' );
 	}
 }
-add_action( 'easy_language_settings_add_settings', 'easy_language_admin_add_settings_general');
+add_action( 'easy_language_settings_add_settings', 'easy_language_admin_add_settings_api');
 
 /**
  * Show selection of supported APIs.

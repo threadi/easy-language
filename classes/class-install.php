@@ -137,7 +137,7 @@ class Install {
 
 	    // generate random-installation-hash if it does not already exist (will never be removed or changed).
 	    if (!get_option(EASY_LANGUAGE_HASH)) {
-		    update_option(EASY_LANGUAGE_HASH, hash("sha256", rand() + get_option('home')));
+		    update_option(EASY_LANGUAGE_HASH, hash("sha256", rand().get_option('home')));
 	    }
 
 	    // add user role for easy-language-translator if it does not exist.
