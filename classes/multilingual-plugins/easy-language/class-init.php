@@ -11,6 +11,7 @@ use easyLanguage\Apis;
 use easyLanguage\Base;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
+use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_Plugins_Base;
 use WP_Admin_Bar;
 use WP_Post;
@@ -189,7 +190,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return array
 	 */
 	public function add_post_type_columns( $columns ): array {
-		// Bail if we're looking at trash.
+		// bail if we're looking at trash.
 		$status = get_query_var( 'post_status' );
 		if ( 'trash' === $status ) {
 			return $columns;
@@ -552,6 +553,13 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// bail if used pagebuilder prevent display of translate-option in frontend (e.g. to use its own options).
 		if( $object->get_page_builder() && false !== $object->get_page_builder()->hide_translate_menu_in_frontend() ) {
 			return;
+		}
+
+		// bail if a multilingual-plugin is used which already translates this page.
+		foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
+			if( $plugin_obj->is_foreign_plugin() ) {
+				return;
+			}
 		}
 
 		// check if this object is a translated object.

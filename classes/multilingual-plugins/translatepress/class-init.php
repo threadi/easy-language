@@ -7,14 +7,9 @@
 
 namespace easyLanguage\Multilingual_plugins\TranslatePress;
 
-use easyLanguage\Apis;
 use easyLanguage\Base;
-use easyLanguage\Helper;
-use easyLanguage\Languages;
 use easyLanguage\Multilingual_Plugins_Base;
 use easyLanguage\Transients;
-use WP_Admin_Bar;
-use WP_Query;
 
 /**
  * Rewrite-Handling for this plugin.
@@ -143,4 +138,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// delete it.
 		$transient_obj->delete();
 	}
+
+	/**
+	 * We do not add any styles or scripts for translatepress.
+	 *
+	 * @return void
+	 */
+	public function get_translations_script(): void {}
 }

@@ -44,11 +44,9 @@ function easy_language_add_styles_and_js_admin(): void {
 		)
 	);
 
-	// add only scripts and styles if our own plugin is used.
+	// add only scripts and styles of enabled plugins.
 	foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
-		if ( false === $plugin_obj->is_foreign_plugin() ) {
-			$plugin_obj->get_translations_script();
-		}
+		$plugin_obj->get_translations_script();
 	}
 }
 add_action( 'admin_enqueue_scripts', 'easy_language_add_styles_and_js_admin', PHP_INT_MAX );

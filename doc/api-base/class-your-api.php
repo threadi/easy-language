@@ -244,38 +244,20 @@ class Your_Api extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return list of active language-mappings.
+	 * Return API URL.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	public function get_active_language_mapping(): array {
-		$result = array();
+	public function get_api_url(): string {
+		return '';
+	}
 
-		// get actual enabled source-languages.
-		$source_languages = $this->get_supported_source_languages();
-
-		// get actual enabled target-languages.
-		$target_languages = $this->get_supported_target_languages();
-
-		// get mapping.
-		$mappings = $this->get_mapping_languages();
-
-		/**
-		 * Loop through the source-languages,
-		 * check the mapping target-languages for each
-		 * and if they are active - if yes, add them to list.
-		 */
-		foreach( $source_languages as $source_language => $enabled ) {
-			if( !empty($mappings[$source_language]) ) {
-				foreach( $mappings[$source_language] as $language ) {
-					if( !empty($target_languages[$language]) ) {
-						$result[$source_language] = $language;
-					}
-				}
-			}
-		}
-
-		// return resulting mapping for active languages.
-		return $result;
+	/**
+	 * Return request-object for this API.
+	 *
+	 * @return Request
+	 */
+	public function get_request_object() {
+		return new Request();
 	}
 }

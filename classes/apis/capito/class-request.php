@@ -1,11 +1,11 @@
 <?php
 /**
- * File for handler for each request to SUMM AI API.
+ * File for handler for each request to Capito API.
  *
  * @package easy-language
  */
 
-namespace easyLanguage\Apis\Summ_Ai;
+namespace easyLanguage\Apis\Capito;
 
 use easyLanguage\Log_Api;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
@@ -16,7 +16,7 @@ use wpdb;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * Create and send request to summ-ai API. Gets the response.
+ * Create and send request to Capito API. Gets the response.
  */
 class Request {
 
@@ -66,25 +66,11 @@ class Request {
 	private array|WP_Error $result;
 
     /**
-     * The request method. Defaults to POST.
+     * The request method. Defaults to PUT.
      *
      * @var string
      */
-    private string $method = 'POST';
-
-    /**
-     * The input_text_type for the request.
-     *
-     * @var string
-     */
-    private string $text_type = 'plain_text';
-
-    /**
-     * Separator which is used to split compound, e.g. "Bundes-Kanzler".
-     *
-     * @var string
-     */
-    private string $separator = 'interpunct';
+    private string $method = 'PUT';
 
 	/**
 	 * Target-language for this request.
@@ -122,18 +108,18 @@ class Request {
 	private float $duration = 0;
 
 	/**
-	 * Marker if this is just a test.
-	 *
-	 * @var bool
-	 */
-	private bool $is_test = false;
-
-	/**
 	 * Source-language for this request.
 	 *
 	 * @var string
 	 */
 	private string $source_language;
+
+	/**
+	 * The token used for this request.
+	 *
+	 * @var string
+	 */
+	private string $token;
 
 	/**
 	 * Constructor.
@@ -145,7 +131,7 @@ class Request {
 		$this->wpdb = $wpdb;
 
 		// table for requests and responses.
-		$this->table_requests = DB::get_instance()->get_wpdb_prefix() . 'easy_language_summ_ai';
+		$this->table_requests = DB::get_instance()->get_wpdb_prefix() . 'easy_language_capito';
 	}
 
 	/**
@@ -188,25 +174,18 @@ class Request {
 		}
 
 		// bail if no text for translation is given.
-		if ( ! $this->has_text() ) {
+		if ( 'PUT' === $this->get_method() && ! $this->has_text() ) {
 			return;
 		}
 
-		// get summ_ai-object.
-		$summ_ai_obj = Summ_AI::get_instance();
-
-		// map target language.
-		$request_target_language = 'easy';
-		$supported_target_languages = $summ_ai_obj->get_supported_target_languages();
-		if( !empty($this->target_language) && !empty($supported_target_languages[$this->target_language]) && !empty($supported_target_languages[$this->target_language]['api_value']) ) {
-			$request_target_language = $supported_target_languages[$this->target_language]['api_value'];
-		}
+		// get capito-object.
+		$capito_obj = Capito::get_instance();
 
 		// merge header-array.
 		$headers = array_merge(
 			$this->header,
 			array(
-				'Authorization' => 'Token: '.get_option(EASY_LANGUAGE_HASH),
+				'Authorization' => 'Bearer '.$this->token,
 			)
 		);
 
@@ -222,14 +201,11 @@ class Request {
 		// set request data.
 		$data = array();
 
-        // set request-data for POST.
-        if( 'POST' === $this->get_method() ) {
-            $data['input_text']             = $this->get_text();
-            $data['input_text_type']        = $this->get_text_type();
-            $data['user']                   = $summ_ai_obj->get_contact_email();
-            $data['is_test']                = false;
-            $data['separator']              = $this->get_separator();
-	        $data['output_language_level']  = $request_target_language;
+        // set request-data for PUT.
+        if( 'PUT' === $this->get_method() ) {
+            $data['content']                = $this->get_text();
+            $data['locale']                 = $this->get_source_language();
+	        $data['proficiency']            = $this->get_target_language();
             $args['body']                   = wp_json_encode($data);
         }
 
@@ -256,7 +232,7 @@ class Request {
 
 		// log the request (with anonymized token).
 		$args['headers']['Authorization'] = 'anonymized';
-        Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, print_r( $args, true ), print_r( 'HTTP-Status: '.$this->get_http_status().'<br>'.$this->response, true ) );
+        Log_Api::get_instance()->add_log( $capito_obj->get_name(), $this->http_status, print_r( $args, true ), print_r( 'HTTP-Status: '.$this->get_http_status().'<br>'.$this->response, true ) );
 
 		// save request and result in db.
 		$this->save_in_db();
@@ -308,38 +284,6 @@ class Request {
         return $this->method;
     }
 
-    /**
-     * Get text_type for request.
-     *
-     * @return string
-     */
-    public function get_separator(): string {
-        return $this->separator;
-    }
-
-    /**
-     * Get text_type for request.
-     *
-     * @return string
-     */
-    public function get_text_type(): string {
-        return $this->text_type;
-    }
-
-    /**
-     * Set text_type for request.
-     *
-     * @param string $type
-     *
-     * @return void
-     * @noinspection PhpUnused
-     */
-    public function set_text_type( string $type ): void {
-        if( in_array( $type, array('html', 'plain_text'), true ) ) {
-            $this->text_type = $type;
-        }
-    }
-
 	/**
 	 * Set target-language for this request.
 	 *
@@ -349,6 +293,15 @@ class Request {
 	 */
 	public function set_target_language( $lang ): void {
 		$this->target_language = $lang;
+	}
+
+	/**
+	 * Get source-language for this request.
+	 *
+	 * @return string
+	 */
+	public function get_source_language(): string {
+		return $this->source_language;
 	}
 
 	/**
@@ -391,12 +344,32 @@ class Request {
 	}
 
 	/**
-	 * Set this as test.
+	 * Return the target language for this request.
 	 *
-	 * @param bool $is_test true if this request is a test.
+	 * @return string
+	 */
+	private function get_target_language(): string {
+		return $this->target_language;
+	}
+
+	/**
+	 * Set token for the request.
+	 *
+	 * @param string $token The token to use for the request.
 	 * @return void
 	 */
-	public function set_is_test( bool $is_test ): void {
-		$this->is_test = $is_test;
+	public function set_token( string $token ): void {
+		$this->token = $token;
+	}
+
+	/**
+	 * Set method for the request.
+	 *
+	 * @param string $string
+	 *
+	 * @return void
+	 */
+	public function set_method( string $string ): void {
+		$this->method = $string;
 	}
 }

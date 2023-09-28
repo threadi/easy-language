@@ -141,4 +141,77 @@ class Base {
 	public function has_settings(): bool {
 		return false;
 	}
+
+	/**
+	 * Return if test mode for this API is active or not.
+	 *
+	 * @return bool
+	 */
+	public function is_test_mode_active(): bool {
+		return false;
+	}
+
+	/**
+	 * Return request object.
+	 *
+	 * @return bool
+	 * @noinspection PhpMissingReturnTypeInspection
+	 */
+	public function get_request_object() {
+		return false;
+	}
+
+	/**
+	 * Return list of active language-mappings.
+	 *
+	 * @return array
+	 */
+	public function get_active_language_mapping(): array {
+		$result = array();
+
+		// get actual enabled source-languages.
+		$source_languages = $this->get_active_source_languages();
+
+		// get actual enabled target-languages.
+		$target_languages = $this->get_active_target_languages();
+
+		// get mapping.
+		$mappings = $this->get_mapping_languages();
+
+		/**
+		 * Loop through the source-languages,
+		 * check the mapping target-languages for each
+		 * and if they are active - if yes, add them to list.
+		 */
+		foreach( $source_languages as $source_language => $enabled ) {
+			if( !empty($mappings[$source_language]) ) {
+				foreach( $mappings[$source_language] as $language ) {
+					if( !empty($target_languages[$language]) ) {
+						$result[$source_language][] = $language;
+					}
+				}
+			}
+		}
+
+		// return resulting list.
+		return $result;
+	}
+
+	/**
+	 * Return active source languages.
+	 *
+	 * @return array
+	 */
+	public function get_active_source_languages(): array {
+		return array();
+	}
+
+	/**
+	 * Return active target languages.
+	 *
+	 * @return array
+	 */
+	public function get_active_target_languages(): array {
+		return array();
+	}
 }

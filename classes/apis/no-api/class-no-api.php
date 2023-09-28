@@ -9,12 +9,6 @@ namespace easyLanguage\Apis\No_Api;
 
 use easyLanguage\Base;
 use easyLanguage\Api_Base;
-use easyLanguage\Helper;
-use easyLanguage\Multilingual_Plugins;
-use easyLanguage\Multilingual_plugins\Easy_Language\Db;
-use easyLanguage\Transients;
-use WP_User;
-use wpdb;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) exit;
@@ -123,4 +117,13 @@ class No_Api extends Base implements Api_Base {
 	}
 
 	public function cli(): void {}
+
+	/**
+	 * Return API URL.
+	 *
+	 * @return string
+	 */
+	public function get_api_url(): string {
+		return '';
+	}
 }

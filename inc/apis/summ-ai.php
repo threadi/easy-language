@@ -1,8 +1,8 @@
 <?php
 /**
- * File to add summ-ai API with minimal usage.
+ * File to add SUMM AI API with minimal usage.
  *
- * @package easy-language.
+ * @package easy-language
  */
 
 use easyLanguage\Apis\Summ_Ai\Summ_AI;
@@ -17,4 +17,4 @@ function easy_language_register_summ_ai_api( array $api_list ): array {
 	$api_list[] = Summ_AI::get_instance();
 	return $api_list;
 }
-add_filter( 'easy_language_register_api', 'easy_language_register_summ_ai_api', 10 );
+add_filter( 'easy_language_register_api', 'easy_language_register_summ_ai_api', 20 );

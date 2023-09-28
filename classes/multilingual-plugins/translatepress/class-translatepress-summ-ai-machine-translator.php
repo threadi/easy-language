@@ -7,7 +7,7 @@
 
 namespace easyLanguage\Multilingual_plugins\TranslatePress;
 
-use easyLanguage\Apis\Summ_Ai\Request;
+use easyLanguage\Apis;
 use TRP_Machine_Translator;
 use WP_Error;
 
@@ -29,7 +29,7 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 	private bool $is_test = false;
 
 	/**
-	 * Send request to summ ai
+	 * Send request to summ ai.
 	 *
 	 * @param string $source_language       Translate from language.
 	 * @param string $language_code         Translate to language.
@@ -40,14 +40,22 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function send_request( $source_language, $language_code, $string_to_translate ): WP_Error|array {
+		// get SUMM AI API-object.
+		$api_object = Apis::get_instance()->get_active_api();
+		if( false === $api_object || 'summ_ai' !== $api_object->get_name() ) {
+			return new WP_Error( 'error', __( 'No active SUMM AI API!', 'easy-language' ) );
+		}
+
 		// send request.
-		$request = new Request();
-		$request->set_token( $this->get_api_key() );
-		$request->set_url( EASY_LANGUAGE_SUMM_AI_API_URL );
-		$request->set_is_test( $this->is_test );
-		$request->set_text( $string_to_translate );
-		$request->send();
-		return $request->get_result();
+		$request_obj = $api_object->get_request_object();
+		$request_obj->set_url( $api_object->get_api_url() );
+		$request_obj->set_is_test( $this->is_test );
+		$request_obj->set_text( $string_to_translate );
+		$request_obj = apply_filters( 'easy_language_summ_ai_request_object', $request_obj );
+		$request_obj->send();
+
+		// return request result.
+		return $request_obj->get_result();
 	}
 
 	/**
@@ -135,25 +143,29 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 	}
 
 	/**
-	 * Get the api key.
+	 * Return placebo string for API key for compatibility with translatepress.
 	 *
 	 * @return string
 	 */
 	public function get_api_key(): string {
-		return isset( $this->settings['trp_machine_translation_settings'], $this->settings['trp_machine_translation_settings']['summ-ai-key'] ) ? $this->settings['trp_machine_translation_settings']['summ-ai-key'] : false;
+		return 'placebo';
 	}
 
 	/**
-	 * Return supported languages: only Leichte Sprache.
+	 * Return supported languages.
 	 *
 	 * @return array
 	 */
 	public function get_supported_languages(): array {
-		return array( 'de_DE', 'ls_ls' );
+		return array(
+			'de_DE' => 'de',
+			'de_EL' => 'de',
+			'de_LS' => 'de'
+		);
 	}
 
 	/**
-	 * Return list of languages this engine supports: only Leichte Sprache.
+	 * Return list of languages this engine supports.
 	 *
 	 * @param array $languages List of languages.
 	 * @return array
@@ -161,13 +173,14 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 	 */
 	public function get_engine_specific_language_codes( array $languages ): array {
 		return array(
-			'de_DE' => 'de_DE',
-			'ls_ls' => 'ls_ls',
+			'de_DE' => 'de',
+			'de_EL' => 'de',
+			'de_LS' => 'de'
 		);
 	}
 
 	/**
-	 * Summ-ai does not support formality yet, but we need this for the machine translation tab to show the unsupported languages for formality
+	 * We do not support formality yet, but we need this for the machine translation tab to show the unsupported languages for formality
 	 *
 	 * @return array
 	 */
@@ -178,44 +191,12 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 	/**
 	 * Check for key-validity.
 	 *
-	 * @return array|mixed|null
+	 * @return array
 	 */
-	public function check_api_key_validity(): mixed {
-		$machine_translator = $this;
-		$translation_engine = $this->settings['trp_machine_translation_settings']['translation-engine'];
-		$api_key            = $machine_translator->get_api_key();
-
-		$is_error       = false;
-		$return_message = '';
-
-		if ( 'summ-ai' === $translation_engine && 'yes' === $this->settings['trp_machine_translation_settings']['machine-translation'] ) {
-
-			if ( isset( $this->correct_api_key ) && null !== $this->correct_api_key ) {
-				return $this->correct_api_key;
-			}
-
-			if ( empty( $api_key ) ) {
-				$is_error       = true;
-				$return_message = __( 'Please enter your summ ai key.', 'easy-language' );
-			} else {
-				// Perform test.
-				$response = $machine_translator->test_request();
-				$code     = wp_remote_retrieve_response_code( $response );
-				if ( 200 !== $code ) {
-					$is_error           = true;
-					$translate_response = trp_gt_response_codes( $code );
-					$return_message     = $translate_response['message'];
-				}
-			}
-			$this->correct_api_key = array(
-				'message' => $return_message,
-				'error'   => $is_error,
-			);
-		}
-
+	public function check_api_key_validity(): array {
 		return array(
-			'message' => $return_message,
-			'error'   => $is_error,
+			'message' => '',
+			'error'   => false,
 		);
 	}
 }

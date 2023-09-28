@@ -62,11 +62,11 @@ class Languages {
 			return $api_obj->get_active_target_languages();
 		}
 
-        // if no API is active, get the list from plugin-settings.
+        // if no API with own settings is active, get the list from plugin-settings.
         $list = array();
 		$settings_language = array();
 		foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
-			$settings_language = $plugin_obj->get_supported_languages();
+			$settings_language = $settings_language + $plugin_obj->get_supported_languages();
 		}
         foreach( $settings_language as $language => $enabled ) {
             $list[$language] = $this->get_possible_target_languages()[$language];
@@ -117,14 +117,14 @@ class Languages {
 		        'de_EL' => array(
 			        'label' => __( 'Einfache Sprache', 'easy-language'),
 			        'enabled' => true,
-			        'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language'),
-			        'url' => 'de_el',
+			        'description' => '', // __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language'),
+			        'url' => 'de_el'
 		        ),
 	            'de_LS' => array(
-	                'label' => __( 'Leichte Sprache', 'easy-language'),
+	                'label' => 'Leichte Sprache', //__( 'Leichte Sprache', 'easy-language'),
 	                'enabled' => true,
-	                'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language'),
-	                'url' => 'de_ls',
+	                'description' => '', //__( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language'),
+	                'url' => 'de_ls'
 	            )
 	        )
         );

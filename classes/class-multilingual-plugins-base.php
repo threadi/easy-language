@@ -46,4 +46,11 @@ interface Multilingual_Plugins_Base {
 	 * @return array
 	 */
 	public function get_supported_languages(): array;
+
+	/**
+	 * Get styles and scripts of the plugin.
+	 *
+	 * @return void
+	 */
+	public function get_translations_script(): void;
 }

@@ -51,20 +51,9 @@ class Multilingual_Plugins
     /**
      * Return available multilingual plugin-supports.
      *
-     * This should be only one plugin: our easy-language.
-     * If another one is active, remove easy-language from list.
-     *
      * @return array
      */
     public function get_available_plugins(): array {
-        $plugins = apply_filters( 'easy_language_register_plugin', array() );
-        if( count($plugins) > 1 ) {
-            foreach( $plugins as $index => $plugin_obj ) {
-                if( false === $plugin_obj->is_foreign_plugin() ) {
-                    unset($plugins[$index]);
-                }
-            }
-        }
-        return $plugins;
+        return apply_filters( 'easy_language_register_plugin', array() );
     }
 }

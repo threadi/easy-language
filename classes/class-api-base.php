@@ -26,6 +26,13 @@ interface Api_Base {
 	 */
 	public function get_supported_target_languages(): array;
 
+	/**
+	 * Get the list of active source languages.
+	 *
+	 * @return array
+	 */
+	public function get_active_source_languages(): array;
+
     /**
      * Get the list of active target languages.
      *
@@ -131,4 +138,18 @@ interface Api_Base {
 	 * @return void
 	 */
 	public function cli(): void;
+
+	/**
+	 * Return API URL.
+	 *
+	 * @return string
+	 */
+	public function get_api_url(): string;
+
+	/**
+	 * Return the Request-object for this API.
+	 *
+	 * @return mixed
+	 */
+	public function get_request_object();
 }

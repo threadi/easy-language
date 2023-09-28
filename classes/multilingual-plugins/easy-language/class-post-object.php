@@ -440,6 +440,11 @@ class Post_Object implements Easy_Language_Object {
 			$return_array['status'] = 'exceeded';
 		}
 
+		// if unlimited-marker is set, set status to ok.
+		if( !empty($quota_array['unlimited']) ) {
+			$return_array['status'] = 'ok';
+		}
+
 		// return ok.
 		return $return_array;
 	}

@@ -60,14 +60,6 @@ function easy_language_admin_add_settings_api(): void {
 		$apis[$api_obj->get_name()] = $api_obj;
 	}
 
-	// get list of available plugins and check if they support APIs.
-	$supports_api = false;
-	foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
-		if( $plugin_obj->is_supporting_apis() ) {
-			$supports_api = true;
-		}
-	}
-
 	// API-Chooser.
 	if (!empty($apis)) {
 		add_settings_field(
@@ -81,7 +73,6 @@ function easy_language_admin_add_settings_api(): void {
 				'fieldId' => 'easy_language_api',
 				'description' => __('Please choose the API you want to use to translate your website.', 'easy-language'),
 				'options' => $apis,
-				'readonly' => !$supports_api,
 				'disable_empty' => true
 			)
 		);

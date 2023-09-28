@@ -23,9 +23,7 @@ class Cli
      */
     public function trp_reset_translations(): void
     {
-        if (helper::is_plugin_active('translatepress-multilingual/index.php')) {
-            easy_language_trp_reset_translations();
-        }
+        easy_language_trp_reset_translations();
 
         // return ok-message.
         \WP_CLI::success("All TranslatePress-translations has been reset.");

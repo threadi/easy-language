@@ -161,3 +161,12 @@ body .text-translations-table #source_language, body .text-translations-table #t
 .easy-language-choose-api .form-table th { display: none }
 
 .easy-language-choose-api .form-table td { padding-left: 0 }
+
+.easy-language-transient .notice-dismiss:before {
+	display: inline-block;
+	float: right;
+}
+
+.easy-language-transient .notice-dismiss:hover {
+	color: #d63638;
+}

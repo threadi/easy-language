@@ -45,7 +45,7 @@ class Log_Api_Table extends WP_List_Table {
 		// set the table-name.
 		$this->table_name = DB::get_instance()->get_wpdb_prefix() . 'easy_language_log';
 
-		// call parent constructor
+		// call parent constructor.
 		parent::__construct();
 	}
 
@@ -58,7 +58,7 @@ class Log_Api_Table extends WP_List_Table {
 		return array(
 			'state' => __('state', 'easy-language'),
 			'date' => __('date', 'easy-language'),
-			'api' => __('log', 'easy-language'),
+			'api' => __('API', 'easy-language'),
 			'request' => __('request', 'easy-language'),
 			'response' => __('response', 'easy-language')
 		);
@@ -70,11 +70,13 @@ class Log_Api_Table extends WP_List_Table {
 	 * @return array
 	 */
 	private function table_data(): array {
+		$orderby = (isset($_REQUEST['orderby']) && in_array($_REQUEST['orderby'], array_keys($this->get_sortable_columns()))) ? $_REQUEST['orderby'] : 'date';
+		$order = (isset($_REQUEST['order']) && in_array($_REQUEST['order'], array('asc', 'desc'))) ? $_REQUEST['order'] : 'desc';
 		$sql = '
             SELECT `state`, `time` AS `date`, `request`, `response`, `api`
             FROM `'.$this->table_name.'`
-            ORDER BY `time` DESC';
-		return $this->wpdb->get_results( $sql, ARRAY_A );
+            ORDER BY %1$s %2$s';
+		return $this->wpdb->get_results( $this->wpdb->prepare( $sql, array( $orderby, $order ) ), ARRAY_A );
 	}
 
 	/**
@@ -106,7 +108,7 @@ class Log_Api_Table extends WP_List_Table {
 	 * @return array
 	 */
 	public function get_sortable_columns(): array {
-		return ['date' => ['date', false]];
+		return array( 'date' => array( 'time', false ) );
 	}
 
 	/**
@@ -115,24 +117,25 @@ class Log_Api_Table extends WP_List_Table {
 	 * @param  array $item        Data
 	 * @param  String $column_name - Current column name
 	 *
-	 * @return mixed
+	 * @return string
 	 * @noinspection PhpMissingReturnTypeInspection
 	 * @noinspection PhpSwitchCanBeReplacedWithMatchExpressionInspection
 	 */
 	public function column_default( $item, $column_name ) {
 		switch( $column_name ) {
 			case 'date':
-				return Helper::get_format_date_time($item[ $column_name ]);
+				return wp_kses_post(Helper::get_format_date_time($item[ $column_name ]));
 
+			case 'api':
 			case 'state':
-				return $item[ $column_name ];
+				return wp_kses_post($item[ $column_name ]);
 
 			case 'request':
 			case 'response':
-				return nl2br($item[ $column_name ]);
+				return wp_kses_post(nl2br($item[ $column_name ]));
 
 			default:
-				return print_r( $item, true ) ;
+				return wp_kses_post(print_r( $item, true ));
 		}
 	}
 }

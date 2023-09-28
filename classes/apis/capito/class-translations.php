@@ -1,13 +1,14 @@
 <?php
 /**
- * File for translations-handling of the SUMM AI API.
+ * File for translations-handling of the Capito API.
  *
  * @package easy-language
  */
 
-namespace easyLanguage\Apis\Summ_Ai;
+namespace easyLanguage\Apis\Capito;
 
 use easyLanguage\Api_Base;
+use easyLanguage\Languages;
 use easyLanguage\Multilingual_Plugins;
 
 // prevent direct access.
@@ -98,15 +99,18 @@ class Translations {
      * @noinspection PhpUnused
      */
     public function call_api( string $text_to_translate, string $source_language, string $target_language ): array {
+		// map the languages with its shorthand (e.g. de_DE => de).
+	    $source_language = $this->init->get_supported_source_languages()[$source_language]['api_value'];
+	    $target_language = $this->init->get_supported_target_languages()[$target_language]['api_value'];
+
 		// build request.
         $request_obj = $this->init->get_request_object();
+		$request_obj->set_token( $this->init->get_token() );
 	    $request_obj->set_url( $this->init->get_api_url() );
 	    $request_obj->set_text( $text_to_translate );
-	    $request_obj->set_text_type( 'plain_text' );
-	    $request_obj->set_is_test( $this->init->is_test_mode_active() );
 	    $request_obj->set_source_language( $source_language );
 	    $request_obj->set_target_language( $target_language );
-	    $request_obj = apply_filters( 'easy_language_summ_ai_request_object', $request_obj );
+	    $request_obj = apply_filters( 'easy_language_capito_request_object', $request_obj );
 	    $request_obj->send();
 
         // return result depending on http-status.
@@ -118,17 +122,12 @@ class Translations {
             $request_array = json_decode( $response, true );
 
 			// get translated text.
-	        $translated_text = apply_filters( 'easy_language_translated_text', $request_array['translated_text'], $request_array, $this );
-
-			// save character-count to quota if answer does not contain "no_count".
-	        if( empty($request_array['no_count']) ) {
-		        update_option( 'easy_language_summ_ai_quota', absint( get_option( 'easy_language_summ_ai_quota', 0 ) ) + strlen( $text_to_translate ) );
-	        }
+	        $translated_text = apply_filters( 'easy_language_translated_text', $request_array['content'], $request_array, $this );
 
             // return translation to plugin which will save it.
             return array(
                 'translated_text' => $translated_text,
-                'jobid' => absint($request_array['jobid'])
+                'jobid' => 0
             );
         }
 

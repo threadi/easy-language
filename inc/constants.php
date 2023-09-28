@@ -14,6 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 const EASY_LANGUAGE_SUMM_AI_API_URL = 'http://dev4.laolaweb.com/summaiproxy/index.php';
 
 /**
+ * Capito API URL for translations.
+ */
+const EASY_LANGUAGE_CAPITO_API_URL = 'https://api.capito.ai/simplification';
+
+/**
+ * Capito API URL for quotas.
+ */
+const EASY_LANGUAGE_CAPITO_API_URL_QUOTA = 'https://api.capito.ai/shop/me/quotas';
+
+/**
  * Set transient-based hints for the backend.
  */
 const EASY_LANGUAGE_TRANSIENTS = array(
@@ -49,7 +59,13 @@ const EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING = 'easy_language_translate_running'
 const EASY_LANGUAGE_HASH = 'easy_language_hash';
 
 /**
- * Quota for free plugin.
+ * Quota for SUMM AI in free plugin.
  * Changes will not work as this is also checked by API.
  */
 const EASY_LANGUAGE_SUMM_AI_QUOTA = 18000;
+
+/**
+ * Quota for Capito API.
+ * Changes will not work as this is also checked by API.
+ */
+const EASY_LANGUAGE_CAPITO_QUOTA = 1000000;
