@@ -3,8 +3,7 @@ ToDo
 
 Funktionales
 ------------
-* parallel andere Übersetzungsplugins erlauben für Mehrsprachigkeit (Englisch + Deutsch + Leichte Sprache)
-* Sprachwechsel für Elementor und andere PageBuilder
+* Sprachwechsel im Frontend durchtesten & für Elementor und andere PageBuilder ergänzen
 * Kompatibilität mit Plugins testen
 -> Caching-Plugins
 -> Order-Plugins

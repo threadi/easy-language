@@ -8,6 +8,8 @@
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
 use easyLanguage\Apis;
+use easyLanguage\Base;
+use easyLanguage\Multilingual_Plugins;
 use WP_Post;
 
 // prevent direct access.
@@ -25,7 +27,14 @@ class Pagebuilder_Support {
      */
     private static ?Pagebuilder_Support $instance = null;
 
-    /**
+	/**
+	 * Instance of initializing object.
+	 *
+	 * @var Base
+	 */
+	private Base $init;
+
+	/**
      * Constructor for this object.
      */
     private function __construct() {}
@@ -48,12 +57,17 @@ class Pagebuilder_Support {
         return static::$instance;
     }
 
-    /**
-     * Initialize pagebuilder-support for our own plugin.
-     *
-     * @return void
-     */
-    public function init(): void {
+	/**
+	 * Initialize pagebuilder-support for our own plugin.
+	 *
+	 * @param Base $init
+	 *
+	 * @return void
+	 */
+    public function init( Base $init ): void {
+		// secure initializing object.
+		$this->init = $init;
+
         // add meta-box.
         add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
     }
@@ -66,6 +80,11 @@ class Pagebuilder_Support {
      * @return void
      */
     public function add_meta_box( string $post_type ): void {
+		// bail if support for our own languages is handled by other multilingual plugin.
+		if( Multilingual_Plugins::get_instance()->is_plugin_with_support_for_given_languages_enabled( $this->init->get_supported_languages() ) ) {
+			return;
+		}
+
         // only for supported post-types.
         $post_types = Init::get_instance()->get_supported_post_types();
         if ( !empty( $post_types[$post_type] ) ) {

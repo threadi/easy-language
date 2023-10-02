@@ -1,24 +1,19 @@
 <?php
 /**
- * File for initializing the easy-language-own translations.
+ * File for initializing polylang support.
  *
  * @package easy-language
  */
 
 namespace easyLanguage\Multilingual_plugins\Polylang;
 
-use easyLanguage\Apis;
 use easyLanguage\Base;
-use easyLanguage\Helper;
 use easyLanguage\Languages;
 use easyLanguage\Multilingual_Plugins_Base;
 use easyLanguage\Transients;
-use PLL_Admin_Model;
-use WP_Admin_Bar;
-use WP_Query;
 
 /**
- * Rewrite-Handling for this plugin.
+ * Object to handle polylang support.
  */
 class Init extends Base implements Multilingual_Plugins_Base {
 
@@ -74,9 +69,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
     public function init(): void {
 		// hooks for polylang.
         add_filter( 'pll_predefined_languages', array( $this, 'add_predefined_language' ) );
+		add_filter( 'pll_predefined_flags', array( $this, 'add_flag' ) );
+	    add_filter( 'pll_flag', array( $this, 'get_flag' ), 10, 2 );
 
 	    // disable transients on polylang-deactivation.
-	    add_action( 'deactivate_sitepress-multilingual-cms/sitepress.php', array( $this, 'foreign_deactivate') );
+	    add_action( 'deactivate_polylang/polylang.php', array( $this, 'foreign_deactivate') );
     }
 
     /**
@@ -84,22 +81,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
      *
      * @return void
      */
-    public function install(): void {
-        if( class_exists('PLL_Admin_Model') ) {
-            $options = get_option('polylang');
-            $pll = new PLL_Admin_Model($options);
-	        foreach( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
-		        $lang = array(
-			        'name'       => $language['label'],
-			        'slug'       => 'ls',
-			        'locale'     => $language_code,
-			        'rtl'        => 0,
-			        'term_group' => 0,
-		        );
-		        $pll->add_language( $lang );
-	        }
-        }
-    }
+    public function install(): void {}
 
 	/**
 	 * Add predefined languages.
@@ -111,11 +93,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
     public function add_predefined_language( $languages ): array {
 	    foreach( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
 		    $languages[$language_code] = array(
-			    'code'     => 'ls',
+			    'code'     => $language['url'],
 			    'locale'   => $language_code,
 			    'name'     => $language['label'],
 			    'dir'      => 'ltr',
-			    'flag'     => 'ls',
+			    'flag'     => $language_code,
 			    'facebook' => $language_code,
 		    );
 	    }
@@ -146,7 +128,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	public function deactivation(): void {}
 
 	/**
-	 * Run on deactivation of translatepress.
+	 * Run on deactivation of polylang.
 	 *
 	 * @return void
 	 */
@@ -159,5 +141,86 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// delete it.
 		$transient_obj->delete();
+	}
+
+	/**
+	 * We add no translation-scripts for polylang.
+	 *
+	 * @return void
+	 */
+	public function get_translations_script(): void {}
+
+	/**
+	 * Add our custom flags for supported languages.
+	 *
+	 * @param array $flags
+	 *
+	 * @return array
+	 */
+	public function add_flag( array $flags ): array {
+		foreach( Languages::get_instance()->get_possible_target_languages() as $language_code => $language ) {
+			$flags[$language_code] = $language['label'];
+		}
+		return $flags;
+	}
+
+	/**
+	 * Get our custom flags for supported languages.
+	 *
+	 * @param array $flag
+	 * @param string $code
+	 *
+	 * @return array
+	 */
+	public function get_flag( array $flag, string $code ): array {
+		// short-return if it is not one of our own language-codes.
+		$languages = Languages::get_instance()->get_possible_target_languages();
+		if ( empty($languages[$code]) ) {
+			return $flag;
+		}
+
+		global $wp_filesystem;
+
+		// set URL.
+		$flag['url'] = plugins_url( 'gfx/'.$code.'.png', EASY_LANGUAGE );
+
+		// get file for base64.
+		$file = plugin_dir_path( EASY_LANGUAGE ) . 'gfx/'.$code.'.png';
+		WP_Filesystem();
+		$file_contents = $wp_filesystem->get_contents( $file );
+
+		// return attribute if file-content is empty.
+		if ( empty( $file_contents ) ) {
+			return $flag;
+		}
+
+		// set src for flag.
+		$flag['src'] = 'data:image/png;base64,' . base64_encode( $file_contents );
+
+		// return result.
+		return $flag;
+	}
+
+	/**
+	 * Return list of active languages in polylang.
+	 *
+	 * @return array
+	 */
+	public function get_active_languages(): array {
+		// bail if polylang is not active.
+		if( !function_exists('PLL') ) {
+			return array();
+		}
+
+		// initialize the list to return.
+		$languages = array();
+
+		// loop through the languages activated in polylang.
+		foreach( PLL()->model->get_languages_list() as $language ) {
+			$languages[$language->get_locale()] = "1";
+		}
+
+		// return resulting list of locales (e.g. "de_EL").
+		return $languages;
 	}
 }

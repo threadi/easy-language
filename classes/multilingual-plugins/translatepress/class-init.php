@@ -10,6 +10,7 @@ namespace easyLanguage\Multilingual_plugins\TranslatePress;
 use easyLanguage\Base;
 use easyLanguage\Multilingual_Plugins_Base;
 use easyLanguage\Transients;
+use TRP_Translate_Press;
 
 /**
  * Rewrite-Handling for this plugin.
@@ -145,4 +146,26 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return void
 	 */
 	public function get_translations_script(): void {}
+
+	/**
+	 * Return list of active languages this plugin is using atm.
+	 *
+	 * @return array
+	 */
+	public function get_active_languages(): array {
+		// get settings from translatepress.
+		$trp = TRP_Translate_Press::get_trp_instance();
+		$trp_query = $trp->get_component( 'settings' );
+
+		// initialize the list to return.
+		$languages = array();
+
+		// loop through the languages activated in WPML.
+		foreach( $trp_query->get_setting( 'translation-languages') as $language ) {
+			$languages[$language] = "1";
+		}
+
+		// return resulting list of locales (e.g. "de_EL").
+		return $languages;
+	}
 }

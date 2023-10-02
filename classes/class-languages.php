@@ -50,7 +50,7 @@ class Languages {
 	 * Get actual supported languages.
      *
      * If an API is active, use their supported languages if they can be configured.
-     * If no API is active, use settings.
+     * If no API is active, use plugin settings.
 	 *
 	 * @return array
 	 */

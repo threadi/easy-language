@@ -1,0 +1,12 @@
+<wpml-config>
+    <custom-types>
+        <custom-type translate="0">lel_lang_switcher</custom-type>
+    </custom-types>
+	<custom-term-fields>
+		<custom-term-field action="ignore">easy_language_source_language</custom-term-field>
+		<custom-term-field action="ignore">easy_language_text_language</custom-term-field>
+		<custom-term-field action="ignore">easy_language_translated_in </custom-term-field>
+		<custom-term-field action="ignore">easy_language_translation_language</custom-term-field>
+		<custom-term-field action="ignore">easy_language_translation_original_id </custom-term-field>
+	</custom-term-fields>
+</wpml-config>

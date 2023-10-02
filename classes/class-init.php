@@ -68,7 +68,7 @@ class Init {
 
         // initialize the multilingual-plugins.
         foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
-            $plugin_obj->init();
+			$plugin_obj->init();
         }
 
         // general hooks.
@@ -139,14 +139,13 @@ class Init {
 				/**
 				 * Show hint if the foreign plugin does NOT support apis.
 				 */
+				/* translators: %1$s will be replaced by the name of the multilingual-plugin */
+				$message = sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional language.', 'easy-language' ), $plugin_obj->get_title() );
 				if( false === $plugin_obj->is_supporting_apis() ) {
 					/* translators: %1$s will be replaced by the name of the multilingual-plugin */
-					$transient_obj->set_message( sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional language. Due to limitations of this plugin, it is unfortunately not possible for us to provide automatic translation for plain language. If you want to use this, deactivate %1$s and use only our plugin for this.', 'easy-language' ), $plugin_obj->get_title() ) );
+					$message .= '<br><br>'.sprintf( __('Due to limitations of this plugin, it is unfortunately not possible for us to provide automatic translation for plain language. If you want to use this, deactivate %1$s and use only the <i>Easy Language</i> plugin for this.', 'easy-language' ), $plugin_obj->get_title() );
 				}
-				else {
-					/* translators: %1$s will be replaced by the name of the multilingual-plugin */
-					$transient_obj->set_message( sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain Language to this plugin as additional language.', 'easy-language' ), $plugin_obj->get_title() ) );
-				}
+				$transient_obj->set_message( $message );
 				$transient_obj->save();
 			}
 		}

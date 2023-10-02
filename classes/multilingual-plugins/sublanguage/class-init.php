@@ -1,23 +1,20 @@
 <?php
 /**
- * File for initializing the easy-language-own translations.
+ * File for initializing the sublanguage-support.
  *
  * @package easy-language
  */
 
 namespace easyLanguage\Multilingual_plugins\Sublanguage;
 
-use easyLanguage\Apis;
 use easyLanguage\Base;
-use easyLanguage\Helper;
 use easyLanguage\Languages;
 use easyLanguage\Multilingual_Plugins_Base;
 use easyLanguage\Transients;
-use WP_Admin_Bar;
 use WP_Query;
 
 /**
- * Rewrite-Handling for this plugin.
+ * Object to handle the sublanguage-support.
  */
 class Init extends Base implements Multilingual_Plugins_Base {
 
@@ -75,7 +72,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
         add_action( 'admin_init', array( $this, 'wp_init' ) );
 
 	    // disable transients on sublanguage-deactivation.
-	    add_action( 'deactivate_sitepress-multilingual-cms/sitepress.php', array( $this, 'foreign_deactivate') );
+	    add_action( 'deactivate_sublanguage/sublanguage.php', array( $this, 'foreign_deactivate') );
     }
 
     /**
@@ -95,6 +92,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
             $query = array(
                 'post_type' => 'language',
                 'title' => $language['label'],
+				'post_status' => array( 'any', 'trash' ),
                 'fields' => 'ids'
             );
             $results = new WP_Query( $query );
@@ -134,7 +132,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	public function deactivation(): void {}
 
 	/**
-	 * Run on deactivation of translatepress.
+	 * Run on deactivation of sublanguage.
 	 *
 	 * @return void
 	 */
@@ -148,4 +146,36 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// delete it.
 		$transient_obj->delete();
 	}
+
+	/**
+	 * Return list of active languages this plugin is using atm.
+	 *
+	 * @return array
+	 */
+	public function get_active_languages(): array {
+		// define return array-list.
+		$languages = array();
+
+		// query the actual languages used by sublanguage.
+		$query = array(
+			'post_type' => 'language',
+			'post_status' => 'publish'
+		);
+		$results = new WP_Query( $query );
+
+		// loop through them.
+		foreach( $results->posts as $language ) {
+			$languages[$language->post_content] = "1";
+		}
+
+		// return resulting list.
+		return $languages;
+	}
+
+	/**
+	 * We do not add any scripts for sublanguage.
+	 *
+	 * @return void
+	 */
+	public function get_translations_script(): void {}
 }

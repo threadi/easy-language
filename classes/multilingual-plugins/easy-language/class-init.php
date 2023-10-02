@@ -105,7 +105,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// get our own pagebuilder-support-handler.
 		$pagebuilder = Pagebuilder_Support::get_instance();
-		$pagebuilder->init();
+		$pagebuilder->init( $this );
 
 		// include pagebuilder support.
 		foreach( glob(plugin_dir_path(EASY_LANGUAGE)."classes/multilingual-plugins/easy-language/pagebuilder/*.php") as $filename ) {
@@ -143,7 +143,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
         // embed files.
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), PHP_INT_MAX );
-
 	}
 
 	/**
@@ -152,6 +151,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return void
 	 */
 	public function admin_init(): void {
+		// bail if support for our own languages is handled by other multilingual plugin.
+		if( Multilingual_Plugins::get_instance()->is_plugin_with_support_for_given_languages_enabled( $this->get_supported_languages() ) ) {
+			return;
+		}
+
 		// get supported post-types and loop through them.
 		foreach( $this->get_supported_post_types() as $post_type => $enabled ) {
 			// get the post type as object to get additional settings of it.
@@ -424,8 +428,24 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	public function hide_translated_posts( $query ): void {
 		if ( is_admin() && '' === $query->get('do_not_use_easy_language_filter') && $query->get('post_status') !== 'trash' ) {
+			// get our supported post-types.
 			$post_types = $this->get_supported_post_types();
-            if( !empty($post_types[$query->get('post_type')]) ) {
+
+			// get requested post-types, if they are a post-type.
+			$hide_translated_posts = false;
+			if( is_array($query->get('post_type')) ) {
+				foreach( $query->get('post_type') as $post_type ) {
+					if( !empty($post_types[$post_type]) ) {
+						$hide_translated_posts = true;
+					}
+				}
+			}
+			else {
+				if( !empty($post_types[$query->get('post_type')]) ) {
+					$hide_translated_posts = true;
+				}
+			}
+            if( $hide_translated_posts ) {
 	            $query->set( 'meta_query', array(
 			            array(
 				            'key'     => 'easy_language_translation_original_id',
@@ -530,6 +550,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// do not show if user has no capabilities for this.
 		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// bail if support for our own languages is handled by other multilingual plugin.
+		if( Multilingual_Plugins::get_instance()->is_plugin_with_support_for_given_languages_enabled( $this->get_supported_languages() ) ) {
 			return;
 		}
 
@@ -1204,7 +1229,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return array
 	 */
 	public function get_supported_languages(): array {
-		$settings_language = get_option( 'easy_language_languages', array() );
+		$settings_language = (array)get_option( 'easy_language_languages', array() );
 		if( empty($settings_language) ) {
 			$settings_language = array();
 		}
@@ -1649,5 +1674,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	public function change_langauges( $value ): array {
 		Rewrite::get_instance()->set_refresh();
 		return $value;
+	}
+
+	/**
+	 * Return list of active languages this plugin is using atm.
+	 *
+	 * @return array
+	 */
+	public function get_active_languages(): array {
+		return $this->get_supported_languages();
 	}
 }

@@ -48,6 +48,15 @@ interface Multilingual_Plugins_Base {
 	public function get_supported_languages(): array;
 
 	/**
+	 * Return list of active languages this plugin is using atm.
+	 *
+	 * Format example: array( "de_LS" => 1 )
+	 *
+	 * @return array
+	 */
+	public function get_active_languages(): array;
+
+	/**
 	 * Get styles and scripts of the plugin.
 	 *
 	 * @return void

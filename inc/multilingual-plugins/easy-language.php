@@ -18,4 +18,4 @@ function easy_language_register_plugin_easy_language( array $plugin_list ): arra
     $plugin_list[] = Init::get_instance();
     return $plugin_list;
 }
-add_filter( 'easy_language_register_plugin', 'easy_language_register_plugin_easy_language');
+add_filter( 'easy_language_register_plugin', 'easy_language_register_plugin_easy_language', PHP_INT_MAX );
