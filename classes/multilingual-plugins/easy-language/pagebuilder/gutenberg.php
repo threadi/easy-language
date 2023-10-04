@@ -13,11 +13,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * Add Gutenberg-object to list of supported pagebuilder.
  *
- * @param $list
+ * @param array $list List of supported pagebuilder.
  *
  * @return array
  */
-function easy_language_pagebuilder_gutenberg( $list ): array {
+function easy_language_pagebuilder_gutenberg( array $list ): array {
 	$list[] = Gutenberg::get_instance();
 	return $list;
 }

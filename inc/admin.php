@@ -94,3 +94,30 @@ function easy_language_admin_dismiss(): void {
 	wp_die();
 }
 add_action( 'wp_ajax_dismiss_admin_notice', 'easy_language_admin_dismiss' );
+
+/**
+ * Add link to plugin-settings in plugin-list.
+ *
+ * @param $links
+ * @return array
+ * @noinspection PhpUnused
+ */
+function easy_language_admin_add_setting_link( $links ): array
+{
+	// build and escape the URL
+	$url = add_query_arg(
+		array(
+			'page' => 'easy_language_settings'
+		),
+		get_admin_url() . 'options-general.php'
+	);
+
+	// create the link
+	$settings_link = "<a href='".esc_url($url)."'>" . __( 'Settings', 'easy-language' ) . '</a>';
+
+	// adds the link to the end of the array
+	$links[] = $settings_link;
+
+	return $links;
+}
+add_filter( 'plugin_action_links_'.plugin_basename( EASY_LANGUAGE ), 'easy_language_admin_add_setting_link' );
