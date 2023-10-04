@@ -703,7 +703,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// set language-switcher-mode.
 		if( !get_option('easy_language_switcher_link') ) {
-			update_option('easy_language_switcher_link', 'link_translated');
+			update_option('easy_language_switcher_link', 'hide_not_translated');
 		}
 
 		// set supported language to one matching the project-language.
@@ -1028,6 +1028,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					    'enabled' => true,
 					    'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will target the language-specific homepage.', 'easy-language'),
 				    ),
+					'hide_not_translated' => array(
+						'label' => __( 'Do not link not translated pages.', 'easy-language'),
+						'enabled' => true,
+						'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will not be visible.', 'easy-language'),
+					),
 			    ),
 		    )
 	    );

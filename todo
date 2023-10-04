@@ -3,7 +3,7 @@ ToDo
 
 Funktionales
 ------------
-* Sprachwechsel im Frontend durchtesten & für Elementor und andere PageBuilder ergänzen
+* Lizenz & Update-Mechanismus für Pro
 * Kompatibilität mit Plugins testen
 -> Caching-Plugins
 -> Order-Plugins

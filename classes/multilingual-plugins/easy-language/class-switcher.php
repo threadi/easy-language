@@ -63,6 +63,8 @@ class Switcher {
 		add_action( 'init', array( $this, 'wp_init' ) );
 		add_action( 'init', array( $this, 'set_default' ), 20 );
 		add_filter( 'wp_get_nav_menu_items', array( $this, 'set_menu_items') );
+		add_action( 'wp_nav_menu_item_custom_fields', array( $this, 'add_menu_options' ) );
+		add_action( 'wp_update_nav_menu_item', array( $this, 'save_menu_options' ), 10, 2 );
 	}
 
 	/**
@@ -72,7 +74,7 @@ class Switcher {
 	 */
 	public function wp_init(): void {
 		/**
-		 * Register our own language-switcher as post-type.
+		 * Register our own language-switcher as post-type for classic themes.
 		 */
 		$args = array(
 			'exclude_from_search'   => true,
@@ -87,21 +89,25 @@ class Switcher {
 		);
 		register_post_type( EASY_LANGUAGE_CPT_SWITCHER, $args );
 
+		/**
+		 * Register our own language-switcher als Blocks for FSE/Block Editor.
+		 */
 		if( function_exists('register_block_type') ) {
 			// register switcher block for navigation in FSE-themes.
+			// hint: https://github.com/WordPress/gutenberg/issues/31387
 			register_block_type( helper::get_plugin_path() . 'classes/multilingual-plugins/easy-language/blocks/navigation-switcher/', array(
 				'render_callback' => array( $this, 'get' ),
 				'attributes'      => array(
-					'preview' => array(
-						'type' => 'boolean',
+					'preview'              => array(
+						'type'    => 'boolean',
 						'default' => false
 					),
-					'show_icons' => array(
-						'type' => 'boolean',
+					'show_icons'           => array(
+						'type'    => 'boolean',
 						'default' => false
 					),
 					'hide_actual_language' => array(
-						'type' => 'boolean',
+						'type'    => 'boolean',
 						'default' => false
 					),
 				),
@@ -112,16 +118,16 @@ class Switcher {
 			register_block_type( helper::get_plugin_path() . 'classes/multilingual-plugins/easy-language/blocks/switcher/', array(
 				'render_callback' => array( $this, 'get' ),
 				'attributes'      => array(
-					'preview' => array(
-						'type' => 'boolean',
+					'preview'              => array(
+						'type'    => 'boolean',
 						'default' => false
 					),
-					'show_icons' => array(
-						'type' => 'boolean',
+					'show_icons'           => array(
+						'type'    => 'boolean',
 						'default' => false
 					),
 					'hide_actual_language' => array(
-						'type' => 'boolean',
+						'type'    => 'boolean',
 						'default' => false
 					),
 				),
@@ -280,15 +286,18 @@ class Switcher {
 			return $items;
 		}
 
-		// get active languages.
+		// get active languages and bail if none available.
 		$languages = array_merge( $object->get_language(), Languages::get_instance()->get_active_languages() );
 		if( empty($languages) ) {
 			return $items;
 		}
 
-		// loop through the possible items.
+		// loop through the possible menu-items.
 		foreach( $items as $index => $item ) {
-			if( $item->object == EASY_LANGUAGE_CPT_SWITCHER ) {
+			if( $item->object === EASY_LANGUAGE_CPT_SWITCHER ) {
+				// get icon-setting.
+				$show_icons = 'on' === get_post_meta( $item->ID, 'easy-language-icons', true );
+
 				// get the post-item of this menu-item (this is not the page!).
 				$post_id = get_post_meta( $item->ID, '_menu_item_object_id', true );
 				$post_obj = new Post_Object( $post_id );
@@ -301,24 +310,84 @@ class Switcher {
 				// get actual index.
 				$new_index = $index;
 
+				// language-counter.
+				$language_counter = 0;
+
 				// loop through the active languages and create a single menu item for each.
 				foreach( $languages as $language_code => $settings ) {
+					// bail if not translated pages should not be linked.
+					if ( 'hide_not_translated' === get_option( 'easy_language_switcher_link', '' ) && ! $object->is_translated_in_language( $language_code ) && $language_code !== key($object->get_language()) ) {
+						continue;
+					}
+
 					// create own object for this menu item.
 					$new_item = clone $items[ $index ];
 					// set title for menu item.
-					$new_item->title = $settings['label'];
-					$new_item->menu_order = $items[ $index ]->menu_order + 1;
+					$new_item->title = $show_icons ? 'icon' : $settings['label']; // TODO
+					$new_item->menu_order = $items[ $index ]->menu_order + $language_counter;
 					// set URL for menu item.
 					$new_item->url = $object->get_language_specific_url( empty($settings['url']) ? get_permalink($object->get_id()) : $settings['url'], $language_code );
+
+					// merge items.
 					array_splice($items, $new_index, 1, array( $new_item ) );
 
 					// update key for next language.
 					$new_index = $new_index + 1;
+					$language_counter++;
 				}
 			}
 		}
 
 		// return resulting list of menu items.
 		return $items;
+	}
+
+	/**
+	 * Add options for language-switcher in classic menu.
+	 *
+	 * @param int $item_id
+	 *
+	 * @return void
+	 */
+	public function add_menu_options( int $item_id ): void {
+		// get value.
+		$value = get_post_meta( $item_id, 'easy-language-icons', true );
+
+		// set check-marker.
+		$checked = '';
+		if( !empty($value) && 'on' === $value ) {
+			$checked = ' checked="checked"';
+		}
+
+		// output.
+		?>
+		<p class="field-easy-language-icons">
+			<label for="edit-menu-item-easy-language-icons-<?php echo $item_id; ?>">
+				<?php _e( 'Show icons' ); ?><br />
+				<input type="checkbox" id="edit-menu-item-easy-language-icons-<?php echo $item_id; ?>" name="menu-item-easy-language-icons[<?php echo $item_id; ?>]"<?php echo esc_attr($checked); ?>>
+			</label>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Save our custom options in classic menu.
+	 *
+	 * @param int $menu_id
+	 * @param int $item_id
+	 *
+	 * @return void
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function save_menu_options( int $menu_id, int $item_id ): void {
+		// get value.
+		$value = !empty($_POST[ 'menu-item-easy-language-icons' ][ $item_id ]) ? wp_unslash($_POST[ 'menu-item-easy-language-icons' ][ $item_id ]) : '';
+
+		if( !empty($value) ){
+			update_post_meta( $item_id, 'easy-language-icons', sanitize_text_field( $value ) );
+		}
+		else{
+			delete_post_meta( $item_id, 'easy-language-icons' );
+		}
 	}
 }

@@ -211,7 +211,7 @@ class Post_Object implements Easy_Language_Object {
 
 		// if actual object is translated, link to the translated object.
 		if( $this->is_translated_in_language( $language_code ) ) {
-			if ( 'link_translated' === get_option( 'easy_language_switcher_link', '' ) ) {
+			if ( in_array( get_option( 'easy_language_switcher_link', '' ), array( 'hide_not_translated', 'link_translated' ), true ) ) {
 				$url = get_permalink( $this->get_translated_in_language( $language_code ) );
 			}
 			else {
@@ -230,7 +230,7 @@ class Post_Object implements Easy_Language_Object {
 			$url = get_permalink( $this->get_id() );
 		}
 		// if this page is not translated, link to the homepage.
-		elseif( 'link_translated' === get_option( 'easy_language_switcher_link', '' ) ) {
+		elseif ( in_array( get_option( 'easy_language_switcher_link', '' ), array( 'hide_not_translated', 'link_translated' ), true ) ) {
 			$url = get_home_url();
 		}
 

@@ -7,7 +7,7 @@
 	"category": "widgets",
 	"icon": "list-view",
 	"description": "Provides a Block for Language Switcher.",
-	"keywords": ["easy language", "switcher"],
+	"keywords": [ "easy language", "switcher" ],
 	"supports": {
 	  	"anchor": true,
 		"color": {
