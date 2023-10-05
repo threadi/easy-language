@@ -35,7 +35,7 @@ function easy_language_admin_add_settings_content(): void {
 	}
 
 	// get the active tab from the $_GET param.
-	$tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : null;
+	$tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'api';
 
 	// output.
 	?>
@@ -55,7 +55,7 @@ function easy_language_admin_add_settings_content(): void {
 		<div class="tab-content">
 			<?php
 			// get the content of the actual tab.
-			do_action( 'easy_language_settings_' . ( $tab == null ? 'api' : $tab ) . '_page' );
+			do_action( 'easy_language_settings_' . $tab . '_page' );
 			?>
 		</div>
 	</div>
