@@ -8,7 +8,9 @@
 use easyLanguage\Apis\No_Api\No_Api;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Register the SUMM AI Api in this plugin.

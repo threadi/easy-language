@@ -251,4 +251,13 @@ class Helper {
 		}
 		return $value;
 	}
+
+	/**
+	 * Return the URL for plugin-support.
+	 *
+	 * @return string
+	 */
+	public static function get_support_url(): string {
+		return 'https://laolaweb.com/kontakt/';
+	}
 }

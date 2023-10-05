@@ -9,7 +9,9 @@ use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Transients;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Add own CSS and JS for backend.
@@ -19,10 +21,11 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 function easy_language_add_styles_and_js_admin(): void {
 	// admin-specific styles.
-	wp_enqueue_style('easy-language-admin',
-		plugin_dir_url(EASY_LANGUAGE) . '/admin/style.css',
+	wp_enqueue_style(
+		'easy-language-admin',
+		plugin_dir_url( EASY_LANGUAGE ) . '/admin/style.css',
 		array(),
-		filemtime(plugin_dir_path(EASY_LANGUAGE) . '/admin/style.css'),
+		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/admin/style.css' ),
 	);
 
 	// backend-JS.
@@ -30,7 +33,7 @@ function easy_language_add_styles_and_js_admin(): void {
 		'easy-language-admin',
 		plugins_url( '/admin/js.js', EASY_LANGUAGE ),
 		array( 'jquery' ),
-		filemtime( plugin_dir_path(EASY_LANGUAGE) . '/admin/js.js' ),
+		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/admin/js.js' ),
 		true
 	);
 
@@ -39,13 +42,13 @@ function easy_language_add_styles_and_js_admin(): void {
 		'easy-language-admin',
 		'easyLanguageJsVars',
 		array(
-			'ajax_url'           => admin_url( 'admin-ajax.php' ),
-			'dismiss_nonce'      => wp_create_nonce( 'easy-language-dismiss-nonce' ),
+			'ajax_url'      => admin_url( 'admin-ajax.php' ),
+			'dismiss_nonce' => wp_create_nonce( 'easy-language-dismiss-nonce' ),
 		)
 	);
 
 	// add only scripts and styles of enabled plugins.
-	foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
+	foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
 		$plugin_obj->get_translations_script();
 	}
 }
@@ -98,26 +101,25 @@ add_action( 'wp_ajax_dismiss_admin_notice', 'easy_language_admin_dismiss' );
 /**
  * Add link to plugin-settings in plugin-list.
  *
- * @param $links
+ * @param array $links List of links to show in plugin-list on this specific plugin.
  * @return array
  * @noinspection PhpUnused
  */
-function easy_language_admin_add_setting_link( $links ): array
-{
-	// build and escape the URL
+function easy_language_admin_add_setting_link( array $links ): array {
+	// build and escape the URL.
 	$url = add_query_arg(
 		array(
-			'page' => 'easy_language_settings'
+			'page' => 'easy_language_settings',
 		),
 		get_admin_url() . 'options-general.php'
 	);
 
-	// create the link
-	$settings_link = "<a href='".esc_url($url)."'>" . __( 'Settings', 'easy-language' ) . '</a>';
+	// create the link.
+	$settings_link = "<a href='" . esc_url( $url ) . "'>" . __( 'Settings', 'easy-language' ) . '</a>';
 
-	// adds the link to the end of the array
+	// adds the link to the end of the array.
 	$links[] = $settings_link;
 
 	return $links;
 }
-add_filter( 'plugin_action_links_'.plugin_basename( EASY_LANGUAGE ), 'easy_language_admin_add_setting_link' );
+add_filter( 'plugin_action_links_' . plugin_basename( EASY_LANGUAGE ), 'easy_language_admin_add_setting_link' );

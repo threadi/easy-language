@@ -6,7 +6,9 @@
  */
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 // set autoloader.
 spl_autoload_register( 'easy_language_autoloader' );
@@ -38,8 +40,8 @@ function easy_language_autoloader( string $class_name ): void {
 
 		// If we're at the first entry, then we're at the filename.
 		$file_name = '';
-		if( $file_parts_count - 1 === $i ) {
-			$file_name = $current.".php";
+		if ( $file_parts_count - 1 === $i ) {
+			$file_name = $current . '.php';
 		} else {
 			$namespace = $namespace . '/' . $current;
 		}
@@ -49,7 +51,7 @@ function easy_language_autoloader( string $class_name ): void {
 		$dirs = apply_filters( 'easy_language_class_dirs', array( __FILE__ ) );
 		foreach ( $dirs as $dir ) {
 			// Now build a path to the file using mapping to the file location.
-			$filepath_pre  = trailingslashit( dirname( $dir, 2 ) . '/classes/' . $namespace );
+			$filepath_pre = trailingslashit( dirname( $dir, 2 ) . '/classes/' . $namespace );
 			foreach ( array( 'class', 'interface' ) as $type ) {
 				$filepath = $filepath_pre . $type . '-' . strtolower( $file_name );
 

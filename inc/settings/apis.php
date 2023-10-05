@@ -15,13 +15,13 @@ use easyLanguage\Multilingual_Plugins;
  * @noinspection PhpUnused
  */
 function easy_language_admin_add_menu_content_settings(): void {
-	// check user capabilities
+	// check user capabilities.
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 
 	?>
-	<form method="POST" action="<?php echo get_admin_url(); ?>options.php">
+	<form method="POST" action="<?php echo esc_url(get_admin_url()); ?>options.php">
 		<?php
 		settings_fields( 'easyLanguageApiFields' );
 		do_settings_sections( 'easyLanguageApiPage' );
@@ -30,7 +30,7 @@ function easy_language_admin_add_menu_content_settings(): void {
 	</form>
 	<?php
 }
-add_action('easy_language_settings_api_page', 'easy_language_admin_add_menu_content_settings' );
+add_action( 'easy_language_settings_api_page', 'easy_language_admin_add_menu_content_settings' );
 
 /**
  * Get general options.
@@ -47,39 +47,39 @@ function easy_language_admin_add_settings_api(): void {
 		__( 'Choose API for translations', 'easy-language' ),
 		'__return_true',
 		'easyLanguageApiPage',
-        array(
-            'before_section' => '<div class="%s">',
-            'after_section' => '</div>',
-            'section_class' => 'easy-language-choose-api'
-        )
+		array(
+			'before_section' => '<div class="%s">',
+			'after_section'  => '</div>',
+			'section_class'  => 'easy-language-choose-api',
+		)
 	);
 
 	// get list of supported APIs.
 	$apis = array();
-	foreach( Apis::get_instance()->get_available_apis() as $api_obj ) {
-		$apis[$api_obj->get_name()] = $api_obj;
+	foreach ( Apis::get_instance()->get_available_apis() as $api_obj ) {
+		$apis[ $api_obj->get_name() ] = $api_obj;
 	}
 
 	// API-Chooser.
-	if (!empty($apis)) {
+	if ( ! empty( $apis ) ) {
 		add_settings_field(
 			'easy_language_api',
-			__('Choose API', 'easy-language'),
+			__( 'Choose API', 'easy-language' ),
 			'easy_language_admin_choose_api',
 			'easyLanguageApiPage',
 			'settings_section_main',
 			array(
-				'label_for' => 'easy_language_api',
-				'fieldId' => 'easy_language_api',
-				'description' => __('Please choose the API you want to use to translate your website.', 'easy-language'),
-				'options' => $apis,
-				'disable_empty' => true
+				'label_for'     => 'easy_language_api',
+				'fieldId'       => 'easy_language_api',
+				'description'   => __( 'Please choose the API you want to use to translate your website.', 'easy-language' ),
+				'options'       => $apis,
+				'disable_empty' => true,
 			)
 		);
 		register_setting( 'easyLanguageApiFields', 'easy_language_api' );
 	}
 }
-add_action( 'easy_language_settings_add_settings', 'easy_language_admin_add_settings_api');
+add_action( 'easy_language_settings_add_settings', 'easy_language_admin_add_settings_api' );
 
 /**
  * Show selection of supported APIs.
@@ -89,57 +89,65 @@ add_action( 'easy_language_settings_add_settings', 'easy_language_admin_add_sett
  * @return void
  */
 function easy_language_admin_choose_api( array $attr ): void {
-	if( !empty($attr['options']) ) {
+	if ( ! empty( $attr['options'] ) ) {
 
-        // show description in front of list.
-		if( !empty($attr['description']) ) {
-			echo "<p>".wp_kses_post($attr['description'])."</p>";
+		// show description in front of list.
+		if ( ! empty( $attr['description'] ) ) {
+			echo '<p>' . wp_kses_post( $attr['description'] ) . '</p>';
 		}
 
-        // add wrapper for list.
-		?><div class="easy-api-radios"><?php
+		// add wrapper for list.
+		?>
+		<div class="easy-api-radios">
+		<?php
 
-        // loop through the options (available APIs).
-		foreach( $attr['options'] as $key => $settings ) {
+		// loop through the options (available APIs).
+		foreach ( $attr['options'] as $key => $settings ) {
 			// get checked-marker.
-			$actual_value = get_option($attr['fieldId'], '');
-			$checked = $actual_value === $key ? ' checked="checked"' : '';
+			$actual_value = get_option( $attr['fieldId'], '' );
+			$checked      = $actual_value === $key ? ' checked="checked"' : '';
 
 			// readonly.
 			$readonly = '';
-			if( isset($attr['readonly']) && false !== $attr['readonly'] ) {
+			if ( isset( $attr['readonly'] ) && false !== $attr['readonly'] ) {
 				$readonly = ' disabled="disabled"';
-				if( !empty($checked) ) {
-					?><input type="hidden" name="<?php echo esc_attr($attr['fieldId']); ?>_ro" value="<?php echo esc_attr($key); ?>"><?php
+				if ( ! empty( $checked ) ) {
+					?>
+					<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro" value="<?php echo esc_attr( $key ); ?>">
+					<?php
 				}
 			}
 
 			// output.
 			?>
-            <div class="easy-api-radio">
-                <input type="radio" id="<?php echo esc_attr($attr['fieldId'].$key); ?>" name="<?php echo esc_attr($attr['fieldId']); ?>" value="<?php echo esc_attr($key); ?>"<?php echo esc_attr($checked).esc_attr($readonly); ?>>
-                <label for="<?php echo esc_attr($attr['fieldId'].$key); ?>" data-active-title="<?php echo esc_html__( 'Activated', 'easy-language' ); ?>">
-                    <?php
-                        // get api-logo, if it exists.
-                        $logo_url = $settings->get_logo_url();
-                        if( !empty($logo_url) ) {
-                            ?><img src="<?php echo esc_url($logo_url); ?>" alt="<?php echo esc_attr($settings->get_title()); ?>"><?php
-                        }
+			<div class="easy-api-radio">
+				<input type="radio" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>" value="<?php echo esc_attr( $key ); ?>"<?php echo esc_attr( $checked ) . esc_attr( $readonly ); ?>>
+				<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" data-active-title="<?php echo esc_html__( 'Activated', 'easy-language' ); ?>">
+			<?php
+				// get api-logo, if it exists.
+				$logo_url = $settings->get_logo_url();
+			if ( ! empty( $logo_url ) ) {
+				?>
+							<img src="<?php echo esc_url( $logo_url ); ?>" alt="<?php echo esc_attr( $settings->get_title() ); ?>">
+						<?php
+			}
 
-                        // show api-title.
-                        echo '<h2>'.esc_html($settings->get_title()).'</h2>';
+				// show api-title.
+				echo '<h2>' . esc_html( $settings->get_title() ) . '</h2>';
 
-                        // show api-description, if available.
-                        if( !empty($settings->get_description()) ) {
-                            echo wp_kses_post($settings->get_description());
-                        }
-                    ?>
-                </label>
-            </div>
+				// show api-description, if available.
+			if ( ! empty( $settings->get_description() ) ) {
+						echo wp_kses_post( $settings->get_description() );
+			}
+			?>
+				</label>
+			</div>
 			<?php
 		}
 
-        // end wrapper for list.
-        ?></div><?php
+		// end wrapper for list.
+		?>
+		</div>
+		<?php
 	}
 }

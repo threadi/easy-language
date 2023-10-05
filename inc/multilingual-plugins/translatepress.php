@@ -10,7 +10,9 @@ use easyLanguage\Languages;
 use easyLanguage\Multilingual_plugins\TranslatePress\Init;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Register the TranslatePress service in this plugin.
@@ -20,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 function easy_language_register_plugin_translate_press( array $plugin_list ): array {
 	// bail if plugin is not active.
-	if( false === Helper::is_plugin_active( 'translatepress-multilingual/index.php' ) ) {
+	if ( false === Helper::is_plugin_active( 'translatepress-multilingual/index.php' ) ) {
 		return $plugin_list;
 	}
 
@@ -35,10 +37,10 @@ add_filter( 'easy_language_register_plugin', 'easy_language_register_plugin_tran
 /**
  * Add our languages to list of all languages from translatepress.
  *
- * @param array $list List of supported languages.
+ * @param array $supported_languages_list List of supported languages.
  * @return array
  */
-function easy_language_trp_add_to_wp_list( array $list ): array {
+function easy_language_trp_add_to_wp_list( array $supported_languages_list ): array {
 	// remove our own filter to prevent loops.
 	remove_filter( 'trp_wp_languages', 'easy_language_trp_add_to_wp_list' );
 
@@ -46,9 +48,9 @@ function easy_language_trp_add_to_wp_list( array $list ): array {
 	$languages = Languages::get_instance()->get_possible_target_languages();
 
 	// add them to the list.
-	foreach( $languages as $language_code => $language ) {
-		if( empty($list[$language['url']]) ) {
-			$list[ $language['url'] ] = array(
+	foreach ( $languages as $language_code => $language ) {
+		if ( empty( $supported_languages_list[ $language['url'] ] ) ) {
+			$supported_languages_list[ $language['url'] ] = array(
 				'language'     => $language_code,
 				'english_name' => $language['label'],
 				'native_name'  => $language['label'],
@@ -63,21 +65,21 @@ function easy_language_trp_add_to_wp_list( array $list ): array {
 	add_filter( 'trp_wp_languages', 'easy_language_trp_add_to_wp_list' );
 
 	// return resulting list.
-	return $list;
+	return $supported_languages_list;
 }
 add_filter( 'trp_wp_languages', 'easy_language_trp_add_to_wp_list' );
 
 /**
  * Add our automatic machine as functions.
  *
- * @param array $list List of supported languages.
+ * @param array $api_list List of supported languages.
  * @return array
  */
-function easy_language_trp_add_automatic_machine( array $list ): array {
-	$list['summ-ai'] = 'easyLanguage\Multilingual_plugins\TranslatePress\Translatepress_Summ_Ai_Machine_Translator';
-	return $list;
+function easy_language_trp_add_automatic_machine( array $api_list ): array {
+	$api_list['summ-ai'] = 'easyLanguage\Multilingual_plugins\TranslatePress\Translatepress_Summ_Ai_Machine_Translator';
+	return $api_list;
 }
-add_filter( 'trp_automatic_translation_engines_classes', 'easy_language_trp_add_automatic_machine', 10, 1 );
+add_filter( 'trp_automatic_translation_engines_classes', 'easy_language_trp_add_automatic_machine' );
 
 /**
  * Add the automatic machine to the list in translatePress-backend.
@@ -108,17 +110,16 @@ function easy_language_trp_reset_translations(): void {
 	$languages = Languages::get_instance()->get_possible_target_languages();
 
 	// add them to the list.
-	foreach( $languages as $language_code => $language ) {
+	foreach ( $languages as $language_code => $language ) {
 		// get table names.
-		$table_name = $trp_query->get_table_name( strtolower($language_code) );
-		$gettext_table_name = $trp_query->get_gettext_table_name( strtolower($language_code) );
+		$table_name         = $trp_query->get_table_name( strtolower( $language_code ) );
+		$gettext_table_name = $trp_query->get_gettext_table_name( strtolower( $language_code ) );
 
 		// check if table exist.
-		$sql = "SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = %s";
-		if( !empty($wpdb->get_results( $wpdb->prepare( $sql, array( $table_name) ) ) ) ) {
-			// truncate tables
-			$wpdb->query( 'TRUNCATE TABLE ' . $table_name );
-			$wpdb->query( 'TRUNCATE TABLE ' . $gettext_table_name );
+		if ( ! empty( $wpdb->get_results( $wpdb->prepare( 'SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = %s', array( $table_name ) ) ) ) ) {
+			// truncate tables.
+			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', $table_name ) );
+			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', $gettext_table_name ) );
 		}
 	}
 }
@@ -140,7 +141,7 @@ function easy_language_trp_get_supported_languages( bool $all_are_available, arr
 		$languages = Languages::get_instance()->get_possible_target_languages();
 
 		// add them to the list.
-		foreach( $languages as $language_code => $language ) {
+		foreach ( $languages as $language_code => $language ) {
 			if ( in_array( $language_code, $languages, true ) ) {
 				// re-add our own filter.
 				add_filter( 'trp_mt_available_supported_languages', 'easy_language_trp_get_supported_languages', 10, 3 );
@@ -170,7 +171,7 @@ function easy_language_trp_set_current_language_fields( array $current_language,
 	$languages = Languages::get_instance()->get_possible_target_languages();
 
 	// add them to the list.
-	foreach( $languages as $language_code => $language ) {
+	foreach ( $languages as $language_code => $language ) {
 		if ( $language_code === $trp_language ) {
 			$current_language = array(
 				'name' => $language['label'],
@@ -198,7 +199,7 @@ function easy_language_set_flag( string $flags_path, string $searched_language_c
 	$languages = Languages::get_instance()->get_possible_target_languages();
 
 	// add them to the list.
-	foreach( $languages as $language_code => $language ) {
+	foreach ( $languages as $language_code => $language ) {
 		if ( $language_code === $searched_language_code ) {
 			$flags_path = helper::get_plugin_url() . 'gfx/';
 		}

@@ -58,3 +58,14 @@ Yes, an icon is displayed in the page or post list for this purpose. As soon as 
 
 = 1.0.0 =
 * Initial release
+
+= 2.0.0 =
+* Plugin completely revised
+* Added translation for posts and pages in Einfache or Leichte Sprache, manually or automatic
+* Added support for API-based translations via SUMM AI and Capito
+* Added support for different source and target languages
+* Added support for different PageBuilder (Block Editor, Classic Editor)
+* Added multiple hooks
+* Initially support for translating taxonomies
+* Extended support for translations with TranslatePress
+* WordPress Coding Standard 3.0 compatible

@@ -145,7 +145,7 @@ class Transients {
 	 * @return void
 	 */
 	public function check_transients(): void {
-		foreach ( $this->get_transients() as $transient_obj ) {
+		foreach ( apply_filters( 'easy_language_get_transients_for_display', $this->get_transients() ) as $transient_obj ) {
 			if ( $transient_obj->is_set() ) {
 				$transient_obj->display();
 			}

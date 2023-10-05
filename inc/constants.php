@@ -6,12 +6,14 @@
  */
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * SUMM AI API URL for free version.
  */
-const EASY_LANGUAGE_SUMM_AI_API_URL = 'http://dev4.laolaweb.com/summaiproxy/index.php';
+const EASY_LANGUAGE_SUMM_AI_API_URL = 'https://api.laolaweb.com/summaiproxy/index.php';
 
 /**
  * Capito API URL for translations.
@@ -27,8 +29,8 @@ const EASY_LANGUAGE_CAPITO_API_URL_QUOTA = 'https://api.capito.ai/shop/me/quotas
  * Set transient-based hints for the backend.
  */
 const EASY_LANGUAGE_TRANSIENTS = array(
-	'easy_language_message' => array(),
-	'easy_language_refresh_rewrite_rules' => array()
+	'easy_language_message'               => array(),
+	'easy_language_refresh_rewrite_rules' => array(),
 );
 
 /**
@@ -42,15 +44,15 @@ const EASY_LANGUAGE_CPT_SWITCHER = 'lel_lang_switcher';
 const EASY_LANGUAGE_LANGUAGE_EMERGENCY = 'en_US';
 
 /**
- * options-list of transients.
+ * Options-list of transients.
  */
 const EASY_LANGUAGE_TRANSIENT_LIST = 'easy_language_transients';
 
 /**
  * Define names for progressbar during translation.
  */
-const EASY_LANGUAGE_OPTION_TRANSLATE_COUNT = 'easy_language_translate_count';
-const EASY_LANGUAGE_OPTION_TRANSLATE_MAX = 'easy_language_translate_max';
+const EASY_LANGUAGE_OPTION_TRANSLATE_COUNT   = 'easy_language_translate_count';
+const EASY_LANGUAGE_OPTION_TRANSLATE_MAX     = 'easy_language_translate_max';
 const EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING = 'easy_language_translate_running';
 
 /**

@@ -193,6 +193,8 @@ class Base {
 			}
 		}
 
+		// TODO warn if no mapping set.
+
 		// return resulting list.
 		return $result;
 	}

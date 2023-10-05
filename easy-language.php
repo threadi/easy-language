@@ -20,8 +20,8 @@ use easyLanguage\Init;
 const EASY_LANGUAGE = __FILE__;
 
 // do nothing if PHP-version is not 8.0 or newer.
-if( version_compare(PHP_VERSION, '8.0', '<') ) {
-    return;
+if ( version_compare( PHP_VERSION, '8.0', '<' ) ) {
+	return;
 }
 
 // embed necessary files.
@@ -32,10 +32,9 @@ require_once 'inc/constants.php';
 if ( is_admin() ) {
 	include_once 'inc/admin.php';
 	// include all settings-files.
-	foreach( glob(plugin_dir_path(EASY_LANGUAGE)."inc/settings/*.php") as $filename ) {
+	foreach ( glob( plugin_dir_path( EASY_LANGUAGE ) . 'inc/settings/*.php' ) as $filename ) {
 		include $filename;
 	}
-
 }
 
 // initialize the plugin.

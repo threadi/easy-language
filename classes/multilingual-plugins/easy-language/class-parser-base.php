@@ -196,7 +196,8 @@ class Parser_Base {
                             /* translators: %1$s will be replaced by the API-title */
                             echo sprintf(__( 'Translate via %1$s', 'easy-language' ), esc_html($api_obj->get_title() ));
                             if( $quota_state['quota_percent'] > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
-                                echo '<span class="dashicons dashicons-info-outline" title="'.esc_attr( sprintf( __('Quota for the used API is used for %f percent!', 'easy-language' ), $quota_state['quota_percent'] ) ).'"></span>';
+								/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
+                                echo '<span class="dashicons dashicons-info-outline" title="'.esc_attr( sprintf( __('Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ).'"></span>';
                             }
                         ?>
                         </a></p>
@@ -239,6 +240,7 @@ class Parser_Base {
 				// get translated post for this language (if it is not the original).
 				if( empty($settings['url']) ) {
 					$link = $original_post_object->get_page_builder()->get_edit_link();
+					/* translators: %1$s will be replaced by the page-title where the original content resides */
 					$link_title = __( 'Original Content in %1$s', 'easy-language');
 					$link_content = '<span class="dashicons dashicons-admin-home"></span>';
 				}

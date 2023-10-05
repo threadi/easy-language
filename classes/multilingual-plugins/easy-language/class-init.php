@@ -243,7 +243,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 					// do not show anything if the used page builder plugin is not available.
 					if( false === $page_builder->is_active() ) {
-						echo '<span class="dashicons dashicons-lightbulb" title="'.sprintf(__( 'Used page builder %s not available', 'easy-language' ), $page_builder->get_name()).'"></span>';
+						/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
+						echo '<span class="dashicons dashicons-lightbulb" title="'.esc_attr(sprintf(__( 'Used page builder %1$s not available', 'easy-language' ), $page_builder->get_name())).'"></span>';
 
 						// get link to delete this translation.
 						$delete_translation = get_delete_post_link( $translated_post_id );
@@ -274,11 +275,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	                        $do_translation = $translated_post_obj->get_translation_via_api_link();
 
 	                        // show link to translate this page via api.
-	                        /* translators: %1$s is the name of the language, %2$s is the name of the used API */
+	                        /* translators: %1$s is the name of the language, %2$s is the name of the used API, %3$s will be the API-title */
 	                        echo '<a href="' . esc_url( $do_translation ) . '" class="dashicons dashicons-translation easy-language-translate-object" data-id="'.absint($post_object->get_id()).'" title="' . esc_attr( sprintf( __( 'Translate this %1$s in %2$s with %3$s', 'easy-language' ), $translated_post_obj->get_type(), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</a>';
                         }
                         else {
                             // otherwise show simple not clickable icon.
+							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
 	                        echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'Not enough quota to translate this %1$s in %2$s with %3$s.', 'easy-language' ), $translated_post_obj->get_type(), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</span>';
                         }
 
@@ -1052,7 +1054,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
         if( 'general' === $tab ) $activeClass = ' nav-tab-active';
 
         // output tab
-        echo '<a href="'.esc_url(helper::get_settings_page_url()).'&tab=general" class="nav-tab'.esc_attr($activeClass).'">'.__('General settings', 'easy-language').'</a>';
+        echo '<a href="'.esc_url(helper::get_settings_page_url()).'&tab=general" class="nav-tab'.esc_attr($activeClass).'">'.__('General Settings', 'easy-language').'</a>';
     }
 
 	/**
@@ -1263,7 +1265,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 				// do not show anything if the used page builder plugin is not available.
 				if( false === $page_builder->is_active() ) {
-					echo '<span class="dashicons dashicons-lightbulb" title="'.sprintf(__( 'Used page builder %s not available', 'easy-language' ), $page_builder->get_name()).'"></span>';
+					/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
+					echo '<span class="dashicons dashicons-lightbulb" title="'.sprintf(__( 'Used page builder %1$s not available', 'easy-language' ), $page_builder->get_name()).'"></span>';
 				}
 				else {
 					// create link to edit the translated post.

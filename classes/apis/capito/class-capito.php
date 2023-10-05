@@ -133,10 +133,11 @@ class Capito extends Base implements Api_Base {
 		/* translators: %1$d will be replaced by the link to Capito */
 		$text = sprintf( __( '<p>The Capito API allows you to automatically translate the entire website into plain and/or simple language via quota-limited API. More Information <a href="%1$s">here</a>.</p>', 'easy-language' ), esc_url($this->get_language_specific_support_page()) );
 		if( $quota['character_limit'] > 0 ) {
-			$text .= sprintf( __( '<p><strong>Actual character spent:</strong> %2$d<br><strong>Quota limit:</strong> %3$d<br><strong>Rest quota:</strong> %4$d</strong></p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ), $quota['character_spent'], $quota['character_limit'], absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) );
+			/* translators: %1$d will be replaced by the characters spent for Capito, %2$d will be the quota for Capito, %3$d will be the rest quota */
+			$text .= sprintf( __( '<p><strong>Actual character spent:</strong> %1$d<br><strong>Quota limit:</strong> %2$d<br><strong>Rest quota:</strong> %3$d</strong></p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ), $quota['character_spent'], $quota['character_limit'], absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) );
 		}
 		elseif( !empty($quota['unlimited']) ) {
-			$text .= sprintf( __( '<p><strong>Unlimited quota</strong></p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+			$text .= __( '<p><strong>Unlimited quota</strong></p>', 'easy-language' );
 		}
 
 		// return resulting text.
@@ -616,18 +617,9 @@ class Capito extends Base implements Api_Base {
 		);
 
 		// Set description for token field if it has not been set.
-		/* translators: %1$s will be replaced by the SUMM AI URL */
+		/* translators: %1$s will be replaced by the Capito URL */
 		$description = sprintf(__('Get your Capito API Token <a href="%1$s" target="_blank">here (opens new window)</a>.<br>If you have any questions about the token provided by Capito, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language'), esc_url($this->get_language_specific_support_page()));
 		if( false !== $this->is_capito_token_set() ) {
-			// Set link to test the entered token.
-			$url = add_query_arg(
-				array(
-					'action' => 'easy_language_capito_test_token',
-					'nonce' => wp_create_nonce( 'easy-language-capito-test-token' )
-				),
-				get_admin_url() . 'admin.php'
-			);
-
 			// set link to remove the token.
 			$remove_token_url = add_query_arg(
 				array(
@@ -671,7 +663,7 @@ class Capito extends Base implements Api_Base {
 		// Enable source-languages
 		// -> defaults to WP-locale
 		// -> if WPML, Polylang or TranslatePress is available, show additional languages
-		// -> but restrict list to languages supported by SUMM AI
+		// -> but restrict list to languages supported by Capito
 		add_settings_field(
 			'easy_language_capito_source_languages',
 			__( 'Choose source languages', 'easy-language' ),
@@ -724,7 +716,7 @@ class Capito extends Base implements Api_Base {
 					'automatic' => array(
 						'label' => __( 'Automatic translation of each text.', 'easy-language'),
 						'enabled' => true,
-						'description' => __( 'Each untranslated but in translation-objects saved text will be translated automatic in the intervall set below.', 'easy-language'),
+						'description' => __( 'Each for translation requested text will be translated automatic in the intervall set below. Be aware that this is not an automatic translation in frontend initiated through the visitor.', 'easy-language'),
 					),
 					'manuell' => array(
 						'label' => __( 'Translate texts manually, use API as helper.', 'easy-language'),
@@ -850,7 +842,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Validate the SUMM API Token.
+	 * Validate the the API token.
 	 *
 	 * @param $value
 	 * @return ?string
@@ -870,10 +862,10 @@ class Capito extends Base implements Api_Base {
 
 		// if no token has been entered, show hint.
 		if( empty($value) ) {
-			add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __('You did not enter an API token. All translation options via the Capito API have been disabled. ', 'easy-language') );
+			add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __('You did not enter an API token. All translation options via the Capito API have been disabled.', 'easy-language') );
 		}
 		// if token has been changed, get the quota.
-		elseif( 0 !== strcmp($value, get_option( 'easy_language_pro_summ_api_key', '' ) ) ) {
+		elseif( 0 !== strcmp($value, get_option( 'easy_language_capito_api_key', '' ) ) ) {
 			$this->get_quota_from_api( $value );
 		}
 
@@ -1081,7 +1073,8 @@ class Capito extends Base implements Api_Base {
 					$transient_obj = $transients_obj->add();
 					$transient_obj->set_dismissible_days( 2 );
 					$transient_obj->set_name( 'easy_language_capito_quota' );
-					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the Capito API is completely depleted.</strong> You will not be able to use any translation from SUMM AI. Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
+					/* translators: %1$s will be replaced by the URL for Capito support. */
+					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the Capito API is completely depleted.</strong> You will not be able to use any translation from Capito. Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 					$transient_obj->set_type( 'error' );
 					$transient_obj->save();
 				} elseif ( $percent > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
@@ -1089,6 +1082,7 @@ class Capito extends Base implements Api_Base {
 					$transient_obj = $transients_obj->add();
 					$transient_obj->set_dismissible_days( 2 );
 					$transient_obj->set_name( 'easy_language_capito_quota' );
+					/* translators: %1$s will be replaced by the URL for Capito support. */
 					$transient_obj->set_message( sprintf( __( '<strong>More than 80%% of your quota for the Capito API has already been used.</strong> Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 					$transient_obj->set_type( 'error' );
 					$transient_obj->save();
