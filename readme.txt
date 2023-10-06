@@ -20,7 +20,7 @@ You will be able to translate 1800 characters via SUMM AI API without any costs.
 
 * Adds easy language to other multilingual plugins like WPML, Polylang, Sublanguage, TranslatePress
 * Use SUMM AI API to automatically translate texts with our plugin or TranslatePress
-* PageBuilder: native support for Block Editor (Gutenberg), Elementor, Divi, WP Bakery
+* PageBuilder: native support for Block Editor (Gutenberg); other page builder (like Elementor, Divi, WPBakery) are supported in Pro-plugin
 * Multisite: all translated texts will be available to any other blog in the network
 * Own translator role for users to only translate texts.
 

@@ -7,6 +7,7 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
+use easyLanguage\Api_Base;
 use easyLanguage\Apis;
 use easyLanguage\Base;
 use easyLanguage\Helper;
@@ -21,7 +22,9 @@ use WP_Term;
 use WP_User;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Initializer for this plugin.
@@ -34,19 +37,19 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	protected bool $foreign_plugin = false;
 
-    /**
-     * Marker for API-support.
-     *
-     * @var bool
-     */
-    protected bool $supports_apis = true;
+	/**
+	 * Marker for API-support.
+	 *
+	 * @var bool
+	 */
+	protected bool $supports_apis = true;
 
-    /**
-     * Name of this plugin.
-     *
-     * @var string
-     */
-    protected string $name = 'easy-language';
+	/**
+	 * Name of this plugin.
+	 *
+	 * @var string
+	 */
+	protected string $name = 'easy-language';
 
 	/**
 	 * Title of this plugin.
@@ -108,7 +111,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$pagebuilder->init( $this );
 
 		// include pagebuilder support.
-		foreach( glob(plugin_dir_path(EASY_LANGUAGE)."classes/multilingual-plugins/easy-language/pagebuilder/*.php") as $filename ) {
+		foreach ( glob( plugin_dir_path( EASY_LANGUAGE ) . 'classes/multilingual-plugins/easy-language/pagebuilder/*.php' ) as $filename ) {
 			include $filename;
 		}
 
@@ -116,11 +119,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		add_action( 'update_option_WPLANG', array( $this, 'option_locale_changed' ), 10, 2 );
 		add_action( 'admin_bar_menu', array( $this, 'admin_bar_menu' ), 500 );
 
-        // add settings.
-        add_action( 'easy_language_settings_add_settings', array( $this, 'add_settings' ), 15 );
+		// add settings.
+		add_action( 'easy_language_settings_add_settings', array( $this, 'add_settings' ), 15 );
 
-        // add settings tab.
-        add_action( 'easy_language_settings_add_tab', array( $this, 'add_settings_tab' ), 15 );
+		// add settings tab.
+		add_action( 'easy_language_settings_add_tab', array( $this, 'add_settings_tab' ), 15 );
 
 		// add translations-overview.
 		add_action( 'easy_language_settings_translations_page', array( $this, 'add_translations' ), 15 );
@@ -128,20 +131,20 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// add translations tab in settings-page.
 		add_action( 'easy_language_settings_add_tab', array( $this, 'add_translations_tab' ), 50 );
 
-        // add settings page.
-        add_action( 'easy_language_settings_general_page', array( $this, 'add_settings_page' ) );
+		// add settings page.
+		add_action( 'easy_language_settings_general_page', array( $this, 'add_settings_page' ) );
 
 		// backend translation-hooks to show or hide translated pages.
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'pre_get_posts', array( $this, 'hide_translated_posts' ) );
 		add_filter( 'get_terms_args', array( $this, 'hide_translated_terms' ) );
-        add_filter( 'get_pages', array( $this, 'get_pages' ) );
+		add_filter( 'get_pages', array( $this, 'get_pages' ) );
 
 		// add ajax-actions hooks.
 		add_action( 'wp_ajax_easy_language_run_translation', array( $this, 'ajax_run_translation' ) );
 		add_action( 'wp_ajax_easy_language_get_info_translation', array( $this, 'ajax_get_translation_info' ) );
 
-        // embed files.
+		// embed files.
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), PHP_INT_MAX );
 	}
 
@@ -152,36 +155,36 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	public function admin_init(): void {
 		// bail if support for our own languages is handled by other multilingual plugin.
-		if( Multilingual_Plugins::get_instance()->is_plugin_with_support_for_given_languages_enabled( $this->get_supported_languages() ) ) {
+		if ( Multilingual_Plugins::get_instance()->is_plugin_with_support_for_given_languages_enabled( $this->get_supported_languages() ) ) {
 			return;
 		}
 
 		// get supported post-types and loop through them.
-		foreach( $this->get_supported_post_types() as $post_type => $enabled ) {
+		foreach ( $this->get_supported_post_types() as $post_type => $enabled ) {
 			// get the post type as object to get additional settings of it.
 			$post_type_obj = get_post_type_object( $post_type );
 
 			// go only further if the post-type is visible in backend
 			// and trash status is not called.
-			if( false !== $post_type_obj->show_in_menu ) {
-				add_filter( 'manage_'.$post_type.'_posts_columns', array( $this, 'add_post_type_columns' ) );
-				add_action( 'manage_'.$post_type.'_posts_custom_column' , array( $this, 'add_post_type_column_content' ), 10, 2 );
-				add_filter( 'views_edit-'.$post_type, array( $this, 'add_post_type_view' ) );
+			if ( false !== $post_type_obj->show_in_menu ) {
+				add_filter( 'manage_' . $post_type . '_posts_columns', array( $this, 'add_post_type_columns' ) );
+				add_action( 'manage_' . $post_type . '_posts_custom_column', array( $this, 'add_post_type_column_content' ), 10, 2 );
+				add_filter( 'views_edit-' . $post_type, array( $this, 'add_post_type_view' ) );
 			}
 		}
 
-        // get supported taxonomies and loop through them.
-        foreach( $this->get_supported_taxonomies() as $category => $enabled ) {
-	        add_filter( 'manage_edit-'.$category.'_columns', array( $this, 'add_taxonomy_columns' ) );
-	        add_action( 'manage_'.$category.'_custom_column' , array( $this, 'add_taxonomy_column_content' ), 10, 3 );
-        }
+		// get supported taxonomies and loop through them.
+		foreach ( $this->get_supported_taxonomies() as $category => $enabled ) {
+			add_filter( 'manage_edit-' . $category . '_columns', array( $this, 'add_taxonomy_columns' ) );
+			add_action( 'manage_' . $category . '_custom_column', array( $this, 'add_taxonomy_column_content' ), 10, 3 );
+		}
 
 		// add filter for changed posts.
 		add_action( 'restrict_manage_posts', array( $this, 'add_posts_filter' ) );
 		add_filter( 'parse_query', array( $this, 'posts_filter' ) );
 
 		// support for nested pages: show translated pages as action-links.
-		if( helper::is_plugin_active('wp-nested-pages/nestedpages.php') ) {
+		if ( helper::is_plugin_active( 'wp-nested-pages/nestedpages.php' ) ) {
 			add_filter( 'post_row_actions', array( $this, 'add_post_row_action' ), 10, 2 );
 		}
 	}
@@ -189,11 +192,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Add one column for each enabled language in supported post-types.
 	 *
-	 * @param $columns
+	 * @param array $columns The columns of this post-table.
 	 *
 	 * @return array
 	 */
-	public function add_post_type_columns( $columns ): array {
+	public function add_post_type_columns( array $columns ): array {
 		// bail if we're looking at trash.
 		$status = get_query_var( 'post_status' );
 		if ( 'trash' === $status ) {
@@ -201,13 +204,13 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		}
 
 		// create new array for columns to get clean ordering.
-		$new_columns = array();
-		$new_columns['cb'] = $columns['cb'];
+		$new_columns          = array();
+		$new_columns['cb']    = $columns['cb'];
 		$new_columns['title'] = $columns['title'];
 
 		// get actual supported languages.
-		foreach( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
-			$new_columns['easy-language-'.strtolower($language_code)] = $settings['label'];
+		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+			$new_columns[ 'easy-language-' . strtolower( $language_code ) ] = $settings['label'];
 		}
 
 		// return result.
@@ -217,12 +220,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Add content for the new added columns in post-types.
 	 *
-	 * @param $column
-	 * @param $post_id
+	 * @param string $column The column.
+	 * @param int   $post_id The post-id.
 	 *
 	 * @return void
 	 */
-	public function add_post_type_column_content( $column, $post_id ): void {
+	public function add_post_type_column_content( string $column, int $post_id ): void {
 		// get active API for automatic translation.
 		$api_obj = Apis::get_instance()->get_active_api();
 
@@ -230,298 +233,296 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$post_object = new Post_Object( $post_id );
 
 		// get actual supported languages.
-		foreach( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
-			if ( 'easy-language-'.strtolower($language_code) === $column ) {
+		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+			if ( 'easy-language-' . strtolower( $language_code ) === $column ) {
 				// check if this object is already translated in this language.
-				if( false !== $post_object->is_translated_in_language( $language_code ) ) {
+				if ( false !== $post_object->is_translated_in_language( $language_code ) ) {
 					// get the post-ID of the translated page.
 					$translated_post_id = $post_object->get_translated_in_language( $language_code );
 
 					// get page-builder of this object.
 					$translated_post_obj = new Post_Object( $translated_post_id );
-					$page_builder = $translated_post_obj->get_page_builder();
+					$page_builder        = $translated_post_obj->get_page_builder();
 
 					// do not show anything if the used page builder plugin is not available.
-					if( false === $page_builder->is_active() ) {
+					if ( false === $page_builder->is_active() ) {
 						/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-						echo '<span class="dashicons dashicons-lightbulb" title="'.esc_attr(sprintf(__( 'Used page builder %1$s not available', 'easy-language' ), $page_builder->get_name())).'"></span>';
+						echo '<span class="dashicons dashicons-lightbulb" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), $page_builder->get_name() ) ) . '"></span>';
 
 						// get link to delete this translation.
 						$delete_translation = get_delete_post_link( $translated_post_id );
 
 						// show link to delete the translated post.
 						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="'.esc_attr( sprintf( __( 'Delete translation in %1$s', '' ), $settings['label']) ).'">&nbsp;</a>';
+						echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete translation in %1$s', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
 						continue;
 					}
 
 					// get page-builder-specific edit-link if user has capability for it.
-                    if( current_user_can( 'edit_el_translate' ) ) {
-	                    $edit_translation = $page_builder->get_edit_link();
+					if ( current_user_can( 'edit_el_translate' ) ) {
+						$edit_translation = $page_builder->get_edit_link();
 
-	                    // show link to add translation for this language.
-	                    /* translators: %1$s is the name of the language */
-	                    echo '<a href="' . esc_url( $edit_translation ) . '" class="dashicons dashicons-edit" title="' . esc_attr( sprintf( __( 'Edit translation in %1$s', '' ), $settings['label'] ) ) . '">&nbsp;</a>';
-                    }
+						// show link to add translation for this language.
+						/* translators: %1$s is the name of the language */
+						echo '<a href="' . esc_url( $edit_translation ) . '" class="dashicons dashicons-edit" title="' . esc_attr( sprintf( __( 'Edit translation in %1$s', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
+					}
 
 					// create link to run translation of this page via API (if available).
-					if( false !== $api_obj && current_user_can( 'edit_el_translate' ) ) {
-                        // get quota-state of this object.
-                        $quota_status = $translated_post_obj->get_quota_state( $api_obj );
+					if ( false !== $api_obj && current_user_can( 'edit_el_translate' ) ) {
+						// get quota-state of this object.
+						$quota_status = $translated_post_obj->get_quota_state( $api_obj );
 
-                        // only if it is ok show translate-icon.
-                        if( 'ok' === $quota_status['status'] ) {
-	                        // get link to add translation.
-	                        $do_translation = $translated_post_obj->get_translation_via_api_link();
+						// only if it is ok show translate-icon.
+						if ( 'ok' === $quota_status['status'] ) {
+							// get link to add translation.
+							$do_translation = $translated_post_obj->get_translation_via_api_link();
 
-	                        // show link to translate this page via api.
-	                        /* translators: %1$s is the name of the language, %2$s is the name of the used API, %3$s will be the API-title */
-	                        echo '<a href="' . esc_url( $do_translation ) . '" class="dashicons dashicons-translation easy-language-translate-object" data-id="'.absint($post_object->get_id()).'" title="' . esc_attr( sprintf( __( 'Translate this %1$s in %2$s with %3$s', 'easy-language' ), $translated_post_obj->get_type(), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</a>';
-                        }
-                        else {
-                            // otherwise show simple not clickable icon.
+							// show link to translate this page via api.
+							/* translators: %1$s is the name of the language, %2$s is the name of the used API, %3$s will be the API-title */
+							echo '<a href="' . esc_url( $do_translation ) . '" class="dashicons dashicons-translation easy-language-translate-object" data-id="' . absint( $post_object->get_id() ) . '" title="' . esc_attr( sprintf( __( 'Translate this %1$s in %2$s with %3$s', 'easy-language' ), $translated_post_obj->get_type(), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</a>';
+						} else {
+							// otherwise show simple not clickable icon.
 							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
-	                        echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'Not enough quota to translate this %1$s in %2$s with %3$s.', 'easy-language' ), $translated_post_obj->get_type(), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</span>';
-                        }
+							echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'Not enough quota to translate this %1$s in %2$s with %3$s.', 'easy-language' ), $translated_post_obj->get_type(), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</span>';
+						}
 
-                        // show quota hint.
+						// show quota hint.
 						$this->show_quota_hint( $api_obj );
 					}
 
-                    // get link to view object in frontend.
-                    $show_link = get_permalink( $translated_post_obj->get_id() );
+					// get link to view object in frontend.
+					$show_link = get_permalink( $translated_post_obj->get_id() );
 
-                    // show link to view object in frontend.
-					echo '<a href="' . esc_url( $show_link ) . '" class="dashicons dashicons-admin-site-alt3" target="_blank" title="'.esc_attr( __( 'Show in fronted (opens new window)', 'easy-language' ) ).'">&nbsp;</a>';
+					// show link to view object in frontend.
+					echo '<a href="' . esc_url( $show_link ) . '" class="dashicons dashicons-admin-site-alt3" target="_blank" title="' . esc_attr( __( 'Show in fronted (opens new window)', 'easy-language' ) ) . '">&nbsp;</a>';
 
 					// get link to delete this translation if user has capability for it.
-                    if( current_user_can( 'delete_el_translate' ) ) {
-	                    $delete_translation = get_delete_post_link( $translated_post_id );
+					if ( current_user_can( 'delete_el_translate' ) ) {
+						$delete_translation = get_delete_post_link( $translated_post_id );
 
-	                    // show link to delete the translated post.
-	                    /* translators: %1$s is the name of the language */
-	                    echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete translation in %1$s', '' ), $settings['label'] ) ) . '">&nbsp;</a>';
-                    }
+						// show link to delete the translated post.
+						/* translators: %1$s is the name of the language */
+						echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete translation in %1$s', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
+					}
 
 					// show mark if content of original page has been changed.
-					if( $post_object->has_changed( $language_code ) && current_user_can( 'edit_el_translate' ) ) {
-						echo '<span class="dashicons dashicons-image-rotate" title="'.__( 'Original content has been changed!', 'easy-language' ).'"></span>';
+					if ( $post_object->has_changed( $language_code ) && current_user_can( 'edit_el_translate' ) ) {
+						echo '<span class="dashicons dashicons-image-rotate" title="' . esc_html__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
 					}
-				}
-				else {
+				} else {
 					// create link to translate this post.
 					$create_translation = $post_object->get_translate_link( $language_code );
 
 					// show link to add translation for this language.
 					/* translators: %1$s is the name of the language */
-					echo '<a href="' . esc_url( $create_translation ) . '" class="dashicons dashicons-plus" title="'.esc_attr( sprintf( __( 'Add translation in %s', '' ), $settings['label']) ).'">&nbsp;</a>';
+					echo '<a href="' . esc_url( $create_translation ) . '" class="dashicons dashicons-plus" title="' . esc_attr( sprintf( esc_html__( 'Add translation in %s', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
 				}
 			}
 		}
 	}
 
 	/**
-     * Add one column for each enabled language in supported taxonomies.
-     *
-	 * @param $columns
+	 * Add one column for each enabled language in supported taxonomies.
+	 *
+	 * @param array $columns The columns of this taxonomy-table.
 	 *
 	 * @return array
 	 */
-    public function add_taxonomy_columns( $columns ): array {
-	    // create new array for columns to get clean ordering.
-	    $new_columns = array();
-	    $new_columns['cb'] = $columns['cb'];
-	    $new_columns['name'] = $columns['name'];
+	public function add_taxonomy_columns( array $columns ): array {
+		// create new array for columns to get clean ordering.
+		$new_columns         = array();
+		$new_columns['cb']   = $columns['cb'];
+		$new_columns['name'] = $columns['name'];
 
-	    // get actual supported languages.
-	    foreach( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
-		    $new_columns['easy-language '.strtolower($language_code)] = $settings['label'];
-	    }
+		// get actual supported languages.
+		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+			$new_columns[ 'easy-language ' . strtolower( $language_code ) ] = $settings['label'];
+		}
 
-	    // return result.
-	    return array_merge( $new_columns, $columns );
-    }
+		// return result.
+		return array_merge( $new_columns, $columns );
+	}
 
 	/**
-     * Add content for the new added columns in taxonomies.
-     *
-	 * @param string $string The default value for the column.
+	 * Add content for the new added columns in taxonomies.
+	 *
+	 * @param string $default_value The default value for the column.
 	 * @param string $column The name of the column.
-	 * @param int $term_id The ID of the term.
+	 * @param int    $term_id The ID of the term.
 	 *
 	 * @return void
 	 * @noinspection PhpUnusedParameterInspection
 	 */
-    public function add_taxonomy_column_content( string $string, string $column, int $term_id ): void {
-	    // get active API for automatic translation.
-	    $api_obj = Apis::get_instance()->get_active_api();
+	public function add_taxonomy_column_content( string $default_value, string $column, int $term_id ): void {
+		// get active API for automatic translation.
+		$api_obj = Apis::get_instance()->get_active_api();
 
-        // get term.
-        $term = get_term( $term_id );
+		// get term.
+		$term = get_term( $term_id );
 
-	    // get object of this term.
-	    $term_object = new Term_Object( $term_id, $term->taxonomy );
+		// get object of this term.
+		$term_object = new Term_Object( $term_id, $term->taxonomy );
 
-	    // get actual supported languages.
-	    foreach( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
-		    if ( 'easy-language '.strtolower($language_code) === $column ) {
-			    // check if this object is already translated in this language.
-			    if( false !== $term_object->is_translated_in_language( $language_code ) ) {
-				    // get the term-ID of the translated term.
-				    $translated_term_id = $term_object->get_translated_in_language( $language_code );
+		// get actual supported languages.
+		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+			if ( 'easy-language ' . strtolower( $language_code ) === $column ) {
+				// check if this object is already translated in this language.
+				if ( false !== $term_object->is_translated_in_language( $language_code ) ) {
+					// get the term-ID of the translated term.
+					$translated_term_id = $term_object->get_translated_in_language( $language_code );
 
-				    // get page-builder of this object.
-				    $translated_term_obj = new Term_Object( $translated_term_id, $term->taxonomy );
+					// get page-builder of this object.
+					$translated_term_obj = new Term_Object( $translated_term_id, $term->taxonomy );
 
-				    // get page-builder-specific edit-link if user has capability for it.
-				    if( current_user_can( 'edit_el_translate' ) ) {
-					    $edit_translation = $translated_term_obj->get_edit_link();
+					// get page-builder-specific edit-link if user has capability for it.
+					if ( current_user_can( 'edit_el_translate' ) ) {
+						$edit_translation = $translated_term_obj->get_edit_link();
 
-					    // show link to add translation for this language.
-					    /* translators: %1$s is the name of the language */
-					    echo '<a href="' . esc_url( $edit_translation ) . '" class="dashicons dashicons-edit" title="' . esc_attr( sprintf( __( 'Edit translation in %1$s', '' ), $settings['label'] ) ) . '">&nbsp;</a>';
-				    }
+						// show link to add translation for this language.
+						/* translators: %1$s is the name of the language */
+						echo '<a href="' . esc_url( $edit_translation ) . '" class="dashicons dashicons-edit" title="' . esc_attr( sprintf( __( 'Edit translation in %1$s', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
+					}
 
-				    // create link to run translation of this page via API (if available).
-				    if( false !== $api_obj && current_user_can( 'edit_el_translate' ) ) {
-					    // get link to add translation.
-					    $do_translation = $translated_term_obj->get_translation_via_api_link();
+					// create link to run translation of this page via API (if available).
+					if ( false !== $api_obj && current_user_can( 'edit_el_translate' ) ) {
+						// get link to add translation.
+						$do_translation = $translated_term_obj->get_translation_via_api_link();
 
-					    // show link to translate this page via api.
-					    /* translators: %1$s is the name of the language, %2$s is the name of the used API */
-					    echo '<a href="' . esc_url( $do_translation ) . '" class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'Translate this term in %1$s with %2$s', '' ), $settings['label'], $api_obj->get_title() ) ) . '">&nbsp;</a>';
+						// show link to translate this page via api.
+						/* translators: %1$s is the name of the language, %2$s is the name of the used API */
+						echo '<a href="' . esc_url( $do_translation ) . '" class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'Translate this term in %1$s with %2$s', 'easy-language' ), $settings['label'], $api_obj->get_title() ) ) . '">&nbsp;</a>';
 
-					    // show quota hint.
-					    $this->show_quota_hint( $api_obj );
-				    }
+						// show quota hint.
+						$this->show_quota_hint( $api_obj );
+					}
 
-				    // get link to delete this translation if user has capability for it.
-				    if( current_user_can( 'delete_el_translate' ) ) {
-					    $delete_translation = $translated_term_obj->get_delete_link();
+					// get link to delete this translation if user has capability for it.
+					if ( current_user_can( 'delete_el_translate' ) ) {
+						$delete_translation = $translated_term_obj->get_delete_link();
 
-					    // show link to delete the translated term.
-					    /* translators: %1$s is the name of the language */
-					    echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete translation in %1$s', '' ), $settings['label'] ) ) . '">&nbsp;</a>';
-				    }
+						// show link to delete the translated term.
+						/* translators: %1$s is the name of the language */
+						echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete translation in %1$s', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
+					}
 
-				    // show mark if content of original page has been changed.
-				    if( $term_object->has_changed( $language_code ) && current_user_can( 'edit_el_translate' ) ) {
-					    echo '<span class="dashicons dashicons-image-rotate" title="'.__( 'Original content has been changed!', 'easy-language' ).'"></span>';
-				    }
-			    }
-			    else {
-				    // create link to translate this term.
-				    $create_translation = $term_object->get_translate_link( $language_code );
+					// show mark if content of original page has been changed.
+					if ( $term_object->has_changed( $language_code ) && current_user_can( 'edit_el_translate' ) ) {
+						echo '<span class="dashicons dashicons-image-rotate" title="' . esc_html__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
+					}
+				} else {
+					// create link to translate this term.
+					$create_translation = $term_object->get_translate_link( $language_code );
 
-				    // show link to add translation for this language.
-				    /* translators: %1$s is the name of the language */
-				    echo '<a href="' . esc_url( $create_translation ) . '" class="dashicons dashicons-plus" title="'.esc_attr( sprintf( __( 'Add translation in %s', '' ), $settings['label']) ).'">&nbsp;</a>';
-			    }
-		    }
-	    }
-    }
+					// show link to add translation for this language.
+					/* translators: %1$s is the name of the language */
+					echo '<a href="' . esc_url( $create_translation ) . '" class="dashicons dashicons-plus" title="' . esc_attr( sprintf( __( 'Add translation in %s', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
+				}
+			}
+		}
+	}
 
 	/**
 	 * Hide our translated objects in queries for actively supported post types in backend.
 	 *
-	 * @param $query
+	 * @param WP_Query $query The query-object.
 	 *
 	 * @return void
 	 */
-	public function hide_translated_posts( $query ): void {
-		if ( is_admin() && '' === $query->get('do_not_use_easy_language_filter') && $query->get('post_status') !== 'trash' ) {
+	public function hide_translated_posts( WP_Query $query ): void {
+		if ( is_admin() && '' === $query->get( 'do_not_use_easy_language_filter' ) && $query->get( 'post_status' ) !== 'trash' ) {
 			// get our supported post-types.
 			$post_types = $this->get_supported_post_types();
 
 			// get requested post-types, if they are a post-type.
 			$hide_translated_posts = false;
-			if( is_array($query->get('post_type')) ) {
-				foreach( $query->get('post_type') as $post_type ) {
-					if( !empty($post_types[$post_type]) ) {
+			if ( is_array( $query->get( 'post_type' ) ) ) {
+				foreach ( $query->get( 'post_type' ) as $post_type ) {
+					if ( ! empty( $post_types[ $post_type ] ) ) {
 						$hide_translated_posts = true;
 					}
 				}
-			}
-			else {
-				if( !empty($post_types[$query->get('post_type')]) ) {
+			} elseif ( ! empty( $post_types[ $query->get( 'post_type' ) ] ) ) {
 					$hide_translated_posts = true;
+			}
+			if ( $hide_translated_posts ) {
+				$query->set(
+					'meta_query',
+					array(
+						array(
+							'key'     => 'easy_language_translation_original_id',
+							'compare' => 'NOT EXISTS',
+						),
+					)
+				);
+
+				if ( isset( $_GET['lang'] ) ) {
+					$query->set(
+						'meta_query',
+						array(
+							array(
+								'key'     => 'easy_language_translated_in',
+								'value'   => sanitize_text_field( wp_unslash( $_GET['lang'] ) ),
+								'compare' => 'LIKE',
+							),
+						)
+					);
 				}
 			}
-            if( $hide_translated_posts ) {
-	            $query->set( 'meta_query', array(
-			            array(
-				            'key'     => 'easy_language_translation_original_id',
-				            'compare' => 'NOT EXISTS'
-			            )
-		            )
-	            );
-
-	            if ( isset( $_GET['lang'] ) ) {
-		            $query->set( 'meta_query', array(
-				            array(
-					            'key'     => 'easy_language_translated_in',
-					            'value'   => wp_unslash( $_GET['lang'] ),
-					            'compare' => 'LIKE'
-				            )
-			            )
-		            );
-	            }
-            }
 		}
 	}
 
 	/**
 	 * Hide our translated terms in queries for post types in backend.
 	 *
-	 * @param $args
+	 * @param array $args The arguments for this term-table.
 	 *
 	 * @return array
 	 */
-	public function hide_translated_terms( $args ): array {
-		if ( is_admin() && !empty($args['taxonomy'][0]) && $args['taxonomy'][0] === 'category' && empty($_GET['action']) ) {
+	public function hide_translated_terms( array $args ): array {
+		if ( is_admin() && ! empty( $args['taxonomy'][0] ) && 'category' === $args['taxonomy'][0] && empty( $_GET['action'] ) ) {
 			$args['meta_query'] = array(
-                array(
-                    'key' => 'easy_language_translation_original_id',
-                    'compare' => 'NOT EXISTS'
-                )
+				array(
+					'key'     => 'easy_language_translation_original_id',
+					'compare' => 'NOT EXISTS',
+				),
 			);
 		}
 
-        // return resulting arguments.
-        return $args;
+		// return resulting arguments.
+		return $args;
 	}
 
 	/**
 	 * If locale setting changed in WP, change the plugin-settings.
 	 *
-	 * @param $old_value
-	 * @param $value
+	 * @param string $old_value The old value of the changed option.
+	 * @param string $value The new value of the changed option.
 	 *
 	 * @return void
 	 */
-	public function option_locale_changed( $old_value, $value ): void {
+	public function option_locale_changed( string $old_value, string $value ): void {
 		// if new value is empty, it is the en_US-default.
-		if( empty($value) ) {
+		if ( empty( $value ) ) {
 			$value = 'en_US';
 		}
 
 		// same for old_value.
-		if( empty($old_value) ) {
+		if ( empty( $old_value ) ) {
 			$old_value = 'en_US';
 		}
 
 		// get actual setting for source languages.
-		$languages = get_option( 'easy_language_source_languages', array());
+		$languages = get_option( 'easy_language_source_languages', array() );
 
 		// remove the old-value from list, if it exists there.
-		if( isset($languages[$old_value]) ) {
+		if ( isset( $languages[ $old_value ] ) ) {
 			unset( $languages[ $old_value ] );
 		}
 
 		// check if the new value is supported as source language by active APIs.
-		$add = false;
+		$add     = false;
 		$api_obj = Apis::get_instance()->get_active_api();
-		if( false !== $api_obj ) {
+		if ( false !== $api_obj ) {
 			$source_languages = $api_obj->get_supported_source_languages();
 			if ( ! empty( $source_languages[ $value ] ) ) {
 				$add = true;
@@ -529,24 +530,24 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		}
 
 		// add the new language as activate language.
-		if( false !== $add ) {
-			$languages[ $value ] = "1";
+		if ( false !== $add ) {
+			$languages[ $value ] = '1';
 		}
 
 		// update resulting setting.
-		update_option( 'easy_language_source_languages', $languages);
+		update_option( 'easy_language_source_languages', $languages );
 	}
 
 	/**
 	 * Add translation-button in admin bar in frontend.
 	 *
-	 * @param WP_Admin_Bar $admin_bar
+	 * @param WP_Admin_Bar $admin_bar The admin-bar-object.
 	 *
 	 * @return void
 	 */
 	public function admin_bar_menu( WP_Admin_Bar $admin_bar ): void {
 		// do not show anything in wp-admin.
-		if( is_admin() ) {
+		if ( is_admin() ) {
 			return;
 		}
 
@@ -556,7 +557,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		}
 
 		// bail if support for our own languages is handled by other multilingual plugin.
-		if( Multilingual_Plugins::get_instance()->is_plugin_with_support_for_given_languages_enabled( $this->get_supported_languages() ) ) {
+		if ( Multilingual_Plugins::get_instance()->is_plugin_with_support_for_given_languages_enabled( $this->get_supported_languages() ) ) {
 			return;
 		}
 
@@ -564,40 +565,40 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$target_languages = Languages::get_instance()->get_active_languages();
 
 		// if actual language is not supported as source language, do not show anything.
-		if( empty($target_languages) ) {
+		if ( empty( $target_languages ) ) {
 			return;
 		}
 
-		// get current object id
+		// get current object id.
 		$object_id = get_queried_object_id();
 
 		// get our own object for the requested object.
 		$object = $this->get_object_by_wp_object( get_queried_object(), $object_id );
-		if( false === $object ) {
+		if ( false === $object ) {
 			return;
 		}
 
 		// bail if used pagebuilder prevent display of translate-option in frontend (e.g. to use its own options).
-		if( $object->get_page_builder() && false !== $object->get_page_builder()->hide_translate_menu_in_frontend() ) {
+		if ( $object->get_page_builder() && false !== $object->get_page_builder()->hide_translate_menu_in_frontend() ) {
 			return;
 		}
 
 		// bail if a multilingual-plugin is used which already translates this page.
-		foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if( $plugin_obj->is_foreign_plugin() ) {
+		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
+			if ( $plugin_obj->is_foreign_plugin() ) {
 				return;
 			}
 		}
 
 		// check if this object is a translated object.
-		if( $object->is_translated() ) {
+		if ( $object->is_translated() ) {
 			$object_id = $object->get_original_object_as_int();
 			// get new object as base for the listing.
 			$object = $this->get_object_by_wp_object( get_queried_object(), $object_id );
 		}
 
 		// bail if post type is not supported.
-		if( false === $this->is_post_type_supported( $object->get_type() ) ) {
+		if ( false === $this->is_post_type_supported( $object->get_type() ) ) {
 			return;
 		}
 
@@ -605,34 +606,37 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$id = 'easy-language-translate-button';
 
 		// add not clickable main menu where all languages will be added as dropdown-items.
-		$admin_bar->add_menu( array(
-			'id'    => $id,
-			'parent' => null,
-			'group'  => null,
-			'title' => __( 'Translate page', 'easy-language' ),
-			'href'  => '',
-		) );
+		$admin_bar->add_menu(
+			array(
+				'id'     => $id,
+				'parent' => null,
+				'group'  => null,
+				'title'  => __( 'Translate page', 'easy-language' ),
+				'href'   => '',
+			)
+		);
 
 		// add sub-entry for each possible target language.
-		foreach( $target_languages as $language_code => $target_language ) {
+		foreach ( $target_languages as $language_code => $target_language ) {
 			// check if this object is already translated in this language.
-			if( false !== $object->is_translated_in_language( $language_code ) ) {
+			if ( false !== $object->is_translated_in_language( $language_code ) ) {
 				// generate link-target to default editor with language-marker.
 				$translated_post_object = new Post_Object( $object->get_translated_in_language( $language_code ) );
-				$url = $translated_post_object->get_page_builder()->get_edit_link();
-			}
-			else {
+				$url                    = $translated_post_object->get_page_builder()->get_edit_link();
+			} else {
 				// create link to generate a new translation for this object.
 				$url = $object->get_translate_link( $language_code );
 			}
 
 			// add language as possible translation-target.
-			$admin_bar->add_menu( array(
-				'id'        => $id.'-'.$language_code,
-				'parent'    => $id,
-				'title'     => $target_language['label'],
-				'href'      => $url,
-			) );
+			$admin_bar->add_menu(
+				array(
+					'id'     => $id . '-' . $language_code,
+					'parent' => $id,
+					'title'  => $target_language['label'],
+					'href'   => $url,
+				)
+			);
 		}
 	}
 
@@ -643,8 +647,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @noinspection PhpUndefinedClassInspection
 	 * @noinspection PhpFullyQualifiedNameUsageInspection
 	 */
-	public function cli(): void	{
-		\WP_CLI::add_command('easy-language', 'easyLanguage\Multilingual_plugins\Easy_Language\Cli');
+	public function cli(): void {
+		\WP_CLI::add_command( 'easy-language', 'easyLanguage\Multilingual_plugins\Easy_Language\Cli' );
 	}
 
 	/**
@@ -668,13 +672,13 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Return supported post-types.
 	 *
-	 * @param string $post_type
+	 * @param string $post_type The name of the requested post-type.
 	 *
 	 * @return bool
 	 */
 	public function is_post_type_supported( string $post_type ): bool {
 		$post_types = $this->get_supported_post_types();
-		return !empty($post_types[$post_type]);
+		return ! empty( $post_types[ $post_type ] );
 	}
 
 	/**
@@ -684,80 +688,92 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	public function install(): void {
 		// set supported post-types.
-		if( !get_option('easy_language_post_types') ) {
-			update_option('easy_language_post_types', array( 'post' => '1', 'page' => '1' ) );
+		if ( ! get_option( 'easy_language_post_types' ) ) {
+			update_option(
+				'easy_language_post_types',
+				array(
+					'post' => '1',
+					'page' => '1',
+				)
+			);
 		}
 
 		// set supported taxonomies.
-		if( !get_option('easy_language_taxonomies') ) {
-			update_option('easy_language_taxonomies', array( 'category' => '1', 'post_tag' => '1' ) );
+		if ( ! get_option( 'easy_language_taxonomies' ) ) {
+			update_option(
+				'easy_language_taxonomies',
+				array(
+					'category' => '1',
+					'post_tag' => '1',
+				)
+			);
 		}
 
 		// set deletion state.
-		if( !get_option('easy_language_state_on_deactivation') ) {
-			update_option('easy_language_state_on_deactivation', 'draft' );
+		if ( ! get_option( 'easy_language_state_on_deactivation' ) ) {
+			update_option( 'easy_language_state_on_deactivation', 'draft' );
 		}
 
 		// set to generate permalinks.
-		if( !get_option('easy_language_generate_permalink') ) {
-			update_option('easy_language_generate_permalink', '1' );
+		if ( ! get_option( 'easy_language_generate_permalink' ) ) {
+			update_option( 'easy_language_generate_permalink', '1' );
 		}
 
 		// set language-switcher-mode.
-		if( !get_option('easy_language_switcher_link') ) {
-			update_option('easy_language_switcher_link', 'hide_not_translated');
+		if ( ! get_option( 'easy_language_switcher_link' ) ) {
+			update_option( 'easy_language_switcher_link', 'hide_not_translated' );
 		}
 
 		// set supported language to one matching the project-language.
-		if( !get_option('easy_language_languages') ) {
-			$source_languages = get_option('easy_language_source_languages');
-			$languages = array();
-			$mappings = Apis::get_instance()->get_available_apis()[0]->get_mapping_languages();
-			foreach( $source_languages as $source_language => $enabled ) {
-				if( !empty($mappings[$source_language]) ) {
-					foreach( $mappings[$source_language] as $language ) {
-						$languages[ $language ] = "1";
+		if ( ! get_option( 'easy_language_languages' ) ) {
+			$source_languages = get_option( 'easy_language_source_languages' );
+			$languages        = array();
+			$mappings         = Apis::get_instance()->get_available_apis()[0]->get_mapping_languages();
+			foreach ( $source_languages as $source_language => $enabled ) {
+				if ( ! empty( $mappings[ $source_language ] ) ) {
+					foreach ( $mappings[ $source_language ] as $language ) {
+						$languages[ $language ] = '1';
 					}
 				}
 			}
-			update_option('easy_language_languages', $languages );
+			update_option( 'easy_language_languages', $languages );
 		}
 
-        // get post-type-names.
-        $post_type_names = \easyLanguage\Init::get_instance()->get_post_type_names();
+		// get post-type-names.
+		$post_type_names = \easyLanguage\Init::get_instance()->get_post_type_names();
 
-        // get our own translator-role.
-		$translator_role = get_role('el_translator');
+		// get our own translator-role.
+		$translator_role = get_role( 'el_translator' );
 
 		// get all translated, draft and marked objects in any supported language to set them to publish.
-		foreach( $this->get_supported_post_types() as $post_type => $enabled ) {
-			$query = array(
-				'post_type' => $post_type,
-				'posts_per_page' => -1,
-				'post_status' => array( 'any', 'trash' ),
-				'fields' => 'ids',
-				'meta_query' => array(
+		foreach ( $this->get_supported_post_types() as $post_type => $enabled ) {
+			$query   = array(
+				'post_type'                       => $post_type,
+				'posts_per_page'                  => -1,
+				'post_status'                     => array( 'any', 'trash' ),
+				'fields'                          => 'ids',
+				'meta_query'                      => array(
 					'relation' => 'AND',
 					array(
-						'key' => 'easy_language_translation_original_id',
-						'compare' => 'EXISTS'
+						'key'     => 'easy_language_translation_original_id',
+						'compare' => 'EXISTS',
 					),
 					array(
-						'key' => 'easy_language_translation_state_changed_from',
-						'compare' => 'EXISTS'
-					)
+						'key'     => 'easy_language_translation_state_changed_from',
+						'compare' => 'EXISTS',
+					),
 				),
-				'do_not_use_easy_language_filter' => true
+				'do_not_use_easy_language_filter' => true,
 			);
 			$results = new WP_Query( $query );
-			foreach( $results->posts as $post_id ) {
+			foreach ( $results->posts as $post_id ) {
 				// get state this post hav before.
 				$post_state = get_post_meta( $post_id, 'easy_language_translation_state_changed_from', true );
 
 				// set the state.
 				$query = array(
-					'ID'           => $post_id,
-					'post_status'  => $post_state,
+					'ID'          => $post_id,
+					'post_status' => $post_state,
 				);
 				wp_update_post( $query );
 
@@ -766,17 +782,17 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			}
 
 			// add cap for translator-role to edit this post-types.
-            if( !empty($post_type_names[$post_type]) ) {
-	            $translator_role->add_cap( 'create_' . $post_type_names[ $post_type ] );
-	            $translator_role->add_cap( 'delete_' . $post_type_names[ $post_type ] );
-	            $translator_role->add_cap( 'delete_others_' . $post_type_names[ $post_type ] );
-	            $translator_role->add_cap( 'delete_published_' . $post_type_names[ $post_type ] );
-	            $translator_role->add_cap( 'delete_private_' . $post_type_names[ $post_type ] );
-	            $translator_role->add_cap( 'edit_' . $post_type_names[ $post_type ] );
-	            $translator_role->add_cap( 'edit_others_' . $post_type_names[ $post_type ] );
-	            $translator_role->add_cap( 'edit_published_' . $post_type_names[ $post_type ] );
-	            $translator_role->add_cap( 'publish_' . $post_type_names[ $post_type ] );
-            }
+			if ( ! empty( $post_type_names[ $post_type ] ) ) {
+				$translator_role->add_cap( 'create_' . $post_type_names[ $post_type ] );
+				$translator_role->add_cap( 'delete_' . $post_type_names[ $post_type ] );
+				$translator_role->add_cap( 'delete_others_' . $post_type_names[ $post_type ] );
+				$translator_role->add_cap( 'delete_published_' . $post_type_names[ $post_type ] );
+				$translator_role->add_cap( 'delete_private_' . $post_type_names[ $post_type ] );
+				$translator_role->add_cap( 'edit_' . $post_type_names[ $post_type ] );
+				$translator_role->add_cap( 'edit_others_' . $post_type_names[ $post_type ] );
+				$translator_role->add_cap( 'edit_published_' . $post_type_names[ $post_type ] );
+				$translator_role->add_cap( 'publish_' . $post_type_names[ $post_type ] );
+			}
 		}
 	}
 
@@ -788,21 +804,21 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	public function deactivation(): void {
 		// get new state setting.
 		$new_state_setting = get_option( 'easy_language_state_on_deactivation', 'draft' );
-		if( 'disabled' !== $new_state_setting ) {
+		if ( 'disabled' !== $new_state_setting ) {
 			// get all translated objects in any supported language to set them to draft.
 			foreach ( $this->get_supported_post_types() as $post_type => $enabled ) {
 				$query   = array(
-					'post_type'      => $post_type,
-					'posts_per_page' => -1,
-					'post_status'    => array( 'any', 'trash' ),
-					'fields'         => 'ids',
-					'meta_query'     => array(
+					'post_type'                       => $post_type,
+					'posts_per_page'                  => -1,
+					'post_status'                     => array( 'any', 'trash' ),
+					'fields'                          => 'ids',
+					'meta_query'                      => array(
 						array(
 							'key'     => 'easy_language_translation_original_id',
-							'compare' => 'EXISTS'
-						)
+							'compare' => 'EXISTS',
+						),
 					),
-					'do_not_use_easy_language_filter' => true
+					'do_not_use_easy_language_filter' => true,
 				);
 				$results = new WP_Query( $query );
 				foreach ( $results->posts as $post_id ) {
@@ -830,22 +846,22 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	public function uninstall(): void {
 		// remove translated contents.
-		foreach( DB::get_instance()->get_entries() as $entry ) {
+		foreach ( DB::get_instance()->get_entries() as $entry ) {
 			$entry->delete();
 		}
 
-        // remove custom transients which are not set via Transient-object.
-        delete_transient( 'easy_language_refresh_rewrite_rules' );
+		// remove custom transients which are not set via Transient-object.
+		delete_transient( 'easy_language_refresh_rewrite_rules' );
 
 		// delete switcher.
-		$query = array(
-			'post_type' => EASY_LANGUAGE_CPT_SWITCHER,
-			'post_status' => 'any',
+		$query    = array(
+			'post_type'     => EASY_LANGUAGE_CPT_SWITCHER,
+			'post_status'   => 'any',
 			'post_per_page' => -1,
-			'fields' => 'ids'
+			'fields'        => 'ids',
 		);
 		$switcher = new WP_Query( $query );
-		foreach( $switcher->posts as $post_id ) {
+		foreach ( $switcher->posts as $post_id ) {
 			wp_delete_post( $post_id, true );
 		}
 
@@ -858,93 +874,93 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING,
 			EASY_LANGUAGE_OPTION_TRANSLATE_COUNT,
 			EASY_LANGUAGE_OPTION_TRANSLATE_MAX,
-            'easy_language_switcher_default',
-            'easy_language_state_on_deactivation',
-            'easy_language_generate_permalink'
+			'easy_language_switcher_default',
+			'easy_language_state_on_deactivation',
+			'easy_language_generate_permalink',
 		);
-		foreach( $options as $option ) {
+		foreach ( $options as $option ) {
 			delete_option( $option );
 		}
 	}
 
-    /**
-     * Add settings for this plugin.
-     *
-     * @return void
-     */
-    public function add_settings(): void {
-        /**
-         * Easy Language Section
-         */
-        add_settings_section(
-            'settings_section_easy_language',
-            __('General Settings', 'easy-language'),
-            '__return_true',
-            'easyLanguageEasyLanguagePage'
-        );
+	/**
+	 * Add settings for this plugin.
+	 *
+	 * @return void
+	 */
+	public function add_settings(): void {
+		/**
+		 * Easy Language Section
+		 */
+		add_settings_section(
+			'settings_section_easy_language',
+			__( 'General Settings', 'easy-language' ),
+			'__return_true',
+			'easyLanguageEasyLanguagePage'
+		);
 
 		// get all actual post-types in this project.
 		$post_types_array = array( 'post', 'page' );
-	    $post_types = array();
-		foreach( $post_types_array as $post_type ) {
-			$post_type_obj = get_post_type_object($post_type);
-			if( false !== $post_type_obj->show_ui && false !== $post_type_obj->public && 'attachment' !== $post_type_obj->name ) {
-				$post_types[$post_type] = array(
-					'label' => $post_type_obj->label
+		$post_types       = array();
+		foreach ( $post_types_array as $post_type ) {
+			$post_type_obj = get_post_type_object( $post_type );
+			if ( false !== $post_type_obj->show_ui && false !== $post_type_obj->public && 'attachment' !== $post_type_obj->name ) {
+				$post_types[ $post_type ] = array(
+					'label' => $post_type_obj->label,
 				);
 			}
 		}
 
-        // Choose supported post-types.
-        add_settings_field(
-            'easy_language_post_types',
-            __( 'Choose supported post-types', 'easy-language' ),
-            'easy_language_admin_multiple_checkboxes_field',
-            'easyLanguageEasyLanguagePage',
-            'settings_section_easy_language',
-            array(
-                'label_for' => 'easy_language_post_types',
-                'fieldId' => 'easy_language_post_types',
-                'description' => '', // TODO pro-hint
-				'options' => apply_filters( 'easy_language_possible_post_types', $post_types )
-            )
-        );
-        register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_post_types', array( 'sanitize_callback' => array( $this, 'validate_post_types') ) );
+		// Choose supported post-types.
+		add_settings_field(
+			'easy_language_post_types',
+			__( 'Choose supported post-types', 'easy-language' ),
+			'easy_language_admin_multiple_checkboxes_field',
+			'easyLanguageEasyLanguagePage',
+			'settings_section_easy_language',
+			array(
+				'label_for'   => 'easy_language_post_types',
+				'fieldId'     => 'easy_language_post_types',
+				'description' => '', // TODO pro-hint.
+				'options'     => apply_filters( 'easy_language_possible_post_types', $post_types ),
+			)
+		);
+		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_post_types', array( 'sanitize_callback' => array( $this, 'validate_post_types' ) ) );
 
-	    // get all actual taxonomies in this project.
-	    $taxonomies_array = array( 'category', 'post_tag' );
-        $taxonomies = array();
-        foreach( $taxonomies_array as $taxonomy ) {
-	        $taxonomy_obj = get_taxonomy( $taxonomy );
-	        if( false !== $taxonomy_obj->show_ui && false !== $taxonomy_obj->public ) {
-		        $taxonomies[$taxonomy] = array(
-			        'label' => $taxonomy_obj->label
-		        );
-	        }
-        }
+		// get all actual taxonomies in this project.
+		$taxonomies_array = array( 'category', 'post_tag' );
+		$taxonomies       = array();
+		foreach ( $taxonomies_array as $taxonomy ) {
+			$taxonomy_obj = get_taxonomy( $taxonomy );
+			if ( false !== $taxonomy_obj->show_ui && false !== $taxonomy_obj->public ) {
+				$taxonomies[ $taxonomy ] = array(
+					'label' => $taxonomy_obj->label,
+				);
+			}
+		}
 
-	    // Choose supported taxonomies.
-	    add_settings_field(
-		    'easy_language_taxonomies',
-		    __( 'Choose supported taxonomies', 'easy-language' ),
-		    'easy_language_admin_multiple_checkboxes_field',
-		    'easyLanguageEasyLanguagePage',
-		    'settings_section_easy_language',
-		    array(
-			    'label_for' => 'easy_language_taxonomies',
-			    'fieldId' => 'easy_language_taxonomies',
-			    'description' => '',
-			    'options' => apply_filters( 'easy_language_possible_taxonomies', $taxonomies )
-		    )
-	    );
-	    register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_taxonomies', array( 'sanitize_callback' => array( $this, 'validate_taxonomies') ) );
+		// Choose supported taxonomies.
+		add_settings_field(
+			'easy_language_taxonomies',
+			__( 'Choose supported taxonomies', 'easy-language' ),
+			'easy_language_admin_multiple_checkboxes_field',
+			'easyLanguageEasyLanguagePage',
+			'settings_section_easy_language',
+			array(
+				'label_for'   => 'easy_language_taxonomies',
+				'fieldId'     => 'easy_language_taxonomies',
+				'description' => '',
+				'options'     => apply_filters( 'easy_language_possible_taxonomies', $taxonomies ),
+			)
+		);
+		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_taxonomies', array( 'sanitize_callback' => array( $this, 'validate_taxonomies' ) ) );
 
 		// get active api for readonly-marker depending on active api.
 		$active_api = Apis::get_instance()->get_active_api();
-	    $readonly = true;
-        if( $active_api && false === $active_api->has_settings() ) {
-            $readonly = false;
-        }
+		$readonly   = true;
+		if ( $active_api && false === $active_api->has_settings() ) {
+			$readonly = false;
+		}
 
 		// Choose supported languages for manuel translations.
 		add_settings_field(
@@ -954,166 +970,171 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easyLanguageEasyLanguagePage',
 			'settings_section_easy_language',
 			array(
-				'label_for' => 'easy_language_languages',
-				'fieldId' => 'easy_language_languages',
+				'label_for'   => 'easy_language_languages',
+				'fieldId'     => 'easy_language_languages',
 				'description' => $readonly ? __( 'Go to API-settings to choose the languages you want to use.', 'easy-language' ) : __( 'Choose the language you want to use for translation.', 'easy-language' ),
-				'options' => Languages::get_instance()->get_possible_target_languages(),
-				'readonly' => $readonly
+				'options'     => Languages::get_instance()->get_possible_target_languages(),
+				'readonly'    => $readonly,
 			)
 		);
-		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_languages', array( 'sanitize_callback' => array( $this, 'change_langauges' ) ) );
+		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_languages', array( 'sanitize_callback' => array( $this, 'change_languages' ) ) );
 
-	    // Set object state on plugin deactivation.
-	    add_settings_field(
-		    'easy_language_state_on_deactivation',
-		    __( 'Set object state on plugin deactivation', 'easy-language' ),
-		    'easy_language_admin_select_field',
-		    'easyLanguageEasyLanguagePage',
-		    'settings_section_easy_language',
-		    array(
-			    'label_for' => 'easy_language_state_on_deactivation',
-			    'fieldId' => 'easy_language_state_on_deactivation',
-			    'description' => __('If plugin is disabled your translated objects will get the state set here. If plugin is reactivated they will be set to their state before.<br><strong>Hint:</strong> During uninstallation all translated objects will be deleted regardless of the setting here.', 'easy-language'),
-			    'values' => array(
-				    'disabled' => __( 'Do not change anything', 'easy-language'),
-				    'draft' => __( 'Set to draft', 'easy-language'),
-				    'trash' => __( 'Set to trash', 'easy-language'),
-			    ),
-			    'disable_empty' => true
-		    )
-	    );
-	    register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_state_on_deactivation' );
+		// Set object state on plugin deactivation.
+		add_settings_field(
+			'easy_language_state_on_deactivation',
+			__( 'Set object state on plugin deactivation', 'easy-language' ),
+			'easy_language_admin_select_field',
+			'easyLanguageEasyLanguagePage',
+			'settings_section_easy_language',
+			array(
+				'label_for'     => 'easy_language_state_on_deactivation',
+				'fieldId'       => 'easy_language_state_on_deactivation',
+				'description'   => __( 'If plugin is disabled your translated objects will get the state set here. If plugin is reactivated they will be set to their state before.<br><strong>Hint:</strong> During uninstallation all translated objects will be deleted regardless of the setting here.', 'easy-language' ),
+				'values'        => array(
+					'disabled' => __( 'Do not change anything', 'easy-language' ),
+					'draft'    => __( 'Set to draft', 'easy-language' ),
+					'trash'    => __( 'Set to trash', 'easy-language' ),
+				),
+				'disable_empty' => true,
+			)
+		);
+		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_state_on_deactivation' );
 
-	    // Set if translated pages should have a generated permalink.
-	    add_settings_field(
-		    'easy_language_generate_permalink',
-		    __( 'Generate permalink for translated objects', 'easy-language' ),
-		    'easy_language_admin_checkbox_field',
-		    'easyLanguageEasyLanguagePage',
-		    'settings_section_easy_language',
-		    array(
-			    'label_for' => 'easy_language_generate_permalink',
-			    'fieldId' => 'easy_language_generate_permalink',
-			    'description' => __('If enabled an individual permalink will be generated from title after translation of the title.', 'easy-language'),
-		    )
-	    );
-	    register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_generate_permalink' );
+		// Set if translated pages should have a generated permalink.
+		add_settings_field(
+			'easy_language_generate_permalink',
+			__( 'Generate permalink for translated objects', 'easy-language' ),
+			'easy_language_admin_checkbox_field',
+			'easyLanguageEasyLanguagePage',
+			'settings_section_easy_language',
+			array(
+				'label_for'   => 'easy_language_generate_permalink',
+				'fieldId'     => 'easy_language_generate_permalink',
+				'description' => __( 'If enabled an individual permalink will be generated from title after translation of the title.', 'easy-language' ),
+			)
+		);
+		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_generate_permalink' );
 
-	    /**
-	     * Frontend Section
-	     */
-	    add_settings_section(
-		    'settings_section_frontend',
-		    __( 'Frontend Settings', 'easy-language' ),
-		    '__return_true',
-		    'easyLanguageEasyLanguagePage'
-	    );
+		/**
+		 * Frontend Section
+		 */
+		add_settings_section(
+			'settings_section_frontend',
+			__( 'Frontend Settings', 'easy-language' ),
+			'__return_true',
+			'easyLanguageEasyLanguagePage'
+		);
 
-	    // Choose link-mode for language-switcher.
-	    add_settings_field(
-		    'easy_language_switcher_link',
-		    __( 'Choose link-mode for language switcher', 'easy-language' ),
-		    'easy_language_admin_multiple_radio_field',
-		    'easyLanguageEasyLanguagePage',
-		    'settings_section_frontend',
-		    array(
-			    'label_for' => 'easy_language_switcher_link',
-			    'fieldId' => 'easy_language_switcher_link',
-			    'options' => array(
-				    'do_not_link' => array(
-					    'label' => __( 'Do not link translated pages', 'easy-language'),
-					    'enabled' => true,
-					    'description' => __( 'The links in the switcher will general link to the language-specific homepage.', 'easy-language'),
-				    ),
-				    'link_translated' => array(
-					    'label' => __( 'Link translated pages.', 'easy-language'),
-					    'enabled' => true,
-					    'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will target the language-specific homepage.', 'easy-language'),
-				    ),
-					'hide_not_translated' => array(
-						'label' => __( 'Do not link not translated pages.', 'easy-language'),
-						'enabled' => true,
-						'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will not be visible.', 'easy-language'),
+		// Choose link-mode for language-switcher.
+		add_settings_field(
+			'easy_language_switcher_link',
+			__( 'Choose link-mode for language switcher', 'easy-language' ),
+			'easy_language_admin_multiple_radio_field',
+			'easyLanguageEasyLanguagePage',
+			'settings_section_frontend',
+			array(
+				'label_for' => 'easy_language_switcher_link',
+				'fieldId'   => 'easy_language_switcher_link',
+				'options'   => array(
+					'do_not_link'         => array(
+						'label'       => __( 'Do not link translated pages', 'easy-language' ),
+						'enabled'     => true,
+						'description' => __( 'The links in the switcher will general link to the language-specific homepage.', 'easy-language' ),
 					),
-			    ),
-		    )
-	    );
-	    register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_switcher_link' );
-    }
-
-    /**
-     * Add settings-tab for this plugin.
-     *
-     * @param $tab
-     *
-     * @return void
-     */
-    public function add_settings_tab( $tab ): void {
-        // check active tab
-        $activeClass = '';
-        if( 'general' === $tab ) $activeClass = ' nav-tab-active';
-
-        // output tab
-        echo '<a href="'.esc_url(helper::get_settings_page_url()).'&tab=general" class="nav-tab'.esc_attr($activeClass).'">'.__('General Settings', 'easy-language').'</a>';
-    }
+					'link_translated'     => array(
+						'label'       => __( 'Link translated pages.', 'easy-language' ),
+						'enabled'     => true,
+						'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will target the language-specific homepage.', 'easy-language' ),
+					),
+					'hide_not_translated' => array(
+						'label'       => __( 'Do not link not translated pages.', 'easy-language' ),
+						'enabled'     => true,
+						'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will not be visible.', 'easy-language' ),
+					),
+				),
+			)
+		);
+		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_switcher_link' );
+	}
 
 	/**
 	 * Add settings-tab for this plugin.
 	 *
-	 * @param $tab
+	 * @param string $tab The actually called tab.
 	 *
 	 * @return void
 	 */
-	public function add_translations_tab( $tab ): void {
-		// check active tab
-		$activeClass = '';
-		if( 'translations' === $tab ) $activeClass = ' nav-tab-active';
+	public function add_settings_tab( string $tab ): void {
+		// check active tab.
+		$active_class = '';
+		if ( 'general' === $tab ) {
+			$active_class = ' nav-tab-active';
+		}
 
-		// output tab
-		echo '<a href="'.esc_url(helper::get_settings_page_url()).'&tab=translations" class="nav-tab'.esc_attr($activeClass).'">'.__('Translations', 'easy-language').'</a>';
+		// output tab.
+		echo '<a href="' . esc_url( helper::get_settings_page_url() ) . '&tab=general" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'General Settings', 'easy-language' ) . '</a>';
 	}
 
-    /**
-     * Add settings page for this plugin.
-     *
-     * @return void
-     */
-    public function add_settings_page(): void {
-        // check user capabilities
-        if ( ! current_user_can( 'manage_options' ) ) {
-            return;
-        }
+	/**
+	 * Add settings-tab for this plugin.
+	 *
+	 * @param string $tab The actually called tab.
+	 *
+	 * @return void
+	 */
+	public function add_translations_tab( string $tab ): void {
+		// check active tab.
+		$active_class = '';
+		if ( 'translations' === $tab ) {
+			$active_class = ' nav-tab-active';
+		}
 
-        ?>
-        <form method="POST" action="<?php echo get_admin_url(); ?>options.php">
-            <?php
-            settings_fields( 'easyLanguageEasyLanguageFields' );
-            do_settings_sections( 'easyLanguageEasyLanguagePage' );
-            submit_button();
-            ?>
-        </form>
-        <?php
-    }
+		// output tab.
+		echo '<a href="' . esc_url( helper::get_settings_page_url() ) . '&tab=translations" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'Translations', 'easy-language' ) . '</a>';
+	}
+
+	/**
+	 * Add settings page for this plugin.
+	 *
+	 * @return void
+	 */
+	public function add_settings_page(): void {
+		// check user capabilities.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// output.
+		?>
+		<form method="POST" action="<?php echo esc_url( get_admin_url() ); ?>options.php">
+			<?php
+			settings_fields( 'easyLanguageEasyLanguageFields' );
+			do_settings_sections( 'easyLanguageEasyLanguagePage' );
+			submit_button();
+			?>
+		</form>
+		<?php
+	}
 
 	/**
 	 * Process multiple translations.
 	 *
-	 * @param Object $translation_obj
-	 * @param array $language_mappings
-	 * @param int $object_id
-	 * @param string $taxonomy
+	 * @param Object $translation_obj The translation-object.
+	 * @param array  $language_mappings The language-mappings.
+	 * @param int    $object_id The requested object-id (post- or taxonomy-id).
+	 * @param string $taxonomy The taxonomy (only for taxonomies).
 	 *
 	 * @return int
 	 * @noinspection PhpUnused
 	 * @noinspection PhpUndefinedFunctionInspection
 	 */
-	public function process_translations( Object $translation_obj, array $language_mappings, int $object_id = 0, string $taxonomy = '' ): int {
-        // create object-hash.
-        $hash = md5($object_id.$taxonomy);
+	public function process_translations( object $translation_obj, array $language_mappings, int $object_id = 0, string $taxonomy = '' ): int {
+		// create object-hash.
+		$hash = md5( $object_id . $taxonomy );
 
 		// do not run translation if it is already running in another process for this object.
-		$translation_running = get_option(EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING, array() );
-		if( !empty($translation_running[$hash]) && $translation_running[$hash] > 0 ) {
+		$translation_running = get_option( EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING, array() );
+		if ( ! empty( $translation_running[ $hash ] ) && $translation_running[ $hash ] > 0 ) {
 			return 0;
 		}
 
@@ -1123,12 +1144,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// counter for translations.
 		$c = 0;
 
-		// define filter
+		// define filter.
 		$filter = array();
 
 		// add object-id to filter.
-		if( $object_id > 0 ) {
-			$post_obj = new Post_Object( $object_id );
+		if ( $object_id > 0 ) {
+			$post_obj            = new Post_Object( $object_id );
 			$filter['object_id'] = $post_obj->get_id();
 		}
 
@@ -1136,35 +1157,35 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$entries = Db::get_instance()->get_entries( $filter );
 
 		// set max texts to translate.
-		$translation_max = get_option(EASY_LANGUAGE_OPTION_TRANSLATE_MAX, array() );
-		update_option( EASY_LANGUAGE_OPTION_TRANSLATE_MAX, $translation_max + array( $hash => count($entries) ) );
+		$translation_max = get_option( EASY_LANGUAGE_OPTION_TRANSLATE_MAX, array() );
+		update_option( EASY_LANGUAGE_OPTION_TRANSLATE_MAX, $translation_max + array( $hash => count( $entries ) ) );
 
 		// set counter for translated texts to 0.
-		$translation_count = get_option(EASY_LANGUAGE_OPTION_TRANSLATE_COUNT, array() );
+		$translation_count = get_option( EASY_LANGUAGE_OPTION_TRANSLATE_COUNT, array() );
 		update_option( EASY_LANGUAGE_OPTION_TRANSLATE_COUNT, $translation_count + array( $hash => 0 ) );
 
-        // show CLI process.
-	    $progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Run translations', count($entries) ) : false;
+		// show CLI process.
+		$progress = Helper::is_cli() ? \WP_CLI\Utils\make_progress_bar( 'Run translations', count( $entries ) ) : false;
 
 		// loop through translations of this object.
-		foreach( $entries as $entry ) {
+		foreach ( $entries as $entry ) {
 			$c = $c + $this->process_translation( $translation_obj, $language_mappings, $entry, $object_id, $taxonomy );
 
 			// update counter for translation of texts.
-			$translation_count_in_loop = get_option(EASY_LANGUAGE_OPTION_TRANSLATE_COUNT, array() );
-			$translation_count_in_loop[$hash]++;
+			$translation_count_in_loop = get_option( EASY_LANGUAGE_OPTION_TRANSLATE_COUNT, array() );
+			++$translation_count_in_loop[ $hash ];
 			update_option( EASY_LANGUAGE_OPTION_TRANSLATE_COUNT, $translation_count_in_loop );
 
-			// show progress
-			!$progress ?: $progress->tick();
+			// show progress.
+			! $progress ?: $progress->tick();
 		}
 
-		// end progress
-		!$progress ?: $progress->finish();
+		// end progress.
+		! $progress ?: $progress->finish();
 
 		// remove marker for running translation on this object.
-		$translation_running = get_option(EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING, array() );
-		$translation_running[$hash] = 0;
+		$translation_running          = get_option( EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING, array() );
+		$translation_running[ $hash ] = 0;
 		update_option( EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING, $translation_running );
 
 		// return translation-count.
@@ -1174,35 +1195,35 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Process translation of single text initialized with API-support.
 	 *
-	 * @param Object $translation_obj
-	 * @param array $language_mappings
-	 * @param Text $entry
-	 * @param int $object_id
-	 * @param string $taxonomy
+	 * @param Object $translation_obj The translation-object.
+	 * @param array  $language_mappings The language-mappings.
+	 * @param Text   $entry The text-object.
+	 * @param int    $object_id The requested object-id (post- or taxonomy-id).
+	 * @param string $taxonomy The taxonomy (only for taxonomies).
 	 *
 	 * @return int
 	 * @noinspection PhpUnused
 	 */
-	private function process_translation( Object $translation_obj, array $language_mappings, Text $entry, int $object_id, string $taxonomy = '' ): int {
+	private function process_translation( object $translation_obj, array $language_mappings, Text $entry, int $object_id, string $taxonomy = '' ): int {
 		// counter for translations.
 		$c = 0;
 
 		// get object the text belongs to, to get the target language.
-		$object = new Post_Object( $object_id );
+		$object          = new Post_Object( $object_id );
 		$object_language = $object->get_language();
 
 		// send request for each active mapping between source-language and target-languages.
-		foreach( $language_mappings as $source_language => $target_languages ) {
-			foreach( $target_languages as $target_language ) {
+		foreach ( $language_mappings as $source_language => $target_languages ) {
+			foreach ( $target_languages as $target_language ) {
 				// only if this text is not already translated in target-language matching the source-language.
-				if ( !empty($object_language[$target_language]) && false === $entry->has_translation_in_language( $target_language ) && $source_language === $entry->get_source_language() ) {
+				if ( ! empty( $object_language[ $target_language ] ) && false === $entry->has_translation_in_language( $target_language ) && $source_language === $entry->get_source_language() ) {
 					// call API to get translation as result-array.
 					$results = $translation_obj->call_api( $entry->get_original(), $source_language, $target_language );
 
 					// save translation if results are available.
 					if ( ! empty( $results ) ) {
 						$entry->set_translation( $results['translated_text'], $target_language, $translation_obj->init->get_name(), absint( $results['jobid'] ) );
-						$c ++;
+						++$c;
 					}
 				}
 			}
@@ -1211,13 +1232,13 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// loop through translated texts to replace them in their original objects.
 		// if request is only for one object, run it only there.
 		$objects = $entry->get_objects();
-		if( $object_id > 0 ) {
+		if ( $object_id > 0 ) {
 			$objects = array( array( 'object_id' => $object_id ) );
 		}
 
 		// loop through the posts and the languages to replace their texts.
-		foreach( $objects as $object ) {
-			foreach ( $language_mappings as $source_language => $target_languages) {
+		foreach ( $objects as $object ) {
+			foreach ( $language_mappings as $source_language => $target_languages ) {
 				foreach ( $target_languages as $target_language ) {
 					if ( false !== $entry->has_translation_in_language( $target_language ) && $source_language === $entry->get_source_language() ) {
 						$entry->replace_original_with_translation( $object['object_id'], $target_language, $taxonomy );
@@ -1236,8 +1257,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return array
 	 */
 	public function get_supported_languages(): array {
-		$settings_language = (array)get_option( 'easy_language_languages', array() );
-		if( empty($settings_language) ) {
+		$settings_language = (array) get_option( 'easy_language_languages', array() );
+		if ( empty( $settings_language ) ) {
 			$settings_language = array();
 		}
 		return $settings_language;
@@ -1246,12 +1267,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Add row actions to show translate-options and -state per object for nested pages.
 	 *
-	 * @param $actions
-	 * @param $post
+	 * @param array   $actions The possible actions for posts.
+	 * @param WP_Post $post The post-object.
 	 *
 	 * @return array
 	 */
-	public function add_post_row_action( $actions, $post ): array {
+	public function add_post_row_action( array $actions, WP_Post $post ): array {
 		// get post-object.
 		$post_obj = new Post_Object( $post->ID );
 
@@ -1259,29 +1280,27 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$page_builder = $post_obj->get_page_builder();
 
 		// get actual supported languages.
-		foreach( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
 			// check if this object is already translated in this language.
-			if( false !== $post_obj->is_translated_in_language( $language_code ) ) {
+			if ( false !== $post_obj->is_translated_in_language( $language_code ) ) {
 
 				// do not show anything if the used page builder plugin is not available.
-				if( false === $page_builder->is_active() ) {
+				if ( false === $page_builder->is_active() ) {
 					/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-					echo '<span class="dashicons dashicons-lightbulb" title="'.sprintf(__( 'Used page builder %1$s not available', 'easy-language' ), $page_builder->get_name()).'"></span>';
-				}
-				else {
+					echo '<span class="dashicons dashicons-lightbulb" title="' . sprintf( esc_html__( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) . '"></span>';
+				} else {
 					// create link to edit the translated post.
 					$edit_translation = $page_builder->get_edit_link();
 
 					// show link to add translation for this language.
 					$actions[ 'easy-language-' . $language_code ] = '<a href="' . esc_url( $edit_translation ) . '"><i class="dashicons dashicons-edit"></i> ' . esc_html( $settings['label'] ) . '</a>';
 				}
-			}
-			else {
+			} else {
 				// create link to translate this post.
 				$create_translation = $post_obj->get_translate_link( $language_code );
 
 				// show link to add translation for this language.
-				$actions['easy-language-'.$language_code] = '<a href="' . esc_url( $create_translation ) . '"><i class="dashicons dashicons-plus"></i> '.esc_html($settings['label']).'</a>';
+				$actions[ 'easy-language-' . $language_code ] = '<a href="' . esc_url( $create_translation ) . '"><i class="dashicons dashicons-plus"></i> ' . esc_html( $settings['label'] ) . '</a>';
 			}
 		}
 		return $actions;
@@ -1290,19 +1309,19 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Get our own object for given WP-object.
 	 *
-	 * @param WP_Term|WP_User|WP_Post_Type|WP_Post|null $object The WP-object.
-	 * @param int $id The ID of the WP-object.
-	 * @param string $taxonomy The taxonomy.
+	 * @param WP_Term|WP_User|WP_Post_Type|WP_Post|null $wp_object The WP-object.
+	 * @param int                                       $id The ID of the WP-object.
+	 * @param string                                    $taxonomy The taxonomy.
 	 *
 	 * @return object|false
 	 */
-	public function get_object_by_wp_object( WP_Term|WP_User|WP_Post_Type|WP_Post|null $object, int $id, string $taxonomy = '' ): object|false {
-		if( is_null($object) ) {
+	public function get_object_by_wp_object( WP_Term|WP_User|WP_Post_Type|WP_Post|null $wp_object, int $id, string $taxonomy = '' ): object|false {
+		if ( is_null( $wp_object ) ) {
 			return false;
 		}
-		return match ( get_class( $object ) ) {
+		return match ( get_class( $wp_object ) ) {
 			'WP_Post' => new Post_Object( $id ),
-            'WP_Term' => new Term_Object( $id, $taxonomy ),
+			'WP_Term' => new Term_Object( $id, $taxonomy ),
 			default => false,
 		};
 	}
@@ -1314,20 +1333,21 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	public function add_posts_filter(): void {
 		// get called post_type.
-		$called_post_type = (isset($_GET['post_type'])) ? sanitize_text_field($_GET['post_type']) : 'post';
+		$called_post_type = ( isset( $_GET['post_type'] ) ) ? sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) : 'post';
 
 		// get supported post-types.
 		$post_types = $this->get_supported_post_types();
-		foreach( $post_types as $post_type => $enabled ) {
-			if( 1 === absint($enabled) && $post_type === $called_post_type ) {
+		foreach ( $post_types as $post_type => $enabled ) {
+			if ( 1 === absint( $enabled ) && $post_type === $called_post_type ) {
+				$selected_option = isset( $_GET['admin_filter_easy_language_changed'] ) ? sanitize_text_field( wp_unslash( $_GET['admin_filter_easy_language_changed'] ) ) : '';
 				?>
 				<!--suppress HtmlFormInputWithoutLabel -->
 				<select name="admin_filter_easy_language_changed">
 					<option value=""><?php echo esc_html__( 'Filter easy language', 'easy-language' ); ?></option>
-					<option value="translated"<?php echo ( isset( $_GET[ 'admin_filter_easy_language_changed' ] ) && wp_unslash( $_GET[ 'admin_filter_easy_language_changed' ] ) == 'translated' ) ? ' selected="selected"' : ''; ?>><?php echo esc_html__( 'show translated content', 'easy-language' ); ?></option>
-					<option value="not_translated"<?php echo ( isset( $_GET[ 'admin_filter_easy_language_changed' ] ) && wp_unslash( $_GET[ 'admin_filter_easy_language_changed' ] ) == 'not_translated' ) ? ' selected="selected"' : ''; ?>><?php echo esc_html__( 'show not translated content', 'easy-language' ); ?></option>
-					<option value="changed"<?php echo ( isset( $_GET[ 'admin_filter_easy_language_changed' ] ) && wp_unslash( $_GET[ 'admin_filter_easy_language_changed' ] ) == 'changed' ) ? ' selected="selected"' : ''; ?>><?php echo esc_html__( 'show changed content', 'easy-language' ); ?></option>
-					<option value="not_changed"<?php echo ( isset( $_GET[ 'admin_filter_easy_language_changed' ] ) && wp_unslash( $_GET[ 'admin_filter_easy_language_changed' ] ) == 'not_changed' ) ? ' selected="selected"' : ''; ?>><?php echo esc_html__( 'show not changed content', 'easy-language' ); ?></option>
+					<option value="translated"<?php echo ( 'translated' === $selected_option ) ? ' selected="selected"' : ''; ?>><?php echo esc_html__( 'show translated content', 'easy-language' ); ?></option>
+					<option value="not_translated"<?php echo ( 'not_translated' === $selected_option ) ? ' selected="selected"' : ''; ?>><?php echo esc_html__( 'show not translated content', 'easy-language' ); ?></option>
+					<option value="changed"<?php echo ( 'changed' === $selected_option ) ? ' selected="selected"' : ''; ?>><?php echo esc_html__( 'show changed content', 'easy-language' ); ?></option>
+					<option value="not_changed"<?php echo ( 'not_changed' === $selected_option ) ? ' selected="selected"' : ''; ?>><?php echo esc_html__( 'show not changed content', 'easy-language' ); ?></option>
 				</select>
 				<?php
 			}
@@ -1337,7 +1357,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Filter for translated content in table-list.
 	 *
-	 * @param WP_Query $query
+	 * @param WP_Query $query The query-object.
 	 *
 	 * @return void
 	 * @noinspection SpellCheckingInspection
@@ -1346,81 +1366,87 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		global $pagenow;
 
 		// do not change anything if this is not the main query, our filter-var is not set or this is not edit.php.
-		if( empty($_GET['admin_filter_easy_language_changed']) || false === $query->is_main_query() || $pagenow !== 'edit.php' ) {
+		if ( empty( $_GET['admin_filter_easy_language_changed'] ) || false === $query->is_main_query() || 'edit.php' !== $pagenow ) {
 			return;
 		}
 
 		// get called post-type.
-		$called_post_type = (isset($_GET['post_type'])) ? sanitize_text_field($_GET['post_type']) : 'post';
+		$called_post_type = ( isset( $_GET['post_type'] ) ) ? sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) : 'post';
 
 		// get supported post-types.
 		$post_types = $this->get_supported_post_types();
-		foreach( $post_types as $post_type => $enabled ) {
+		foreach ( $post_types as $post_type => $enabled ) {
 			if ( 1 === absint( $enabled ) && $post_type === $called_post_type ) {
 				remove_action( 'pre_get_posts', array( $this, 'hide_translated_objects' ) );
-				switch( wp_unslash($_GET['admin_filter_easy_language_changed']) ) {
+				switch ( sanitize_text_field( wp_unslash( $_GET['admin_filter_easy_language_changed'] ) ) ) {
 					case 'translated':
-                        // get all objects WITH translation-objects.
-						$query->set( 'meta_query', array(
+						// get all objects WITH translation-objects.
+						$query->set(
+							'meta_query',
 							array(
-								'key' => 'easy_language_translated_in',
-								'compare' => 'EXISTS'
+								array(
+									'key'     => 'easy_language_translated_in',
+									'compare' => 'EXISTS',
+								),
 							)
-						) );
+						);
 						break;
 					case 'not_translated':
 						// get all objects WITHOUT translation-objects.
-						$query->set( 'meta_query', array(
-                            'relation' => 'AND',
+						$query->set(
+							'meta_query',
 							array(
-								'key' => 'easy_language_translated_in',
-								'compare' => 'NOT EXISTS'
-							),
-                            array(
-                                'key' => 'easy_language_translation_original_id',
-                                'compare' => 'NOT EXISTS'
-                            )
-						) );
+								'relation' => 'AND',
+								array(
+									'key'     => 'easy_language_translated_in',
+									'compare' => 'NOT EXISTS',
+								),
+								array(
+									'key'     => 'easy_language_translation_original_id',
+									'compare' => 'NOT EXISTS',
+								),
+							)
+						);
 						break;
 					case 'changed':
 						// get all objects which has been changed its content.
 						$meta_query = array(
-							'relation' => 'OR'
+							'relation' => 'OR',
 						);
-						foreach( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+						foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
 							$meta_query[] = array(
 								'relation' => 'AND',
-                                array(
-								    'key' => 'easy_language_'.$language_code.'_changed',
-								    'compare' => 'EXISTS'
-							    ),
-                                array(
-								    'key' => 'easy_language_translated_in',
-								    'compare' => 'EXISTS'
-                                )
+								array(
+									'key'     => 'easy_language_' . $language_code . '_changed',
+									'compare' => 'EXISTS',
+								),
+								array(
+									'key'     => 'easy_language_translated_in',
+									'compare' => 'EXISTS',
+								),
 							);
 						}
-						$query->set( 'meta_query', array($meta_query) );
+						$query->set( 'meta_query', array( $meta_query ) );
 						break;
 					case 'not_changed':
 						// get all objects which has NOT been changed its content.
 						$meta_query = array(
-							'relation' => 'OR'
+							'relation' => 'OR',
 						);
-						foreach( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+						foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
 							$meta_query[] = array(
 								'relation' => 'AND',
 								array(
-									'key' => 'easy_language_'.$language_code.'_changed',
-									'compare' => 'NOT EXISTS'
+									'key'     => 'easy_language_' . $language_code . '_changed',
+									'compare' => 'NOT EXISTS',
 								),
 								array(
-									'key' => 'easy_language_translated_in',
-									'compare' => 'EXISTS'
-								)
+									'key'     => 'easy_language_translated_in',
+									'compare' => 'EXISTS',
+								),
 							);
 						}
-						$query->set( 'meta_query', array($meta_query) );
+						$query->set( 'meta_query', array( $meta_query ) );
 						break;
 				}
 			}
@@ -1430,11 +1456,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Add our languages as filter-views in lists of supported post-types.
 	 *
-	 * @param $views
+	 * @param array $views List of views.
 	 *
 	 * @return array
 	 */
-	public function add_post_type_view( $views ): array {
+	public function add_post_type_view( array $views ): array {
 		// get screen.
 		$screen = get_current_screen();
 
@@ -1442,15 +1468,15 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$post_type = $screen->post_type;
 
 		// loop through active languages and add them to the filter.
-		foreach( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
-			$url = add_query_arg(
+		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+			$url                                        = add_query_arg(
 				array(
 					'post_type' => $post_type,
-					'lang' => $language_code
+					'lang'      => $language_code,
 				),
 				'edit.php'
 			);
-			$views['easy-language-'.$language_code] = '<a href="'.esc_url($url).'">'.esc_html($settings['label']).'</a>';
+			$views[ 'easy-language-' . $language_code ] = '<a href="' . esc_url( $url ) . '">' . esc_html( $settings['label'] ) . '</a>';
 		}
 		return $views;
 	}
@@ -1467,16 +1493,16 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// get api.
 		$api_obj = Apis::get_instance()->get_active_api();
-		if( false === $api_obj ) {
+		if ( false === $api_obj ) {
 			// no api active => forward user.
-			wp_redirect($_SERVER['HTTP_REFERER']);
+			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 			exit;
 		}
 
 		// get the post-id from request.
-		$post_id = isset($_POST['post']) ? absint($_POST['post']) : 0;
+		$post_id = isset( $_POST['post'] ) ? absint( $_POST['post'] ) : 0;
 
-		if( absint($post_id) > 0 ) {
+		if ( absint( $post_id ) > 0 ) {
 			// run translation of this object.
 			$this->process_translations( $api_obj->get_translations_obj(), $api_obj->get_active_language_mapping(), $post_id );
 		}
@@ -1496,23 +1522,23 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		check_ajax_referer( 'easy-language-translate-get-nonce', 'nonce' );
 
 		// get the post-id from request.
-		$post_id = isset($_POST['post']) ? absint($_POST['post']) : 0;
+		$post_id = isset( $_POST['post'] ) ? absint( $_POST['post'] ) : 0;
 
-		if( $post_id > 0 ) {
+		if ( $post_id > 0 ) {
 			// hash of the post_id.
-			$hash = md5($post_id);
+			$hash = md5( $post_id );
 
-            // get running translations.
-			$running_translations = get_option(EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING, array() );
+			// get running translations.
+			$running_translations = get_option( EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING, array() );
 
-            // get max value for running translations.
-            $max_translations = get_option(EASY_LANGUAGE_OPTION_TRANSLATE_MAX, array() );
+			// get max value for running translations.
+			$max_translations = get_option( EASY_LANGUAGE_OPTION_TRANSLATE_MAX, array() );
 
-            // get count value for running translations.
-			$count_translations = get_option(EASY_LANGUAGE_OPTION_TRANSLATE_COUNT, array() );
+			// get count value for running translations.
+			$count_translations = get_option( EASY_LANGUAGE_OPTION_TRANSLATE_COUNT, array() );
 
 			// collect return value.
-			echo absint($count_translations[$hash]).";".absint($max_translations[$hash]).";".absint($running_translations[$hash]);
+			echo absint( $count_translations[ $hash ] ) . ';' . absint( $max_translations[ $hash ] ) . ';' . absint( $running_translations[ $hash ] );
 		}
 
 		// return nothing.
@@ -1520,21 +1546,21 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-     * Remove translated pages from get_pages-result.
-     *
+	 * Remove translated pages from get_pages-result.
+	 *
 	 * @param array $pages The list of pages.
 	 *
 	 * @return array
 	 */
-    public function get_pages( array $pages ): array {
-        foreach( $pages as $index => $page ) {
-            $post_obj = new Post_Object( $page->ID );
-            if( $post_obj->is_translated() ) {
-                unset($pages[$index]);
-            }
-        }
-        return $pages;
-    }
+	public function get_pages( array $pages ): array {
+		foreach ( $pages as $index => $page ) {
+			$post_obj = new Post_Object( $page->ID );
+			if ( $post_obj->is_translated() ) {
+				unset( $pages[ $index ] );
+			}
+		}
+		return $pages;
+	}
 
 	/**
 	 * Embed translation-related scripts, which are also used by some pageBuilders.
@@ -1548,7 +1574,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy-language-translations',
 			plugins_url( '/classes/multilingual-plugins/easy-language/admin/translations.js', EASY_LANGUAGE ),
 			array( 'jquery' ),
-			filemtime( plugin_dir_path(EASY_LANGUAGE) . '/classes/multilingual-plugins/easy-language/admin/translations.js' ),
+			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/translations.js' ),
 			true
 		);
 
@@ -1557,21 +1583,21 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy-language-translations',
 			'easyLanguageTranslationsJsVars',
 			array(
-				'ajax_url'           => admin_url( 'admin-ajax.php' ),
-				'label_translate_is_running' => __( 'Translation in progress', 'easy-language' ),
-				'label_ok' => __( 'OK', 'easy-language' ),
-				'txt_please_wait' => __( 'Please wait', 'easy-language' ),
-				'run_translate_nonce' => wp_create_nonce( 'easy-language-translate-start-nonce' ),
-				'get_translate_nonce' => wp_create_nonce( 'easy-language-translate-get-nonce' ),
+				'ajax_url'                     => admin_url( 'admin-ajax.php' ),
+				'label_translate_is_running'   => __( 'Translation in progress', 'easy-language' ),
+				'label_ok'                     => __( 'OK', 'easy-language' ),
+				'txt_please_wait'              => __( 'Please wait', 'easy-language' ),
+				'run_translate_nonce'          => wp_create_nonce( 'easy-language-translate-start-nonce' ),
+				'get_translate_nonce'          => wp_create_nonce( 'easy-language-translate-get-nonce' ),
 				'txt_translation_has_been_run' => __( 'Translation has been run.', 'easy-language' ),
 			)
 		);
 
 		// embed necessary scripts for progressbar.
-        // TODO lokal speichern?
+		// TODO lokal speichern?
 		$wp_scripts = wp_scripts();
-		wp_enqueue_script('jquery-ui-progressbar');
-		wp_enqueue_script('jquery-ui-dialog');
+		wp_enqueue_script( 'jquery-ui-progressbar' );
+		wp_enqueue_script( 'jquery-ui-dialog' );
 		wp_enqueue_style(
 			'easy-language-jquery-ui-styles',
 			'https://code.jquery.com/ui/' . $wp_scripts->registered['jquery-ui-core']->ver . '/themes/smoothness/jquery-ui.min.css',
@@ -1582,104 +1608,104 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-     * Embed our own scripts.
-     *
+	 * Embed our own scripts.
+	 *
 	 * @return void
 	 */
-    public function admin_enqueue_scripts(): void {
-	    // backend-JS.
-	    wp_enqueue_script(
-		    'easy-language-plugin-admin',
-		    plugins_url( '/classes/multilingual-plugins/easy-language/admin/js.js', EASY_LANGUAGE ),
-		    array( 'jquery' ),
-		    filemtime( plugin_dir_path(EASY_LANGUAGE) . '/classes/multilingual-plugins/easy-language/admin/js.js' ),
-		    true
-	    );
+	public function admin_enqueue_scripts(): void {
+		// backend-JS.
+		wp_enqueue_script(
+			'easy-language-plugin-admin',
+			plugins_url( '/classes/multilingual-plugins/easy-language/admin/js.js', EASY_LANGUAGE ),
+			array( 'jquery' ),
+			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/js.js' ),
+			true
+		);
 
-	    // add php-vars to our backend-js-script.
-	    wp_localize_script(
-		    'easy-language-plugin-admin',
-		    'easyLanguagePluginJsVars',
-		    array(
-			    'delete_confirmation_question' => __( 'Do you really want to delete this translated object?', 'easy-language' )
-		    )
-	    );
-    }
+		// add php-vars to our backend-js-script.
+		wp_localize_script(
+			'easy-language-plugin-admin',
+			'easyLanguagePluginJsVars',
+			array(
+				'delete_confirmation_question' => __( 'Do you really want to delete this translated object?', 'easy-language' ),
+			)
+		);
+	}
 
 	/**
-     * Show list of translations.
-     *
+	 * Show list of translations.
+	 *
 	 * @return void
 	 */
-    public function add_translations(): void {
-        $translations = new Texts_Table();
-        $translations->prepare_items();
-	    ?>
-            <div class="wrap">
-                <div id="icon-users" class="icon32"></div>
-                <h2><?php _e('Translations', 'easy-language'); ?></h2>
-                <p><?php echo esc_html__( 'This table contains all by any API translated texts. The original texts will not be translated a second time.', ''); ?></p>
-                <p><?php echo esc_html__( 'You can here delete the translations to force a new translation of the original text if requested. In objects saved translations will not be deleted.', 'easy-language' ); ?></p>
-                <?php $translations->display(); ?>
-            </div>
-	    <?php
-    }
+	public function add_translations(): void {
+		$translations = new Texts_Table();
+		$translations->prepare_items();
+		?>
+			<div class="wrap">
+				<div id="icon-users" class="icon32"></div>
+				<h2><?php echo esc_html__( 'Translations', 'easy-language' ); ?></h2>
+				<p><?php echo esc_html__( 'This table contains all by any API translated texts. The original texts will not be translated a second time.', 'easy-language' ); ?></p>
+				<p><?php echo esc_html__( 'You can here delete the translations to force a new translation of the original text if requested. In objects saved translations will not be deleted.', 'easy-language' ); ?></p>
+				<?php $translations->display(); ?>
+			</div>
+		<?php
+	}
 
 	/**
 	 * Validate the post-type-setting.
 	 *
-	 * @param $values
+	 * @param array|null $values The possible values.
 	 *
 	 * @return array
 	 */
-	public function validate_post_types( $values ): array {
-        if( is_null( $values ) ) {
-            $values = array();
-        }
+	public function validate_post_types( array|null $values ): array {
+		if ( is_null( $values ) ) {
+			$values = array();
+		}
 		return $values;
 	}
 
 	/**
-     * Validate the taxonomy-setting.
-     *
-	 * @param $values
+	 * Validate the taxonomy-setting.
+	 *
+	 * @param array|null $values The possible values.
 	 *
 	 * @return array
 	 */
-    public function validate_taxonomies( $values ): array {
-	    if( is_null( $values ) ) {
-		    $values = array();
-	    }
-        return $values;
-    }
+	public function validate_taxonomies( array|null $values ): array {
+		if ( is_null( $values ) ) {
+			$values = array();
+		}
+		return $values;
+	}
 
 	/**
-     * Show quota hint in backend tables.
-     *
-	 * @param mixed $api_obj
+	 * Show quota hint in backend tables.
+	 *
+	 * @param Api_Base $api_obj The used API.
 	 *
 	 * @return void
 	 */
-	private function show_quota_hint( mixed $api_obj ): void {
-		$quota_array = $api_obj->get_quota();
+	private function show_quota_hint( Api_Base $api_obj ): void {
+		$quota_array   = $api_obj->get_quota();
 		$quota_percent = 0;
-		if( !empty($quota_array['character_limit']) && $quota_array['character_limit'] > 0 ) {
-			$quota_percent = absint($quota_array['character_spent']) / absint($quota_array['character_limit']);
+		if ( ! empty( $quota_array['character_limit'] ) && $quota_array['character_limit'] > 0 ) {
+			$quota_percent = absint( $quota_array['character_spent'] ) / absint( $quota_array['character_limit'] );
 		}
-		if( $quota_percent > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
-            /* translators: %1$d will be replaced by a percentage value between 0 and 100. */
-			echo '<span class="dashicons dashicons-info-outline" title="'.esc_attr( sprintf( __('Quota for the used API is used for %1$d%%!', 'easy-language' ), round((float)$quota_percent * 100 ) ) ).'"></span>';
+		if ( $quota_percent > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
+			/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
+			echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), round( (float) $quota_percent * 100 ) ) ) . '"></span>';
 		}
 	}
 
 	/**
 	 * Initialize the permalink refresh if languages changing.
 	 *
-	 * @param $value
+	 * @param array $value The new language-strings as list.
 	 *
 	 * @return array
 	 */
-	public function change_langauges( $value ): array {
+	public function change_languages( array $value ): array {
 		Rewrite::get_instance()->set_refresh();
 		return $value;
 	}

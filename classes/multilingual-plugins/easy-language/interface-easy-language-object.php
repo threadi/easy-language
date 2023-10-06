@@ -1,6 +1,6 @@
 <?php
 /**
- * File for interface which descript translatable and translated objects (cpt like page, post or taxonomy like category ..).
+ * File for interface which describe translatable and translated objects (cpt like page, post or taxonomy like category ..).
  *
  * @package easy-language
  */
@@ -8,7 +8,9 @@
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Initialize the object.
@@ -53,11 +55,16 @@ interface Easy_Language_Object {
 	/**
 	 * Return whether a given post type is translated in given language.
 	 *
-	 * @param $language
+	 * @param string $language The language to check.
 	 *
 	 * @return bool
 	 */
-	public function is_translated_in_language( $language ): bool;
+	public function is_translated_in_language( string $language ): bool;
 
+	/**
+	 * Get the pagebuilder used by this object.
+	 *
+	 * @return object|false
+	 */
 	public function get_page_builder(): object|false;
 }

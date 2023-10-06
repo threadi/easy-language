@@ -8,7 +8,9 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Language-Handling for this plugin.
@@ -48,31 +50,31 @@ class Languages {
 
 	/**
 	 * Get actual supported languages.
-     *
-     * If an API is active, use their supported languages if they can be configured.
-     * If no API is active, use plugin settings.
+	 *
+	 * If an API is active, use their supported languages if they can be configured.
+	 * If no API is active, use plugin settings.
 	 *
 	 * @return array
 	 */
 	public function get_active_languages(): array {
-        // get active api.
-        $api_obj = Apis::get_instance()->get_active_api();
-        if( false !== $api_obj && $api_obj->has_settings() ) {
-            // get the supported target languages of this api if it has settings for it.
+		// get active api.
+		$api_obj = Apis::get_instance()->get_active_api();
+		if ( false !== $api_obj && $api_obj->has_settings() ) {
+			// get the supported target languages of this api if it has settings for it.
 			return $api_obj->get_active_target_languages();
 		}
 
-        // if no API with own settings is active, get the list from plugin-settings.
-        $list = array();
+		// if no API with own settings is active, get the list from plugin-settings.
+		$list              = array();
 		$settings_language = array();
-		foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
+		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
 			$settings_language = $settings_language + $plugin_obj->get_supported_languages();
 		}
-        foreach( $settings_language as $language => $enabled ) {
-            $list[$language] = $this->get_possible_target_languages()[$language];
-        }
+		foreach ( $settings_language as $language => $enabled ) {
+			$list[ $language ] = $this->get_possible_target_languages()[ $language ];
+		}
 
-        // return the list from setting it API is not active.
+		// return the list from setting it API is not active.
 		return $list;
 	}
 
@@ -82,51 +84,55 @@ class Languages {
 	 * @return array
 	 */
 	public function get_possible_source_languages(): array {
-		return apply_filters( 'easy_language_possible_source_languages', array(
-				'de_DE' => array(
-					'label' => __( 'German', 'easy-language'),
-					'enabled' => true
+		return apply_filters(
+			'easy_language_possible_source_languages',
+			array(
+				'de_DE'          => array(
+					'label'   => __( 'German', 'easy-language' ),
+					'enabled' => true,
 				),
-				'de_DE-formal' => array(
-					'label' => __( 'German (formal)', 'easy-language'),
-					'enabled' => true
+				'de_DE-formal'   => array(
+					'label'   => __( 'German (formal)', 'easy-language' ),
+					'enabled' => true,
 				),
-				'de_AT' => array(
-					'label' => __( 'German (Austria)', 'easy-language'),
-					'enabled' => true
+				'de_AT'          => array(
+					'label'   => __( 'German (Austria)', 'easy-language' ),
+					'enabled' => true,
 				),
-				'de_CH' => array(
-					'label' => __( 'German (Suisse)', 'easy-language'),
-					'enabled' => true
+				'de_CH'          => array(
+					'label'   => __( 'German (Suisse)', 'easy-language' ),
+					'enabled' => true,
 				),
 				'de_CH_informal' => array(
-					'label' => __( 'German (Suisse, informal)', 'easy-language'),
-					'enabled' => true
-				)
+					'label'   => __( 'German (Suisse, informal)', 'easy-language' ),
+					'enabled' => true,
+				),
 			)
 		);
 	}
 
-    /**
-     * Return possible target languages.
-     *
-     * @return array
-     */
-    public function get_possible_target_languages(): array {
-        return apply_filters( 'easy_language_supported_target_languages', array(
-		        'de_EL' => array(
-			        'label' => __( 'Einfache Sprache', 'easy-language'),
-			        'enabled' => true,
-			        'description' => '', // __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language'),
-			        'url' => 'de_el'
-		        ),
-	            'de_LS' => array(
-	                'label' => 'Leichte Sprache', //__( 'Leichte Sprache', 'easy-language'),
-	                'enabled' => true,
-	                'description' => '', //__( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language'),
-	                'url' => 'de_ls'
-	            )
-	        )
-        );
-    }
+	/**
+	 * Return possible target languages.
+	 *
+	 * @return array
+	 */
+	public function get_possible_target_languages(): array {
+		return apply_filters(
+			'easy_language_supported_target_languages',
+			array(
+				'de_EL' => array(
+					'label'       => __( 'Einfache Sprache', 'easy-language' ),
+					'enabled'     => true,
+					'description' => '', // __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language'),
+					'url'         => 'de_el',
+				),
+				'de_LS' => array(
+					'label'       => 'Leichte Sprache', // __( 'Leichte Sprache', 'easy-language'),
+					'enabled'     => true,
+					'description' => '', // __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language'),
+					'url'         => 'de_ls',
+				),
+			)
+		);
+	}
 }

@@ -13,7 +13,9 @@ use WP_Error;
 use wpdb;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Create and send request to Capito API. Gets the response.
@@ -65,12 +67,12 @@ class Request {
 	 */
 	private array|WP_Error $result;
 
-    /**
-     * The request method. Defaults to PUT.
-     *
-     * @var string
-     */
-    private string $method = 'PUT';
+	/**
+	 * The request method. Defaults to PUT.
+	 *
+	 * @var string
+	 */
+	private string $method = 'PUT';
 
 	/**
 	 * Target-language for this request.
@@ -185,7 +187,7 @@ class Request {
 		$headers = array_merge(
 			$this->header,
 			array(
-				'Authorization' => 'Bearer '.$this->token,
+				'Authorization' => 'Bearer ' . $this->token,
 			)
 		);
 
@@ -194,20 +196,20 @@ class Request {
 			'method'      => $this->get_method(),
 			'headers'     => $headers,
 			'httpversion' => '1.1',
-			'timeout'     => 30,
+			'timeout'     => 300, // TODO einstellbar machen
 			'redirection' => 10,
 		);
 
 		// set request data.
 		$data = array();
 
-        // set request-data for PUT.
-        if( 'PUT' === $this->get_method() ) {
-            $data['content']                = $this->get_text();
-            $data['locale']                 = $this->get_source_language();
-	        $data['proficiency']            = $this->get_target_language();
-            $args['body']                   = wp_json_encode($data);
-        }
+		// set request-data for PUT.
+		if ( 'PUT' === $this->get_method() ) {
+			$data['content']     = $this->get_text();
+			$data['locale']      = $this->get_source_language();
+			$data['proficiency'] = $this->get_target_language();
+			$args['body']        = wp_json_encode( $data );
+		}
 
 		// secure request.
 		$this->request = $args;
@@ -216,7 +218,7 @@ class Request {
 		$start_time = microtime( true );
 
 		// send request and get the result-object.
-        $this->result = wp_remote_post( $this->url, $args );
+		$this->result = wp_remote_post( $this->url, $args );
 
 		// secure end-time.
 		$end_time = microtime( true );
@@ -232,7 +234,7 @@ class Request {
 
 		// log the request (with anonymized token).
 		$args['headers']['Authorization'] = 'anonymized';
-        Log_Api::get_instance()->add_log( $capito_obj->get_name(), $this->http_status, print_r( $args, true ), print_r( 'HTTP-Status: '.$this->get_http_status().'<br>'.$this->response, true ) );
+		Log_Api::get_instance()->add_log( $capito_obj->get_name(), $this->http_status, print_r( $args, true ), print_r( 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response, true ) );
 
 		// save request and result in db.
 		$this->save_in_db();
@@ -275,14 +277,14 @@ class Request {
 		return $this->result;
 	}
 
-    /**
-     * Return the method for this request.
-     *
-     * @return string
-     */
-    public function get_method(): string {
-        return $this->method;
-    }
+	/**
+	 * Return the method for this request.
+	 *
+	 * @return string
+	 */
+	public function get_method(): string {
+		return $this->method;
+	}
 
 	/**
 	 * Set target-language for this request.
@@ -323,15 +325,15 @@ class Request {
 	private function save_in_db(): void {
 		// save the text in db and return the resulting text-object.
 		$query = array(
-			'time' => gmdate( 'Y-m-d H:i:s' ),
-			'request' => serialize($this->get_request()),
-			'response' => $this->get_response(),
-			'duration' => $this->duration,
+			'time'       => gmdate( 'Y-m-d H:i:s' ),
+			'request'    => serialize( $this->get_request() ),
+			'response'   => $this->get_response(),
+			'duration'   => $this->duration,
 			'httpstatus' => $this->get_http_status(),
-			'quota' => strlen($this->get_text()),
-            'blog_id' => get_current_blog_id()
+			'quota'      => strlen( $this->get_text() ),
+			'blog_id'    => get_current_blog_id(),
 		);
-		$this->wpdb->insert( $this->table_requests, $query);
+		$this->wpdb->insert( $this->table_requests, $query );
 	}
 
 	/**

@@ -42,7 +42,7 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 	public function send_request( $source_language, $language_code, $string_to_translate ): WP_Error|array {
 		// get SUMM AI API-object.
 		$api_object = Apis::get_instance()->get_active_api();
-		if( false === $api_object || 'summ_ai' !== $api_object->get_name() ) {
+		if ( false === $api_object || 'summ_ai' !== $api_object->get_name() ) {
 			return new WP_Error( 'error', __( 'No active SUMM AI API!', 'easy-language' ) );
 		}
 
@@ -160,7 +160,7 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 		return array(
 			'de_DE' => 'de',
 			'de_EL' => 'de',
-			'de_LS' => 'de'
+			'de_LS' => 'de',
 		);
 	}
 
@@ -175,7 +175,7 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 		return array(
 			'de_DE' => 'de',
 			'de_EL' => 'de',
-			'de_LS' => 'de'
+			'de_LS' => 'de',
 		);
 	}
 

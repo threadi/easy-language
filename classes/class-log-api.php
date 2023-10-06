@@ -90,15 +90,15 @@ class Log_Api {
 		dbDelta( $sql );
 	}
 
-    /**
-     * Remove log-table on uninstallation.
-     *
-     * @return void
-     */
-    public function delete_table(): void {
-        $sql = 'DROP TABLE IF EXISTS '.$this->table_name;
-        $this->wpdb->query($sql);
-    }
+	/**
+	 * Remove log-table on uninstallation.
+	 *
+	 * @return void
+	 */
+	public function delete_table(): void {
+		$sql = 'DROP TABLE IF EXISTS ' . $this->table_name;
+		$this->wpdb->query( $sql );
+	}
 
 	/**
 	 * Add a single log-entry.
@@ -119,7 +119,7 @@ class Log_Api {
 		/**
 		 * If debug is not enabled, just log errors.
 		 */
-		if( 0 === absint(get_option( 'easy_language_debug_mode', 0 )) && 'error' !== $state ) {
+		if ( 0 === absint( get_option( 'easy_language_debug_mode', 0 ) ) && 'error' !== $state ) {
 			return;
 		}
 

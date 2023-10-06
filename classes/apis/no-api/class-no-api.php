@@ -11,7 +11,9 @@ use easyLanguage\Base;
 use easyLanguage\Api_Base;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Define what SUMM AI supports and what not.
@@ -89,7 +91,7 @@ class No_Api extends Base implements Api_Base {
 	 */
 	public function get_mapping_languages(): array {
 		return array(
-			'de_DE' => array( 'de_EL' )
+			'de_DE' => array( 'de_EL' ),
 		);
 	}
 

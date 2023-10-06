@@ -8,7 +8,9 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Base-object for API- and plugin-main-classes.
@@ -21,12 +23,12 @@ class Base {
 	 */
 	protected bool $foreign_plugin = true;
 
-    /**
-     * Marker for API-support.
-     *
-     * @var bool
-     */
-    protected bool $supports_apis = false;
+	/**
+	 * Marker for API-support.
+	 *
+	 * @var bool
+	 */
+	protected bool $supports_apis = false;
 
 	/**
 	 * Marker if plugin has own API-configuration.
@@ -85,14 +87,14 @@ class Base {
 		return '';
 	}
 
-    /**
-     * Return whether this plugin supports our APIs.
-     *
-     * @return bool
-     */
-    public function is_supporting_apis(): bool {
-        return $this->supports_apis;
-    }
+	/**
+	 * Return whether this plugin supports our APIs.
+	 *
+	 * @return bool
+	 */
+	public function is_supporting_apis(): bool {
+		return $this->supports_apis;
+	}
 
 	/**
 	 * Get quota as array containing 'character_spent' and 'character_limit'.
@@ -102,7 +104,7 @@ class Base {
 	public function get_quota(): array {
 		return array(
 			'character_spent' => 0,
-			'character_limit' => 0
+			'character_limit' => 0,
 		);
 	}
 
@@ -183,11 +185,11 @@ class Base {
 		 * check the mapping target-languages for each
 		 * and if they are active - if yes, add them to list.
 		 */
-		foreach( $source_languages as $source_language => $enabled ) {
-			if( !empty($mappings[$source_language]) ) {
-				foreach( $mappings[$source_language] as $language ) {
-					if( !empty($target_languages[$language]) ) {
-						$result[$source_language][] = $language;
+		foreach ( $source_languages as $source_language => $enabled ) {
+			if ( ! empty( $mappings[ $source_language ] ) ) {
+				foreach ( $mappings[ $source_language ] as $language ) {
+					if ( ! empty( $target_languages[ $language ] ) ) {
+						$result[ $source_language ][] = $language;
 					}
 				}
 			}

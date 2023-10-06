@@ -39,7 +39,7 @@ function easy_language_admin_add_menu_content_advanced_settings(): void {
 	}
 
 	?>
-	<form method="POST" action="<?php echo esc_url(get_admin_url()); ?>options.php">
+	<form method="POST" action="<?php echo esc_url( get_admin_url() ); ?>options.php">
 		<?php
 		settings_fields( 'easyLanguageAdvancedFields' );
 		do_settings_sections( 'easyLanguageAdvancedPage' );

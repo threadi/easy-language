@@ -18,12 +18,12 @@ use WP_Query;
  */
 class Init extends Base implements Multilingual_Plugins_Base {
 
-    /**
-     * Name of this plugin.
-     *
-     * @var string
-     */
-    protected string $name = 'sublanguage';
+	/**
+	 * Name of this plugin.
+	 *
+	 * @var string
+	 */
+	protected string $name = 'sublanguage';
 
 	/**
 	 * Title of this plugin.
@@ -32,81 +32,81 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	protected string $title = 'Sublanguage';
 
-    /**
-     * Instance of this object.
-     *
-     * @var ?Init
-     */
-    private static ?Init $instance = null;
+	/**
+	 * Instance of this object.
+	 *
+	 * @var ?Init
+	 */
+	private static ?Init $instance = null;
 
-    /**
-     * Constructor for Init-Handler.
-     */
-    private function __construct() {}
+	/**
+	 * Constructor for Init-Handler.
+	 */
+	private function __construct() {}
 
-    /**
-     * Prevent cloning of this object.
-     *
-     * @return void
-     */
-    private function __clone() {}
+	/**
+	 * Prevent cloning of this object.
+	 *
+	 * @return void
+	 */
+	private function __clone() {}
 
-    /**
-     * Return the instance of this Singleton object.
-     */
-    public static function get_instance(): Init {
-        if ( ! static::$instance instanceof static ) {
-            static::$instance = new static();
-        }
+	/**
+	 * Return the instance of this Singleton object.
+	 */
+	public static function get_instance(): Init {
+		if ( ! static::$instance instanceof static ) {
+			static::$instance = new static();
+		}
 
-        return static::$instance;
-    }
+		return static::$instance;
+	}
 
-    /**
-     * Initialize this object.
-     *
-     * @return void
-     */
-    public function init(): void {
-        // add hooks.
-        add_action( 'admin_init', array( $this, 'wp_init' ) );
+	/**
+	 * Initialize this object.
+	 *
+	 * @return void
+	 */
+	public function init(): void {
+		// add hooks.
+		add_action( 'admin_init', array( $this, 'wp_init' ) );
 
-	    // disable transients on sublanguage-deactivation.
-	    add_action( 'deactivate_sublanguage/sublanguage.php', array( $this, 'foreign_deactivate') );
-    }
+		// disable transients on sublanguage-deactivation.
+		add_action( 'deactivate_sublanguage/sublanguage.php', array( $this, 'foreign_deactivate' ) );
+	}
 
-    /**
-     * Run on plugin-installation.
-     *
-     * @return void
-     */
-    public function install(): void {}
+	/**
+	 * Run on plugin-installation.
+	 *
+	 * @return void
+	 */
+	public function install(): void {}
 
-    /**
-     * Run on each request to add our supported languages.
-     *
-     * @return void
-     */
-    public function wp_init(): void {
-        foreach( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
-            $query = array(
-                'post_type' => 'language',
-                'title' => $language['label'],
+	/**
+	 * Run on each request to add our supported languages.
+	 *
+	 * @return void
+	 */
+	public function wp_init(): void {
+		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
+			$query   = array(
+				'post_type'   => 'language',
+				'title'       => $language['label'],
 				'post_status' => array( 'any', 'trash' ),
-                'fields' => 'ids'
-            );
-            $results = new WP_Query( $query );
-            if( 0 === $results->post_count ) {
-                $array = array(
-                    'post_type' => 'language',
-                    'post_title' => $language['label'],
-                    'post_content' => $language_code,
-                    'post_status' => 'publish'
-                );
-                wp_insert_post( $array );
-            }
-        }
-    }
+				'fields'      => 'ids',
+			);
+			$results = new WP_Query( $query );
+			if ( 0 === $results->post_count ) {
+				$array = array(
+					'post_type'    => 'language',
+					'post_title'   => $language['label'],
+					'post_content' => $language_code,
+					'post_status'  => 'publish',
+				);
+				wp_insert_post( $array );
+			}
+		}
+	}
 
 	/**
 	 * Return supported languages.
@@ -141,7 +141,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$transients_obj = Transients::get_instance();
 
 		// get transient-object for this plugin.
-		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_plugin_'.$this->get_name() );
+		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_plugin_' . $this->get_name() );
 
 		// delete it.
 		$transient_obj->delete();
@@ -157,15 +157,15 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$languages = array();
 
 		// query the actual languages used by sublanguage.
-		$query = array(
-			'post_type' => 'language',
-			'post_status' => 'publish'
+		$query   = array(
+			'post_type'   => 'language',
+			'post_status' => 'publish',
 		);
 		$results = new WP_Query( $query );
 
 		// loop through them.
-		foreach( $results->posts as $language ) {
-			$languages[$language->post_content] = "1";
+		foreach ( $results->posts as $language ) {
+			$languages[ $language->post_content ] = '1';
 		}
 
 		// return resulting list.

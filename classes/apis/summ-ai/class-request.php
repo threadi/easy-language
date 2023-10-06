@@ -13,7 +13,9 @@ use WP_Error;
 use wpdb;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Create and send request to summ-ai API. Gets the response.
@@ -65,26 +67,26 @@ class Request {
 	 */
 	private array|WP_Error $result;
 
-    /**
-     * The request method. Defaults to POST.
-     *
-     * @var string
-     */
-    private string $method = 'POST';
+	/**
+	 * The request method. Defaults to POST.
+	 *
+	 * @var string
+	 */
+	private string $method = 'POST';
 
-    /**
-     * The input_text_type for the request.
-     *
-     * @var string
-     */
-    private string $text_type = 'plain_text';
+	/**
+	 * The input_text_type for the request.
+	 *
+	 * @var string
+	 */
+	private string $text_type = 'plain_text';
 
-    /**
-     * Separator which is used to split compound, e.g. "Bundes-Kanzler".
-     *
-     * @var string
-     */
-    private string $separator = 'interpunct';
+	/**
+	 * Separator which is used to split compound, e.g. "Bundes-Kanzler".
+	 *
+	 * @var string
+	 */
+	private string $separator = 'interpunct';
 
 	/**
 	 * Target-language for this request.
@@ -196,17 +198,17 @@ class Request {
 		$summ_ai_obj = Summ_AI::get_instance();
 
 		// map target language.
-		$request_target_language = 'easy';
+		$request_target_language    = 'easy';
 		$supported_target_languages = $summ_ai_obj->get_supported_target_languages();
-		if( !empty($this->target_language) && !empty($supported_target_languages[$this->target_language]) && !empty($supported_target_languages[$this->target_language]['api_value']) ) {
-			$request_target_language = $supported_target_languages[$this->target_language]['api_value'];
+		if ( ! empty( $this->target_language ) && ! empty( $supported_target_languages[ $this->target_language ] ) && ! empty( $supported_target_languages[ $this->target_language ]['api_value'] ) ) {
+			$request_target_language = $supported_target_languages[ $this->target_language ]['api_value'];
 		}
 
 		// merge header-array.
 		$headers = array_merge(
 			$this->header,
 			array(
-				'Authorization' => 'Token: '.get_option(EASY_LANGUAGE_HASH),
+				'Authorization' => 'Token: ' . get_option( EASY_LANGUAGE_HASH ),
 			)
 		);
 
@@ -215,23 +217,23 @@ class Request {
 			'method'      => $this->get_method(),
 			'headers'     => $headers,
 			'httpversion' => '1.1',
-			'timeout'     => 30,
+			'timeout'     => 300, // TODO einstellbar machen
 			'redirection' => 10,
 		);
 
 		// set request data.
 		$data = array();
 
-        // set request-data for POST.
-        if( 'POST' === $this->get_method() ) {
-            $data['input_text']             = $this->get_text();
-            $data['input_text_type']        = $this->get_text_type();
-            $data['user']                   = $summ_ai_obj->get_contact_email();
-            $data['is_test']                = false;
-            $data['separator']              = $this->get_separator();
-	        $data['output_language_level']  = $request_target_language;
-            $args['body']                   = wp_json_encode($data);
-        }
+		// set request-data for POST.
+		if ( 'POST' === $this->get_method() ) {
+			$data['input_text']            = $this->get_text();
+			$data['input_text_type']       = $this->get_text_type();
+			$data['user']                  = $summ_ai_obj->get_contact_email();
+			$data['is_test']               = false;
+			$data['separator']             = $this->get_separator();
+			$data['output_language_level'] = $request_target_language;
+			$args['body']                  = wp_json_encode( $data );
+		}
 
 		// secure request.
 		$this->request = $args;
@@ -240,7 +242,7 @@ class Request {
 		$start_time = microtime( true );
 
 		// send request and get the result-object.
-        $this->result = wp_remote_post( $this->url, $args );
+		$this->result = wp_remote_post( $this->url, $args );
 
 		// secure end-time.
 		$end_time = microtime( true );
@@ -256,7 +258,7 @@ class Request {
 
 		// log the request (with anonymized token).
 		$args['headers']['Authorization'] = 'anonymized';
-        Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, print_r( $args, true ), print_r( 'HTTP-Status: '.$this->get_http_status().'<br>'.$this->response, true ) );
+		Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, print_r( $args, true ), print_r( 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response, true ) );
 
 		// save request and result in db.
 		$this->save_in_db();
@@ -299,46 +301,46 @@ class Request {
 		return $this->result;
 	}
 
-    /**
-     * Return the method for this request.
-     *
-     * @return string
-     */
-    public function get_method(): string {
-        return $this->method;
-    }
+	/**
+	 * Return the method for this request.
+	 *
+	 * @return string
+	 */
+	public function get_method(): string {
+		return $this->method;
+	}
 
-    /**
-     * Get text_type for request.
-     *
-     * @return string
-     */
-    public function get_separator(): string {
-        return $this->separator;
-    }
+	/**
+	 * Get text_type for request.
+	 *
+	 * @return string
+	 */
+	public function get_separator(): string {
+		return $this->separator;
+	}
 
-    /**
-     * Get text_type for request.
-     *
-     * @return string
-     */
-    public function get_text_type(): string {
-        return $this->text_type;
-    }
+	/**
+	 * Get text_type for request.
+	 *
+	 * @return string
+	 */
+	public function get_text_type(): string {
+		return $this->text_type;
+	}
 
-    /**
-     * Set text_type for request.
-     *
-     * @param string $type
-     *
-     * @return void
-     * @noinspection PhpUnused
-     */
-    public function set_text_type( string $type ): void {
-        if( in_array( $type, array('html', 'plain_text'), true ) ) {
-            $this->text_type = $type;
-        }
-    }
+	/**
+	 * Set text_type for request.
+	 *
+	 * @param string $type
+	 *
+	 * @return void
+	 * @noinspection PhpUnused
+	 */
+	public function set_text_type( string $type ): void {
+		if ( in_array( $type, array( 'html', 'plain_text' ), true ) ) {
+			$this->text_type = $type;
+		}
+	}
 
 	/**
 	 * Set target-language for this request.
@@ -370,15 +372,15 @@ class Request {
 	private function save_in_db(): void {
 		// save the text in db and return the resulting text-object.
 		$query = array(
-			'time' => gmdate( 'Y-m-d H:i:s' ),
-			'request' => serialize($this->get_request()),
-			'response' => $this->get_response(),
-			'duration' => $this->duration,
+			'time'       => gmdate( 'Y-m-d H:i:s' ),
+			'request'    => serialize( $this->get_request() ),
+			'response'   => $this->get_response(),
+			'duration'   => $this->duration,
 			'httpstatus' => $this->get_http_status(),
-			'quota' => strlen($this->get_text()),
-            'blog_id' => get_current_blog_id()
+			'quota'      => strlen( $this->get_text() ),
+			'blog_id'    => get_current_blog_id(),
 		);
-		$this->wpdb->insert( $this->table_requests, $query);
+		$this->wpdb->insert( $this->table_requests, $query );
 	}
 
 	/**

@@ -15,7 +15,9 @@ use easyLanguage\Transients;
 use wpdb;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Define what SUMM AI supports and what not.
@@ -58,13 +60,13 @@ class Summ_AI extends Base implements Api_Base {
 	private wpdb $wpdb;
 
 	/**
-     * Language-specific support-URL.
-     *
+	 * Language-specific support-URL.
+	 *
 	 * @var array
 	 */
-    private array $support_url = array(
-        'de_DE' => 'https://summ-ai.com/unsere-schnittstelle/'
-    );
+	private array $support_url = array(
+		'de_DE' => 'https://summ-ai.com/unsere-schnittstelle/',
+	);
 
 	/**
 	 * Constructor for Init-Handler.
@@ -104,17 +106,17 @@ class Summ_AI extends Base implements Api_Base {
 	public function get_description(): string {
 		$quota = $this->get_quota();
 		/* translators: %1$d will be replaced by a number, %2$s will be replaced by the URL for the Pro, %3$s will be replaced by the URL for SUMM AI-product-info */
-		return sprintf( __( '<p>The SUMM AI API allows you to automatically translate the entire website into plain and/or simple language via quota-limited API.</p><p>In the free Easy Language plugin you have a quota of %1$d characters you will be able to translate.</p><p>You need <a href="%2$s" target="_blank">Easy Language Pro (opens new window)</a> and a SUMM AI API key to translate more texts: <a href="%3$s" target="_blank">%3$s</a>.</p><p><strong>Actual character spent:</strong> %4$d<br><strong>Quota limit:</strong> %1$d<br><strong>Rest quota:</strong> %5$d</strong></p>', 'easy-language' ), $quota['character_limit'], 'todo', esc_url($this->get_language_specific_support_page()), $quota['character_spent'], absint($quota['character_limit'] - $quota['character_spent']) );
+		return sprintf( __( '<p>The SUMM AI API allows you to automatically translate the entire website into plain and/or simple language via quota-limited API.</p><p>In the free Easy Language plugin you have a quota of %1$d characters you will be able to translate.</p><p>You need <a href="%2$s" target="_blank">Easy Language Pro (opens new window)</a> and a SUMM AI API key to translate more texts: <a href="%3$s" target="_blank">%3$s</a>.</p><p><strong>Actual character spent:</strong> %4$d<br><strong>Quota limit:</strong> %1$d<br><strong>Rest quota:</strong> %5$d</strong></p>', 'easy-language' ), $quota['character_limit'], 'todo', esc_url( $this->get_language_specific_support_page() ), $quota['character_spent'], absint( $quota['character_limit'] - $quota['character_spent'] ) );
 	}
 
 	/**
-     * Return the URL of the public logo for this API.
-     *
+	 * Return the URL of the public logo for this API.
+	 *
 	 * @return string
 	 */
-    public function get_logo_url(): string {
-        return Helper::get_plugin_url().'classes/apis/summ-ai/gfx/logo.jpg';
-    }
+	public function get_logo_url(): string {
+		return Helper::get_plugin_url() . 'classes/apis/summ-ai/gfx/logo.jpg';
+	}
 
 	/**
 	 * Return list of supported source-languages.
@@ -124,31 +126,31 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_supported_source_languages(): array {
 		return array(
-			'de_DE' => array(
-				'label' => __( 'German', 'easy-language'),
-				'enable' => true,
-				'description' => __( 'Informal german spoken in Germany.', 'easy-language')
+			'de_DE'          => array(
+				'label'       => __( 'German', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in Germany.', 'easy-language' ),
 			),
-			'de_DE_formal' => array(
-				'label' => __( 'German (Formal)', 'easy-language'),
-				'enable' => true,
-				'description' => __( 'Formal german spoken in Germany.', 'easy-language')
+			'de_DE_formal'   => array(
+				'label'       => __( 'German (Formal)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Formal german spoken in Germany.', 'easy-language' ),
 			),
-			'de_CH' => array(
-				'label' => __( 'Suisse german', 'easy-language'),
-				'enable' => true,
-				'description' => __( 'Formal german spoken in Suisse.', 'easy-language')
+			'de_CH'          => array(
+				'label'       => __( 'Suisse german', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Formal german spoken in Suisse.', 'easy-language' ),
 			),
 			'de_CH_informal' => array(
-				'label' => __( 'Suisse german (Informal)', 'easy-language'),
-				'enable' => true,
-				'description' => __( 'Informal german spoken in Suisse.', 'easy-language')
+				'label'       => __( 'Suisse german (Informal)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in Suisse.', 'easy-language' ),
 			),
-			'de_AT' => array(
-				'label' => __( 'Austria German', 'easy-language'),
-				'enable' => true,
-				'description' => __( 'German spoken in Austria.', 'easy-language')
-			)
+			'de_AT'          => array(
+				'label'       => __( 'Austria German', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'German spoken in Austria.', 'easy-language' ),
+			),
 		);
 	}
 
@@ -161,19 +163,19 @@ class Summ_AI extends Base implements Api_Base {
 	public function get_supported_target_languages(): array {
 		return array(
 			'de_EL' => array(
-				'label' => __( 'Einfache Sprache', 'easy-language'),
-				'enabled' => true,
-				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language'),
-				'url' => 'de_el',
-				'api_value' => 'plain',
+				'label'       => __( 'Einfache Sprache', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+				'url'         => 'de_el',
+				'api_value'   => 'plain',
 			),
 			'de_LS' => array(
-				'label' => __( 'Leichte Sprache', 'easy-language'),
-				'enabled' => true,
-				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language'),
-				'url' => 'de_ls',
-                'api_value' => 'easy',
-			)
+				'label'       => __( 'Leichte Sprache', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+				'url'         => 'de_ls',
+				'api_value'   => 'easy',
+			),
 		);
 	}
 
@@ -186,7 +188,7 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_mapping_languages(): array {
 		return array(
-			'de_DE' => array( 'de_LS', 'de_EL' )
+			'de_DE' => array( 'de_LS', 'de_EL' ),
 		);
 	}
 
@@ -208,21 +210,21 @@ class Summ_AI extends Base implements Api_Base {
 		global $wpdb;
 
 		// set source language depending on WP-locale and its support.
-		if( !get_option('easy_language_source_languages') ) {
-			$language = helper::get_wp_lang();
-			$languages = array( $language => "1" );
+		if ( ! get_option( 'easy_language_source_languages' ) ) {
+			$language  = helper::get_wp_lang();
+			$languages = array( $language => '1' );
 			update_option( 'easy_language_source_languages', $languages );
 		}
 
 		// set target language depending on source-language and if only one target could be possible.
-		if( !get_option('easy_language_target_languages') ) {
+		if ( ! get_option( 'easy_language_target_languages' ) ) {
 			$source_languages = get_option( 'easy_language_source_languages', array() );
-			$languages = array();
-			$mappings = $this->get_mapping_languages();
-			foreach( $source_languages as $source_language => $enabled ) {
-				if( !empty($mappings[$source_language]) ) {
-					foreach( $mappings[$source_language] as $language ) {
-						$languages[ $language ] = "1";
+			$languages        = array();
+			$mappings         = $this->get_mapping_languages();
+			foreach ( $source_languages as $source_language => $enabled ) {
+				if ( ! empty( $mappings[ $source_language ] ) ) {
+					foreach ( $mappings[ $source_language ] as $language ) {
+						$languages[ $language ] = '1';
 					}
 				}
 			}
@@ -260,15 +262,15 @@ class Summ_AI extends Base implements Api_Base {
 		/**
 		 * Remove settings.
 		 */
-		foreach( $this->get_options() as $option_name ) {
-			delete_option($option_name);
+		foreach ( $this->get_options() as $option_name ) {
+			delete_option( $option_name );
 		}
 
 		/**
 		 * Delete our table.
 		 */
-		$sql = 'DROP TABLE IF EXISTS '.$this->table_requests;
-        $this->wpdb->query($sql);
+		$sql = 'DROP TABLE IF EXISTS ' . $this->table_requests;
+		$this->wpdb->query( $sql );
 	}
 
 	/**
@@ -284,13 +286,13 @@ class Summ_AI extends Base implements Api_Base {
 	}
 
 	/**
-     * Return list of transients this plugin is using, e.g. for clean uninstall.
-     *
+	 * Return list of transients this plugin is using, e.g. for clean uninstall.
+	 *
 	 * @return array
 	 */
-    private function get_transients(): array {
-        return array();
-    }
+	private function get_transients(): array {
+		return array();
+	}
 
 	/**
 	 * Initialize api-specific CLI-functions for this API: none.
@@ -324,16 +326,16 @@ class Summ_AI extends Base implements Api_Base {
 	public function get_active_target_languages(): array {
 		// get actual enabled target-languages.
 		$target_languages = get_option( 'easy_language_target_languages', array() );
-		if( !is_array($target_languages) ) {
+		if ( ! is_array( $target_languages ) ) {
 			$target_languages = array();
 		}
 
 		// define resulting list
 		$list = array();
 
-		foreach( $this->get_supported_target_languages() as $language_code => $language ) {
-			if( !empty($target_languages[$language_code]) ) {
-				$list[$language_code] = $language;
+		foreach ( $this->get_supported_target_languages() as $language_code => $language ) {
+			if ( ! empty( $target_languages[ $language_code ] ) ) {
+				$list[ $language_code ] = $language;
 			}
 		}
 
@@ -342,17 +344,17 @@ class Summ_AI extends Base implements Api_Base {
 	}
 
 	/**
-     * Delete our own transients during disabling this API.
-     *
+	 * Delete our own transients during disabling this API.
+	 *
 	 * @return void
 	 */
-    public function disable(): void {
-        $transients_obj = Transients::get_instance();
-        foreach( $this->get_transients() as $transient_name ) {
-            $transient_obj = $transients_obj->get_transient_by_name( $transient_name );
-            $transient_obj->delete();
-        }
-    }
+	public function disable(): void {
+		$transients_obj = Transients::get_instance();
+		foreach ( $this->get_transients() as $transient_name ) {
+			$transient_obj = $transients_obj->get_transient_by_name( $transient_name );
+			$transient_obj->delete();
+		}
+	}
 
 	/**
 	 * Return the language-specific support-URL for SUMM AI.
@@ -361,8 +363,8 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	private function get_language_specific_support_page(): string {
 		// return language-specific URL if it exists.
-		if( !empty($this->support_url[helper::get_current_language()]) ) {
-			return $this->support_url[helper::get_current_language()];
+		if ( ! empty( $this->support_url[ helper::get_current_language() ] ) ) {
+			return $this->support_url[ helper::get_current_language() ];
 		}
 
 		// otherwise return default url.
@@ -388,7 +390,7 @@ class Summ_AI extends Base implements Api_Base {
 	public function get_quota(): array {
 		return array(
 			'character_spent' => get_option( 'easy_language_summ_ai_quota', 0 ),
-			'character_limit' => EASY_LANGUAGE_SUMM_AI_QUOTA
+			'character_limit' => EASY_LANGUAGE_SUMM_AI_QUOTA,
 		);
 	}
 
@@ -428,16 +430,16 @@ class Summ_AI extends Base implements Api_Base {
 	public function get_active_source_languages(): array {
 		// get actual enabled source-languages.
 		$source_languages = get_option( 'easy_language_source_languages', array() );
-		if( !is_array($source_languages) ) {
+		if ( ! is_array( $source_languages ) ) {
 			$source_languages = array();
 		}
 
 		// define resulting list
 		$list = array();
 
-		foreach( $this->get_supported_source_languages() as $language_code => $language ) {
-			if( !empty($source_languages[$language_code]) ) {
-				$list[$language_code] = $language;
+		foreach ( $this->get_supported_source_languages() as $language_code => $language ) {
+			if ( ! empty( $source_languages[ $language_code ] ) ) {
+				$list[ $language_code ] = $language;
 			}
 		}
 

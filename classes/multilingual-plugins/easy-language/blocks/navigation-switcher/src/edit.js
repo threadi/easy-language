@@ -44,26 +44,26 @@ export default function edit( object ) {
 	 * Collect return for the edit-function
 	 */
 	return (
-		<div { ...useBlockProps() }>
-			<InspectorControls>
-				<PanelBody title={ __( 'Settings', 'easy-language' ) }>
-					<ToggleControl
-						label={ __('Show icons', 'easy-language') }
-						checked={ object.attributes.show_icons }
-						onChange={ value => onChangeShowIcons( value, object ) }
-					/>
-					<ToggleControl
-						label={ __('Hide actual language', 'easy-language') }
-						checked={ object.attributes.hide_actual_language }
-						onChange={ value => onChangeHideActualLanguage( value, object ) }
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<ServerSideRender
-				block="easy-language/navigation-switcher"
-				attributes={ object.attributes }
-				httpMethod="POST"
-			/>
-		</div>
+		< div { ...useBlockProps() } >
+			< InspectorControls >
+				< PanelBody title = { __( 'Settings', 'easy-language' ) } >
+					< ToggleControl
+						label     = { __( 'Show icons', 'easy-language' ) }
+						checked   = { object.attributes.show_icons }
+						onChange  = { value => onChangeShowIcons( value, object ) }
+					/ >
+					< ToggleControl
+						label     = { __( 'Hide actual language', 'easy-language' ) }
+						checked   = { object.attributes.hide_actual_language }
+						onChange  = { value => onChangeHideActualLanguage( value, object ) }
+					/ >
+				< / PanelBody >
+			< / InspectorControls >
+			< ServerSideRender
+				block             = "easy-language/navigation-switcher"
+				attributes        = { object.attributes }
+				httpMethod        = "POST"
+			/ >
+		< / div >
 	);
 }

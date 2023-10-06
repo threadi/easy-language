@@ -21,7 +21,7 @@ function easy_language_admin_add_menu_content_settings(): void {
 	}
 
 	?>
-	<form method="POST" action="<?php echo esc_url(get_admin_url()); ?>options.php">
+	<form method="POST" action="<?php echo esc_url( get_admin_url() ); ?>options.php">
 		<?php
 		settings_fields( 'easyLanguageApiFields' );
 		do_settings_sections( 'easyLanguageApiPage' );

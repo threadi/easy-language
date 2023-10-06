@@ -8,7 +8,9 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Helper for this plugin.
@@ -35,29 +37,28 @@ class Helper {
 		return plugin_dir_url( EASY_LANGUAGE );
 	}
 
-    /**
-     * Return whether the actual request is a REST-API-request.
-     *
-     * @return bool
-     */
-    public static function is_rest_api(): bool {
-        if ( empty( $_SERVER['REQUEST_URI'] ) ) {
-            return false;
-        }
+	/**
+	 * Return whether the actual request is a REST-API-request.
+	 *
+	 * @return bool
+	 */
+	public static function is_rest_api(): bool {
+		if ( empty( $_SERVER['REQUEST_URI'] ) ) {
+			return false;
+		}
 
-        $rest_prefix         = trailingslashit( rest_get_url_prefix() );
-        return str_contains(trailingslashit($_SERVER['REQUEST_URI']), $rest_prefix);
-    }
+		$rest_prefix = trailingslashit( rest_get_url_prefix() );
+		return str_contains( trailingslashit( $_SERVER['REQUEST_URI'] ), $rest_prefix );
+	}
 
-    /**
-     * Check if WP CLI is used for actual request.
-     *
-     * @return bool
-     */
-    public static function is_cli(): bool
-    {
-        return defined( 'WP_CLI' ) && WP_CLI;
-    }
+	/**
+	 * Check if WP CLI is used for actual request.
+	 *
+	 * @return bool
+	 */
+	public static function is_cli(): bool {
+		return defined( 'WP_CLI' ) && WP_CLI;
+	}
 
 	/**
 	 * Return the current frontend language.
@@ -65,10 +66,10 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_current_language(): string {
-		$lang = get_query_var('lang');
+		$lang = get_query_var( 'lang' );
 
 		// if there is no language in query-var, use the WP-locale.
-		if( empty($lang) ) {
+		if ( empty( $lang ) ) {
 			$lang = helper::get_wp_lang();
 		}
 
@@ -84,8 +85,8 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_format_date_time( string $date ): string {
-		$dt = get_date_from_gmt($date);
-		return date_i18n(get_option('date_format') . ' ' . get_option('time_format'), strtotime($dt));
+		$dt = get_date_from_gmt( $date );
+		return date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $dt ) );
 	}
 
 	/**
@@ -94,7 +95,7 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_settings_page_url(): string {
-		return 'options-general.php?page=easy_language_settings';
+		return admin_url() . 'options-general.php?page=easy_language_settings';
 	}
 
 	/**
@@ -104,31 +105,30 @@ class Helper {
 	 * @return string
 	 * @noinspection PhpUnused
 	 */
-	public static function get_wp_lang(): string
-	{
-		$wpLang = get_bloginfo('language');
+	public static function get_wp_lang(): string {
+		$wpLang = get_bloginfo( 'language' );
 
 		/**
 		 * Consider the main language set in Polylang for the web page
 		 */
-		if( self::is_plugin_active('polylang/polylang.php') && function_exists('pll_default_language') ) {
+		if ( self::is_plugin_active( 'polylang/polylang.php' ) && function_exists( 'pll_default_language' ) ) {
 			$wpLang = pll_default_language();
 		}
 
 		/**
 		 * Consider the main language set in WPML for the web page
 		 */
-		if( self::is_plugin_active('sitepress-multilingual-cms/sitepress.php') ) {
-			$wpLang = apply_filters('wpml_default_language', NULL );
+		if ( self::is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' ) ) {
+			$wpLang = apply_filters( 'wpml_default_language', null );
 		}
 
 		// if language not set, use default language.
-		if( empty($wpLang) ) {
+		if ( empty( $wpLang ) ) {
 			$wpLang = EASY_LANGUAGE_LANGUAGE_EMERGENCY;
 		}
 
 		// return language in format ab_CD (e.g. en_US).
-		return str_replace('-', '_', $wpLang);
+		return str_replace( '-', '_', $wpLang );
 	}
 
 	/**
@@ -138,10 +138,10 @@ class Helper {
 	 * @param int $new_id ID of new post-id.
 	 * @return void
 	 */
-	public static function copy_cpt(int $old_id, int $new_id ): void {
+	public static function copy_cpt( int $old_id, int $new_id ): void {
 		// copy all assigned taxonomies.
 		$taxonomies = get_object_taxonomies( get_post_type( $old_id ) ); // returns array of taxonomy names for post type, ex array("category", "post_tag");
-		if( $taxonomies ) {
+		if ( $taxonomies ) {
 			foreach ( $taxonomies as $taxonomy ) {
 				$post_terms = wp_get_object_terms( $old_id, $taxonomy, array( 'fields' => 'slugs' ) );
 				wp_set_object_terms( $new_id, $post_terms, $taxonomy );
@@ -150,16 +150,16 @@ class Helper {
 
 		// duplicate all post meta.
 		$post_meta = get_post_meta( $old_id );
-		if( $post_meta ) {
+		if ( $post_meta ) {
 			foreach ( $post_meta as $meta_key => $meta_values ) {
-                // ignore some keys.
-                if( in_array( $meta_key, array( '_edit_lock', '_edit_last', '_wp_page_template', '_wp_old_slug' ), true ) ) {
-                    continue;
-                }
+				// ignore some keys.
+				if ( in_array( $meta_key, array( '_edit_lock', '_edit_last', '_wp_page_template', '_wp_old_slug' ), true ) ) {
+					continue;
+				}
 
-                // loop through the values of the key and add them to the new id.
+				// loop through the values of the key and add them to the new id.
 				foreach ( $meta_values as $meta_value ) {
-					add_post_meta( $new_id, $meta_key, maybe_unserialize(wp_slash($meta_value)) );
+					add_post_meta( $new_id, $meta_key, maybe_unserialize( wp_slash( $meta_value ) ) );
 				}
 			}
 		}
@@ -171,7 +171,7 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_plugin_path(): string {
-		return plugin_dir_path(EASY_LANGUAGE);
+		return plugin_dir_path( EASY_LANGUAGE );
 	}
 
 	/**
@@ -191,10 +191,9 @@ class Helper {
 	 * @param $array
 	 * @return false
 	 */
-	public static function check_if_setting_error_entry_exists_in_array( $entry, $array ): bool
-	{
-		foreach( $array as $item ) {
-			if( $item['setting'] == $entry ) {
+	public static function check_if_setting_error_entry_exists_in_array( $entry, $array ): bool {
+		foreach ( $array as $item ) {
+			if ( $item['setting'] == $entry ) {
 				return true;
 			}
 		}
@@ -209,10 +208,10 @@ class Helper {
 	 */
 	public static function settings_validate_multiple_checkboxes( $values ): ?array {
 		$filter = current_filter();
-		if( !empty($filter) ) {
-			$filter = str_replace('sanitize_option_', '', $filter);
-			if (empty($values) && !empty($_REQUEST[$filter . '_ro'])) {
-				$values = (array)$_REQUEST[$filter . '_ro'];
+		if ( ! empty( $filter ) ) {
+			$filter = str_replace( 'sanitize_option_', '', $filter );
+			if ( empty( $values ) && ! empty( $_REQUEST[ $filter . '_ro' ] ) ) {
+				$values = (array) $_REQUEST[ $filter . '_ro' ];
 			}
 		}
 		return $values;
@@ -226,10 +225,10 @@ class Helper {
 	 */
 	public static function settings_validate_multiple_radios( $values ): ?string {
 		$filter = current_filter();
-		if( !empty($filter) ) {
-			$filter = str_replace('sanitize_option_', '', $filter);
-			if (empty($values) && !empty($_REQUEST[$filter . '_ro'])) {
-				$values = sanitize_text_field($_REQUEST[$filter . '_ro']);
+		if ( ! empty( $filter ) ) {
+			$filter = str_replace( 'sanitize_option_', '', $filter );
+			if ( empty( $values ) && ! empty( $_REQUEST[ $filter . '_ro' ] ) ) {
+				$values = sanitize_text_field( $_REQUEST[ $filter . '_ro' ] );
 			}
 		}
 		return $values;
@@ -243,10 +242,10 @@ class Helper {
 	 */
 	public static function settings_validate_select_field( $value ): ?string {
 		$filter = current_filter();
-		if( !empty($filter) ) {
-			$filter = str_replace('sanitize_option_', '', $filter);
-			if (empty($values) && !empty($_REQUEST[$filter . '_ro'])) {
-				$value = sanitize_text_field($_REQUEST[$filter . '_ro']);
+		if ( ! empty( $filter ) ) {
+			$filter = str_replace( 'sanitize_option_', '', $filter );
+			if ( empty( $values ) && ! empty( $_REQUEST[ $filter . '_ro' ] ) ) {
+				$value = sanitize_text_field( $_REQUEST[ $filter . '_ro' ] );
 			}
 		}
 		return $value;

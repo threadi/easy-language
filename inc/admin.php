@@ -5,6 +5,7 @@
  * @package easy-language
  */
 
+use easyLanguage\Helper;
 use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Transients;
 
@@ -106,16 +107,8 @@ add_action( 'wp_ajax_dismiss_admin_notice', 'easy_language_admin_dismiss' );
  * @noinspection PhpUnused
  */
 function easy_language_admin_add_setting_link( array $links ): array {
-	// build and escape the URL.
-	$url = add_query_arg(
-		array(
-			'page' => 'easy_language_settings',
-		),
-		get_admin_url() . 'options-general.php'
-	);
-
 	// create the link.
-	$settings_link = "<a href='" . esc_url( $url ) . "'>" . __( 'Settings', 'easy-language' ) . '</a>';
+	$settings_link = "<a href='" . esc_url( Helper::get_settings_page_url() ) . "'>" . __( 'Settings', 'easy-language' ) . '</a>';
 
 	// adds the link to the end of the array.
 	$links[] = $settings_link;

@@ -33,18 +33,21 @@ import {easyLanguageIcon} from "../../components";
  *
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
-registerBlockType( 'easy-language/switcher', {
-	title: __( 'Language Switcher', 'easy-language' ),
-	description: __('Provides a Block for Language Switcher.', 'easy-language'),
-	icon: easyLanguageIcon,
+registerBlockType(
+	'easy-language/switcher',
+	{
+		title: __( 'Language Switcher', 'easy-language' ),
+		description: __( 'Provides a Block for Language Switcher.', 'easy-language' ),
+		icon: easyLanguageIcon,
 
-	/**
-	 * @see ./edit.js
-	 */
-	edit: edit,
+		/**
+		 * @see ./edit.js
+		 */
+		edit: edit,
 
-	/**
-	 * @see ./save.js
-	 */
-	save: save,
-} );
+		/**
+		 * @see ./save.js
+		 */
+		save: save,
+	}
+);

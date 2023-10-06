@@ -13,19 +13,18 @@ use easyLanguage\Helper;
 /**
  * Handler for CLI-operations.
  */
-class Cli
-{
-    /**
-     * Reset translations.
-     *
-     * @return void
-     * @noinspection PhpUnused
-     */
-    public function trp_reset_translations(): void
-    {
-        easy_language_trp_reset_translations();
+class Cli {
 
-        // return ok-message.
-        \WP_CLI::success("All TranslatePress-translations has been reset.");
-    }
+	/**
+	 * Reset translations.
+	 *
+	 * @return void
+	 * @noinspection PhpUnused
+	 */
+	public function trp_reset_translations(): void {
+		easy_language_trp_reset_translations();
+
+		// return ok-message.
+		\WP_CLI::success( 'All TranslatePress-translations has been reset.' );
+	}
 }

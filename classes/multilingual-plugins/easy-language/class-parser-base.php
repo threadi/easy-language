@@ -56,10 +56,10 @@ class Parser_Base {
 	/**
 	 * Set title to parse.
 	 *
-	 * @param $title
+	 * @param string $title The title to parse.
 	 * @return void
 	 */
-	public function set_title( $title ): void {
+	public function set_title( string $title ): void {
 		$this->title = $title;
 	}
 
@@ -75,10 +75,10 @@ class Parser_Base {
 	/**
 	 * Set text to parse.
 	 *
-	 * @param $text
+	 * @param string $text The text to parse.
 	 * @return void
 	 */
-	public function set_text( $text ): void {
+	public function set_text( string $text ): void {
 		$this->text = $text;
 	}
 
@@ -94,7 +94,7 @@ class Parser_Base {
 	/**
 	 * Set the object-id which is parsed.
 	 *
-	 * @param int $object_id
+	 * @param int $object_id The object-id which contents are parsed.
 	 * @return void
 	 */
 	public function set_object_id( int $object_id ): void {
@@ -114,16 +114,19 @@ class Parser_Base {
 	/**
 	 * Return whether the given object is using this page builder.
 	 *
-	 * @param Post_Object $object
+	 * @param Post_Object $post_object The object which is parsed.
 	 *
 	 * @return bool
 	 */
-	public function is_object_using_pagebuilder( Post_Object $object ): bool {
-		return true;
+	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
+		if ( $post_object->is_translatable() || $post_object->is_translated() ) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
-	 * Return edit link for elementor-object.
+	 * Return edit link for pagebuilder-object.
 	 *
 	 * @return string
 	 */
@@ -138,10 +141,10 @@ class Parser_Base {
 	 * @noinspection PhpUnused
 	 */
 	public function get_language_switch(): void {
-        // bail if user has no translation capabilities.
-        if( false === current_user_can( 'edit_el_translate') ) {
-            return;
-        }
+		// bail if user has no translation capabilities.
+		if ( false === current_user_can( 'edit_el_translate' ) ) {
+			return;
+		}
 
 		// get the post-object.
 		$post_object = new Post_Object( get_the_ID() );
@@ -156,130 +159,131 @@ class Parser_Base {
 		$languages = array_merge( $language_array, Languages::get_instance()->get_active_languages() );
 
 		// show translate-button if this is not the original post and an API is active.
-		if( $post_object->get_id() !== $original_post_object->get_id() ) {
+		if ( $post_object->get_id() !== $original_post_object->get_id() ) {
 
 			// check if API for automatic translation is active.
 			$api_obj = Apis::get_instance()->get_active_api();
-			if( false !== $api_obj ) {
+			if ( false !== $api_obj ) {
 
 				// link to get automatic translation via API.
 				$do_translation = $post_object->get_translation_via_api_link();
 
-                // get quota-state for this object.
-                $quota_state = $post_object->get_quota_state( $api_obj );
+				// get quota-state for this object.
+				$quota_state = $post_object->get_quota_state( $api_obj );
 
-                // get object type name.
+				// get object type name.
 				$object_type = $post_object->get_type();
 
-                // do not show translate-button if characters to translate are more than quota characters.
-                if( 'above_limit' === $quota_state['status'] ) {
-	                ?>
-                    <p class="alert">
-		                <?php
-                            /* translators: %1$s will be replaced by the API-title */
-                            echo sprintf( __( 'There would be %1$d characters to translate in this %2$s. That is more than the %3$d available in quota.', 'easy-language' ), esc_html($quota_state['chars_count']), esc_html($object_type), absint($quota_state['quota_rest']) );
-		                ?>
-                    </p>
-	                <?php
-                }
-                elseif( 'exceeded' !== $quota_state['status'] ) {
-                    // output.
-                    ?>
-                    <p>
-                        <?php
-                        /* translators: %1$d will be replaced by the amount of characters in this page/post, %2$s will be replaced by the name of this page-type (post or page)  */
-                        echo wp_kses_post(sprintf(__('There would be %1$d characters translated in this %2$s.', 'easy-language'), esc_html($quota_state['chars_count']), esc_html($object_type) ));
-                        ?>
-                    </p>
-                    <p><a href="<?php echo esc_url($do_translation); ?>" class="button button-secondary easy-language-translate-object" data-id="<?php echo absint($post_object->get_id()); ?>">
-                        <?php
-                            /* translators: %1$s will be replaced by the API-title */
-                            echo sprintf(__( 'Translate via %1$s', 'easy-language' ), esc_html($api_obj->get_title() ));
-                            if( $quota_state['quota_percent'] > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
-								/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
-                                echo '<span class="dashicons dashicons-info-outline" title="'.esc_attr( sprintf( __('Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ).'"></span>';
-                            }
-                        ?>
-                        </a></p>
-                    <?php
-                }
-                else {
-                    ?>
-                        <p class="alert">
-                            <?php
-                                /* translators: %1$s will be replaced by the API-title */
-                                echo sprintf( __( 'No quota for automatic translation with %1$s available.', 'easy-language' ), esc_html($api_obj->get_title()) );
-                            ?>
-                        </p>
-                    <?php
-                }
-			}
-			elseif( current_user_can('manage_options')) {
-                // output.
+				// do not show translate-button if characters to translate are more than quota characters.
+				if ( 'above_limit' === $quota_state['status'] ) {
+					?>
+					<p class="alert">
+						<?php
+							/* translators: %1$s will be replaced by the API-title */
+							printf( esc_html__( 'There would be %1$d characters to translate in this %2$s. That is more than the %3$d available in quota.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $object_type ), absint( $quota_state['quota_rest'] ) );
+						?>
+					</p>
+					<?php
+				} elseif ( 'exceeded' !== $quota_state['status'] ) {
+					// output.
+					?>
+					<p>
+						<?php
+						/* translators: %1$d will be replaced by the amount of characters in this page/post, %2$s will be replaced by the name of this page-type (post or page)  */
+						echo wp_kses_post( sprintf( __( 'There would be %1$d characters translated in this %2$s.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $object_type ) ) );
+						?>
+					</p>
+					<p><a href="<?php echo esc_url( $do_translation ); ?>" class="button button-secondary easy-language-translate-object" data-id="<?php echo absint( $post_object->get_id() ); ?>">
+						<?php
+							/* translators: %1$s will be replaced by the API-title */
+							printf( esc_html__( 'Translate via %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ) );
+						if ( $quota_state['quota_percent'] > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
+							/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
+							echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';
+						}
+						?>
+						</a></p>
+					<?php
+				} else {
+					?>
+						<p class="alert">
+							<?php
+								/* translators: %1$s will be replaced by the API-title */
+								printf( esc_html__( 'No quota for automatic translation with %1$s available.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
+							?>
+						</p>
+					<?php
+				}
+			} elseif ( current_user_can( 'manage_options' ) ) {
+				// output.
 				?>
 				<p>
 					<?php
-						echo esc_html__('No translation-API active.', 'easy-language');
-                        ?> <a href="<?php echo esc_url(Helper::get_settings_page_url()); ?>"><span class="dashicons dashicons-admin-tools"></span></a><?php
+						echo esc_html__( 'No translation-API active.', 'easy-language' );
 					?>
-				</p>
+						<a href="<?php echo esc_url( Helper::get_settings_page_url() ); ?>"><span class="dashicons dashicons-admin-tools"></span></a>				</p>
 				<?php
 			}
 		}
 
 		// loop through the languages to show them as selection.
-		if( !empty($languages) ) {
-			?><table><?php
+		if ( ! empty( $languages ) ) {
+			?>
+			<table>
+			<?php
 			foreach ( $languages as $language_code => $settings ) {
 				// set link to add translation for this language.
 				$link = $original_post_object->get_translate_link( $language_code );
 				/* translators: %1$s will be replaced by the language title */
-				$link_title = __('Add translation in %1$s', 'easy-language');
+				$link_title   = __( 'Add translation in %1$s', 'easy-language' );
 				$link_content = '<span class="dashicons dashicons-plus"></span>';
 
 				// get translated post for this language (if it is not the original).
-				if( empty($settings['url']) ) {
+				if ( empty( $settings['url'] ) ) {
 					$link = $original_post_object->get_page_builder()->get_edit_link();
 					/* translators: %1$s will be replaced by the page-title where the original content resides */
-					$link_title = __( 'Original Content in %1$s', 'easy-language');
+					$link_title   = __( 'Original Content in %1$s', 'easy-language' );
 					$link_content = '<span class="dashicons dashicons-admin-home"></span>';
-				}
-				else {
-					$query = array(
-						'post_type' => get_post_type( get_the_ID() ),
-						'post_status' => 'any',
-						'meta_query' => array(
+				} else {
+					$query   = array(
+						'post_type'                       => get_post_type( get_the_ID() ),
+						'post_status'                     => 'any',
+						'meta_query'                      => array(
 							'relation' => 'AND',
 							array(
-								'key' => 'easy_language_translation_original_id',
-								'value' => $this->get_object_id(),
-								'compare' => '='
+								'key'     => 'easy_language_translation_original_id',
+								'value'   => $this->get_object_id(),
+								'compare' => '=',
 							),
 							array(
-								'key' => 'easy_language_translation_language',
-								'value' => $language_code,
-								'compare' => '='
-							)
+								'key'     => 'easy_language_translation_language',
+								'value'   => $language_code,
+								'compare' => '=',
+							),
 						),
-						'fields' => 'ids',
-						'posts_per_page' => 1,
+						'fields'                          => 'ids',
+						'posts_per_page'                  => 1,
 						'do_not_use_easy_language_filter' => true,
-						'suppress_filters' => true
+						'suppress_filters'                => true,
 					);
-					$results = new WP_Query($query);
-					if( 1 === $results->post_count ) {
+					$results = new WP_Query( $query );
+					if ( 1 === $results->post_count ) {
 						$post_obj = new Post_Object( $results->posts[0] );
-						$link = $post_obj->get_page_builder()->get_edit_link();
-						/* translators: %1$s will be replaced by the language title */
-						$link_title = __('Edit translation in %1$s', 'easy-language');
+						$link     = $post_obj->get_page_builder()->get_edit_link();
+						/* translators: %1$s is the name of the language */
+						$link_title   = __( 'Edit translation in %1$s', 'easy-language' );
 						$link_content = '<span class="dashicons dashicons-edit"></span>';
 					}
 				}
 
 				// output.
-				?><tr><th><?php echo $settings['label']; ?></th><td><a href="<?php echo esc_url($link); ?>" title="<?php echo esc_attr( sprintf( $link_title, $settings['label'] ) ); ?>"><?php echo $link_content; ?></a></td></tr><?php
+				?>
+				<tr><th><?php echo esc_html( $settings['label'] ); ?></th><td><a href="<?php echo esc_url( $link ); ?>" title="<?php echo esc_attr( sprintf( $link_title, $settings['label'] ) ); ?>"><?php echo wp_kses_post($link_content); ?></a></td></tr>
+				<?php
 			}
-			?></table><?php
+			?>
+			</table>
+			<?php
 		}
 	}
 
@@ -304,8 +308,8 @@ class Parser_Base {
 	/**
 	 * Replace original title with translation.
 	 *
-	 * @param string $original_complete
-	 * @param string $translated_part
+	 * @param string $original_complete Complete original content.
+	 * @param string $translated_part The translated content.
 	 *
 	 * @return string
 	 * @noinspection PhpUnused

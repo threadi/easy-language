@@ -6,7 +6,9 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Interface-definition for each API-support-object.
@@ -33,12 +35,12 @@ interface Api_Base {
 	 */
 	public function get_active_source_languages(): array;
 
-    /**
-     * Get the list of active target languages.
-     *
-     * @return array
-     */
-    public function get_active_target_languages(): array;
+	/**
+	 * Get the list of active target languages.
+	 *
+	 * @return array
+	 */
+	public function get_active_target_languages(): array;
 
 	/**
 	 * Return the list of supported languages which could be translated with this API into each other.
@@ -104,12 +106,12 @@ interface Api_Base {
 	 */
 	public function disable(): void;
 
-    /**
-     * Get the API-specific translations-object.
-     *
-     * @return object
-     */
-    public function get_translations_obj(): object;
+	/**
+	 * Get the API-specific translations-object.
+	 *
+	 * @return object
+	 */
+	public function get_translations_obj(): object;
 
 	/**
 	 * Get quota as array containing 'character_spent' and 'character_limit'.

@@ -8,64 +8,32 @@
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
 use easyLanguage\Languages;
-use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor;
-use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Gutenberg;
-use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Undetected;
-use wpdb;
 
 /**
  * Object for single translatable text based on DB-dataset.
  */
-class Text
-{
-    /**
-     * Original text.
-     *
-     * @var string
-     */
-    private string $original;
-
-    /**
-     * ID of this object.
-     *
-     * @var int
-     */
-    private int $id;
-
-    /**
-     * Database-object
-     *
-     * @var wpdb
-     */
-    private wpdb $wpdb;
-
-    /**
-     * Table for translations.
-     *
-     * @var string
-     */
-    private string $table_name_originals;
+class Text {
 
 	/**
-	 * Table for translations.
+	 * Original text.
 	 *
 	 * @var string
 	 */
-	private string $table_name_originals_objects;
+	private string $original;
 
-    /**
-     * Table for translations.
-     *
-     * @var string
-     */
-    private string $table_name_translations;
+	/**
+	 * ID of this object.
+	 *
+	 * @var int
+	 */
+	private int $id;
 
-    /**
-     * List of translations.
-     *
-     * @var array
-     */
-    private array $translations = array();
+	/**
+	 * List of translations.
+	 *
+	 * @var array
+	 */
+	private array $translations = array();
 
 	/**
 	 * Source language.
@@ -74,57 +42,54 @@ class Text
 	 */
 	private string $source_language;
 
-    /**
-     * Constructor for this object.
-     *
-     * @param int $id The original object id of this text from originals-table.
-     */
-    public function __construct( int $id ) {
-        global $wpdb;
+	/**
+	 * Constructor for this object.
+	 *
+	 * @param int $id The original object id of this text from originals-table.
+	 */
+	public function __construct( int $id ) {
+		global $wpdb;
 
-        // secure id of this object.
-        $this->id = $id;
+		// secure id of this object.
+		$this->id = $id;
 
-        // get DB-handler.
-        $this->wpdb = $wpdb;
+		// set the table-name for originals.
+		$wpdb->easy_language_originals = DB::get_instance()->get_wpdb_prefix() . 'easy_language_originals';
 
-        // set the table-name for originals.
-        $this->table_name_originals = DB::get_instance()->get_wpdb_prefix() . 'easy_language_originals';
+		// set the table-name for originals.
+		$wpdb->easy_language_originals_objects = DB::get_instance()->get_wpdb_prefix() . 'easy_language_originals_objects';
 
-	    // set the table-name for originals.
-	    $this->table_name_originals_objects = DB::get_instance()->get_wpdb_prefix() . 'easy_language_originals_objects';
+		// set the table-name for translations.
+		$wpdb->easy_language_translations = DB::get_instance()->get_wpdb_prefix() . 'easy_language_translations';
+	}
 
-        // set the table-name for translations.
-        $this->table_name_translations = DB::get_instance()->get_wpdb_prefix() . 'easy_language_translations';
-    }
+	/**
+	 * Get the id.
+	 *
+	 * @return int
+	 */
+	public function get_id(): int {
+		return $this->id;
+	}
 
-    /**
-     * Get the id.
-     *
-     * @return int
-     */
-    public function get_id(): int {
-        return $this->id;
-    }
+	/**
+	 * Get original text.
+	 *
+	 * @return string
+	 */
+	public function get_original(): string {
+		return $this->original;
+	}
 
-    /**
-     * Get original text.
-     *
-     * @return string
-     */
-    public function get_original(): string {
-        return $this->original;
-    }
-
-    /**
-     * Set original text.
-     *
-     * @param $original
-     * @return void
-     */
-    public function set_original( $original ): void {
-        $this->original = $original;
-    }
+	/**
+	 * Set original text.
+	 *
+	 * @param string $original The text to translate.
+	 * @return void
+	 */
+	public function set_original( string $original ): void {
+		$this->original = $original;
+	}
 
 	/**
 	 * Get the source-language of this text.
@@ -138,141 +103,142 @@ class Text
 	/**
 	 * Set original text.
 	 *
-	 * @param $language
+	 * @param string $language The source-language.
 	 * @return void
 	 */
-	public function set_source_language( $language ): void {
+	public function set_source_language( string $language ): void {
 		$this->source_language = $language;
 	}
 
-    /**
-     * Get the translation of this text in the given language from Db.
-     *
-     * If given language is unknown or no translation exist,
-     * return the original text.
-     *
-     * @param $target_language
-     * @return string
-     */
-    public function get_translation( $target_language ): string {
-        $supported_target_languages = Languages::get_instance()->get_active_languages();
-        if( !empty($supported_target_languages[$target_language]) ) {
-            $translation = $this->get_translation_from_db( $target_language );
-            if( !empty($translation) ) {
-                return wpautop($translation);
-            }
-        }
-        return $this->get_original();
-    }
+	/**
+	 * Get the translation of this text in the given language from Db.
+	 *
+	 * If given language is unknown or no translation exist,
+	 * return the original text.
+	 *
+	 * @param string $target_language The target language for this translation.
+	 * @return string
+	 */
+	public function get_translation( string $target_language ): string {
+		$supported_target_languages = Languages::get_instance()->get_active_languages();
+		if ( ! empty( $supported_target_languages[ $target_language ] ) ) {
+			$translation = $this->get_translation_from_db( $target_language );
+			if ( ! empty( $translation ) ) {
+				return wpautop( $translation );
+			}
+		}
+		return $this->get_original();
+	}
 
 	/**
 	 * Return if the text has a translation in the given language.
 	 *
-	 * @param string $language
+	 * @param string $language The language we search.
 	 * @return bool
 	 */
 	public function has_translation_in_language( string $language ): bool {
-		return !empty($this->get_translation_from_db( $language ) );
+		return ! empty( $this->get_translation_from_db( $language ) );
 	}
 
-    /**
-     * Get translation of this text in the given language.
-     *
-     * @param string $language
-     * @return string
-     */
-    private function get_translation_from_db( string $language ): string {
-        if( !empty($this->translations[$language]) ) {
-            return $this->translations[$language];
-        }
+	/**
+	 * Get translation of this text in the given language.
+	 *
+	 * @param string $language The language we search.
+	 * @return string
+	 */
+	private function get_translation_from_db( string $language ): string {
+		global $wpdb;
 
-        // get from DB.
-        $sql = 'SELECT `translation` FROM '.$this->table_name_translations.' WHERE `oid` = %d AND `language` = %s';
-        $prepared_sql = $this->wpdb->prepare( $sql, array( $this->get_id(), $language ) );
-        $result = $this->wpdb->get_row( $prepared_sql, ARRAY_A );
-        if( !empty($result) ) {
-            // save in object
-            $this->translations[$language] = $result['translation'];
+		if ( ! empty( $this->translations[ $language ] ) ) {
+			return $this->translations[ $language ];
+		}
 
-            // return result
-            return $result['translation'];
-        }
-        return '';
-    }
+		// get from DB.
+		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `translation` FROM ' . $wpdb->easy_language_translations . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
+		if ( ! empty( $result ) ) {
+			// save in object.
+			$this->translations[ $language ] = $result['translation'];
 
-    /**
-     * Save a new translation for this text.
-     *
-     * @param string $translated_text The translated text.
-     * @param string $target_language The target language.
-     * @param string $used_api The name of the used API.
-     * @param int $job_id The API-internal job-ID.
-     * @return void
-     * @noinspection PhpUnused
-     */
-    public function set_translation( string $translated_text, string $target_language, string $used_api, int $job_id ): void {
+			// return result.
+			return $result['translation'];
+		}
+		return '';
+	}
+
+	/**
+	 * Save a new translation for this text.
+	 *
+	 * @param string $translated_text The translated text.
+	 * @param string $target_language The target language.
+	 * @param string $used_api The name of the used API.
+	 * @param int    $job_id The API-internal job-ID.
+	 * @return void
+	 * @noinspection PhpUnused
+	 */
+	public function set_translation( string $translated_text, string $target_language, string $used_api, int $job_id ): void {
+		global $wpdb;
+
 		// get current user.
-	    $user_id = 0;
-		if( is_user_logged_in() ) {
-			$user = wp_get_current_user();
+		$user_id = 0;
+		if ( is_user_logged_in() ) {
+			$user    = wp_get_current_user();
 			$user_id = $user->ID;
 		}
 
-        // save the translation for this text.
-        $query = array(
-            'oid' => $this->get_id(),
-            'time' => gmdate( 'Y-m-d H:i:s' ),
-            'translation' => $translated_text,
-            'language' => $target_language,
-            'used_api' => $used_api,
-            'jobid' => $job_id,
-	        'user_id' => $user_id
-        );
-        $this->wpdb->insert( $this->table_name_translations, $query );
+		// save the translation for this text.
+		$query = array(
+			'oid'         => $this->get_id(),
+			'time'        => gmdate( 'Y-m-d H:i:s' ),
+			'translation' => $translated_text,
+			'language'    => $target_language,
+			'used_api'    => $used_api,
+			'jobid'       => $job_id,
+			'user_id'     => $user_id,
+		);
+		$wpdb->insert( $wpdb->easy_language_translations, $query );
 
-        // change state of text to "translated".
-        $this->set_state( 'translated' );
+		// change state of text to "translated".
+		$this->set_state( 'translated' );
 
-        // save translation in object.
-        $this->translations[$target_language] = $translated_text;
-    }
+		// save translation in object.
+		$this->translations[ $target_language ] = $translated_text;
+	}
 
 	/**
 	 * Replace the original with the translation and save this in object.
 	 *
-	 * @param int $object_id The object-ID where the text should be replaced.
+	 * @param int    $object_id The object-ID where the text should be replaced.
 	 * @param string $target_language The target language for the translated text.
-	 * @param string $taxonomy
+	 * @param string $taxonomy The used taxonomy.
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
 	 */
-    public function replace_original_with_translation( int $object_id, string $target_language, string $taxonomy ): void {
+	public function replace_original_with_translation( int $object_id, string $target_language, string $taxonomy ): void {
 		// get translation objects.
 		$translation_objects = $this->get_objects();
 
-	    // bail if translation-objects could not be loaded.
-	    if( empty($translation_objects) ) {
-		    return;
-	    }
-
-	    // get object.
-		if( !empty($taxonomy) ) {
-			$object = Init::get_instance()->get_object_by_wp_object( get_term( $object_id, $taxonomy ), $object_id, $taxonomy );
+		// bail if translation-objects could not be loaded.
+		if ( empty( $translation_objects ) ) {
+			return;
 		}
-		else {
+
+		// get object.
+		if ( ! empty( $taxonomy ) ) {
+			$object = Init::get_instance()->get_object_by_wp_object( get_term( $object_id, $taxonomy ), $object_id, $taxonomy );
+		} else {
 			$object = Init::get_instance()->get_object_by_wp_object( get_post( $object_id ), $object_id );
 		}
 
 		// bail of no object could be loaded.
-		if( false === $object ) {
+		if ( false === $object ) {
 			return;
 		}
 
-        /**
-         * Replace content depending on the field.
-         */
-		foreach( $translation_objects as $translation_object ) {
+		/**
+		 * Replace content depending on the field.
+		 */
+		foreach ( $translation_objects as $translation_object ) {
 			switch ( $translation_object['field'] ) {
 				case 'title':
 					// replace text depending on used pagebuilder for original text.
@@ -285,11 +251,11 @@ class Text
 					// update post-entry.
 					$query = array(
 						'ID'         => $object_id,
-						'post_title' => wp_strip_all_tags( $title )
+						'post_title' => wp_strip_all_tags( $title ),
 					);
 
 					// add individual post-name for permalink of enabled.
-					if( 1 === absint(get_option( 'easy_language_generate_permalink', 0 ) ) ) {
+					if ( 1 === absint( get_option( 'easy_language_generate_permalink', 0 ) ) ) {
 						$query['post_name'] = wp_unique_post_slug( $title, $object_id, $object->get_status(), $object->get_type(), 0 );
 					}
 
@@ -319,7 +285,7 @@ class Text
 					$query = array(
 						'ID'           => $object_id,
 						'post_type'    => $translation_object['object_type'],
-						'post_content' => $content
+						'post_content' => $content,
 					);
 					wp_update_post( $query );
 					break;
@@ -330,10 +296,10 @@ class Text
 
 					// set query for update.
 					$query = array(
-						'name' => $title
+						'name' => $title,
 					);
 
-					// run update
+					// run update.
 					wp_update_term( $object_id, $taxonomy, $query );
 					break;
 
@@ -343,40 +309,48 @@ class Text
 
 					// set query for update.
 					$query = array(
-						'description' => $description
+						'description' => $description,
 					);
 
-					// run update
+					// run update.
 					wp_update_term( $object_id, $taxonomy, $query );
 					break;
 			}
 		}
 
-        // set state to "in_use" to mark text as translated and inserted.
-        $this->set_state( 'in_use' );
-    }
+		// set state to "in_use" to mark text as translated and inserted.
+		$this->set_state( 'in_use' );
+	}
 
-    /**
-     * Set state of this text.
-     * Will save it also in DB.
-     *
-     * @param string $state
-     * @return void
-     */
-    private function set_state( string $state ): void {
-        $this->wpdb->update( $this->table_name_originals, array( 'state' => $state ), array( 'id' => $this->get_id() ) );
-    }
+	/**
+	 * Set state of this text.
+	 * Will save it also in DB.
+	 *
+	 * @param string $state The state for this translation.
+	 * @return void
+	 */
+	private function set_state( string $state ): void {
+		global $wpdb;
+		$wpdb->update( $wpdb->easy_language_originals, array( 'state' => $state ), array( 'id' => $this->get_id() ) );
+	}
 
-    /**
-     * Delete this entry with all of its translations.
-     *
-     * @return void
-     */
-    public function delete(): void {
-        $this->wpdb->delete( $this->table_name_originals, array( 'id' => $this->get_id() ) );
-	    $this->wpdb->delete( $this->table_name_originals_objects, array( 'oid' => $this->get_id(), 'blog_id' => get_current_blog_id() ) );
-        $this->wpdb->delete( $this->table_name_translations, array( 'oid' => $this->get_id() ) );
-    }
+	/**
+	 * Delete this entry with all of its translations.
+	 *
+	 * @return void
+	 */
+	public function delete(): void {
+		global $wpdb;
+		$wpdb->delete( $wpdb->easy_language_originals, array( 'id' => $this->get_id() ) );
+		$wpdb->delete(
+			$wpdb->easy_language_originals_objects,
+			array(
+				'oid'     => $this->get_id(),
+				'blog_id' => get_current_blog_id(),
+			)
+		);
+		$wpdb->delete( $wpdb->easy_language_translations, array( 'oid' => $this->get_id() ) );
+	}
 
 	/**
 	 * Return list of objects which are using this text.
@@ -384,35 +358,40 @@ class Text
 	 * @return array
 	 */
 	public function get_objects(): array {
+		global $wpdb;
+
 		// get from DB.
-		$sql = 'SELECT oo.`object_type`, oo.`object_id`, oo.`page_builder`, o.`field`
-				FROM '.$this->table_name_originals_objects.' oo
-				JOIN '.$this->table_name_originals.' o ON (o.id = oo.oid)
-				WHERE oo.`oid` = %d AND oo.`blog_id` = %d';
-		$prepared_sql = $this->wpdb->prepare( $sql, array( $this->get_id(), get_current_blog_id() ) );
+		$prepared_sql = $wpdb->prepare(
+			'SELECT oo.`object_type`, oo.`object_id`, oo.`page_builder`, o.`field`
+				FROM ' . $wpdb->easy_language_originals_objects . ' oo
+				JOIN ' . $wpdb->easy_language_originals . ' o ON (o.id = oo.oid)
+				WHERE oo.`oid` = %d AND oo.`blog_id` = %d',
+			array( $this->get_id(), get_current_blog_id() )
+		);
 
 		// return result.
-		return (array)$this->wpdb->get_results( $prepared_sql, ARRAY_A );
+		return (array) $wpdb->get_results( $prepared_sql, ARRAY_A );
 	}
 
 	/**
 	 * Set given ID and type as object which is using this text.
 	 *
 	 * @param string $type The object-type (e.g. post, page, category).
-	 * @param int $id The object-ID from WP.
+	 * @param int    $id The object-ID from WP.
 	 * @param string $page_builder The used pagebuilder.
 	 *
 	 * @return void
 	 */
 	public function set_object( string $type, int $id, string $page_builder ): void {
+		global $wpdb;
 		$query = array(
-			'oid' => $this->get_id(),
-			'time' => gmdate( 'Y-m-d H:i:s' ),
-			'object_type' => $type,
-			'object_id' => $id,
-            'blog_id' => get_current_blog_id(),
-			'page_builder' => $page_builder
+			'oid'          => $this->get_id(),
+			'time'         => gmdate( 'Y-m-d H:i:s' ),
+			'object_type'  => $type,
+			'object_id'    => $id,
+			'blog_id'      => get_current_blog_id(),
+			'page_builder' => $page_builder,
 		);
-		$this->wpdb->insert( $this->table_name_originals_objects, $query );
+		$wpdb->insert( $wpdb->easy_language_originals_objects, $query );
 	}
 }

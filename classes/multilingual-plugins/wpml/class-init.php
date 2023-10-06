@@ -20,12 +20,12 @@ use WPML_Flags_Factory;
  */
 class Init extends Base implements Multilingual_Plugins_Base {
 
-    /**
-     * Name of this plugin.
-     *
-     * @var string
-     */
-    protected string $name = 'wpml';
+	/**
+	 * Name of this plugin.
+	 *
+	 * @var string
+	 */
+	protected string $name = 'wpml';
 
 	/**
 	 * Title of this plugin.
@@ -34,54 +34,54 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	protected string $title = 'WPML';
 
-    /**
-     * Instance of this object.
-     *
-     * @var ?Init
-     */
-    private static ?Init $instance = null;
+	/**
+	 * Instance of this object.
+	 *
+	 * @var ?Init
+	 */
+	private static ?Init $instance = null;
 
-    /**
-     * Constructor for Init-Handler.
-     */
-    private function __construct() {}
+	/**
+	 * Constructor for Init-Handler.
+	 */
+	private function __construct() {}
 
-    /**
-     * Prevent cloning of this object.
-     *
-     * @return void
-     */
-    private function __clone() {}
+	/**
+	 * Prevent cloning of this object.
+	 *
+	 * @return void
+	 */
+	private function __clone() {}
 
-    /**
-     * Return the instance of this Singleton object.
-     */
-    public static function get_instance(): Init {
-        if ( ! static::$instance instanceof static ) {
-            static::$instance = new static();
-        }
+	/**
+	 * Return the instance of this Singleton object.
+	 */
+	public static function get_instance(): Init {
+		if ( ! static::$instance instanceof static ) {
+			static::$instance = new static();
+		}
 
-        return static::$instance;
-    }
+		return static::$instance;
+	}
 
-    /**
-     * Initialize this object.
-     *
-     * @return void
-     */
-    public function init(): void {
+	/**
+	 * Initialize this object.
+	 *
+	 * @return void
+	 */
+	public function init(): void {
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 
 		// disable transients on WPML-deactivation.
-	    add_action( 'deactivate_sitepress-multilingual-cms/sitepress.php', array( $this, 'foreign_deactivate') );
-    }
+		add_action( 'deactivate_sitepress-multilingual-cms/sitepress.php', array( $this, 'foreign_deactivate' ) );
+	}
 
-    /**
-     * Run on plugin-installation.
-     *
-     * @return void
-     */
-    public function install(): void {}
+	/**
+	 * Run on plugin-installation.
+	 *
+	 * @return void
+	 */
+	public function install(): void {}
 
 	/**
 	 * Return supported languages.
@@ -118,7 +118,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$transients_obj = Transients::get_instance();
 
 		// get transient-object for this plugin.
-		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_plugin_'.$this->get_name() );
+		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_plugin_' . $this->get_name() );
 
 		// delete it.
 		$transient_obj->delete();
@@ -136,8 +136,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$languages = array();
 
 		// loop through the languages activated in WPML.
-		foreach( $sitepress->get_active_languages() as $language ) {
-			$languages[$language['code']] = "1";
+		foreach ( $sitepress->get_active_languages() as $language ) {
+			$languages[ $language['code'] ] = '1';
 		}
 
 		// return resulting list of locales (e.g. "de_EL").
@@ -158,7 +158,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	public function admin_init(): void {
 		// bail of WPML-class does not exist.
-		if( !class_exists('WPML_Flags_Factory') ) {
+		if ( ! class_exists( 'WPML_Flags_Factory' ) ) {
 			return;
 		}
 
@@ -169,29 +169,29 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$wpml_changed = false;
 
 		// get actual active languages.
-		$old_active_languages  = $sitepress->get_active_languages();
-		$active_languages = array();
-		foreach( $old_active_languages as $old_active_language ) {
+		$old_active_languages = $sitepress->get_active_languages();
+		$active_languages     = array();
+		foreach ( $old_active_languages as $old_active_language ) {
 			$active_languages[] = $old_active_language['code'];
 		}
 
 		// check if our languages does already exist in wpml-db.
-		foreach( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
-			$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `id` FROM ' . DB::get_instance()->get_wpdb_prefix() . "icl_languages WHERE code = %s", array($language_code) ) );
+		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
+			$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `id` FROM ' . DB::get_instance()->get_wpdb_prefix() . 'icl_languages WHERE code = %s', array( $language_code ) ) );
 			if ( empty( $result ) ) {
 				// copy flag in uploads-directory for WPML-flags.
 				$wp_upload_dir = wp_upload_dir();
 				$base_path     = $wp_upload_dir['basedir'] . '/';
 				$path          = 'flags/';
-				$flag_path = $base_path . $path . $language_code.'.png';
+				$flag_path     = $base_path . $path . $language_code . '.png';
 				if ( ! file_exists( $flag_path ) ) {
-					copy( plugin_dir_path( EASY_LANGUAGE ) . 'gfx/'.$language_code.'.png', $flag_path );
+					copy( plugin_dir_path( EASY_LANGUAGE ) . 'gfx/' . $language_code . '.png', $flag_path );
 				}
 
 				// collect possible translations.
 				$translations = array();
 				foreach ( Languages::get_instance()->get_possible_source_languages() as $source_language_code => $source_language ) {
-					$translations[$source_language_code] = array(
+					$translations[ $source_language_code ] = array(
 						'language_code'         => $source_language_code,
 						'display_language_code' => $source_language_code,
 						'name'                  => $source_language['label'],
@@ -208,7 +208,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					'encode_url'     => 0,
 					'tag'            => $language_code,
 					'translations'   => $translations,
-					'flag'           => $language_code.'.png',
+					'flag'           => $language_code . '.png',
 					'flag_upload'    => true,
 				);
 				$icl_edit_languages->insert_one( $data );
@@ -222,9 +222,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		}
 
 		// run tasks if something has been changed.
-		if( false !== $wpml_changed ) {
+		if ( false !== $wpml_changed ) {
 			// save the active languages (including our own).
-			$setup_instance             = wpml_get_setup_instance();
+			$setup_instance = wpml_get_setup_instance();
 			$setup_instance->set_active_languages( $active_languages );
 
 			// clear cache in WPML.

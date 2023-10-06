@@ -8,7 +8,9 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Initialize a single transient-object.
@@ -134,14 +136,14 @@ class Transient {
 	 * @noinspection PhpUnused
 	 */
 	public function is_set(): bool {
-        $transient = get_transient( $this->get_name() );
-		if( null === $transient ) {
-            return false;
-        }
-        if( false === $transient ) {
-            return false;
-        }
-        return true;
+		$transient = get_transient( $this->get_name() );
+		if ( null === $transient ) {
+			return false;
+		}
+		if ( false === $transient ) {
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -159,7 +161,7 @@ class Transient {
 		$entry = get_transient( $this->get_name() );
 
 		// bail if entry is empty.
-		if( empty($entry) || !isset($entry['message']) ) {
+		if ( empty( $entry ) || ! isset( $entry['message'] ) ) {
 			return;
 		}
 
@@ -173,14 +175,14 @@ class Transient {
 		if ( $this->has_message() ) {
 			?>
 			<div class="easy-language-transient updated <?php echo esc_attr( $this->get_type() ); ?>" data-dismissible="<?php echo esc_attr( $this->get_name() ); ?>-<?php echo absint( $this->get_dismissible_days() ); ?>">
-                <h3><img src="<?php echo Helper::get_plugin_url().'/gfx/easy-language-icon.png'; ?>" alt="" /> <?php echo esc_html(Helper::get_plugin_name()); ?></h3>
+				<h3><img src="<?php echo Helper::get_plugin_url() . '/gfx/easy-language-icon.png'; ?>" alt="" /> <?php echo esc_html( Helper::get_plugin_name() ); ?></h3>
 				<?php
 				echo wp_kses_post( wpautop( $this->get_message() ) );
 				if ( $this->get_dismissible_days() > 0 ) {
-                    /* translators: %1$d will be replaced by the days this message will be hidden. */
-                    $title = sprintf( __( 'Hide this message for %1$d days.', 'easy-language' ), $this->get_dismissible_days() );
+					/* translators: %1$d will be replaced by the days this message will be hidden. */
+					$title = sprintf( __( 'Hide this message for %1$d days.', 'easy-language' ), $this->get_dismissible_days() );
 					?>
-					<button type="button" class="notice-dismiss" title="<?php echo esc_html($title); ?>"><?php echo esc_html__( 'Dismiss', 'easy-language' ); ?><span class="screen-reader-text"><?php echo esc_html($title); ?></span></button>
+					<button type="button" class="notice-dismiss" title="<?php echo esc_html( $title ); ?>"><?php echo esc_html__( 'Dismiss', 'easy-language' ); ?><span class="screen-reader-text"><?php echo esc_html( $title ); ?></span></button>
 					<?php
 				}
 				?>

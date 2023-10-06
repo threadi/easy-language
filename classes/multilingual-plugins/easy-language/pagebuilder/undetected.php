@@ -8,19 +8,21 @@
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Undetected;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Add Undetected-object to list of supported pagebuilder.
  *
  * Must be last index in list of supported pagebuilder, so we use PHP_INT_MAX for position.
  *
- * @param $list
+ * @param array $pagebuilder_list List of supported pagebuilder.
  *
  * @return array
  */
-function easy_language_pagebuilder_undetected( $list ): array {
-	$list[] = Undetected::get_instance();
-	return $list;
+function easy_language_pagebuilder_undetected( array $pagebuilder_list ): array {
+	$pagebuilder_list[] = Undetected::get_instance();
+	return $pagebuilder_list;
 }
 add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_undetected', PHP_INT_MAX );

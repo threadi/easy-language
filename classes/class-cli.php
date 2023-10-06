@@ -11,7 +11,9 @@ use easyLanguage\Api\Summ_Ai\Request;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Handler for CLI-operations.
@@ -33,6 +35,6 @@ class Cli {
 		$init->activation();
 
 		// return ok-message.
-		\WP_CLI::success("Plugin has been reset.");
+		\WP_CLI::success( 'Plugin has been reset.' );
 	}
 }

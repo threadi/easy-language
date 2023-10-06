@@ -5,6 +5,8 @@
  * @package easy-language
  */
 
+use easyLanguage\Helper;
+
 /**
  * Add settings in options menu.
  *
@@ -35,16 +37,16 @@ function easy_language_admin_add_settings_content(): void {
 	}
 
 	// get the active tab from the $_GET param.
-	$tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : 'api';
+	$tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'api';
 
 	// output.
 	?>
 	<div class="wrap">
 		<h1><?php esc_html_e( 'Easy Language Plugin', 'easy-language' ); ?></h1>
 		<nav class="nav-tab-wrapper">
-			<a href="<?php echo admin_url(); ?>options-general.php?page=easy_language_settings" class="nav-tab
+			<a href="<?php echo esc_url( Helper::get_settings_page_url() ); ?>" class="nav-tab
 								<?php
-								if ( $tab === null ) :
+								if ( 'api' === $tab ) :
 									?>
 				nav-tab-active<?php endif; ?>"><?php esc_html_e( 'API', 'easy-language' ); ?></a>
 			<?php
@@ -85,11 +87,11 @@ function easy_language_admin_add_settings(): void {
 				foreach ( $sections as $section ) {
 					// loop through the field of this section.
 					foreach ( $section as $field ) {
-						$functionName = 'easy_language_admin_sanitize_settings_field';
+						$function_name = 'easy_language_admin_sanitize_settings_field';
 						if ( ! empty( $field['args']['sanitizeFunction'] ) && function_exists( $field['args']['sanitizeFunction'] ) ) {
-							$functionName = $field['args']['sanitizeFunction'];
+							$function_name = $field['args']['sanitizeFunction'];
 						}
-						add_filter( 'sanitize_option_' . $field['args']['fieldId'], $functionName, 10, 2 );
+						add_filter( 'sanitize_option_' . $field['args']['fieldId'], $function_name, 10, 2 );
 					}
 				}
 			}
@@ -101,19 +103,19 @@ add_action( 'admin_init', 'easy_language_admin_add_settings' );
 /**
  * Define an input-text-field.
  *
- * @param $attr
+ * @param array $attr List of attributes.
  *
  * @return void
  * @noinspection DuplicatedCode
  */
-function easy_language_admin_text_field( $attr ): void {
+function easy_language_admin_text_field( array $attr ): void {
 	if ( ! empty( $attr['fieldId'] ) ) {
-		// get value from config
+		// get value from config.
 		$value = get_option( $attr['fieldId'], '' );
 
 		// get value from request.
 		if ( isset( $_POST[ $attr['fieldId'] ] ) ) {
-			$value = sanitize_text_field( $_POST[ $attr['fieldId'] ] );
+			$value = sanitize_text_field( wp_unslash( $_POST[ $attr['fieldId'] ] ) );
 		}
 
 		// get title.
@@ -143,7 +145,7 @@ function easy_language_admin_text_field( $attr ): void {
 		<input type="text" id="<?php echo esc_attr( $attr['fieldId'] ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>" value="<?php echo esc_attr( $value ); ?>"
 											<?php
 											echo ! empty( $attr['placeholder'] ) ? ' placeholder="' . esc_attr( $attr['placeholder'] ) . '"' : '';
-											echo $readonly;
+											echo esc_attr( $readonly );
 											?>
 		class="widefat" title="<?php echo esc_attr( $title ); ?>">
 		<?php
@@ -163,19 +165,19 @@ function easy_language_admin_text_field( $attr ): void {
 /**
  * Define an input-number-field.
  *
- * @param $attr
+ * @param array $attr List of attributes.
  *
  * @return void
  * @noinspection DuplicatedCode
  */
-function easy_language_admin_number_field( $attr ): void {
+function easy_language_admin_number_field( array $attr ): void {
 	if ( ! empty( $attr['fieldId'] ) ) {
 		// get value from config.
 		$value = get_option( $attr['fieldId'], '' );
 
 		// get value from request.
 		if ( isset( $_POST[ $attr['fieldId'] ] ) ) {
-			$value = sanitize_text_field( $_POST[ $attr['fieldId'] ] );
+			$value = sanitize_text_field( wp_unslash( $_POST[ $attr['fieldId'] ] ) );
 		}
 
 		// get title.
@@ -193,12 +195,12 @@ function easy_language_admin_number_field( $attr ): void {
 			<?php
 		}
 
-		// output
+		// output.
 		?>
 		<input type="number" id="<?php echo esc_attr( $attr['fieldId'] ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>" value="<?php echo esc_attr( $value ); ?>"
 											<?php
 											echo ! empty( $attr['placeholder'] ) ? ' placeholder="' . esc_attr( $attr['placeholder'] ) . '"' : '';
-											echo $readonly;
+											echo esc_attr( $readonly );
 											?>
 		class="widefat" title="<?php echo esc_attr( $title ); ?>">
 		<?php
@@ -211,18 +213,18 @@ function easy_language_admin_number_field( $attr ): void {
 /**
  * Define an input-email-field.
  *
- * @param $attr
+ * @param array $attr List of attributes.
  *
  * @return void
- * @noinspection DuplicatedCode*/
-function easy_language_admin_email_field( $attr ): void {
+ */
+function easy_language_admin_email_field( array $attr ): void {
 	if ( ! empty( $attr['fieldId'] ) ) {
 		// get value from config.
 		$value = get_option( $attr['fieldId'], '' );
 
 		// get value from request.
 		if ( isset( $_POST[ $attr['fieldId'] ] ) ) {
-			$value = sanitize_text_field( $_POST[ $attr['fieldId'] ] );
+			$value = sanitize_text_field( wp_unslash( $_POST[ $attr['fieldId'] ] ) );
 		}
 
 		// get title.
@@ -252,7 +254,7 @@ function easy_language_admin_email_field( $attr ): void {
 		<input type="email" id="<?php echo esc_attr( $attr['fieldId'] ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>" value="<?php echo esc_attr( $value ); ?>"
 											<?php
 											echo ! empty( $attr['placeholder'] ) ? ' placeholder="' . esc_attr( $attr['placeholder'] ) . '"' : '';
-											echo $readonly;
+											echo esc_attr( $readonly );
 											?>
 		class="widefat" title="<?php echo esc_attr( $title ); ?>">
 		<?php
@@ -272,10 +274,10 @@ function easy_language_admin_email_field( $attr ): void {
 /**
  * Define an input-checkbox-field.
  *
- * @param $attr
+ * @param array $attr List of attributes.
  * @return void
  */
-function easy_language_admin_checkbox_field( $attr ): void {
+function easy_language_admin_checkbox_field( array $attr ): void {
 	if ( ! empty( $attr['fieldId'] ) ) {
 		// get title.
 		$title = '';
@@ -288,7 +290,7 @@ function easy_language_admin_checkbox_field( $attr ): void {
 		if ( isset( $attr['readonly'] ) && false !== $attr['readonly'] ) {
 			$readonly = ' disabled="disabled"';
 			?>
-			<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro" value="<?php echo ( get_option( $attr['fieldId'], 0 ) == 1 || ( isset( $_POST[ $attr['fieldId'] ] ) && absint( $_POST[ $attr['fieldId'] ] ) == 1 ) ) ? '1' : '0'; ?>">
+			<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro" value="<?php echo ( 1 === absint( get_option( $attr['fieldId'], 0 ) ) || ( isset( $_POST[ $attr['fieldId'] ] ) && 1 === absint( $_POST[ $attr['fieldId'] ] ) ) ) ? '1' : '0'; ?>">
 			<?php
 		}
 
@@ -297,7 +299,7 @@ function easy_language_admin_checkbox_field( $attr ): void {
 				name="<?php echo esc_attr( $attr['fieldId'] ); ?>"
 				value="1"
 			<?php
-			echo ( get_option( $attr['fieldId'], 0 ) == 1 || ( isset( $_POST[ $attr['fieldId'] ] ) && absint( $_POST[ $attr['fieldId'] ] ) == 1 ) ) ? ' checked="checked"' : '';
+			echo ( 1 === absint( get_option( $attr['fieldId'], 0 ) ) || ( isset( $_POST[ $attr['fieldId'] ] ) && 1 === absint( $_POST[ $attr['fieldId'] ] ) ) ) ? ' checked="checked"' : '';
 			echo esc_attr( $readonly );
 			?>
 				class="easy-language-field-width"
@@ -310,7 +312,7 @@ function easy_language_admin_checkbox_field( $attr ): void {
 			echo '<p>' . wp_kses_post( $attr['description'] ) . '</p>';
 		}
 
-		// show optional hint for our Pro-version
+		// show optional hint for our Pro-version.
 		if ( ! empty( $attr['pro_hint'] ) ) {
 			do_action( 'easy_language_admin_show_pro_hint', $attr['pro_hint'] );
 		}
@@ -320,18 +322,18 @@ function easy_language_admin_checkbox_field( $attr ): void {
 /**
  * Show select-field with given values.
  *
- * @param $attr
+ * @param array $attr List of attributes.
  *
  * @return void
  */
-function easy_language_admin_select_field( $attr ): void {
+function easy_language_admin_select_field( array $attr ): void {
 	if ( ! empty( $attr['fieldId'] ) && ! empty( $attr['values'] ) ) {
 		// get value from config.
 		$value = get_option( $attr['fieldId'], '' );
 
 		// or get it from request.
 		if ( isset( $_POST[ $attr['fieldId'] ] ) ) {
-			$value = sanitize_text_field( $_POST[ $attr['fieldId'] ] );
+			$value = sanitize_text_field( wp_unslash( $_POST[ $attr['fieldId'] ] ) );
 		}
 
 		// get title.
@@ -350,7 +352,7 @@ function easy_language_admin_select_field( $attr ): void {
 		}
 
 		?>
-		<select id="<?php echo esc_attr( $attr['fieldId'] ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>" class="easy-language-field-width"<?php echo $readonly; ?> title="<?php echo esc_attr( $title ); ?>">
+		<select id="<?php echo esc_attr( $attr['fieldId'] ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>" class="easy-language-field-width"<?php echo esc_attr( $readonly ); ?> title="<?php echo esc_attr( $title ); ?>">
 			<?php
 			if ( empty( $attr['disable_empty'] ) ) {
 				?>
@@ -359,7 +361,7 @@ function easy_language_admin_select_field( $attr ): void {
 			}
 			foreach ( $attr['values'] as $key => $label ) {
 				?>
-					<option value="<?php echo esc_attr( $key ); ?>"<?php echo ( $value == $key ? ' selected="selected"' : '' ); ?>><?php echo esc_html( $label ); ?></option>
+					<option value="<?php echo esc_attr( $key ); ?>"<?php echo ( $value === $key ? ' selected="selected"' : '' ); ?>><?php echo esc_html( $label ); ?></option>
 					<?php
 			}
 			?>
@@ -374,82 +376,13 @@ function easy_language_admin_select_field( $attr ): void {
 }
 
 /**
- * Show multiselect-field with given values.
- *
- * @param $attr
- * @return void
- */
-function easy_language_admin_multiselect_field( $attr ): void {
-	if ( ! empty( $attr['fieldId'] ) && ! empty( $attr['values'] ) ) {
-		// get value from config.
-		$actualValues = get_option( $attr['fieldId'], array() );
-		if ( empty( $actualValues ) ) {
-			$actualValues = array();
-		}
-
-		// or get them from request.
-		if ( isset( $_POST[ $attr['fieldId'] ] ) && is_array( $_POST[ $attr['fieldId'] ] ) ) {
-			$actualValues = array();
-			$values       = array_map( 'sanitize_text_field', $_POST[ $attr['fieldId'] ] );
-			foreach ( $values as $key => $item ) {
-				$actualValues[ absint( $key ) ] = sanitize_text_field( $item );
-			}
-		}
-
-		// if $actualValues is a string, convert it.
-		if ( ! is_array( $actualValues ) ) {
-			$actualValues = explode( ',', $actualValues );
-		}
-
-		// use values as key if set.
-		if ( ! empty( $attr['useValuesAsKeys'] ) ) {
-			$newArray = array();
-			foreach ( $attr['values'] as $value ) {
-				$newArray[ $value ] = $value;
-			}
-			$attr['values'] = $newArray;
-		}
-
-		// get title.
-		$title = '';
-		if ( isset( $attr['title'] ) ) {
-			$title = $attr['title'];
-		}
-
-		// set readonly attribute.
-		$readonly = '';
-		if ( isset( $attr['readonly'] ) && false !== $attr['readonly'] ) {
-			$readonly = ' disabled="disabled"';
-			?>
-			<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro" value="<?php echo implode( ',', $actualValues ); ?>" />
-			<?php
-		}
-
-		?>
-		<select id="<?php echo esc_attr( $attr['fieldId'] ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>[]" multiple class="easy-language-field-width"<?php echo $readonly; ?> title="<?php echo esc_attr( $title ); ?>">
-			<?php
-			foreach ( $attr['values'] as $key => $value ) {
-				?>
-				<option value="<?php echo esc_attr( $key ); ?>"<?php echo in_array( $key, $actualValues, true ) ? ' selected="selected"' : ''; ?>><?php echo esc_html( $value ); ?></option>
-				<?php
-			}
-			?>
-			</select>
-		<?php
-		if ( ! empty( $attr['description'] ) ) {
-			echo '<p>' . wp_kses_post( $attr['description'] ) . '</p>';
-		}
-	}
-}
-
-/**
  * Show multiple checkboxes for a single setting.
  *
- * @param $attr
+ * @param array $attr List of attributes.
  *
  * @return void
  */
-function easy_language_admin_multiple_checkboxes_field( $attr ): void {
+function easy_language_admin_multiple_checkboxes_field( array $attr ): void {
 	if ( ! empty( $attr['options'] ) ) {
 		if ( ! empty( $attr['description'] ) ) {
 			echo '<p class="easy-language-checkbox">' . wp_kses_post( $attr['description'] ) . '</p>';

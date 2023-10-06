@@ -12,7 +12,9 @@ use easyLanguage\Languages;
 use WP_Term_Query;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Handles a single post-object.
@@ -42,7 +44,8 @@ class Term_Object implements Easy_Language_Object {
 	/**
 	 * Initialize the object.
 	 *
-	 * @param int $term_id The Term-ID.
+	 * @param int    $term_id The Term-ID.
+	 * @param string $taxonomy The taxonomy.
 	 */
 	public function __construct( int $term_id, string $taxonomy ) {
 		// secure the given ID.
@@ -54,14 +57,14 @@ class Term_Object implements Easy_Language_Object {
 		/**
 		 * Check translate-typ of object: translatable or translated.
 		 */
-		if( get_term_meta( $this->get_id(), 'easy_language_translation_original_id', true ) ) {
+		if ( get_term_meta( $this->get_id(), 'easy_language_translation_original_id', true ) ) {
 			$this->translate_type = 'translated';
 		}
 
 		/**
 		 * Set original language for translatable type-objects, if not set.
 		 */
-		if( 'translatable' === $this->translate_type && empty(get_post_meta( $this->get_id(), 'easy_language_text_language', true )) ) {
+		if ( 'translatable' === $this->translate_type && empty( get_post_meta( $this->get_id(), 'easy_language_text_language', true ) ) ) {
 			update_term_meta( $this->get_id(), 'easy_language_text_language', helper::get_wp_lang() );
 		}
 	}
@@ -73,16 +76,15 @@ class Term_Object implements Easy_Language_Object {
 	 */
 	public function get_language(): array {
 		$languages = Languages::get_instance()->get_active_languages();
-		if( 'translatable' === $this->translate_type ) {
-			$languages = Languages::get_instance()->get_possible_source_languages();
+		if ( 'translatable' === $this->translate_type ) {
+			$languages     = Languages::get_instance()->get_possible_source_languages();
 			$language_code = get_term_meta( $this->get_id(), 'easy_language_text_language', true );
-		}
-		else {
+		} else {
 			$language_code = get_term_meta( $this->get_id(), 'easy_language_translation_language', true );
 		}
-		if( !empty($language_code) && !empty($languages[$language_code]) ) {
+		if ( ! empty( $language_code ) && ! empty( $languages[ $language_code ] ) ) {
 			return array(
-				$language_code => $languages[ $language_code ]
+				$language_code => $languages[ $language_code ],
 			);
 		}
 		return array();
@@ -112,7 +114,7 @@ class Term_Object implements Easy_Language_Object {
 	 * @return int
 	 */
 	public function get_original_object_as_int(): int {
-		return absint(get_term_meta( $this->get_id(), 'easy_language_translation_original_id', true ) );
+		return absint( get_term_meta( $this->get_id(), 'easy_language_translation_original_id', true ) );
 	}
 
 	/**
@@ -136,42 +138,42 @@ class Term_Object implements Easy_Language_Object {
 	/**
 	 * Return whether a given post type is translated in given language.
 	 *
-	 * @param $language
+	 * @param string $language The language to check.
 	 *
 	 * @return bool
 	 */
-	public function is_translated_in_language( $language ): bool {
+	public function is_translated_in_language( string $language ): bool {
 		return $this->get_translated_in_language( $language ) > 0;
 	}
 
 	/**
 	 * Return the post_id of the translation of this object in a given language.
 	 *
-	 * @param string $language_code
+	 * @param string $language_code The language we search.
 	 *
 	 * @return int
 	 */
 	public function get_translated_in_language( string $language_code ): int {
-		$query = array(
-			'meta_query' => array(
+		$query  = array(
+			'meta_query'                      => array(
 				'relation' => 'AND',
 				array(
-					'key' => 'easy_language_translation_original_id',
-					'value' => $this->get_id(),
-					'compare' => '='
+					'key'     => 'easy_language_translation_original_id',
+					'value'   => $this->get_id(),
+					'compare' => '=',
 				),
 				array(
-					'key' => 'easy_language_translation_language',
-					'value' => $language_code,
-					'compare' => '='
+					'key'     => 'easy_language_translation_language',
+					'value'   => $language_code,
+					'compare' => '=',
 				),
 			),
-			'fields' => 'ids',
-			'hide_empty' => false,
-			'do_not_use_easy_language_filter' => '1'
+			'fields'                          => 'ids',
+			'hide_empty'                      => false,
+			'do_not_use_easy_language_filter' => '1',
 		);
 		$result = new WP_Term_Query( $query );
-		if( null !== $result->terms && 1 === count($result->terms) ) {
+		if ( null !== $result->terms && 1 === count( $result->terms ) ) {
 			return $result->terms[0];
 		}
 		return 0;
@@ -200,27 +202,21 @@ class Term_Object implements Easy_Language_Object {
 		$url = trailingslashit( $slug );
 
 		// if actual object is translated, link to the translated object.
-		if( $this->is_translated_in_language( $language_code ) ) {
+		if ( $this->is_translated_in_language( $language_code ) ) {
 			if ( 'link_translated' === get_option( 'easy_language_switcher_link', '' ) ) {
 				$url = get_permalink( $this->get_translated_in_language( $language_code ) );
-			}
-			else {
-				if( 'page' === get_option('show_on_front') ) {
-					$object_id = absint( get_option( 'page_on_front', 0 ) );
-					$object = new Post_Object( $object_id );
+			} elseif ( 'page' === get_option( 'show_on_front' ) ) {
+					$object_id          = absint( get_option( 'page_on_front', 0 ) );
+					$object             = new Post_Object( $object_id );
 					$translated_post_id = $object->get_translated_in_language( $language_code );
-					$url = get_permalink( $translated_post_id );
-				}
-				elseif( 'posts' === get_option('show_on_front') ) {
-					$url = get_home_url();
-				}
+					$url                = get_permalink( $translated_post_id );
+			} elseif ( 'posts' === get_option( 'show_on_front' ) ) {
+				$url = get_home_url();
 			}
-		}
-		elseif( $language_code === key($this->get_language()) ) {
+		} elseif ( key( $this->get_language() ) === $language_code ) {
 			$url = get_permalink( $this->get_id() );
-		}
-		// if this page is not translated, link to the homepage.
-		elseif( 'link_translated' === get_option( 'easy_language_switcher_link', '' ) ) {
+		} elseif ( 'link_translated' === get_option( 'easy_language_switcher_link', '' ) ) {
+			// if this page is not translated, link to the homepage.
 			$url = get_home_url();
 		}
 
@@ -241,18 +237,18 @@ class Term_Object implements Easy_Language_Object {
 	/**
 	 * Set marker that the translatable content of this object has been changed.
 	 *
-	 * @param string $language_code
+	 * @param string $language_code The language we will mark.
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
 	 */
 	public function mark_as_changed_in_language( string $language_code ): void {
-		if( false === $this->is_translatable() ) {
+		if ( false === $this->is_translatable() ) {
 			return;
 		}
 
 		// set marker.
-		update_term_meta( $this->get_id(), 'easy_language_'.$language_code.'_changed', '1' );
+		update_term_meta( $this->get_id(), 'easy_language_' . $language_code . '_changed', '1' );
 	}
 
 	/**
@@ -263,7 +259,7 @@ class Term_Object implements Easy_Language_Object {
 	 * @return bool
 	 */
 	public function has_changed( string $language_code ): bool {
-		$changed_marker = absint( get_term_meta( $this->get_id(), 'easy_language_'.$language_code.'_changed', true ) );
+		$changed_marker = absint( get_term_meta( $this->get_id(), 'easy_language_' . $language_code . '_changed', true ) );
 		return $this->is_translatable() && 1 === $changed_marker;
 	}
 
@@ -275,31 +271,31 @@ class Term_Object implements Easy_Language_Object {
 	 * @return void
 	 */
 	public function remove_changed_marker( int|string $language_code ): void {
-		if( false === $this->is_translatable() ) {
+		if ( false === $this->is_translatable() ) {
 			return;
 		}
 
 		// delete marker.
-		delete_term_meta( $this->get_id(), 'easy_language_'.$language_code.'_changed' );
+		delete_term_meta( $this->get_id(), 'easy_language_' . $language_code . '_changed' );
 	}
 
 	/**
 	 * Add a language as translated language to translatable object.
 	 *
-	 * @param string $target_language
+	 * @param string $target_language The language we search.
 	 *
 	 * @return void
 	 */
 	public function add_translated_language( string $target_language ): void {
 		// only for translatable object.
-		if( false === $this->is_translatable() ) {
+		if ( false === $this->is_translatable() ) {
 			delete_term_meta( $this->get_id(), 'easy_language_translated_in' );
 			return;
 		}
 
 		// get actual value.
 		$value = get_term_meta( $this->get_id(), 'easy_language_translated_in', true );
-		if( false === str_contains( $value, ','.$target_language.',' ) ) {
+		if ( false === str_contains( $value, ',' . $target_language . ',' ) ) {
 			$value .= ',' . $target_language . ',';
 		}
 
@@ -310,13 +306,13 @@ class Term_Object implements Easy_Language_Object {
 	/**
 	 * Remove a language as translated language from a translatable object.
 	 *
-	 * @param string $target_language
+	 * @param string $target_language The language we search.
 	 *
 	 * @return void
 	 */
 	public function remove_translated_language( string $target_language ): void {
 		// only for translatable object.
-		if( false === $this->is_translatable() ) {
+		if ( false === $this->is_translatable() ) {
 			return;
 		}
 
@@ -324,11 +320,10 @@ class Term_Object implements Easy_Language_Object {
 		$value = get_term_meta( $this->get_id(), 'easy_language_translated_in', true );
 
 		// remove language from list.
-		$value = str_replace( ','.$target_language.',', '', $value );
-		if( empty($value) ) {
+		$value = str_replace( ',' . $target_language . ',', '', $value );
+		if ( empty( $value ) ) {
 			delete_term_meta( $this->get_id(), 'easy_language_translated_in' );
-		}
-		else {
+		} else {
 			update_term_meta( $this->get_id(), 'easy_language_translated_in', $value );
 		}
 	}
@@ -339,11 +334,12 @@ class Term_Object implements Easy_Language_Object {
 	 * @return string
 	 */
 	public function get_translation_via_api_link(): string {
-		return add_query_arg( array(
+		return add_query_arg(
+			array(
 				'action'   => 'easy_language_get_automatic_translation',
-				'id'     => $this->get_id(),
+				'id'       => $this->get_id(),
 				'nonce'    => wp_create_nonce( 'easy-language-get-automatic-translation' ),
-				'taxonomy' => $this->get_taxonomy_name()
+				'taxonomy' => $this->get_taxonomy_name(),
 			),
 			get_admin_url() . 'admin.php'
 		);
@@ -352,17 +348,18 @@ class Term_Object implements Easy_Language_Object {
 	/**
 	 * Get link to create a translation of the actual object with given language.
 	 *
-	 * @param string $language_code
+	 * @param string $language_code The language we search.
 	 *
 	 * @return string
 	 */
 	public function get_translate_link( string $language_code ): string {
-		return add_query_arg( array(
+		return add_query_arg(
+			array(
 				'action'   => 'easy_language_add_translation',
 				'nonce'    => wp_create_nonce( 'easy-language-add-translation' ),
 				'term'     => $this->get_id(),
 				'taxonomy' => $this->get_taxonomy_name(),
-				'language' => $language_code
+				'language' => $language_code,
 			),
 			get_admin_url() . 'admin.php'
 		);
@@ -383,11 +380,12 @@ class Term_Object implements Easy_Language_Object {
 	 * @return string
 	 */
 	public function get_edit_link(): string {
-		return add_query_arg( array(
+		return add_query_arg(
+			array(
 				'taxonomy' => $this->get_taxonomy_name(),
-				'tag_ID' => $this->get_id()
+				'tag_ID'   => $this->get_id(),
 			),
-			get_admin_url().'term.php'
+			get_admin_url() . 'term.php'
 		);
 	}
 
@@ -407,13 +405,15 @@ class Term_Object implements Easy_Language_Object {
 	 */
 	public function get_delete_link(): string {
 		return wp_nonce_url(
-			add_query_arg( array(
-					'action' => 'delete',
+			add_query_arg(
+				array(
+					'action'   => 'delete',
 					'taxonomy' => $this->get_taxonomy_name(),
-					'tag_ID' => $this->get_id()
+					'tag_ID'   => $this->get_id(),
 				),
-				get_admin_url().'edit-tags.php'
-			), 'delete-tag_' . $this->get_id()
+				get_admin_url() . 'edit-tags.php'
+			),
+			'delete-tag_' . $this->get_id()
 		);
 	}
 
