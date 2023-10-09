@@ -139,6 +139,11 @@ class Helper {
 	 * @return void
 	 */
 	public static function copy_cpt( int $old_id, int $new_id ): void {
+		// prevent copy to its own.
+		if( $old_id === $new_id ) {
+			return;
+		}
+
 		// copy all assigned taxonomies.
 		$taxonomies = get_object_taxonomies( get_post_type( $old_id ) ); // returns array of taxonomy names for post type, ex array("category", "post_tag");
 		if ( $taxonomies ) {
@@ -150,7 +155,7 @@ class Helper {
 
 		// duplicate all post meta.
 		$post_meta = get_post_meta( $old_id );
-		if ( $post_meta ) {
+		if ( is_array($post_meta) ) {
 			foreach ( $post_meta as $meta_key => $meta_values ) {
 				// ignore some keys.
 				if ( in_array( $meta_key, array( '_edit_lock', '_edit_last', '_wp_page_template', '_wp_old_slug' ), true ) ) {
@@ -159,7 +164,7 @@ class Helper {
 
 				// loop through the values of the key and add them to the new id.
 				foreach ( $meta_values as $meta_value ) {
-					add_post_meta( $new_id, $meta_key, maybe_unserialize( wp_slash( $meta_value ) ) );
+					add_post_meta( $new_id, $meta_key, wp_slash( maybe_unserialize( $meta_value ) ) );
 				}
 			}
 		}

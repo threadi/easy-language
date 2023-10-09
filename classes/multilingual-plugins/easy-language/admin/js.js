@@ -6,7 +6,9 @@ jQuery( document ).ready(
 			function (e) {
 				e.preventDefault();
 
-				easy_language_get_translation( $( this ).data( 'id' ) );
+				if( confirm( easyLanguagePluginJsVars.translate_confirmation_question ) ) {
+					easy_language_get_translation($(this).data('id'));
+				}
 			}
 		);
 

@@ -162,29 +162,29 @@ class Texts {
 				update_post_meta( $copied_post_id, 'easy_language_translation_language', $target_language );
 
 				// parse text depending on used pagebuilder for this object.
-				$obj = $post_obj->get_page_builder();
-				$obj->set_object_id( $copied_post_id );
-				$obj->set_title( $post_obj->get_title() );
-				$obj->set_text( $post_obj->get_content() );
+				$pagebuilder_obj = $post_obj->get_page_builder();
+				$pagebuilder_obj->set_object_id( $copied_post_id );
+				$pagebuilder_obj->set_title( $post_obj->get_title() );
+				$pagebuilder_obj->set_text( $post_obj->get_content() );
 
 				// loop through the resulting texts and add each one for translation.
-				foreach ( $obj->get_parsed_texts() as $text ) {
+				foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
 					// check if the text is already saved as original text for translation.
 					$original_text_obj = $this->db->get_entry_by_text( $text, $source_language );
 					if ( false === $original_text_obj ) {
 						// save the text for translation.
 						$original_text_obj = $this->db->add( $text, $source_language, 'post_content' );
 					}
-					$original_text_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $obj->get_name() );
+					$original_text_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $pagebuilder_obj->get_name() );
 				}
 
 				// check if the title has already saved as original text for translation.
-				$original_title_obj = $this->db->get_entry_by_text( $obj->get_title(), $source_language );
+				$original_title_obj = $this->db->get_entry_by_text( $pagebuilder_obj->get_title(), $source_language );
 				if ( false === $original_title_obj ) {
 					// save the text for translation.
-					$original_title_obj = $this->db->add( $obj->get_title(), $source_language, 'title' );
+					$original_title_obj = $this->db->add( $pagebuilder_obj->get_title(), $source_language, 'title' );
 				}
-				$original_title_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $obj->get_name() );
+				$original_title_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $pagebuilder_obj->get_name() );
 
 				// add this language as translated language to original post.
 				$post_obj->add_translated_language( $target_language );
@@ -194,6 +194,9 @@ class Texts {
 
 				// get object of copy.
 				$copy_post_obj = new Post_Object( $copied_post_id );
+
+				// run pagebuilder-specific tasks.
+				$pagebuilder_obj->update_object( $copy_post_obj );
 
 				// forward user to the edit-page of the newly created object.
 				wp_safe_redirect( $copy_post_obj->get_page_builder()->get_edit_link() );

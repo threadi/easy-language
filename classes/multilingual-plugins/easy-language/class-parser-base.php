@@ -317,4 +317,13 @@ class Parser_Base {
 	public function get_title_with_translations( string $original_complete, string $translated_part ): string {
 		return str_replace( $this->get_title(), $translated_part, $original_complete );
 	}
+
+	/**
+	 * Run no updates on object per default.
+	 *
+	 * @param Post_Object $post_object The object.
+	 *
+	 * @return void
+	 */
+	public function update_object( Post_Object $post_object ): void {}
 }

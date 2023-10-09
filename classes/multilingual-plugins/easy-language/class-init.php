@@ -1627,6 +1627,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy-language-plugin-admin',
 			'easyLanguagePluginJsVars',
 			array(
+				'translate_confirmation_question' => __( 'Translate this object?', 'easy-language' ),
 				'delete_confirmation_question' => __( 'Do you really want to delete this translated object?', 'easy-language' ),
 			)
 		);

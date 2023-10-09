@@ -1120,7 +1120,8 @@ class Capito extends Base implements Api_Base {
 		$transient_obj->delete();
 
 		// redirect user.
-		wp_redirect( $_SERVER['HTTP_REFERER'] );
+		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		exit;
 	}
 
 	/**
@@ -1136,6 +1137,7 @@ class Capito extends Base implements Api_Base {
 		$this->get_quota_from_api();
 
 		// redirect user.
-		wp_redirect( $_SERVER['HTTP_REFERER'] );
+		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		exit;
 	}
 }
