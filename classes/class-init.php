@@ -116,6 +116,8 @@ class Init {
 	 * @return void
 	 */
 	public function admin_init(): void {
+		global $pagenow;
+
 		// get transients objects-object.
 		$transients_obj = Transients::get_instance();
 
@@ -150,6 +152,12 @@ class Init {
 				$transient_obj->set_message( $message );
 				$transient_obj->save();
 			}
+		}
+
+		// remove first step hint if API-settings are called.
+		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_intro_step_1' );
+		if( 'options-general.php' === $pagenow && !empty($_GET['page']) && 'easy_language_settings' === $_GET['page'] && $transient_obj->is_set() ) {
+			$transient_obj->delete();
 		}
 	}
 

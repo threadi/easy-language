@@ -14,6 +14,7 @@ use easyLanguage\Helper;
 use easyLanguage\Languages;
 use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_Plugins_Base;
+use easyLanguage\Transients;
 use WP_Admin_Bar;
 use WP_Post;
 use WP_Post_Type;
@@ -146,6 +147,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// embed files.
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), PHP_INT_MAX );
+
+		// misc hooks.
+		add_filter( 'admin_body_class', array( $this, 'add_body_class') );
+		add_action( 'admin_action_dismiss_intro_step_2', array( $this, 'dismiss_intro_step_2' ) );
 	}
 
 	/**
@@ -459,10 +464,15 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					$query->set(
 						'meta_query',
 						array(
+							'relation' => 'AND',
 							array(
 								'key'     => 'easy_language_translated_in',
 								'value'   => sanitize_text_field( wp_unslash( $_GET['lang'] ) ),
 								'compare' => 'LIKE',
+							),
+							array(
+								'key'     => 'easy_language_translation_original_id',
+								'compare' => 'NOT EXISTS',
 							),
 						)
 					);
@@ -682,7 +692,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * Run on plugin-installation.
+	 * Run on plugin-activation.
 	 *
 	 * @return void
 	 */
@@ -794,6 +804,16 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				$translator_role->add_cap( 'publish_' . $post_type_names[ $post_type ] );
 			}
 		}
+
+		// set transient for hint where to start.
+		$transient_obj = Transients::get_instance()->add();
+		$transient_obj->set_dismissible_days( 2 );
+		$transient_obj->set_name( 'easy_language_intro_step_1' );
+		/* translators: %1$s will be replaced by the URL for Capito support. */
+		$transient_obj->set_message( sprintf( __( '<strong>You have installed Easy Language - nice and thank you!</strong> Now move to the <a href="%1$s">API-settings</a>, select one and start translation your site in easy language.', 'easy-language' ), esc_url( Helper::get_settings_page_url() ) ) );
+		$transient_obj->set_type( 'hint' );
+		$transient_obj->save();
+
 	}
 
 	/**
@@ -1469,13 +1489,16 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// loop through active languages and add them to the filter.
 		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+			// define filter-url.
 			$url                                        = add_query_arg(
 				array(
 					'post_type' => $post_type,
 					'lang'      => $language_code,
 				),
-				'edit.php'
+				get_admin_url().'edit.php'
 			);
+
+			// add the filter to the list.
 			$views[ 'easy-language-' . $language_code ] = '<a href="' . esc_url( $url ) . '">' . esc_html( $settings['label'] ) . '</a>';
 		}
 		return $views;
@@ -1613,6 +1636,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return void
 	 */
 	public function admin_enqueue_scripts(): void {
+		// Enabled the pointer-scripts.
+		wp_enqueue_style( 'wp-pointer' );
+		wp_enqueue_script( 'wp-pointer' );
+
 		// backend-JS.
 		wp_enqueue_script(
 			'easy-language-plugin-admin',
@@ -1629,6 +1656,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			array(
 				'translate_confirmation_question' => __( 'Translate this object?', 'easy-language' ),
 				'delete_confirmation_question' => __( 'Do you really want to delete this translated object?', 'easy-language' ),
+				'dismiss_intro_nonce' => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),
+				/* translators: %1$s will be replaced by the path to the easy language icon */
+				'intro_step_2' => sprintf( __( '<p><img src="%1$s" alt=""><strong>Start to translate your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' )
 			)
 		);
 	}
@@ -1718,5 +1748,27 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	public function get_active_languages(): array {
 		return $this->get_supported_languages();
+	}
+
+	/**
+	 * Add marker for free version on body-element
+	 *
+	 * @param $classes
+	 * @return string
+	 * @noinspection PhpUnused
+	 */
+	public function add_body_class( $classes ): string {
+		if( 1 === absint(get_option( 'easy_language_intro_step_2', 0 ) ) ) {
+			$classes .= 'easy-language-intro-step-2';
+		}
+		return $classes;
+	}
+
+	public function dismiss_intro_step_2(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-dismiss-intro-step-2', 'nonce' );
+
+		// hide pointer.
+		update_option( 'easy_language_intro_step_2', 2 );
 	}
 }

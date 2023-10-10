@@ -7,6 +7,7 @@
 
 use easyLanguage\Apis;
 use easyLanguage\Multilingual_Plugins;
+use easyLanguage\Transients;
 
 /**
  * Page for API settings.
@@ -20,6 +21,7 @@ function easy_language_admin_add_menu_content_settings(): void {
 		return;
 	}
 
+	// output.
 	?>
 	<form method="POST" action="<?php echo esc_url( get_admin_url() ); ?>options.php">
 		<?php
@@ -76,7 +78,7 @@ function easy_language_admin_add_settings_api(): void {
 				'disable_empty' => true,
 			)
 		);
-		register_setting( 'easyLanguageApiFields', 'easy_language_api' );
+		register_setting( 'easyLanguageApiFields', 'easy_language_api', array( 'sanitize_callback' => 'easy_language_admin_validate_chosen_api' ) );
 	}
 }
 add_action( 'easy_language_settings_add_settings', 'easy_language_admin_add_settings_api' );
@@ -150,4 +152,18 @@ function easy_language_admin_choose_api( array $attr ): void {
 		</div>
 		<?php
 	}
+}
+
+/**
+ * Check if API has been saved first time to show intro part 2.
+ *
+ * @param string $value
+ *
+ * @return string
+ */
+function easy_language_admin_validate_chosen_api( string $value ): string {
+	if( !get_option( 'easy_language_intro_step_2') ) {
+		update_option( 'easy_language_intro_step_2', 1 );
+	}
+	return $value;
 }

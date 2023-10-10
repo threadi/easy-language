@@ -170,3 +170,9 @@ body .text-translations-table #source_language, body .text-translations-table #t
 .easy-language-transient .notice-dismiss:hover {
 	color: #d63638;
 }
+
+.easy-language-pointer p img {
+	display: inline-block;
+	margin-right: 8px;
+	width: 32px;
+}
