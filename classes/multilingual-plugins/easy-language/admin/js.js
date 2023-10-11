@@ -30,7 +30,7 @@ jQuery( document ).ready(
 			close: function() {
 				// save via ajax the dismission of this hint.
 				let data = {
-					'action': 'dismiss_intro_step_2',
+					'action': 'easy_language_dismiss_intro_step_2',
 					'nonce': easyLanguagePluginJsVars.dismiss_intro_nonce
 				};
 

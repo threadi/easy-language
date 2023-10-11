@@ -95,7 +95,9 @@ class Parser_Base {
 	 * Set the object-id which is parsed.
 	 *
 	 * @param int $object_id The object-id which contents are parsed.
+	 *
 	 * @return void
+	 * @noinspection PhpUnused
 	 */
 	public function set_object_id( int $object_id ): void {
 		$this->object_id = $object_id;
@@ -137,17 +139,24 @@ class Parser_Base {
 	/**
 	 * Get language switch for page builder.
 	 *
+	 * @param int $post_id The requested post_id.
+	 *
 	 * @return void
 	 * @noinspection PhpUnused
 	 */
-	public function get_language_switch(): void {
+	public function get_language_switch( int $post_id = 0 ): void {
 		// bail if user has no translation capabilities.
 		if ( false === current_user_can( 'edit_el_translate' ) ) {
 			return;
 		}
 
+		// get the post_id.
+		if( 0 === $post_id ) {
+			$post_id = get_the_ID();
+		}
+
 		// get the post-object.
-		$post_object = new Post_Object( get_the_ID() );
+		$post_object = new Post_Object( $post_id );
 
 		// get the original-object.
 		$original_post_object = new Post_Object( $this->get_object_id() );
@@ -246,7 +255,7 @@ class Parser_Base {
 					$link_content = '<span class="dashicons dashicons-admin-home"></span>';
 				} else {
 					$query   = array(
-						'post_type'                       => get_post_type( get_the_ID() ),
+						'post_type'                       => get_post_type( $post_object->get_id() ),
 						'post_status'                     => 'any',
 						'meta_query'                      => array(
 							'relation' => 'AND',

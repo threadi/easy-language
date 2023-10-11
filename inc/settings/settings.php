@@ -42,7 +42,7 @@ function easy_language_admin_add_settings_content(): void {
 	// output.
 	?>
 	<div class="wrap">
-		<h1><?php esc_html_e( 'Easy Language Plugin', 'easy-language' ); ?></h1>
+		<h1><?php esc_html_e( 'Easy Language Settings', 'easy-language' ); ?></h1>
 		<nav class="nav-tab-wrapper">
 			<a href="<?php echo esc_url( Helper::get_settings_page_url() ); ?>" class="nav-tab
 								<?php

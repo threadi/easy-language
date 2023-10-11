@@ -91,11 +91,6 @@ class Texts {
 			add_action( 'save_post_' . $post_type, array( $this, 'update_translation_of_post' ), 10, 3 );
 		}
 
-		// check updated terms.
-		foreach ( $this->init->get_supported_taxonomies() as $taxonomy => $enabled ) {
-			add_action( 'saved_' . $taxonomy, array( $this, 'update_translation_of_term' ), 10, 4 );
-		}
-
 		// if object is trashed.
 		add_action( 'wp_trash_post', array( $this, 'trash_object' ) );
 
@@ -415,61 +410,6 @@ class Texts {
 		// if this is a translated object, reset the changed-marker on its original.
 		if ( $post_obj->is_translated() ) {
 			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
-			// get all translations for this object in all active languages.
-			foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
-				$original_post->remove_changed_marker( $language_code );
-			}
-		}
-	}
-
-	/**
-	 * Check updated translatable term.
-	 *
-	 * @param int   $term_id The term-id.
-	 * @param int   $tt_id The term-id.
-	 * @param bool  $update Marker whether this is an update (true) or not (false).
-	 * @param array $args List of arguments as array.
-	 *
-	 * @return void
-	 * @noinspection PhpUnusedParameterInspection
-	 */
-	public function update_translation_of_term( int $term_id, int $tt_id, bool $update, array $args ): void {
-		// bail if this is not an update to prevent confusing during creation of translation-objects.
-		if ( false === $update ) {
-			return;
-		}
-
-		// get the object.
-		$term_obj = new Term_Object( $term_id, $args['taxonomy'] );
-
-		// if this is an original object, check its contents.
-		if ( $term_obj->is_translatable() ) {
-			// get all translations for this object in all active languages.
-			foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
-				$translated_post_id = $term_obj->get_translated_in_language( $language_code );
-
-				// loop through the resulting texts and check if the text has been changed (aka: is not available in translation-db).
-				foreach ( array(
-					'taxonomy_title'       => '',
-					'taxonomy_description' => '',
-				) as $field => $text ) {
-					$filter = array(
-						'object_id'   => $translated_post_id,
-						'object_type' => $term_obj->get_type(),
-						'field'       => $field,
-						'hash'        => $this->db->get_string_hash( $text ),
-					);
-					if ( empty( Db::get_instance()->get_entries( $filter ) ) ) {
-						// mark the object as changed as translated content has been changed or new content has been added in the given language.
-						$term_obj->mark_as_changed_in_language( $language_code );
-					}
-				}
-			}
-		}
-
-		// if this is a translated object, reset the changed-marker on its original.
-		if ( $term_obj->is_translated() ) {
-			$original_post = new Term_Object( $term_obj->get_original_object_as_int(), $args['taxonomy'] );
 			// get all translations for this object in all active languages.
 			foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
 				$original_post->remove_changed_marker( $language_code );
