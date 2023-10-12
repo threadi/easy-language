@@ -136,7 +136,7 @@ class Pagebuilder_Support {
 			?>
 			<p>
 				<?php
-					/* translators: %1$s will be replaced by the object name (post or page), %2$s will be replaced by the name of the current language of this page/post */
+				/* translators: %1$s will be replaced by the type of the object, %2$s will be replaced by the name of the language */
 					echo wp_kses_post( sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), esc_html( $object_type ), esc_html( $language['label'] ) ) );
 				?>
 			</p>

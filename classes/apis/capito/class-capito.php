@@ -66,7 +66,7 @@ class Capito extends Base implements Api_Base {
 	 *
 	 * @var array
 	 */
-	private array $support_url = array(
+	protected array $support_url = array(
 		'de_DE' => 'https://www.capito.eu/',
 		'en_US' => 'https://www.capito.eu/en/',
 		'en_UK' => 'https://www.capito.eu/en/',
@@ -133,13 +133,28 @@ class Capito extends Base implements Api_Base {
 		$quota = $this->get_quota();
 
 		/* translators: %1$d will be replaced by the link to Capito */
-		$text = sprintf( __( '<p>The Capito API allows you to automatically translate the entire website into plain and/or simple language via quota-limited API. More Information <a href="%1$s">here</a>.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+		$text = sprintf( __( '<p><a href="%1$s" target="_blank"><strong>capito digital</strong> (opens new window)</a> is an AI-based tool for <i>Easy language< /i>.<br>It helps you write better texts.</p><p>This API simplifies texts based on the Common European Framework of Reference for Languages.<br>This describes the <i>complexity of languages according to proficiency levels</i> (A1, A2, B1 ..).</p><p>The number of simplifications with capito digital is limited to <strong>quotas</strong>.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( $quota['character_limit'] > 0 ) {
 			/* translators: %1$d will be replaced by the characters spent for Capito, %2$d will be the quota for Capito, %3$d will be the rest quota */
 			$text .= sprintf( __( '<p><strong>Actual character spent:</strong> %1$d<br><strong>Quota limit:</strong> %2$d<br><strong>Rest quota:</strong> %3$d</strong></p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ), $quota['character_spent'], $quota['character_limit'], absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) );
 		} elseif ( ! empty( $quota['unlimited'] ) ) {
 			$text .= __( '<p><strong>Unlimited quota</strong></p>', 'easy-language' );
+		} elseif ( -1 === $quota['character_limit'] ) {
+			$text .= '<p><strong>'.__( 'The available quota is retrieved after entering the API key in the API settings.', 'easy-language' ).'</strong></p>';
 		}
+
+		// wrapper for buttons.
+		$text .= '<p>';
+
+		// help-button.
+		$text .= '<a href="'.esc_url($this->get_language_specific_support_page()).'" target="_blank" class="button button-primary" title="'.esc_attr( __( 'Get help for this API', 'easy-language' ) ).'"><span class="dashicons dashicons-editor-help"></span></a>';
+
+		// Show setting-button if this API is enabled.
+		if( $this->is_active() ) {
+			$text .= '<a href="'.esc_html($this->get_settings_url()).'" class="button button-primary" title="'.esc_html__( 'Go to settings', 'easy-languag'  ).'"><span class="dashicons dashicons-admin-generic"></span></a>';
+		}
+
+		$text .= '</p>';
 
 		// return resulting text.
 		return $text;
@@ -484,21 +499,6 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return the language-specific support-URL for Capito.
-	 *
-	 * @return string
-	 */
-	private function get_language_specific_support_page(): string {
-		// return language-specific URL if it exists.
-		if ( ! empty( $this->support_url[ helper::get_current_language() ] ) ) {
-			return $this->support_url[ helper::get_current_language() ];
-		}
-
-		// otherwise return default url.
-		return $this->support_url['de_DE'];
-	}
-
-	/**
 	 * Add settings tab.
 	 *
 	 * @param $tab
@@ -720,7 +720,7 @@ class Capito extends Base implements Api_Base {
 						'description' => __( 'Each for translation requested text will be translated automatic in the intervall set below. Be aware that this is not an automatic translation in frontend initiated through the visitor.', 'easy-language' ),
 					),
 					'manuell'   => array(
-						'label'       => __( 'Translate texts manually, use API as helper.', 'easy-language' ),
+						'label'       => __( 'Simplify texts manually, use API as helper.', 'easy-language' ),
 						'enabled'     => true,
 						'description' => __( 'The system will not check automatically for translations. Its your decision.', 'easy-language' ),
 					),
@@ -865,9 +865,13 @@ class Capito extends Base implements Api_Base {
 		if ( empty( $value ) ) {
 			add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __( 'You did not enter an API token. All translation options via the Capito API have been disabled.', 'easy-language' ) );
 		}
-		// if token has been changed, get the quota.
+		// TODO validate key against the API.
+		// if token has been changed, get the quota and delete settings hint.
 		elseif ( 0 !== strcmp( $value, get_option( 'easy_language_capito_api_key', '' ) ) ) {
 			$this->get_quota_from_api( $value );
+
+			// delete api-settings hint.
+			Transients::get_instance()->get_transient_by_name( 'easy_language_api_changed' )->delete();
 		}
 
 		// return the entered token.
@@ -877,7 +881,7 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Validate the language-settings.
 	 *
-	 * The source-language must be possible to translate in the target-language.
+	 * The source-language must be possible to simplify in the target-language.
 	 *
 	 * @param $values
 	 *
@@ -1065,7 +1069,7 @@ class Capito extends Base implements Api_Base {
 			update_option( 'easy_language_capito_quota', $quota );
 
 			// check if key is limited.
-			if ( absint( $quota['simplification']['subscription']['available'] ) > 0 ) {
+			if ( !empty($quota['simplification']) && absint( $quota['simplification']['subscription']['available'] ) > 0 ) {
 				// show hint of 80% of limit is used.
 				$percent = absint( $quota['simplification']['subscription']['remaining'] ) / absint( $quota['simplification']['subscription']['available'] );
 				if ( 1 === $percent ) {
@@ -1105,6 +1109,7 @@ class Capito extends Base implements Api_Base {
 	 * Remove token via click.
 	 *
 	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function remove_token(): void {
 		// check nonce.
@@ -1128,6 +1133,7 @@ class Capito extends Base implements Api_Base {
 	 * Get quota via link request.
 	 *
 	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function get_quota_from_api_via_link(): void {
 		// check nonce.
@@ -1139,5 +1145,14 @@ class Capito extends Base implements Api_Base {
 		// redirect user.
 		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 		exit;
+	}
+
+	/**
+	 * Return whether this API is configured (true) or not (false).
+	 *
+	 * @return bool
+	 */
+	public function is_configured(): bool {
+		return !empty($this->get_token());
 	}
 }

@@ -22,4 +22,7 @@ jQuery(document).ready(function($) {
             $this.closest('div[data-dismissible]').hide('slow');
         }
     );
+
+	// prevent leaving of posts-form if it has changes.
+	$("body.settings_page_easy_language_settings form").dirty({preventLeaving: true});
 });

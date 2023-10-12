@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Easy Language
- * Description:       Provides possibility to translate texts to easy and plain language.
+ * Description:       Provides possibility to simplify texts to easy and plain language.
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Version:           @@VersionNumber@@

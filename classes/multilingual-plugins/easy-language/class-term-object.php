@@ -329,7 +329,7 @@ class Term_Object implements Easy_Language_Object {
 	}
 
 	/**
-	 * Return the link to translate the actual object via given api.
+	 * Return the link to simplify the actual object via given api.
 	 *
 	 * @return string
 	 */

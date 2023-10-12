@@ -104,7 +104,7 @@ class Texts {
 	 *
 	 * The given object will be copied. All texts are added as texts to translate.
 	 *
-	 * The author will after this be able to translate this object manually or via API.
+	 * The author will after this be able to simplify this object manually or via API.
 	 *
 	 * @return void
 	 */
@@ -112,13 +112,16 @@ class Texts {
 		// check nonce.
 		check_ajax_referer( 'easy-language-add-translation', 'nonce' );
 
+		// get active api.
+		$api_object = Apis::get_instance()->get_active_api();
+
 		// get post id.
 		$original_post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
 
 		// get target-language.
 		$target_language = isset( $_GET['language'] ) ? sanitize_text_field( wp_unslash( $_GET['language'] ) ) : '';
 
-		if ( $original_post_id > 0 && ! empty( $target_language ) ) {
+		if ( $original_post_id > 0 && ! empty( $target_language ) && $api_object ) {
 			// get post-object.
 			$post_obj = new Post_Object( $original_post_id );
 
@@ -155,6 +158,9 @@ class Texts {
 
 				// save the target-language of the copied object.
 				update_post_meta( $copied_post_id, 'easy_language_translation_language', $target_language );
+
+				// save the API used for this translation.
+				update_post_meta( $copied_post_id, 'easy_language_api', $api_object->get_name() );
 
 				// parse text depending on used pagebuilder for this object.
 				$pagebuilder_obj = $post_obj->get_page_builder();
@@ -385,7 +391,7 @@ class Texts {
 			// set object-id to pagebuilder-object.
 			$obj->set_object_id( $post_obj->get_id() );
 
-			// set original text to translate in pagebuilder-object.
+			// set original text to simplify in pagebuilder-object.
 			$obj->set_text( $post_obj->get_content() );
 
 			// get all translations for this object in all active languages.

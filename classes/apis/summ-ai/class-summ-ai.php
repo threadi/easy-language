@@ -64,7 +64,7 @@ class Summ_AI extends Base implements Api_Base {
 	 *
 	 * @var array
 	 */
-	private array $support_url = array(
+	protected array $support_url = array(
 		'de_DE' => 'https://summ-ai.com/unsere-schnittstelle/',
 	);
 
@@ -104,9 +104,26 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_description(): string {
+		// get quota.
 		$quota = $this->get_quota();
+
 		/* translators: %1$d will be replaced by a number, %2$s will be replaced by the URL for the Pro, %3$s will be replaced by the URL for SUMM AI-product-info */
-		return sprintf( __( '<p>The SUMM AI API allows you to automatically translate the entire website into plain and/or simple language via quota-limited API.</p><p>In the free Easy Language plugin you have a quota of %1$d characters you will be able to translate.</p><p>You need <a href="%2$s" target="_blank">Easy Language Pro (opens new window)</a> and a SUMM AI API key to translate more texts: <a href="%3$s" target="_blank">%3$s</a>.</p><p><strong>Actual character spent:</strong> %4$d<br><strong>Quota limit:</strong> %1$d<br><strong>Rest quota:</strong> %5$d</strong></p>', 'easy-language' ), $quota['character_limit'], 'todo', esc_url( $this->get_language_specific_support_page() ), $quota['character_spent'], absint( $quota['character_limit'] - $quota['character_spent'] ) );
+		$text = sprintf( __( '<p>Make any complicated text barrier-free and understandable with the <a href="%1$s" target="_blank"><strong>SUMM AI</strong> (opens new window)</a> AI-based tool.<br>Create simple and easy-to-understand texts on your website.</p><p>This API simplifies texts according to the official rules of the Leichte Sprache e.V.<br>This specifies how texts must be written in easy language.</ p><p><strong>With the free Easy Language plugin you have a quota of %2$d characters available for text simplifications.</strong></p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ), absint($quota['character_limit']) );
+		if ( $quota['character_limit'] > 0 ) {
+			/* translators: %1$d will be replaced by quota for this API, %2$d will be the characters spent for this API, %3$d will be the rest quota */
+			$text .= $this->get_quota_table();
+		}
+
+		// wrapper for buttons.
+		$text .= '<p>';
+
+		// help-button.
+		$text .= '<a href="'.esc_url($this->get_language_specific_support_page()).'" target="_blank" class="button button-primary" title="'.esc_attr( __( 'Get help for this API', 'easy-language' ) ).'"><span class="dashicons dashicons-editor-help"></span></a>';
+
+		$text .= '</p>';
+
+		// return resulting text.
+		return $text;
 	}
 
 	/**
@@ -180,7 +197,7 @@ class Summ_AI extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return the list of supported languages which could be translated with this API into each other.
+	 * Return the list of supported languages which could be translated with this API.
 	 *
 	 * Left source, right possible target languages.
 	 *
@@ -357,21 +374,6 @@ class Summ_AI extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return the language-specific support-URL for SUMM AI.
-	 *
-	 * @return string
-	 */
-	private function get_language_specific_support_page(): string {
-		// return language-specific URL if it exists.
-		if ( ! empty( $this->support_url[ helper::get_current_language() ] ) ) {
-			return $this->support_url[ helper::get_current_language() ];
-		}
-
-		// otherwise return default url.
-		return $this->support_url['de_DE'];
-	}
-
-	/**
 	 * We have no settings for SUMM AI in free version.
 	 *
 	 * @param $tab
@@ -434,7 +436,7 @@ class Summ_AI extends Base implements Api_Base {
 			$source_languages = array();
 		}
 
-		// define resulting list
+		// define resulting list.
 		$list = array();
 
 		foreach ( $this->get_supported_source_languages() as $language_code => $language ) {
@@ -445,5 +447,14 @@ class Summ_AI extends Base implements Api_Base {
 
 		// return resulting list.
 		return $list;
+	}
+
+	/**
+	 * Return true as this API is preconfigured.
+	 *
+	 * @return bool
+	 */
+	public function is_configured(): bool {
+		return true;
 	}
 }

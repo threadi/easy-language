@@ -190,7 +190,7 @@ class Init {
 	}
 
 	/**
-	 * Return list of singular-plural-names for post-tpyes.
+	 * Return list of internal singular-plural-names for post-types (not the translations).
 	 *
 	 * @return array
 	 */
@@ -198,6 +198,34 @@ class Init {
 		return array(
 			'post' => 'posts',
 			'page' => 'pages',
+		);
+	}
+
+	/**
+	 * Return list of settings for supported post-types.
+	 *
+	 * @return array
+	 */
+	public function get_post_type_settings(): array {
+		return array(
+			'post' => array(
+				'label_singular' => __( 'post' ),
+				'label_plural' => __( 'posts' ),
+				'admin_edit_url' => add_query_arg(
+					array(),
+					admin_url().'edit.php'
+				)
+			),
+			'page' => array(
+				'label_singular' => __( 'page' ),
+				'label_plural' => __( 'pages' ),
+				'admin_edit_url' => add_query_arg(
+					array(
+						'post_type' => 'page'
+					),
+					admin_url().'edit.php'
+				)
+			),
 		);
 	}
 

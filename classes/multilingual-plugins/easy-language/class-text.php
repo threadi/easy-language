@@ -275,7 +275,7 @@ class Text {
 					// set object-id to pagebuilder-object.
 					$obj->set_object_id( $object_id );
 
-					// set original text to translate in pagebuilder-object.
+					// set original text to simplify in pagebuilder-object.
 					$obj->set_text( $this->get_original() );
 
 					// get the resulting text depending on pagebuilder.

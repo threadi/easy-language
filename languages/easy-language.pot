@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-10-11T13:20:43+02:00\n"
+"POT-Creation-Date: 2023-10-12T16:21:39+02:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: easy-language\n"
@@ -19,7 +19,7 @@ msgid "Easy Language"
 msgstr ""
 
 #. Description of the plugin
-msgid "Provides possibility to translate texts to easy and plain language."
+msgid "Provides possibility to simplify texts to easy and plain language."
 msgstr ""
 
 #. Author of the plugin
@@ -32,7 +32,7 @@ msgstr ""
 
 #. translators: %1$d will be replaced by the link to Capito
 #: classes/apis/capito/class-capito.php:136
-msgid "<p>The Capito API allows you to automatically translate the entire website into plain and/or simple language via quota-limited API. More Information <a href=\"%1$s\">here</a>.</p>"
+msgid "<p><a href=\"%1$s\" target=\"_blank\"><strong>capito digital</strong> (opens new window)</a> is an AI-based tool for <i>Easy language< /i>.<br>It helps you write better texts.</p><p>This API simplifies texts based on the Common European Framework of Reference for Languages.<br>This describes the <i>complexity of languages according to proficiency levels</i> (A1, A2, B1 ..).</p><p>The number of simplifications with capito digital is limited to <strong>quotas</strong>.</p>"
 msgstr ""
 
 #. translators: %1$d will be replaced by the characters spent for Capito, %2$d will be the quota for Capito, %3$d will be the rest quota
@@ -44,318 +44,331 @@ msgstr ""
 msgid "<p><strong>Unlimited quota</strong></p>"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:166
-#: classes/apis/summ-ai/class-summ-ai.php:130
+#: classes/apis/capito/class-capito.php:143
+msgid "The available quota is retrieved after entering the API key in the API settings."
+msgstr ""
+
+#: classes/apis/capito/class-capito.php:173
+#: classes/apis/summ-ai/class-summ-ai.php:139
 #: classes/class-languages.php:91
 #: doc/api-base/class-your-api.php:69
 msgid "German"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:168
+#: classes/apis/capito/class-capito.php:175
 msgid "Informal german spoken in germany."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:172
+#: classes/apis/capito/class-capito.php:179
 msgid "German (CH)"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:174
+#: classes/apis/capito/class-capito.php:181
 msgid "Informal german spoken in suisse."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:178
+#: classes/apis/capito/class-capito.php:185
 msgid "German (AT)"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:180
+#: classes/apis/capito/class-capito.php:187
 msgid "Informal german spoken in austria."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:184
-#: classes/apis/capito/class-capito.php:190
+#: classes/apis/capito/class-capito.php:191
+#: classes/apis/capito/class-capito.php:197
 msgid "English"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:186
+#: classes/apis/capito/class-capito.php:193
 msgid "English spoken in the United Kingdom."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:192
+#: classes/apis/capito/class-capito.php:199
 msgid "English spoken in the USA."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:207
+#: classes/apis/capito/class-capito.php:214
 msgid "German A1"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:209
+#: classes/apis/capito/class-capito.php:216
 msgid "The easiest level of german language."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:214
+#: classes/apis/capito/class-capito.php:221
 msgid "German A2"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:221
+#: classes/apis/capito/class-capito.php:228
 msgid "German B1"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:228
+#: classes/apis/capito/class-capito.php:235
 msgid "German B2"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:235
+#: classes/apis/capito/class-capito.php:242
 msgid "German C1"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:242
+#: classes/apis/capito/class-capito.php:249
 msgid "German C2"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:244
-#: classes/apis/capito/class-capito.php:286
+#: classes/apis/capito/class-capito.php:251
+#: classes/apis/capito/class-capito.php:293
 msgid "highest complexity"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:249
+#: classes/apis/capito/class-capito.php:256
 msgid "English A1"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:251
+#: classes/apis/capito/class-capito.php:258
 msgid "The easiest level of english language."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:256
+#: classes/apis/capito/class-capito.php:263
 msgid "English A2"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:263
+#: classes/apis/capito/class-capito.php:270
 msgid "English B1"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:270
+#: classes/apis/capito/class-capito.php:277
 msgid "English B2"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:277
+#: classes/apis/capito/class-capito.php:284
 msgid "English C1"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:284
+#: classes/apis/capito/class-capito.php:291
 msgid "English C2"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:529
+#: classes/apis/capito/class-capito.php:521
 msgid "Capito"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:564
+#: classes/apis/capito/class-capito.php:556
 msgid "Capito Quota"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:572
+#: classes/apis/capito/class-capito.php:564
 msgid "No quota consumed so far"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:574
+#: classes/apis/capito/class-capito.php:566
 msgid "Update quota now."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:576
+#: classes/apis/capito/class-capito.php:568
 msgid "Unlimited."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:593
+#: classes/apis/capito/class-capito.php:585
+#: classes/class-base.php:314
 msgid "Quota"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:594
+#: classes/apis/capito/class-capito.php:586
 msgid "Update now"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:599
+#: classes/apis/capito/class-capito.php:591
 msgid "Info about quota will be available until the API token is set"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:615
+#: classes/apis/capito/class-capito.php:607
 msgid "Capito Settings"
 msgstr ""
 
 #. translators: %1$s will be replaced by the Capito URL
-#: classes/apis/capito/class-capito.php:622
+#: classes/apis/capito/class-capito.php:614
 msgid "Get your Capito API Token <a href=\"%1$s\" target=\"_blank\">here (opens new window)</a>.<br>If you have any questions about the token provided by Capito, please contact their support: <a href=\"%1$s\" target=\"_blank\">%1$s (opens new window)</a>"
 msgstr ""
 
 #. translators: %1$s will be replaced by the Capito URL
-#: classes/apis/capito/class-capito.php:635
+#: classes/apis/capito/class-capito.php:627
 msgid "If you have any questions about the token provided by Capito, please contact their support: <a href=\"%1$s\" target=\"_blank\">%1$s (opens new window)</a>"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:636
+#: classes/apis/capito/class-capito.php:628
 msgid "Remove token"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:650
+#: classes/apis/capito/class-capito.php:642
 msgid "Capito API Key"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:658
+#: classes/apis/capito/class-capito.php:650
 msgid "Enter token here"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:670
+#: classes/apis/capito/class-capito.php:662
 msgid "Choose source languages"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:677
+#: classes/apis/capito/class-capito.php:669
 msgid "These are the possible source languages for Capito-translations. This language has to be the language which you use for any texts in your website."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:687
+#: classes/apis/capito/class-capito.php:679
 msgid "Choose target languages"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:694
+#: classes/apis/capito/class-capito.php:686
 msgid "These are the possible target languages for Capito-translations."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:704
+#: classes/apis/capito/class-capito.php:696
 msgid "Choose translation-mode"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:713
+#: classes/apis/capito/class-capito.php:705
 msgid "Disabled"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:715
+#: classes/apis/capito/class-capito.php:707
 msgid "You have to write all translations manually. The API will not be used."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:718
+#: classes/apis/capito/class-capito.php:710
 msgid "Automatic translation of each text."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:720
+#: classes/apis/capito/class-capito.php:712
 msgid "Each for translation requested text will be translated automatic in the intervall set below. Be aware that this is not an automatic translation in frontend initiated through the visitor."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:723
-msgid "Translate texts manually, use API as helper."
+#: classes/apis/capito/class-capito.php:715
+msgid "Simplify texts manually, use API as helper."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:725
+#: classes/apis/capito/class-capito.php:717
 msgid "The system will not check automatically for translations. Its your decision."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:742
+#: classes/apis/capito/class-capito.php:734
 msgid "Interval for automatic translation"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:751
+#: classes/apis/capito/class-capito.php:743
 msgid "The interval is only used for automatic translations."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:759
+#: classes/apis/capito/class-capito.php:751
 msgid "Interval for quota request"
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:768
+#: classes/apis/capito/class-capito.php:760
 msgid "The actual API quota will be requested in this interval."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:866
+#: classes/apis/capito/class-capito.php:858
 msgid "You did not enter an API token. All translation options via the Capito API have been disabled."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:889
+#: classes/apis/capito/class-capito.php:885
 msgid "You have to set a target-language for translations."
 msgstr ""
 
-#: classes/apis/capito/class-capito.php:891
+#: classes/apis/capito/class-capito.php:887
 msgid "At least one language cannot (currently) be translated into the selected target languages by the API."
 msgstr ""
 
 #. translators: %1$s will be replaced by the URL for Capito support.
-#: classes/apis/capito/class-capito.php:1077
+#: classes/apis/capito/class-capito.php:1073
 msgid "<strong>Your quota for the Capito API is completely depleted.</strong> You will not be able to use any translation from Capito. Please contact the <a href=\"%1$s\" target=\"_blank\">Capito support (opens new window)</a> about extending the quota."
 msgstr ""
 
 #. translators: %1$s will be replaced by the URL for Capito support.
-#: classes/apis/capito/class-capito.php:1086
+#: classes/apis/capito/class-capito.php:1082
 msgid "<strong>More than 80%% of your quota for the Capito API has already been used.</strong> Please contact the <a href=\"%1$s\" target=\"_blank\">Capito support (opens new window)</a> about extending the quota."
 msgstr ""
 
 #: classes/apis/no-api/class-no-api.php:72
-msgid "<p>Do not use any API for translations.</p>"
+msgid "<p>This is a pseudo-API.<br>It does not use any API for translations.</p><p>Use this \"API\" if you do not want to use any other API.<br>You will be able to write your own texts in Leichte and Einfache Sprache.</p><p><strong>No quota, no costs.</strong></p>"
 msgstr ""
 
 #. translators: %1$d will be replaced by a number, %2$s will be replaced by the URL for the Pro, %3$s will be replaced by the URL for SUMM AI-product-info
-#: classes/apis/summ-ai/class-summ-ai.php:109
-msgid "<p>The SUMM AI API allows you to automatically translate the entire website into plain and/or simple language via quota-limited API.</p><p>In the free Easy Language plugin you have a quota of %1$d characters you will be able to translate.</p><p>You need <a href=\"%2$s\" target=\"_blank\">Easy Language Pro (opens new window)</a> and a SUMM AI API key to translate more texts: <a href=\"%3$s\" target=\"_blank\">%3$s</a>.</p><p><strong>Actual character spent:</strong> %4$d<br><strong>Quota limit:</strong> %1$d<br><strong>Rest quota:</strong> %5$d</strong></p>"
+#: classes/apis/summ-ai/class-summ-ai.php:111
+msgid "<p>Make any complicated text barrier-free and understandable with the <a href=\"%1$s\" target=\"_blank\"><strong>SUMM AI</strong> (opens new window)</a> AI-based tool.<br>Create simple and easy-to-understand texts on your website.</p><p>This API simplifies texts according to the official rules of the Leichte Sprache e.V.<br>This specifies how texts must be written in easy language.</ p><p><strong>With the free Easy Language plugin you have a quota of %2$d characters available for text simplifications.</strong></p>"
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:132
+#: classes/apis/summ-ai/class-summ-ai.php:141
 #: doc/api-base/class-your-api.php:71
 msgid "Informal german spoken in Germany."
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:135
+#: classes/apis/summ-ai/class-summ-ai.php:144
 #: doc/api-base/class-your-api.php:74
 msgid "German (Formal)"
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:137
+#: classes/apis/summ-ai/class-summ-ai.php:146
 #: doc/api-base/class-your-api.php:76
 msgid "Formal german spoken in Germany."
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:140
+#: classes/apis/summ-ai/class-summ-ai.php:149
 #: doc/api-base/class-your-api.php:79
 msgid "Suisse german"
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:142
+#: classes/apis/summ-ai/class-summ-ai.php:151
 #: doc/api-base/class-your-api.php:81
 msgid "Formal german spoken in Suisse."
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:145
+#: classes/apis/summ-ai/class-summ-ai.php:154
 #: doc/api-base/class-your-api.php:84
 msgid "Suisse german (Informal)"
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:147
+#: classes/apis/summ-ai/class-summ-ai.php:156
 #: doc/api-base/class-your-api.php:86
 msgid "Informal german spoken in Suisse."
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:150
+#: classes/apis/summ-ai/class-summ-ai.php:159
 #: doc/api-base/class-your-api.php:89
 msgid "Austria German"
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:152
+#: classes/apis/summ-ai/class-summ-ai.php:161
 #: doc/api-base/class-your-api.php:91
 msgid "German spoken in Austria."
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:166
+#: classes/apis/summ-ai/class-summ-ai.php:175
 #: classes/class-languages.php:124
 msgid "Einfache Sprache"
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:168
+#: classes/apis/summ-ai/class-summ-ai.php:177
 msgid "The Einfache Sprache used in Germany, Suisse and Austria."
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:173
+#: classes/apis/summ-ai/class-summ-ai.php:182
 #: doc/api-base/class-your-api.php:119
 msgid "Leichte Sprache"
 msgstr ""
 
-#: classes/apis/summ-ai/class-summ-ai.php:175
+#: classes/apis/summ-ai/class-summ-ai.php:184
 #: doc/api-base/class-your-api.php:121
 msgid "The Leichte Sprache used in Germany, Suisse and Austria."
+msgstr ""
+
+#: classes/class-base.php:315
+msgid "Character spent"
+msgstr ""
+
+#: classes/class-base.php:316
+msgid "Rest quota"
 msgstr ""
 
 #. translators: %1$s will be replaced by the name of the multilingual-plugin
@@ -420,214 +433,202 @@ msgid "Dismiss"
 msgstr ""
 
 #. translators: %1$s will be replaced by the name of the PageBuilder (like Elementor)
-#: classes/multilingual-plugins/easy-language/class-init.php:255
-#: classes/multilingual-plugins/easy-language/class-init.php:1311
+#: classes/multilingual-plugins/easy-language/class-init.php:246
+#: classes/multilingual-plugins/easy-language/class-init.php:1148
 msgid "Used page builder %1$s not available"
 msgstr ""
 
 #. translators: %1$s is the name of the language
-#: classes/multilingual-plugins/easy-language/class-init.php:262
-#: classes/multilingual-plugins/easy-language/class-init.php:310
-#: classes/multilingual-plugins/easy-language/class-init.php:410
+#: classes/multilingual-plugins/easy-language/class-init.php:253
+#: classes/multilingual-plugins/easy-language/class-init.php:301
 msgid "Delete translation in %1$s"
 msgstr ""
 
 #. translators: %1$s is the name of the language
-#: classes/multilingual-plugins/easy-language/class-init.php:272
-#: classes/multilingual-plugins/easy-language/class-init.php:388
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:274
+#: classes/multilingual-plugins/easy-language/class-init.php:263
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:283
 msgid "Edit translation in %1$s"
 msgstr ""
 
 #. translators: %1$s is the name of the language, %2$s is the name of the used API, %3$s will be the API-title
-#: classes/multilingual-plugins/easy-language/class-init.php:287
-msgid "Translate this %1$s in %2$s with %3$s"
+#: classes/multilingual-plugins/easy-language/class-init.php:278
+msgid "Simplify this %1$s in %2$s with %3$s"
 msgstr ""
 
 #. translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-init.php:291
-msgid "Not enough quota to translate this %1$s in %2$s with %3$s."
+#: classes/multilingual-plugins/easy-language/class-init.php:282
+msgid "Not enough quota to simplify this %1$s in %2$s with %3$s."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:302
+#: classes/multilingual-plugins/easy-language/class-init.php:293
 msgid "Show in fronted (opens new window)"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:315
-#: classes/multilingual-plugins/easy-language/class-init.php:415
+#: classes/multilingual-plugins/easy-language/class-init.php:306
 msgid "Original content has been changed!"
 msgstr ""
 
 #. translators: %1$s is the name of the language
-#: classes/multilingual-plugins/easy-language/class-init.php:323
-#: classes/multilingual-plugins/easy-language/class-init.php:423
+#: classes/multilingual-plugins/easy-language/class-init.php:314
 msgid "Add translation in %s"
 msgstr ""
 
-#. translators: %1$s is the name of the language, %2$s is the name of the used API
-#: classes/multilingual-plugins/easy-language/class-init.php:398
-msgid "Translate this term in %1$s with %2$s"
-msgstr ""
-
-#: classes/multilingual-plugins/easy-language/class-init.php:624
-msgid "Translate page"
+#. translators: %1$s will be replaced by the object-name (like page or post)
+#: classes/multilingual-plugins/easy-language/class-init.php:495
+msgid "Simplify %1$s"
 msgstr ""
 
 #. translators: %1$s will be replaced by the URL for Capito support.
-#: classes/multilingual-plugins/easy-language/class-init.php:813
+#: classes/multilingual-plugins/easy-language/class-init.php:669
 msgid "<strong>You have installed Easy Language - nice and thank you!</strong> Now move to the <a href=\"%1$s\">API-settings</a>, select one and start translation your site in easy language."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:918
-#: classes/multilingual-plugins/easy-language/class-init.php:1096
+#: classes/multilingual-plugins/easy-language/class-init.php:776
+#: classes/multilingual-plugins/easy-language/class-init.php:951
 msgid "General Settings"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:938
+#: classes/multilingual-plugins/easy-language/class-init.php:796
 msgid "Choose supported post-types"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:966
-msgid "Choose supported taxonomies"
-msgstr ""
-
-#: classes/multilingual-plugins/easy-language/class-init.php:989
+#: classes/multilingual-plugins/easy-language/class-init.php:822
 msgid "Choose languages"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:996
-msgid "Go to API-settings to choose the languages you want to use."
+#. translators: %1$s will be replaced by the settings-URL for the active API
+#: classes/multilingual-plugins/easy-language/class-init.php:830
+msgid "Go to <a href=\"%1$s\">API-settings</a> to choose the languages you want to use."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:996
+#. translators: %1$s will be replaced by the settings-URL for the active API
+#: classes/multilingual-plugins/easy-language/class-init.php:830
 msgid "Choose the language you want to use for translation."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1006
+#: classes/multilingual-plugins/easy-language/class-init.php:840
 msgid "Set object state on plugin deactivation"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1013
+#: classes/multilingual-plugins/easy-language/class-init.php:847
 msgid "If plugin is disabled your translated objects will get the state set here. If plugin is reactivated they will be set to their state before.<br><strong>Hint:</strong> During uninstallation all translated objects will be deleted regardless of the setting here."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1015
+#: classes/multilingual-plugins/easy-language/class-init.php:849
+#: classes/multilingual-plugins/easy-language/class-init.php:870
 msgid "Do not change anything"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1016
+#: classes/multilingual-plugins/easy-language/class-init.php:850
+#: classes/multilingual-plugins/easy-language/class-init.php:871
 msgid "Set to draft"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1017
+#: classes/multilingual-plugins/easy-language/class-init.php:851
+#: classes/multilingual-plugins/easy-language/class-init.php:872
 msgid "Set to trash"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1027
+#: classes/multilingual-plugins/easy-language/class-init.php:861
+msgid "Set object state on API change"
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:868
+msgid "If the API is changed, set all objects of the former API to the state set here."
+msgstr ""
+
+#: classes/multilingual-plugins/easy-language/class-init.php:882
 msgid "Generate permalink for translated objects"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1034
+#: classes/multilingual-plugins/easy-language/class-init.php:889
 msgid "If enabled an individual permalink will be generated from title after translation of the title."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1044
+#: classes/multilingual-plugins/easy-language/class-init.php:899
 msgid "Frontend Settings"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1052
+#: classes/multilingual-plugins/easy-language/class-init.php:907
 msgid "Choose link-mode for language switcher"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1061
+#: classes/multilingual-plugins/easy-language/class-init.php:916
 msgid "Do not link translated pages"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1063
+#: classes/multilingual-plugins/easy-language/class-init.php:918
 msgid "The links in the switcher will general link to the language-specific homepage."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1066
+#: classes/multilingual-plugins/easy-language/class-init.php:921
 msgid "Link translated pages."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1068
+#: classes/multilingual-plugins/easy-language/class-init.php:923
 msgid "The Links in the switcher will link to the translated page. If a page is not translated, the link will target the language-specific homepage."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1071
+#: classes/multilingual-plugins/easy-language/class-init.php:926
 msgid "Do not link not translated pages."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1073
+#: classes/multilingual-plugins/easy-language/class-init.php:928
 msgid "The Links in the switcher will link to the translated page. If a page is not translated, the link will not be visible."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1114
-#: classes/multilingual-plugins/easy-language/class-init.php:1679
-msgid "Translations"
-msgstr ""
-
-#: classes/multilingual-plugins/easy-language/class-init.php:1367
+#: classes/multilingual-plugins/easy-language/class-init.php:1204
 msgid "Filter easy language"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1368
+#: classes/multilingual-plugins/easy-language/class-init.php:1205
 msgid "show translated content"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1369
+#: classes/multilingual-plugins/easy-language/class-init.php:1206
 msgid "show not translated content"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1370
+#: classes/multilingual-plugins/easy-language/class-init.php:1207
 msgid "show changed content"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1371
+#: classes/multilingual-plugins/easy-language/class-init.php:1208
 msgid "show not changed content"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1611
+#: classes/multilingual-plugins/easy-language/class-init.php:1448
 msgid "Translation in progress"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1612
+#: classes/multilingual-plugins/easy-language/class-init.php:1449
 msgid "OK"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1613
+#: classes/multilingual-plugins/easy-language/class-init.php:1450
 msgid "Please wait"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1616
+#: classes/multilingual-plugins/easy-language/class-init.php:1453
 msgid "Translation has been run."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1659
-msgid "Translate this object?"
+#: classes/multilingual-plugins/easy-language/class-init.php:1503
+msgid "Simplify the texts in this object?"
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1660
+#: classes/multilingual-plugins/easy-language/class-init.php:1504
 msgid "Do you really want to delete this translated object?"
 msgstr ""
 
 #. translators: %1$s will be replaced by the path to the easy language icon
-#: classes/multilingual-plugins/easy-language/class-init.php:1663
-msgid "<p><img src=\"%1$s\" alt=\"\"><strong>Start to translate your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>"
-msgstr ""
-
-#: classes/multilingual-plugins/easy-language/class-init.php:1680
-msgid "This table contains all by any API translated texts. The original texts will not be translated a second time."
-msgstr ""
-
-#: classes/multilingual-plugins/easy-language/class-init.php:1681
-msgid "You can here delete the translations to force a new translation of the original text if requested. In objects saved translations will not be deleted."
+#: classes/multilingual-plugins/easy-language/class-init.php:1507
+msgid "<p><img src=\"%1$s\" alt=\"\"><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>"
 msgstr ""
 
 #. translators: %1$d will be replaced by a percentage value between 0 and 100.
-#: classes/multilingual-plugins/easy-language/class-init.php:1730
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:202
+#: classes/multilingual-plugins/easy-language/class-init.php:1541
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:211
 msgid "Quota for the used API is used for %1$d%%!"
 msgstr ""
 
@@ -635,44 +636,45 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
-#. translators: %1$s will be replaced by the object name (post or page), %2$s will be replaced by the name of the current language of this page/post
+#. translators: %1$s will be replaced by the type of the object, %2$s will be replaced by the name of the language
 #: classes/multilingual-plugins/easy-language/class-pagebuilder-support.php:140
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:78
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:120
 msgid "You are editing this %1$s in the language <strong>%2$s</strong>."
 msgstr ""
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:183
-msgid "There would be %1$d characters to translate in this %2$s. That is more than the %3$d available in quota."
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:192
+msgid "There would be %1$d characters to simplify in this %2$s. That is more than the %3$d available in quota."
 msgstr ""
 
 #. translators: %1$d will be replaced by the amount of characters in this page/post, %2$s will be replaced by the name of this page-type (post or page)
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:193
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:202
 msgid "There would be %1$d characters translated in this %2$s."
 msgstr ""
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:199
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:208
 #: classes/multilingual-plugins/easy-language/pagebuilder/divi.php:118
-msgid "Translate via %1$s"
+msgid "Simplify via %1$s"
 msgstr ""
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:212
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:221
 msgid "No quota for automatic translation with %1$s available."
 msgstr ""
 
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:222
-#: classes/multilingual-plugins/easy-language/pagebuilder/divi.php:126
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:231
 msgid "No translation-API active."
 msgstr ""
 
 #. translators: %1$s will be replaced by the language title
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:238
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:247
 msgid "Add translation in %1$s"
 msgstr ""
 
 #. translators: %1$s will be replaced by the page-title where the original content resides
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:245
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:254
 msgid "Original Content in %1$s"
 msgstr ""
 
@@ -729,10 +731,8 @@ msgstr ""
 msgid "Languages"
 msgstr ""
 
-#. translators: %1$s will be replaced by the name of the language
-#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:78
-#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:120
-msgid "You are editing this page in the language <strong>%1$s</strong>."
+#: classes/multilingual-plugins/easy-language/pagebuilder/divi.php:126
+msgid "No simplification-API active."
 msgstr ""
 
 #: classes/multilingual-plugins/translatepress/class-translatepress-summ-ai-machine-translator.php:46
@@ -827,20 +827,30 @@ msgstr ""
 msgid "API Logs"
 msgstr ""
 
-#: inc/settings/apis.php:49
+#: inc/settings/apis.php:51
 msgid "Choose API for translations"
 msgstr ""
 
-#: inc/settings/apis.php:69
+#: inc/settings/apis.php:71
 msgid "Choose API"
 msgstr ""
 
-#: inc/settings/apis.php:76
-msgid "Please choose the API you want to use to translate your website."
+#: inc/settings/apis.php:78
+msgid "Please choose the API you want to use to simplify texts your website."
 msgstr ""
 
-#: inc/settings/apis.php:127
+#: inc/settings/apis.php:129
 msgid "Activated"
+msgstr ""
+
+#. translators: %1$s will be replaced by the name of the active API, %2%s will be replaced by the settings-URL for this API, %3$s will be replaced by list of post-types and their links in wp-admin.
+#: inc/settings/apis.php:244
+msgid "<strong>You have activated %1$s as your translation API.</strong> Check the <a href=\"%2$s\">API-settings</a>. Then go now to your %3$s and simplify them with this API."
+msgstr ""
+
+#. translators: %1$s will be replaced by the name of the active API, %2$s will be replaced by list of post-types and their links in wp-admin.
+#: inc/settings/apis.php:247
+msgid "<strong>You have activated %1$s as your translation API.</strong> Go now to your %2$s and simplify them with this API."
 msgstr ""
 
 #: inc/settings/settings.php:19

@@ -107,7 +107,7 @@ interface Api_Base {
 	public function disable(): void;
 
 	/**
-	 * Get the API-specific translations-object.
+	 * Get the API-specific translations-object (used to run translations).
 	 *
 	 * @return object
 	 */
@@ -149,9 +149,30 @@ interface Api_Base {
 	public function get_api_url(): string;
 
 	/**
-	 * Return the Request-object for this API.
+	 * Return the request-object for this API.
 	 *
 	 * @return mixed
 	 */
 	public function get_request_object();
+
+	/**
+	 * Return all by this API translated post type objects.
+	 *
+	 * @return array
+	 */
+	public function get_translated_post_type_objects(): array;
+
+	/**
+	 * Return the settings-URL for the API.
+	 *
+	 * @return string
+	 */
+	public function get_settings_url(): string;
+
+	/**
+	 * Return whether this API is configured (true) or not (false).
+	 *
+	 * @return bool
+	 */
+	public function is_configured(): bool;
 }

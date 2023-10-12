@@ -115,7 +115,7 @@ function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): vo
 				$admin_bar->add_menu( array(
 					'id'     => $id . '-translate-object',
 					'parent' => $id,
-					'title'  => sprintf(__( 'Translate via %1$s', 'easy-language' ), $api_obj->get_title()),
+					'title'  => sprintf(__( 'Simplify via %1$s', 'easy-language' ), $api_obj->get_title()),
 					'href'   => $post_object->get_translation_via_api_link(),
 				) );
 			}
@@ -123,7 +123,7 @@ function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): vo
 				$admin_bar->add_menu( array(
 					'id'     => $id . '-translate-object',
 					'parent' => $id,
-					'title'  => __('No translation-API active.', 'easy-language'),
+					'title'  => __('No simplification-API active.', 'easy-language'),
 					'href'   => '',
 				) );
 			}

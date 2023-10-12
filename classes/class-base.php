@@ -8,6 +8,8 @@
 namespace easyLanguage;
 
 // prevent direct access.
+use WP_Query;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -50,6 +52,15 @@ class Base {
 	 * @var string
 	 */
 	protected string $title = '';
+
+	/**
+	 * Language-specific support-URL.
+	 *
+	 * @var array
+	 */
+	protected array $support_url = array(
+		'de_DE' => 'https://laolaweb.com/',
+	);
 
 	/**
 	 * Return the internal name of the API.
@@ -217,5 +228,95 @@ class Base {
 	 */
 	public function get_active_target_languages(): array {
 		return array();
+	}
+
+	/**
+	 * Return all by this API translated post type objects.
+	 *
+	 * @return array
+	 */
+	public function get_translated_post_type_objects(): array {
+		$post_types = \easyLanguage\Multilingual_plugins\Easy_Language\Init::get_instance()->get_supported_post_types();
+		$post_types_array = array();
+		foreach( $post_types as $post_type => $enabled ) {
+			$post_types_array[] = $post_type;
+		}
+		$query   = array(
+			'post_type'                       => $post_types_array,
+			'posts_per_page'                  => -1,
+			'post_status'                     => array( 'any', 'trash' ),
+			'fields'                          => 'ids',
+			'meta_query'                      => array(
+				array(
+					'key'     => 'easy_language_api',
+					'value' => $this->get_name(),
+					'compare' => '='
+				)
+			),
+			'do_not_use_easy_language_filter' => true,
+		);
+		$results = new WP_Query( $query );
+		return $results->posts;
+	}
+
+	/**
+	 * Return the settings-URL for the API.
+	 *
+	 * @return string
+	 */
+	public function get_settings_url(): string {
+		if( false === $this->has_settings() ) {
+			return '';
+		}
+		return add_query_arg(
+			array(
+				'tab' => $this->get_name()
+			),
+			Helper::get_settings_page_url()
+		);
+	}
+
+	/**
+	 * Return true if API has settings.
+	 *
+	 * @return bool
+	 */
+	public function is_configured(): bool {
+		return $this->has_settings();
+	}
+
+	/**
+	 * Return the language-specific support-URL for Capito.
+	 *
+	 * @return string
+	 */
+	public function get_language_specific_support_page(): string {
+		// return language-specific URL if it exists.
+		if ( ! empty( $this->support_url[ helper::get_current_language() ] ) ) {
+			return $this->support_url[ helper::get_current_language() ];
+		}
+
+		// otherwise return default url.
+		return $this->support_url['de_DE'];
+	}
+
+	/**
+	 * Get overview about quota as html-table.
+	 *
+	 * @return string
+	 */
+	protected function get_quota_table(): string {
+		// get quota.
+		$quota = $this->get_quota();
+
+		// define table.
+		$table = '<table>';
+		$table .= '<tr><th>'.esc_html__('Quota', 'easy-language').':</th><td>'.absint($quota['character_limit']).'</td></tr>';
+		$table .= '<tr><th>'.esc_html__('Character spent', 'easy-language').':</th><td>'.absint($quota['character_spent']).'</td></tr>';
+		$table .= '<tr><th>'.esc_html__('Rest quota', 'easy-language').':</th><td>'.absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ).'</td></tr>';
+		$table .= '</table>';
+
+		// output the resulting table.
+		return $table;
 	}
 }

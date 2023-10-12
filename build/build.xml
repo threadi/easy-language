@@ -87,6 +87,7 @@
 			<zipfileset dir="${src.dir}/gfx" prefix="${plugin.slug}/gfx" />
             <zipfileset dir="${src.dir}/inc" prefix="${plugin.slug}/inc" />
             <zipfileset dir="${src.dir}/languages" prefix="${plugin.slug}/languages" />
+			<zipfileset dir="${src.dir}/libs" prefix="${plugin.slug}/libs" />
             <zipfileset dir="${src.dir}" includes="uninstall.php,readme.txt" prefix="${plugin.slug}" />
             <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
         </zip>

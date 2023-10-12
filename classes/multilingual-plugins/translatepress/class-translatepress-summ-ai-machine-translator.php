@@ -31,9 +31,9 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 	/**
 	 * Send request to summ ai.
 	 *
-	 * @param string $source_language       Translate from language.
-	 * @param string $language_code         Translate to language.
-	 * @param string $string_to_translate   Array of string to translate.
+	 * @param string $source_language       From language.
+	 * @param string $language_code         To language.
+	 * @param string $string_to_translate   Array of string to simplify.
 	 *
 	 * @return array|WP_Error               Response
 	 * @noinspection PhpMissingParamTypeInspection
@@ -82,7 +82,7 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 			// set the original text as fallback.
 			$translated_strings[ $key ] = $string_to_translate;
 
-			// send request to translate the string.
+			// send request to simplify the string.
 			$response = $this->send_request( $source_language, $target_language, $string_to_translate );
 
 			// this is run only if "Log machine translation queries." is set to Yes.

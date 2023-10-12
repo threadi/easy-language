@@ -84,7 +84,7 @@ add_filter( 'trp_automatic_translation_engines_classes', 'easy_language_trp_add_
 /**
  * Add the automatic machine to the list in translatePress-backend.
  *
- * @param array $engines List of supported translate engines.
+ * @param array $engines List of supported simplify engines.
  * @return mixed
  */
 function easy_language_trp_add_automatic_engine( array $engines ): array {

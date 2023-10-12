@@ -25,7 +25,7 @@ class No_Api extends Base implements Api_Base {
 	 *
 	 * @var string
 	 */
-	protected string $name = 'no_ai';
+	protected string $name = 'no_api';
 
 	/**
 	 * Set the public title for the API.
@@ -69,7 +69,7 @@ class No_Api extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_description(): string {
-		return __( '<p>Do not use any API for translations.</p>', 'easy-language' );
+		return __( '<p>This is a pseudo-API.<br>It does not use any API for translations.</p><p>Use this "API" if you do not want to use any other API.<br>You will be able to write your own texts in Leichte and Einfache Sprache.</p><p><strong>No quota, no costs.</strong></p>', 'easy-language' );
 	}
 
 	public function get_supported_source_languages(): array {

@@ -183,13 +183,13 @@ class Parser_Base {
 				// get object type name.
 				$object_type = $post_object->get_type();
 
-				// do not show translate-button if characters to translate are more than quota characters.
+				// do not show simplify-button if characters to simplify are more than quota characters.
 				if ( 'above_limit' === $quota_state['status'] ) {
 					?>
 					<p class="alert">
 						<?php
 							/* translators: %1$s will be replaced by the API-title */
-							printf( esc_html__( 'There would be %1$d characters to translate in this %2$s. That is more than the %3$d available in quota.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $object_type ), absint( $quota_state['quota_rest'] ) );
+							printf( esc_html__( 'There would be %1$d characters to simplify in this %2$s. That is more than the %3$d available in quota.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $object_type ), absint( $quota_state['quota_rest'] ) );
 						?>
 					</p>
 					<?php
@@ -205,7 +205,7 @@ class Parser_Base {
 					<p><a href="<?php echo esc_url( $do_translation ); ?>" class="button button-secondary easy-language-translate-object" data-id="<?php echo absint( $post_object->get_id() ); ?>">
 						<?php
 							/* translators: %1$s will be replaced by the API-title */
-							printf( esc_html__( 'Translate via %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ) );
+							printf( esc_html__( 'Simplify via %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ) );
 						if ( $quota_state['quota_percent'] > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
 							/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
 							echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';

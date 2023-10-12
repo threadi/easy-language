@@ -132,6 +132,8 @@ body .text-translations-table #source_language, body .text-translations-table #t
     z-index: 1;
 }
 
+.easy-api-radios input[type='radio'] + label > p:last-child { margin-bottom: 0 }
+
 .easy-api-radios input[type='radio'] + label:before {
     background-color: #c45602;
     border-radius: 8px;
@@ -158,9 +160,23 @@ body .text-translations-table #source_language, body .text-translations-table #t
 	margin-bottom: 8px;
 }
 
-.easy-language-choose-api .form-table th { display: none }
+.easy-language-choose-api .form-table > tr > th, .easy-language-choose-api .form-table > tbody > tr > th { display: none }
+
+.easy-language-choose-api .form-table div table {
+	border-collapse: collapse;
+	margin: 0 0 16px;
+}
+
+.easy-language-choose-api .form-table div th, .easy-language-choose-api .form-table div td { padding: 0; }
+
+.easy-language-choose-api .form-table div td { text-align: right; }
 
 .easy-language-choose-api .form-table td { padding-left: 0 }
+
+.easy-language-choose-api .form-table td a.button {
+	padding-top: 5px;
+	margin-right: 8px;
+}
 
 .easy-language-transient .notice-dismiss:before {
 	display: inline-block;

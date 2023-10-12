@@ -90,7 +90,7 @@ class Translations {
 	}
 
 	/**
-	 * Call API to translate single text.
+	 * Call API to simplify single text.
 	 *
 	 * @param string $text_to_translate
 	 * @param string $source_language

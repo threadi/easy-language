@@ -7,6 +7,7 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language\Parser;
 
+use Elementor\Core\Files\CSS\Post as Post_CSS;
 use Elementor\Plugin;
 use easyLanguage\Helper;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser;
@@ -265,5 +266,18 @@ class Elementor extends Parser_Base implements Parser {
 	 */
 	public function is_active(): bool {
 		return $this->is_elementor_active();
+	}
+
+	/**
+	 * Run no updates on object per default.
+	 *
+	 * @param Post_Object $post_object The object.
+	 *
+	 * @return void
+	 */
+	public function update_object( Post_Object $post_object ): void {
+		// update object-specific css.
+		$post_css = Post_CSS::create( $post_object->get_id() );
+		$post_css->update();
 	}
 }
