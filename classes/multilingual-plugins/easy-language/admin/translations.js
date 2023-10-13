@@ -1,61 +1,67 @@
 /**
- * Start loading of translations of actual object.
+ * Start loading of simplifications of actual object.
  */
-function easy_language_get_translation( obj_id ) {
-	// create dialog if it does not exist atm
-	if ( jQuery( '#easylanguage-translate-dialog' ).length === 0 ) {
-		jQuery( '<div id="easylanguage-translate-dialog" title="' + easyLanguageTranslationsJsVars.label_translate_is_running + '"><div id="easylanguage-translate-dialog-step-description"></div><div id="easylanguage-translate-dialog-progressbar"></div></div>' ).dialog(
+function easy_language_get_simplification( obj_id, link ) {
+	// create dialog if it does not exist atm.
+	if ( jQuery( '#easylanguage-simplification-dialog' ).length === 0 ) {
+		jQuery( '<div id="easylanguage-simplification-dialog" title="' + easyLanguageSimplificationJsVars.label_simplification_is_running + '"><div id="easylanguage-simplification-dialog-step-description"></div><div id="easylanguage-simplification-dialog-progressbar"></div></div>' ).dialog(
 			{
 				width: 500,
 				closeOnEscape: false,
-				dialogClass: "easylanguage-translate-dialog-no-close",
+				dialogClass: "easylanguage-simplification-dialog-no-close",
 				resizable: false,
 				modal: true,
 				draggable: false,
 				buttons: [
-				{
-					text: easyLanguageTranslationsJsVars.label_ok,
-					click: function () {
-						location.reload();
+					{
+						text: easyLanguageSimplificationJsVars.label_open_link,
+						click: function () {
+							location.href=link;
+						}
+					},
+					{
+						text: easyLanguageSimplificationJsVars.label_ok,
+						click: function () {
+							location.reload();
+						}
 					}
-				}
 				]
 			}
 		);
 	} else {
-		jQuery( '#easylanguage-translate-dialog' ).dialog( 'open' );
+		jQuery( '#easylanguage-simplification-dialog' ).dialog( 'open' );
 	}
 
-	// disable button in dialog
-	jQuery( '.easylanguage-translate-dialog-no-close .ui-button' ).prop( 'disabled', true );
+	// disable buttons in dialog.
+	jQuery( '.easylanguage-simplification-dialog-no-close .ui-button' ).prop( 'disabled', true );
 
-	// init description
-	let stepDescription = jQuery( '#easylanguage-translate-dialog-step-description' );
-	stepDescription.html( '<p>' + easyLanguageTranslationsJsVars.txt_please_wait + '</p>' );
+	// init description.
+	let stepDescription = jQuery( '#easylanguage-simplification-dialog-step-description' );
+	stepDescription.html( '<p>' + easyLanguageSimplificationJsVars.txt_please_wait + '</p>' );
 
-	// init progressbar
-	let progressbar = jQuery( "#easylanguage-translate-dialog-progressbar" );
+	// init progressbar.
+	let progressbar = jQuery( "#easylanguage-simplification-dialog-progressbar" );
 	progressbar.progressbar(
 		{
 			value: 0
 		}
 	).removeClass( "hidden" );
 
-	// start translation.
+	// start simplification.
 	jQuery.ajax(
 		{
 			type: "POST",
-			url: easyLanguageTranslationsJsVars.ajax_url,
+			url: easyLanguageSimplificationJsVars.ajax_url,
 			data: {
 				'action': 'easy_language_run_translation',
 				'post': obj_id,
-				'nonce': easyLanguageTranslationsJsVars.run_translate_nonce
+				'nonce': easyLanguageSimplificationJsVars.run_simplification_nonce
 			},
 			beforeSend: function () {
 				// get import-infos
 				setTimeout(
 					function () {
-						easy_language_get_translation_info( obj_id, progressbar, stepDescription ); },
+						easy_language_get_simplification_info( obj_id, progressbar, stepDescription ); },
 					1000
 				);
 			}
@@ -70,21 +76,22 @@ function easy_language_get_translation( obj_id ) {
  * @param progressbar
  * @param stepDescription
  */
-function easy_language_get_translation_info(obj_id, progressbar, stepDescription) {
+function easy_language_get_simplification_info(obj_id, progressbar, stepDescription) {
 	jQuery.ajax(
 		{
 			type: "POST",
-			url: easyLanguageTranslationsJsVars.ajax_url,
+			url: easyLanguageSimplificationJsVars.ajax_url,
 			data: {
 				'action': 'easy_language_get_info_translation',
 				'post': obj_id,
-				'nonce': easyLanguageTranslationsJsVars.get_translate_nonce
+				'nonce': easyLanguageSimplificationJsVars.get_simplification_nonce
 			},
 			success: function (data) {
 				let stepData = data.split( ";" );
 				let count    = parseInt( stepData[0] );
 				let max      = parseInt( stepData[1] );
 				let running  = parseInt( stepData[2] );
+				let result  = stepData[3];
 
 				// update progressbar
 				progressbar.progressbar(
@@ -97,13 +104,14 @@ function easy_language_get_translation_info(obj_id, progressbar, stepDescription
 				if ( running >= 1 ) {
 					setTimeout(
 						function () {
-							easy_language_get_translation_info( obj_id, progressbar, stepDescription ) },
+							easy_language_get_simplification_info( obj_id, progressbar, stepDescription ) },
 						500
 					);
 				} else {
+					stepDescription.html( '<p>' + result + '</p>' );
 					progressbar.addClass( "hidden" );
-					stepDescription.html( easyLanguageTranslationsJsVars.txt_translation_has_been_run );
-					jQuery( '.easylanguage-translate-dialog-no-close .ui-button' ).prop( 'disabled', false );
+					jQuery( '#easylanguage-simplification-dialog' ).dialog( { title:easyLanguageSimplificationJsVars.label_simplification_done } );
+					jQuery( '.easylanguage-simplification-dialog-no-close .ui-button' ).prop( 'disabled', false );
 				}
 			}
 		}

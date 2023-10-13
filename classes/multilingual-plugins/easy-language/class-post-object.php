@@ -371,8 +371,8 @@ class Post_Object implements Easy_Language_Object {
 	public function get_translate_link( string $language_code ): string {
 		return add_query_arg(
 			array(
-				'action'   => 'easy_language_add_translation',
-				'nonce'    => wp_create_nonce( 'easy-language-add-translation' ),
+				'action'   => 'easy_language_add_simplification',
+				'nonce'    => wp_create_nonce( 'easy-language-add-simplification' ),
 				'post'     => $this->get_id(),
 				'language' => $language_code,
 			),

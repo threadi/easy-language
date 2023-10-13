@@ -7,7 +7,7 @@ jQuery( document ).ready(
 				e.preventDefault();
 
 				if( confirm( easyLanguagePluginJsVars.translate_confirmation_question ) ) {
-					easy_language_get_translation($(this).data('id'));
+					easy_language_get_simplification($(this).data('id'), $(this).data('link'));
 				}
 			}
 		);

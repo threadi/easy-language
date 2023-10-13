@@ -207,32 +207,26 @@ class Text {
 	/**
 	 * Replace the original with the translation and save this in object.
 	 *
-	 * @param int    $object_id The object-ID where the text should be replaced.
+	 * @param int $object_id The object-ID where the text should be replaced.
 	 * @param string $target_language The target language for the translated text.
-	 * @param string $taxonomy The used taxonomy.
 	 *
-	 * @return void
-	 * @noinspection PhpUnused
+	 * @return bool
 	 */
-	public function replace_original_with_translation( int $object_id, string $target_language, string $taxonomy ): void {
+	public function replace_original_with_translation( int $object_id, string $target_language ): bool {
 		// get translation objects.
 		$translation_objects = $this->get_objects();
 
 		// bail if translation-objects could not be loaded.
 		if ( empty( $translation_objects ) ) {
-			return;
+			return false;
 		}
 
 		// get object.
-		if ( ! empty( $taxonomy ) ) {
-			$object = Init::get_instance()->get_object_by_wp_object( get_term( $object_id, $taxonomy ), $object_id, $taxonomy );
-		} else {
-			$object = Init::get_instance()->get_object_by_wp_object( get_post( $object_id ), $object_id );
-		}
+		$object = Init::get_instance()->get_object_by_wp_object( get_post( $object_id ), $object_id );
 
 		// bail of no object could be loaded.
 		if ( false === $object ) {
-			return;
+			return false;
 		}
 
 		/**
@@ -261,6 +255,9 @@ class Text {
 
 					// save it.
 					wp_update_post( $query );
+
+					// run pagebuilder-specific tasks to update settings or trigger third party events.
+					$obj->update_object( $object );
 					break;
 
 				case 'post_content':
@@ -269,7 +266,7 @@ class Text {
 
 					// do nothing if not page builder could be loaded.
 					if ( false === $obj ) {
-						return;
+						return false;
 					}
 
 					// set object-id to pagebuilder-object.
@@ -289,37 +286,16 @@ class Text {
 					);
 					wp_update_post( $query );
 					break;
-
-				case 'taxonomy_title':
-					// get title.
-					$title = $this->get_translation( $target_language );
-
-					// set query for update.
-					$query = array(
-						'name' => $title,
-					);
-
-					// run update.
-					wp_update_term( $object_id, $taxonomy, $query );
-					break;
-
-				case 'taxonomy_description':
-					// get description.
-					$description = $this->get_translation( $target_language );
-
-					// set query for update.
-					$query = array(
-						'description' => $description,
-					);
-
-					// run update.
-					wp_update_term( $object_id, $taxonomy, $query );
-					break;
+				default:
+					do_action( 'easy_language_replace_texts', $this, $target_language, $object_id, $translation_objects );
 			}
 		}
 
 		// set state to "in_use" to mark text as translated and inserted.
 		$this->set_state( 'in_use' );
+
+		// return true as we have replaced contents.
+		return true;
 	}
 
 	/**

@@ -209,16 +209,16 @@ class Init {
 	public function get_post_type_settings(): array {
 		return array(
 			'post' => array(
-				'label_singular' => __( 'post' ),
-				'label_plural' => __( 'posts' ),
+				'label_singular' => __( 'post', 'easy-language' ),
+				'label_plural' => __( 'posts', 'easy-language' ),
 				'admin_edit_url' => add_query_arg(
 					array(),
 					admin_url().'edit.php'
 				)
 			),
 			'page' => array(
-				'label_singular' => __( 'page' ),
-				'label_plural' => __( 'pages' ),
+				'label_singular' => __( 'page', 'easy-language' ),
+				'label_plural' => __( 'pages', 'easy-language' ),
 				'admin_edit_url' => add_query_arg(
 					array(
 						'post_type' => 'page'

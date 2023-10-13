@@ -115,7 +115,8 @@ function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): vo
 				$admin_bar->add_menu( array(
 					'id'     => $id . '-translate-object',
 					'parent' => $id,
-					'title'  => sprintf(__( 'Simplify via %1$s', 'easy-language' ), $api_obj->get_title()),
+					/* translators: %1$s will be replaced by the API-title */
+					'title'  => sprintf(__( 'Simplify with %1$s', 'easy-language' ), $api_obj->get_title()),
 					'href'   => $post_object->get_translation_via_api_link(),
 				) );
 			}

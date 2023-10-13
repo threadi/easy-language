@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 const EASY_LANGUAGE_SUMM_AI_API_URL = 'https://api.laolaweb.com/summaiproxy/index.php';
 
 /**
- * Capito API URL for translations.
+ * Capito API URL for simplifications.
  */
 const EASY_LANGUAGE_CAPITO_API_URL = 'https://api.capito.ai/simplification';
 
@@ -24,6 +24,16 @@ const EASY_LANGUAGE_CAPITO_API_URL = 'https://api.capito.ai/simplification';
  * Capito API URL for quotas.
  */
 const EASY_LANGUAGE_CAPITO_API_URL_QUOTA = 'https://api.capito.ai/shop/me/quotas';
+
+/**
+ * CHATGPT API URL for simplifications.
+ */
+const EASY_LANGUAGE_CHATGPT_API_URL = 'https://api.openai.com/v1/chat/completions';
+
+/**
+ * ChatGpt URL for quotas.
+ */
+const EASY_LANGUAGE_CHATGPT_API_URL_QUOTA = 'https://api.openai.com/v1/chat/completions';
 
 /**
  * Set transient-based hints for the backend.
@@ -51,9 +61,10 @@ const EASY_LANGUAGE_TRANSIENT_LIST = 'easy_language_transients';
 /**
  * Define names for progressbar during translation.
  */
-const EASY_LANGUAGE_OPTION_TRANSLATE_COUNT   = 'easy_language_translate_count';
-const EASY_LANGUAGE_OPTION_TRANSLATE_MAX     = 'easy_language_translate_max';
-const EASY_LANGUAGE_OPTION_TRANSLATE_RUNNING = 'easy_language_translate_running';
+const EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT   = 'easy_language_simplification_count';
+const EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX     = 'easy_language_simplification_max';
+const EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING = 'easy_language_simplification_running';
+const EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS = 'easy_language_simplification_results';
 
 /**
  * Hash for plugin-installation.

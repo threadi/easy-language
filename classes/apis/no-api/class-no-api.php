@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Define what SUMM AI supports and what not.
+ * Define what No-API supports and what not.
  */
 class No_Api extends Base implements Api_Base {
 
@@ -64,7 +64,7 @@ class No_Api extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return the public description of the SUMM AI API.
+	 * Return the public description of this API.
 	 *
 	 * @return string
 	 */

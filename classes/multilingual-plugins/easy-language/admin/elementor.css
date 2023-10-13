@@ -1,3 +1,5 @@
+.easy-language-table p { margin: 0 0 8px }
+
 .easy-language-table table { margin-bottom: 1em }
 
 .easy-language-table th { text-align: left; }
@@ -6,5 +8,13 @@
 
 .easy-language-table .button:before {
 	content: "\f326";
-	font-family: Dashicons, Sans-serif;
+	font-family: Dashicons, sans-serif;
+}
+
+#easylanguage-simplification-dialog-progressbar.hidden {
+	display: none;
+}
+
+#easylanguage-simplification-dialog-step-description {
+	line-height: 1.4;
 }

@@ -171,7 +171,7 @@ class Rewrite {
 	 * @return array
 	 */
 	public function set_query_vars( array $query_vars ): array {
-		$query_vars[] = filter_input( INPUT_GET, 'lang', FILTER_SANITIZE_STRING ) ? 'lang' : '';
+		$query_vars[] = filter_input( INPUT_GET, 'lang', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) ? 'lang' : '';
 		return $query_vars;
 	}
 

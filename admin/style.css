@@ -174,8 +174,9 @@ body .text-translations-table #source_language, body .text-translations-table #t
 .easy-language-choose-api .form-table td { padding-left: 0 }
 
 .easy-language-choose-api .form-table td a.button {
-	padding-top: 5px;
+	line-height: 2;
 	margin-right: 8px;
+	padding-top: 5px;
 }
 
 .easy-language-transient .notice-dismiss:before {
@@ -192,3 +193,5 @@ body .text-translations-table #source_language, body .text-translations-table #t
 	margin-right: 8px;
 	width: 32px;
 }
+
+#easylanguage-simplification-dialog-step-description { line-height: 1.4; }

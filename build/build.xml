@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="easy-language" basedir="." default="help">
 
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="libs/ant-contrib-1.0b3.jar"/>
+		</classpath>
+	</taskdef>
+
     <!-- Include config file containing  -->
     <loadproperties srcFile="build.properties" />
 
@@ -13,6 +19,8 @@
     <fail unless="plugin.slug" />
     <fail unless="plugin.version" />
     <fail unless="npm.path" />
+	<fail unless="apis" />
+	<fail unless="pagebuilders" />
     <fail message="Do not run as root!">
         <condition>
             <equals arg1="root" arg2="${user.name}"/>
@@ -83,15 +91,38 @@
         <delete file="${build.dir}/${plugin.slug}_${plugin.version}.zip"/>
         <zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip">
 			<zipfileset dir="${src.dir}/admin" prefix="${plugin.slug}/admin" />
-            <zipfileset dir="${src.dir}/classes" prefix="${plugin.slug}/classes" />
+            <zipfileset dir="${src.dir}/classes" prefix="${plugin.slug}/classes">
+				<exclude name="**/apis/**" />
+				<exclude name="**/multilingual-plugins/easy-language/pagebuilder/**" />
+				<exclude name="**/multilingual-plugins/easy-language/parser/**" />
+			</zipfileset>
 			<zipfileset dir="${src.dir}/gfx" prefix="${plugin.slug}/gfx" />
-            <zipfileset dir="${src.dir}/inc" prefix="${plugin.slug}/inc" />
+            <zipfileset dir="${src.dir}/inc" prefix="${plugin.slug}/inc">
+				<exclude name="**/apis/**" />
+			</zipfileset>
             <zipfileset dir="${src.dir}/languages" prefix="${plugin.slug}/languages" />
 			<zipfileset dir="${src.dir}/libs" prefix="${plugin.slug}/libs" />
             <zipfileset dir="${src.dir}" includes="uninstall.php,readme.txt" prefix="${plugin.slug}" />
             <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
         </zip>
-        <delete file="${src.dir}/${plugin.slug}-release.php"/>
+		<for list="${apis}" param="api">
+			<sequential>
+				<zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip" update="true">
+					<zipfileset dir="${src.dir}/classes/apis/@{api}" prefix="${plugin.slug}/classes/apis/@{api}" />
+					<zipfileset dir="${src.dir}/inc/apis/" includes="@{api}.php" prefix="${plugin.slug}/inc/apis/" />
+				</zip>
+			</sequential>
+		</for>
+		<for list="${pagebuilders}" param="pagebuilder">
+			<sequential>
+				<zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip" update="true">
+					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/parser/@{pagebuilder}" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/parser/@{pagebuilder}" erroronmissingdir="false" />
+					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/pagebuilder/" includes="@{pagebuilder}.php" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/pagebuilder/" />
+					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/parser/" includes="class-@{pagebuilder}.php" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/parser/" />
+				</zip>
+			</sequential>
+		</for>
+		<delete file="${src.dir}/${plugin.slug}-release.php"/>
         <copy file="${log.dir}/languages/easy-language.pot" tofile="${src.dir}/languages/easy-language.pot" overwrite="true" />
         <copy file="${log.dir}/languages/easy-language-de_DE.po" tofile="${src.dir}/languages/easy-language-de_DE.po" overwrite="true" />
         <copy file="${log.dir}/languages/easy-language-de_DE_formal.po" tofile="${src.dir}/languages/easy-language-de_DE_formal.po" overwrite="true" />

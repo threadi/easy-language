@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Register the SUMM AI Api in this plugin.
+ * Register the No-Api in this plugin.
  *
  * @param array $api_list List of available APIs.
  * @return array

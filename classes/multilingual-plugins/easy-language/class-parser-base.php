@@ -133,7 +133,16 @@ class Parser_Base {
 	 * @return string
 	 */
 	public function get_edit_link(): string {
-		return get_edit_post_link( $this->get_object_id(), 'edit' );
+		// get the edit-link by object-id.
+		$link = get_edit_post_link( $this->get_object_id(), 'edit' );
+
+		// return empty string if link does not exist.
+		if( is_null($link) ) {
+			return '';
+		}
+
+		// return link if it does exist.
+		return $link;
 	}
 
 	/**
@@ -183,6 +192,13 @@ class Parser_Base {
 				// get object type name.
 				$object_type = $post_object->get_type();
 
+				// get object type name.
+				$object_type_settings = \easyLanguage\Init::get_instance()->get_post_type_settings();
+				$object_type_name = 'page';
+				if( !empty($object_type_settings[$post_object->get_type()]) ) {
+					$object_type_name = $object_type_settings[$post_object->get_type()]['label_singular'];
+				}
+
 				// do not show simplify-button if characters to simplify are more than quota characters.
 				if ( 'above_limit' === $quota_state['status'] ) {
 					?>
@@ -199,13 +215,14 @@ class Parser_Base {
 					<p>
 						<?php
 						/* translators: %1$d will be replaced by the amount of characters in this page/post, %2$s will be replaced by the name of this page-type (post or page)  */
-						echo wp_kses_post( sprintf( __( 'There would be %1$d characters translated in this %2$s.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $object_type ) ) );
+						echo wp_kses_post( sprintf( __( 'There would be %1$d characters translated in this %2$s.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $object_type_name ) ) );
 						?>
 					</p>
-					<p><a href="<?php echo esc_url( $do_translation ); ?>" class="button button-secondary easy-language-translate-object" data-id="<?php echo absint( $post_object->get_id() ); ?>">
+					<?php /* translators: %1$s will be replaced by tne object-type-name (e.g. post oder page), %2$s will be replaced by the API-name */ ?>
+					<p><a href="<?php echo esc_url( $do_translation ); ?>" class="button button-secondary easy-language-translate-object elementor-button" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url(get_permalink($post_id)); ?>" title="<?php echo esc_attr( sprintf( __( 'Simplify this %1$s with %2$s', 'easy-language' ), esc_html($object_type_name), esc_html( $api_obj->get_title() ) ) ); ?>">
 						<?php
 							/* translators: %1$s will be replaced by the API-title */
-							printf( esc_html__( 'Simplify via %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ) );
+							printf( esc_html__( 'Simplify with %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ) );
 						if ( $quota_state['quota_percent'] > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
 							/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
 							echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';

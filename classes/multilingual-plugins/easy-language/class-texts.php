@@ -78,7 +78,7 @@ class Texts {
 		$this->init = $init;
 
 		// add object for translation.
-		add_action( 'admin_action_easy_language_add_translation', array( $this, 'add_object_to_translate' ) );
+		add_action( 'admin_action_easy_language_add_simplification', array( $this, 'add_object_to_simplification' ) );
 
 		// get automatic translation of given object.
 		add_action( 'admin_action_easy_language_get_automatic_translation', array( $this, 'get_automatic_translation' ) );
@@ -96,21 +96,20 @@ class Texts {
 
 		// delete translations if object is really deleted.
 		add_action( 'delete_post', array( $this, 'delete_translation_of_post' ) );
-		add_action( 'delete_term', array( $this, 'delete_translation_of_term' ), 10, 3 );
 	}
 
 	/**
-	 * Add object for translation via request.
+	 * Add post-object for simplification via request.
 	 *
-	 * The given object will be copied. All texts are added as texts to translate.
+	 * The given object will be copied. All texts are added as texts to simplify.
 	 *
 	 * The author will after this be able to simplify this object manually or via API.
 	 *
 	 * @return void
 	 */
-	public function add_object_to_translate(): void {
+	public function add_object_to_simplification(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-add-translation', 'nonce' );
+		check_ajax_referer( 'easy-language-add-simplification', 'nonce' );
 
 		// get active api.
 		$api_object = Apis::get_instance()->get_active_api();
@@ -205,83 +204,9 @@ class Texts {
 			}
 		}
 
-		// get term id.
-		$original_term_id  = isset( $_GET['term'] ) ? absint( $_GET['term'] ) : 0;
-		$original_taxonomy = isset( $_GET['taxonomy'] ) ? sanitize_text_field( wp_unslash( $_GET['taxonomy'] ) ) : '';
-
-		if ( $original_term_id > 0 && ! empty( $target_language ) ) {
-			// get term-object.
-			$term_obj = new Term_Object( $original_term_id, $original_taxonomy );
-
-			// check if this object is already translated in this language.
-			if ( false === $term_obj->is_translated_in_language( $target_language ) ) {
-				// get the source-language.
-				$source_language = get_term_meta( $original_term_id, 'easy_language_text_language', true );
-				if ( empty( $source_language ) ) {
-					$source_language = Helper::get_wp_lang();
-				}
-
-				// get the original-term as array.
-				$term = get_term( $original_term_id, $term_obj->get_taxonomy_name(), ARRAY_A );
-
-				// remove unnecessary fields.
-				unset( $term['term_id'] );
-				unset( $term['name'] );
-				unset( $term['taxonomy'] );
-
-				// save the copy.
-				$result = wp_insert_term( $term_obj->get_name() . '-2', $term_obj->get_taxonomy_name(), $term );
-				if ( ! is_wp_error( $result ) ) {
-					// get the ID of the copy.
-					$copied_term_id = $result['term_id'];
-
-					// mark the copied term as translation-object of the original.
-					update_term_meta( $copied_term_id, 'easy_language_translation_original_id', $original_term_id );
-
-					// save the source-language of the copied object.
-					update_term_meta( $copied_term_id, 'easy_language_source_language', $source_language );
-
-					// save the target-language of the copied object.
-					update_term_meta( $copied_term_id, 'easy_language_translation_language', $target_language );
-
-					// get name and description as translatable texts.
-					$title       = get_term_field( 'name', $copied_term_id, $original_taxonomy );
-					$description = get_term_field( 'description', $copied_term_id, $original_taxonomy );
-
-					// set this texts as translatable texts.
-					foreach ( array(
-						'taxonomy_title'       => $title,
-						'taxonomy_description' => $description,
-					) as $field => $text ) {
-						// check if the text is already saved as original text for translation.
-						$original_text_obj = $this->db->get_entry_by_text( $text, $source_language );
-						if ( false === $original_text_obj ) {
-							// save the text for translation.
-							$original_text_obj = $this->db->add( $text, $source_language, $field );
-						}
-						if ( $original_text_obj instanceof Text ) {
-							$original_text_obj->set_object( $term_obj->get_taxonomy_name(), $copied_term_id, '' );
-						}
-					}
-
-					// add this language as translated language to original term.
-					$term_obj->add_translated_language( $target_language );
-
-					// set marker to reset permalinks.
-					Rewrite::get_instance()->set_refresh();
-
-					// get object of copy.
-					$copy_term_obj = new Term_Object( $copied_term_id, $original_taxonomy );
-
-					// forward user to the edit-page of the newly created object.
-					wp_safe_redirect( $copy_term_obj->get_edit_link() );
-					exit;
-				}
-			}
-		}
-
 		// redirect user.
 		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		exit;
 	}
 
 	/**
@@ -306,32 +231,7 @@ class Texts {
 	}
 
 	/**
-	 * Delete translations of a term if it will be deleted.
-	 *
-	 * @param int    $term_id The term-ID.
-	 * @param int    $tt_id The taxonomy-term-ID.
-	 * @param string $taxonomy The taxonomy.
-	 *
-	 * @return void
-	 * @noinspection PhpUnusedParameterInspection
-	 */
-	public function delete_translation_of_term( int $term_id, int $tt_id, string $taxonomy ): void {
-		// get entries by this term.
-		$entries = $this->db->get_entries(
-			array(
-				'object_id'   => $term_id,
-				'object_type' => $taxonomy,
-			)
-		);
-
-		// delete them.
-		foreach ( $entries as $entry ) {
-			$entry->delete();
-		}
-	}
-
-	/**
-	 * Get automatic translation via API if one is available.
+	 * Get simplification via API if one is available.
 	 *
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
@@ -351,12 +251,9 @@ class Texts {
 		// get object id.
 		$object_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 
-		// get taxonomy, if set.
-		$taxonomy = isset( $_GET['taxonomy'] ) ? sanitize_text_field( wp_unslash( $_GET['taxonomy'] ) ) : '';
-
 		if ( $object_id > 0 ) {
 			// run translation of this object.
-			$this->init->process_translations( $api_obj->get_translations_obj(), $api_obj->get_active_language_mapping(), $object_id, $taxonomy );
+			$this->init->process_translations( $api_obj->get_translations_obj(), $api_obj->get_active_language_mapping(), $object_id );
 		}
 
 		// redirect user back to editor.
@@ -440,8 +337,10 @@ class Texts {
 			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
 			$languages     = $post_obj->get_language();
 			$language_code = array_key_first( $languages );
-			$original_post->remove_translated_language( $language_code );
-			$original_post->remove_changed_marker( $language_code );
+			if( !empty($language_code) ) {
+				$original_post->remove_translated_language( $language_code );
+				$original_post->remove_changed_marker( $language_code );
+			}
 		}
 	}
 

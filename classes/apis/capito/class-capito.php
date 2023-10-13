@@ -133,7 +133,7 @@ class Capito extends Base implements Api_Base {
 		$quota = $this->get_quota();
 
 		/* translators: %1$d will be replaced by the link to Capito */
-		$text = sprintf( __( '<p><a href="%1$s" target="_blank"><strong>capito digital</strong> (opens new window)</a> is an AI-based tool for <i>Easy language< /i>.<br>It helps you write better texts.</p><p>This API simplifies texts based on the Common European Framework of Reference for Languages.<br>This describes the <i>complexity of languages according to proficiency levels</i> (A1, A2, B1 ..).</p><p>The number of simplifications with capito digital is limited to <strong>quotas</strong>.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+		$text = sprintf( __( '<p><a href="%1$s" target="_blank"><strong>capito digital</strong> (opens new window)</a> is an AI-based tool for <i>Easy language</i>.<br>It helps you write better texts.</p><p>This API simplifies texts based on the Common European Framework of Reference for Languages.<br>This describes the <i>complexity of languages according to proficiency levels</i> (A1, A2, B1 ..).</p><p>The number of simplifications with capito digital is limited to <strong>quotas</strong>.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( $quota['character_limit'] > 0 ) {
 			/* translators: %1$d will be replaced by the characters spent for Capito, %2$d will be the quota for Capito, %3$d will be the rest quota */
 			$text .= sprintf( __( '<p><strong>Actual character spent:</strong> %1$d<br><strong>Quota limit:</strong> %2$d<br><strong>Rest quota:</strong> %3$d</strong></p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ), $quota['character_spent'], $quota['character_limit'], absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) );
@@ -411,7 +411,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return list of options this plugin is using, e.g. for clean uninstall.
+	 * Return list of options this plugin is using, e.g. for clean uninstallation.
 	 *
 	 * @return array
 	 */
@@ -519,13 +519,13 @@ class Capito extends Base implements Api_Base {
 			return;
 		}
 
-		// check active tab
+		// check active tab.
 		$activeClass = '';
 		if ( $this->get_name() === $tab ) {
 			$activeClass = ' nav-tab-active';
 		}
 
-		// output tab
+		// output tab.
 		echo '<a href="' . esc_url( helper::get_settings_page_url() ) . '&tab=' . esc_attr( $this->get_name() ) . '" class="nav-tab' . esc_attr( $activeClass ) . '">' . __( 'Capito', 'easy-language' ) . '</a>';
 	}
 
@@ -712,7 +712,7 @@ class Capito extends Base implements Api_Base {
 					'disabled'  => array(
 						'label'       => __( 'Disabled', 'easy-language' ),
 						'enabled'     => true,
-						'description' => __( 'You have to write all translations manually. The API will not be used.', 'easy-language' ),
+						'description' => __( 'You have to write all simplifications manually. The API will not be used.', 'easy-language' ),
 					),
 					'automatic' => array(
 						'label'       => __( 'Automatic translation of each text.', 'easy-language' ),
@@ -843,7 +843,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Validate the the API token.
+	 * Validate the API token.
 	 *
 	 * @param $value
 	 * @return ?string
@@ -990,7 +990,7 @@ class Capito extends Base implements Api_Base {
 	public function set_quota_interval( $value ): ?string {
 		$value = Helper::settings_validate_select_field( $value );
 		if ( ! empty( $value ) ) {
-			wp_schedule_event( time(), $value, 'easy_language_quota_request_quota' );
+			wp_schedule_event( time(), $value, 'easy_language_quota_request_quota' ); // TODO eindeutiger Name nötig
 		}
 
 		// return setting.
