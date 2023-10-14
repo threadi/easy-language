@@ -206,8 +206,6 @@ class Base {
 			}
 		}
 
-		// TODO warn if no mapping set.
-
 		// return resulting list.
 		return $result;
 	}
@@ -286,7 +284,7 @@ class Base {
 	}
 
 	/**
-	 * Return the language-specific support-URL for Capito.
+	 * Return the language-specific support-URL for the API.
 	 *
 	 * @return string
 	 */
@@ -318,5 +316,55 @@ class Base {
 
 		// output the resulting table.
 		return $table;
+	}
+
+	/**
+	 * Return whether a valid language-combination is set.
+	 *
+	 * Any active source language must be translatable to any active target-language.
+	 *
+	 * @param array $target_languages List of target languages to check.
+	 * @return bool true if valid language-combination exist
+	 */
+	protected function is_language_set( array $target_languages = array() ): bool {
+		if ( empty( $target_languages ) ) {
+			// get actual enabled source-languages.
+			$target_languages = $this->get_active_target_languages();
+		}
+
+		if ( ! is_array( $target_languages ) ) {
+			$target_languages = array();
+		}
+
+		// get mappings.
+		$mappings = $this->get_mapping_languages();
+
+		// get actual enabled source-languages.
+		$source_languages = $this->get_active_source_languages();
+		if ( ! is_array( $source_languages ) ) {
+			$source_languages = array();
+		}
+
+		// check if all source-languages mapping all target-languages.
+		$match = array();
+		foreach ( $source_languages as $source_language => $enabled ) {
+			foreach ( $target_languages as $value => $enabled2 ) {
+				if ( 1 === absint( $enabled ) && 1 === absint( $enabled2 ) && ! empty( $mappings[ $source_language ] ) && false !== in_array( $value, $mappings[ $source_language ], true ) ) {
+					$match[] = $source_language;
+				}
+			}
+		}
+
+		// return false if no valid combination has been found.
+		return ! empty( $match );
+	}
+
+	/**
+	 * Return whether this API has extended support in Easy Language Pro.
+	 *
+	 * @return bool
+	 */
+	public function is_extended_in_pro(): bool {
+		return false;
 	}
 }

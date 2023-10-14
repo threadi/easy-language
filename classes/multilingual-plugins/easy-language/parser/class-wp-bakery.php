@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling WPBakery pagebuilder for translations.
+ * File for handling WPBakery pagebuilder for simplifications.
  *
  * @package easy-language
  */

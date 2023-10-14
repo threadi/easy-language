@@ -190,7 +190,7 @@ class Init {
 	}
 
 	/**
-	 * Return list of internal singular-plural-names for post-types (not the translations).
+	 * Return list of internal singular-plural-names for post-types (not the translated names).
 	 *
 	 * @return array
 	 */

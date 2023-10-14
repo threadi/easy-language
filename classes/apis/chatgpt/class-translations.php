@@ -1,6 +1,6 @@
 <?php
 /**
- * File for translations-handling of the ChatGpt API.
+ * File for simplifications-handling of the ChatGpt API.
  *
  * @package easy-language
  */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Translations-Handling for this plugin.
+ * Simplifications-Handling for this plugin.
  */
 class Translations {
 	/**
@@ -67,15 +67,15 @@ class Translations {
 	}
 
 	/**
-	 * Run translations of texts via active plugin.
+	 * Run simplifications of texts via active plugin.
 	 *
-	 * @return int Count of translations.
+	 * @return int Count of simplifications.
 	 */
 	public function run(): int {
 		// get active language-mappings.
 		$mappings = $this->init->get_active_language_mapping();
 
-		// counter for successfully translations.
+		// counter for successfully simplifications.
 		$c = 0;
 
 		// get active plugins and check if one of them supports APIs.
@@ -85,7 +85,7 @@ class Translations {
 			}
 		}
 
-		// return count of successfully translations.
+		// return count of successfully simplifications.
 		return $c;
 	}
 
@@ -99,7 +99,7 @@ class Translations {
 	 * @noinspection PhpUnused
 	 */
 	public function call_api( string $text_to_translate, string $source_language, string $target_language ): array {
-		$request_text = $this->init->get_request_text_by_language( $source_language );
+		$request_text = $this->init->get_request_text_by_language( $target_language );
 
 		// build request.
 		$request_obj = $this->init->get_request_object();
@@ -117,18 +117,19 @@ class Translations {
 			$response = $request_obj->get_response();
 
 			// transform it to array.
-			$request_array = json_decode( $response, true );
+			$request_array = json_decode($response, true);
 
-			// TODO genauer auf Rückgabe-Format prüfen
+			// get the text only if it has returned from API.
+			if (!empty($request_array['choices'][0]['message']['content'])) {
+				// get translated text.
+				$translated_text = apply_filters('easy_language_translated_text', $request_array['choices'][0]['message']['content'], $request_array, $this);
 
-			// get translated text.
-			$translated_text = apply_filters( 'easy_language_translated_text', $request_array['choices'][0]['message']['content'], $request_array, $this );
-
-			// return translation to plugin which will save it.
-			return array(
-				'translated_text' => $translated_text,
-				'jobid'           => 0,
-			);
+				// return translation to plugin which will save it.
+				return array(
+					'translated_text' => $translated_text,
+					'jobid' => 0,
+				);
+			}
 		}
 
 		// return nothing.

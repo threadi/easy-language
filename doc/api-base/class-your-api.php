@@ -228,7 +228,7 @@ class Your_Api extends Base implements Api_Base {
 	public function cli(): void {}
 
 	/**
-	 * Return the translations-object.
+	 * Return the simplification-object.
 	 *
 	 * @return Translations
 	 */

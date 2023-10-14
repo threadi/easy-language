@@ -6,8 +6,6 @@
  */
 
 use easyLanguage\Apis;
-use easyLanguage\Helper;
-use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_plugins\Easy_Language\Init;
 use easyLanguage\Transients;
 
@@ -48,7 +46,7 @@ function easy_language_admin_add_settings_api(): void {
 	 */
 	add_settings_section(
 		'settings_section_main',
-		__( 'Choose API for translations', 'easy-language' ),
+		__( 'Choose API for simplifications of your website-texts', 'easy-language' ),
 		'__return_true',
 		'easyLanguageApiPage',
 		array(
@@ -111,39 +109,43 @@ function easy_language_admin_choose_api( array $attr ): void {
 			$actual_value = get_option( $attr['fieldId'], '' );
 			$checked      = $actual_value === $key ? ' checked="checked"' : '';
 
-			// readonly.
-			$readonly = '';
-			if ( isset( $attr['readonly'] ) && false !== $attr['readonly'] ) {
-				$readonly = ' disabled="disabled"';
-				if ( ! empty( $checked ) ) {
-					?>
-					<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro" value="<?php echo esc_attr( $key ); ?>">
-					<?php
-				}
+			// set marker for Pro-extension of this API.
+			$css_class = '';
+			$pro_hint = '';
+			if( $settings->is_extended_in_pro() ) {
+				$css_class .= ' easy-language-api-pro-hint';
+				$pro_hint = $settings->get_pro_hint();
+			}
+			if( !empty($checked) ) {
+				$css_class .= ' easy-language-api-active';
 			}
 
 			// output.
 			?>
-			<div class="easy-api-radio">
-				<input type="radio" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>" value="<?php echo esc_attr( $key ); ?>"<?php echo esc_attr( $checked ) . esc_attr( $readonly ); ?>>
-				<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" data-active-title="<?php echo esc_html__( 'Activated', 'easy-language' ); ?>">
+			<div class="easy-api-radio<?php echo esc_attr($css_class); ?>">
+				<input type="radio" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>" value="<?php echo esc_attr( $key ); ?>"<?php echo esc_attr( $checked ); ?>>
+				<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" data-active-title="<?php echo esc_html__( 'Activated', 'easy-language' ); ?>" data-choose-title="<?php echo esc_html__( 'Chosen', 'easy-language' ); ?>">
 			<?php
 				// get api-logo, if it exists.
 				$logo_url = $settings->get_logo_url();
-			if ( ! empty( $logo_url ) ) {
-				?>
-							<img src="<?php echo esc_url( $logo_url ); ?>" alt="<?php echo esc_attr( $settings->get_title() ); ?>">
-						<?php
-			}
+				if ( ! empty( $logo_url ) ) {
+					?>
+						<img src="<?php echo esc_url( $logo_url ); ?>" alt="<?php echo esc_attr( $settings->get_title() ); ?>">
+					<?php
+				}
 
 				// show api-title.
 				echo '<h2>' . esc_html( $settings->get_title() ) . '</h2>';
 
 				// show api-description, if available.
-			if ( ! empty( $settings->get_description() ) ) {
-						echo wp_kses_post( $settings->get_description() );
-			}
-			?>
+				if ( ! empty( $settings->get_description() ) ) {
+					echo wp_kses_post( $settings->get_description() );
+				}
+
+				if( !empty($pro_hint) ) {
+					?><span class="pro-hint"><?php echo wp_kses_post($pro_hint); ?></span><?php
+				}
+				?>
 				</label>
 			</div>
 			<?php
@@ -165,11 +167,6 @@ function easy_language_admin_choose_api( array $attr ): void {
  * @noinspection PhpUnused
  */
 function easy_language_admin_validate_chosen_api( string $value ): string {
-	// Check if API has been saved first time to show intro part 2.
-	if( !get_option( 'easy_language_intro_step_2') ) {
-		update_option( 'easy_language_intro_step_2', 1 );
-	}
-
 	// get the new post-state for objects of the former API.
 	$post_state = get_option('easy_language_state_on_api_change', 'draft' );
 
@@ -198,6 +195,17 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 	// get the new API.
 	$new_api = Apis::get_instance()->get_api_by_name( $value );
 
+	// Remove intro-hint if it is enabled.
+	if( 1 === absint(get_option( 'easy_language_intro_step_2', 0 ) ) ) {
+		delete_option( 'easy_language_intro_step_2' );
+	}
+
+	// Check if API has been saved first time and the new API is already configured (or no configuration at all),
+	// to show intro part 2.
+	if( !get_option( 'easy_language_intro_step_2') && ( false !== $new_api->is_configured() || false === $new_api->has_settings() ) ) {
+		update_option( 'easy_language_intro_step_2', 1 );
+	}
+
 	// if the new API is valid and setting has been changed.
 	if( $new_api && $api && $api->get_name() !== $new_api->get_name() ) {
 		// get the translated objects of the new API (all of them).
@@ -219,8 +227,8 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 			delete_post_meta( $post_type_object_id, 'easy_language_translation_state_changed_from' );
 		}
 
-		// add hint if user has not configured the API yet and has not translation-objects.
-		if( empty($post_type_objects) && $new_api->is_configured() ) {
+		// Enable hint if user has not configured the new API yet and if this API has no translation-objects.
+		if( empty($post_type_objects) && false === $new_api->is_configured() ) {
 			$links              = '';
 			$post_type_settings = \easyLanguage\Init::get_instance()->get_post_type_settings();
 			$post_types         = Init::get_instance()->get_supported_post_types();
@@ -228,7 +236,7 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 			$post_types_counter = 0;
 			foreach ( $post_types as $post_type => $enabled ) {
 				if ( $post_types_counter === ( $post_types_count - 1 ) ) {
-					$links .= ' ' . esc_html( 'and', 'easy-language' ) . ' ';
+					$links .= ' ' . esc_html__( 'and', 'easy-language' ) . ' ';
 				}
 				$links .= '<a href="' . esc_url( $post_type_settings[ $post_type ]['admin_edit_url'] ) . '">' . $post_type_settings[ $post_type ]['label_plural'] . '</a>';
 				++ $post_types_counter;
@@ -241,10 +249,10 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 			}
 			if ( $new_api->has_settings() ) {
 				/* translators: %1$s will be replaced by the name of the active API, %2%s will be replaced by the settings-URL for this API, %3$s will be replaced by list of post-types and their links in wp-admin. */
-				$transient_obj->set_message( sprintf( __( '<strong>You have activated %1$s as your translation API.</strong> Check the <a href="%2$s">API-settings</a>. Then go now to your %3$s and simplify them with this API.', 'easy-language' ), esc_html( $new_api->get_title() ), esc_url( $new_api->get_settings_url() ), wp_kses_post( $links ) ) );
+				$transient_obj->set_message( sprintf( __( '<strong>You have activated %1$s as API to simplify your texts.</strong> Please check now the <a href="%2$s">API-settings</a> before you could use %1$s.', 'easy-language' ), esc_html( $new_api->get_title() ), esc_url( $new_api->get_settings_url() ) ) );
 			} else {
 				/* translators: %1$s will be replaced by the name of the active API, %2$s will be replaced by list of post-types and their links in wp-admin. */
-				$transient_obj->set_message( sprintf( __( '<strong>You have activated %1$s as your translation API.</strong> Go now to your %2$s and simplify them with this API.', 'easy-language' ), esc_html( $new_api->get_title() ), wp_kses_post( $links ) ) );
+				$transient_obj->set_message( sprintf( __( '<strong>You have activated %1$s as API to simplify your texts.</strong> Go now to your %2$s and simplify them with %1$s.', 'easy-language' ), esc_html( $new_api->get_title() ), wp_kses_post( $links ) ) );
 			}
 			$transient_obj->set_type( 'hint' );
 			$transient_obj->save();

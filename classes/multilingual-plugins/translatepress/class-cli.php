@@ -16,15 +16,15 @@ use easyLanguage\Helper;
 class Cli {
 
 	/**
-	 * Reset translations.
+	 * Reset simplifications.
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
 	 */
-	public function trp_reset_translations(): void {
+	public function trp_reset_simplification(): void {
 		easy_language_trp_reset_translations();
 
 		// return ok-message.
-		\WP_CLI::success( 'All TranslatePress-translations has been reset.' );
+		\WP_CLI::success( 'All TranslatePress-simplifications has been reset.' );
 	}
 }

@@ -82,6 +82,20 @@ function easy_language_admin_add_settings_advanced(): void {
 	);
 	register_setting( 'easyLanguageAdvancedFields', 'easy_language_log_max_age' );
 
+	// Set timeout for each API-request.
+	add_settings_field(
+		'easy_language_api_timeout',
+		__( 'Timeout for API-requests', 'easy-language' ),
+		'easy_language_admin_number_field',
+		'easyLanguageAdvancedPage',
+		'settings_section_advanced',
+		array(
+			'label_for'   => 'easy_language_api_timeout',
+			'fieldId'     => 'easy_language_api_timeout'
+		)
+	);
+	register_setting( 'easyLanguageAdvancedFields', 'easy_language_api_timeout' );
+
 	// Debug-Mode.
 	add_settings_field(
 		'easy_language_debug_mode',

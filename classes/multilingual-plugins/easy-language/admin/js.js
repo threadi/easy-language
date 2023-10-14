@@ -20,6 +20,7 @@ jQuery( document ).ready(
 			}
 		);
 
+		// show pointer where user could edit its contents.
 		$('body.easy-language-intro-step-2 .menu-icon-page .wp-menu-name').pointer({
 			content: easyLanguagePluginJsVars.intro_step_2,
 			position: {

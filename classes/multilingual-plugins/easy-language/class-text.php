@@ -1,6 +1,6 @@
 <?php
 /**
- * File for our own translation-machine.
+ * File for our own simplification-machine.
  *
  * @package easy-language
  */
@@ -29,7 +29,7 @@ class Text {
 	private int $id;
 
 	/**
-	 * List of translations.
+	 * List of simplifications.
 	 *
 	 * @var array
 	 */
@@ -59,7 +59,7 @@ class Text {
 		// set the table-name for originals.
 		$wpdb->easy_language_originals_objects = DB::get_instance()->get_wpdb_prefix() . 'easy_language_originals_objects';
 
-		// set the table-name for translations.
+		// set the table-name for simplifications.
 		$wpdb->easy_language_translations = DB::get_instance()->get_wpdb_prefix() . 'easy_language_translations';
 	}
 
@@ -111,12 +111,12 @@ class Text {
 	}
 
 	/**
-	 * Get the translation of this text in the given language from Db.
+	 * Get the simplification of this text in the given language from Db.
 	 *
-	 * If given language is unknown or no translation exist,
+	 * If given language is unknown or no simplification exist,
 	 * return the original text.
 	 *
-	 * @param string $target_language The target language for this translation.
+	 * @param string $target_language The target language for this simplification.
 	 * @return string
 	 */
 	public function get_translation( string $target_language ): string {
@@ -131,7 +131,7 @@ class Text {
 	}
 
 	/**
-	 * Return if the text has a translation in the given language.
+	 * Return if the text has a simplification in the given language.
 	 *
 	 * @param string $language The language we search.
 	 * @return bool
@@ -311,21 +311,44 @@ class Text {
 	}
 
 	/**
-	 * Delete this entry with all of its translations.
+	 * Delete this entry with all of its simplifications.
+	 *
+	 * @param int $object_id The object-ID which connection should be deleted primarily.
 	 *
 	 * @return void
 	 */
-	public function delete(): void {
+	public function delete( int $object_id ): void {
 		global $wpdb;
-		$wpdb->delete( $wpdb->easy_language_originals, array( 'id' => $this->get_id() ) );
-		$wpdb->delete(
-			$wpdb->easy_language_originals_objects,
-			array(
-				'oid'     => $this->get_id(),
-				'blog_id' => get_current_blog_id(),
-			)
-		);
-		$wpdb->delete( $wpdb->easy_language_translations, array( 'oid' => $this->get_id() ) );
+
+		// get object count before we do anything.
+		$object_count = count($this->get_objects());
+
+		// delete connection between text and given object_id.
+		if( $object_count > 0 ) {
+			$wpdb->delete(
+				$wpdb->easy_language_originals_objects,
+				array(
+					'oid' => $this->get_id(),
+					'blog_id' => get_current_blog_id(),
+					'object_id' => $object_id
+				)
+			);
+		}
+		else {
+			$wpdb->delete(
+				$wpdb->easy_language_originals_objects,
+				array(
+					'oid' => $this->get_id(),
+					'blog_id' => get_current_blog_id(),
+				)
+			);
+		}
+
+		// if this text is used only from 1 object, delete it completely.
+		if( 1 === $object_count ) {
+			$wpdb->delete($wpdb->easy_language_originals, array('id' => $this->get_id()));
+			$wpdb->delete($wpdb->easy_language_translations, array('oid' => $this->get_id()));
+		}
 	}
 
 	/**

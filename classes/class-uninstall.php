@@ -179,6 +179,7 @@ class Uninstall {
 			'easy_language_debug_mode',
 			'easy_language_api',
 			'easy_language_log_max_age',
+			'easy_language_api_timeout'
 		);
 	}
 }

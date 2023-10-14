@@ -188,7 +188,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					copy( plugin_dir_path( EASY_LANGUAGE ) . 'gfx/' . $language_code . '.png', $flag_path );
 				}
 
-				// collect possible translations.
+				// collect possible simplifications.
 				$translations = array();
 				foreach ( Languages::get_instance()->get_possible_source_languages() as $source_language_code => $source_language ) {
 					$translations[ $source_language_code ] = array(

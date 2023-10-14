@@ -144,7 +144,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * We add no translation-scripts for polylang.
+	 * We add no simplification-scripts for polylang.
 	 *
 	 * @return void
 	 */

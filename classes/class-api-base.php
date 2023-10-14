@@ -107,7 +107,7 @@ interface Api_Base {
 	public function disable(): void;
 
 	/**
-	 * Get the API-specific translations-object (used to run translations).
+	 * Get the API-specific simplifications-object (used to run simplifications).
 	 *
 	 * @return object
 	 */
@@ -175,4 +175,11 @@ interface Api_Base {
 	 * @return bool
 	 */
 	public function is_configured(): bool;
+
+	/**
+	 * Return whether this API has extended support in Easy Language Pro.
+	 *
+	 * @return bool
+	 */
+	public function is_extended_in_pro(): bool;
 }

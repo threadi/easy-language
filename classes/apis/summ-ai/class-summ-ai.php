@@ -319,7 +319,7 @@ class Summ_AI extends Base implements Api_Base {
 	public function cli(): void {}
 
 	/**
-	 * Return the translations-object.
+	 * Return the simplifications-object.
 	 *
 	 * @return Translations
 	 */
@@ -456,5 +456,25 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function is_configured(): bool {
 		return true;
+	}
+
+	/**
+	 * Return whether this API has extended support in Easy Language Pro.
+	 *
+	 * @return bool
+	 */
+	public function is_extended_in_pro(): bool {
+		return true;
+	}
+
+	/**
+	 * Return custom pro-hint for API-chooser.
+	 *
+	 * @return string
+	 * @noinspection PhpUnused
+	 */
+	public function get_pro_hint(): string {
+		/* translators: %1$s will be replaced by the link to laolaweb.com */
+		return sprintf(__( 'Use your own API Key with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a>', 'easy-language' ), esc_url(Helper::get_pro_url()) );
 	}
 }

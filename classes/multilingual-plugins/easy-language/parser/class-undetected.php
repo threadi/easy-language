@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling unknown pagebuilder for translations.
+ * File for handling unknown pagebuilder for simplifications.
  *
  * @package easy-language
  */

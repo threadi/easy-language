@@ -1,6 +1,6 @@
 <?php
 /**
- * File for initializing the easy-language-own translations.
+ * File for initializing the easy-language-own simplifications.
  *
  * @package easy-language
  */
@@ -254,11 +254,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					$page_builder        = $translated_post_obj->get_page_builder();
 
 					// get object type name.
-					$object_type_settings = \easyLanguage\Init::get_instance()->get_post_type_settings();
-					$object_type_name = 'page';
-					if( !empty($object_type_settings[$post_object->get_type()]) ) {
-						$object_type_name = $object_type_settings[$post_object->get_type()]['label_singular'];
-					}
+					$object_type_name = Helper::get_objekt_type_name( $translated_post_obj );
 
 					// do not show anything if the used page builder plugin is not available.
 					if ( false === $page_builder->is_active() ) {
@@ -270,7 +266,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 						// show link to delete the translated post.
 						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete translation in %1$s', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
+						echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete translation in %1$s', 'easy-language' ), esc_html($settings['label']) ) ) . '">&nbsp;</a>';
 						continue;
 					}
 
@@ -280,7 +276,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 						// show link to add translation for this language.
 						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $edit_translation ) . '" class="dashicons dashicons-edit" title="' . esc_attr( sprintf( __( 'Edit translation in %1$s', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
+						echo '<a href="' . esc_url( $edit_translation ) . '" class="dashicons dashicons-edit" title="' . esc_attr( sprintf( __( 'Edit translation in %1$s', 'easy-language' ), esc_html($settings['label']) ) ) . '">&nbsp;</a>';
 					}
 
 					// create link to run translation of this page via API (if available).
@@ -299,7 +295,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						} else {
 							// otherwise show simple not clickable icon.
 							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
-							echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'Not enough quota to simplify this %1$s in %2$s with %3$s.', 'easy-language' ), $translated_post_obj->get_type(), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</span>';
+							echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'Not enough quota to simplify this %1$s in %2$s with %3$s.', 'easy-language' ), esc_html($object_type_name), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</span>';
 						}
 
 						// show quota hint.
@@ -685,11 +681,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			}
 		}
 
+		// load language file.
+		load_plugin_textdomain( 'easy-language', false, dirname( plugin_basename( EASY_LANGUAGE ) ) . '/languages' );
+
 		// set transient for hint where to start.
 		$transient_obj = Transients::get_instance()->add();
 		$transient_obj->set_dismissible_days( 2 );
 		$transient_obj->set_name( 'easy_language_intro_step_1' );
-		/* translators: %1$s will be replaced by the URL for Capito support. */
+		/* translators: %1$s will be replaced by the URL for api settings-URL. */
 		$transient_obj->set_message( sprintf( __( '<strong>You have installed Easy Language - nice and thank you!</strong> Now check the <a href="%1$s">API-settings</a>, select one and start simplifying the texts in your website in easy or plain language.', 'easy-language' ), esc_url( Helper::get_settings_page_url() ) ) );
 		$transient_obj->set_type( 'hint' );
 		$transient_obj->save();
@@ -748,7 +747,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	public function uninstall(): void {
 		// remove translated contents.
 		foreach ( DB::get_instance()->get_entries() as $entry ) {
-			$entry->delete();
+			$entry->delete( 0 );
 		}
 
 		// remove custom transients which are not set via Transient-object.
@@ -823,11 +822,22 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			array(
 				'label_for'   => 'easy_language_post_types',
 				'fieldId'     => 'easy_language_post_types',
-				'description' => '', // TODO pro-hint.
 				'options'     => apply_filters( 'easy_language_possible_post_types', $post_types ),
 			)
 		);
 		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_post_types', array( 'sanitize_callback' => array( $this, 'validate_post_types' ) ) );
+
+		add_settings_field(
+			'easy_language_advanced_pro_hint',
+			'',
+			'easy_language_admin_advanced_pro_hint',
+			'easyLanguageEasyLanguagePage',
+			'settings_section_easy_language',
+			array(
+				'label_for' => 'easy_language_advanced_pro_hint',
+				'fieldId' => 'easy_language_advanced_pro_hint',
+			)
+		);
 
 		// add additional settings after post-typs.
 		do_action( 'easy_language_add_settings_after_post_types' );
@@ -1083,11 +1093,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// save result for this simplification if we have got used an API.
 		if( $c > 0 ) {
 			// get object type name.
-			$object_type_settings = \easyLanguage\Init::get_instance()->get_post_type_settings();
-			$object_type_name = 'page';
-			if( !empty($object_type_settings[$post_object->get_type()]) ) {
-				$object_type_name = $object_type_settings[$post_object->get_type()]['label_singular'];
-			}
+			$object_type_name = Helper::get_objekt_type_name( $post_object );
 
 			// set result.
 			$translation_results          = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, array() );
@@ -1452,7 +1458,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$post_id = isset( $_POST['post'] ) ? absint( $_POST['post'] ) : 0;
 
 		if ( absint( $post_id ) > 0 ) {
-			// run translation of this object.
+			// run simplification of this object.
 			$this->process_translations( $api_obj->get_translations_obj(), $api_obj->get_active_language_mapping(), $post_id );
 		}
 
@@ -1550,22 +1556,20 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		);
 
 		// embed necessary scripts for progressbar.
-		// TODO lokal speichern?
-		$wp_scripts = wp_scripts();
 		wp_enqueue_script( 'jquery-ui-progressbar' );
 		wp_enqueue_script( 'jquery-ui-dialog' );
 		wp_enqueue_style(
 			'easy-language-jquery-ui-styles',
-			'https://code.jquery.com/ui/' . $wp_scripts->registered['jquery-ui-core']->ver . '/themes/smoothness/jquery-ui.min.css',
+			trailingslashit(plugin_dir_url( EASY_LANGUAGE )) . 'libs/jquery-ui.smoothness.css',
 			false,
-			'1.0.0',
+			filemtime( trailingslashit(plugin_dir_path( EASY_LANGUAGE )) . 'libs/jquery-ui.smoothness.css' ),
 			false
 		);
 
-		// dirty
-		wp_enqueue_script( 'improuv-trainings-admin-dirty-js',
-			plugins_url( 'libs/jquery.dirty.js' , EASY_LANGUAGE ),
-			['jquery'],
+		// add jquery-dirty script.
+		wp_enqueue_script( 'easy-language-admin-dirty-js',
+			trailingslashit(plugin_dir_url( EASY_LANGUAGE )) . 'libs/jquery.dirty.js',
+			array( 'jquery' ),
 			filemtime(trailingslashit(plugin_dir_path(EASY_LANGUAGE)) . 'libs/jquery.dirty.js'),
 		);
 	}

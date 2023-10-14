@@ -118,7 +118,7 @@ class Install {
 		// create log table if not exist.
 		Log_Api::get_instance()->create_table();
 
-		// create translation tables if not exist.
+		// create simplification tables if not exist.
 		Db::get_instance()->create_table();
 
 		// set debug-mode to disabled per default.
@@ -134,6 +134,11 @@ class Install {
 		// set max age for log entries.
 		if ( ! get_option( 'easy_language_log_max_age' ) ) {
 			update_option( 'easy_language_log_max_age', '50' );
+		}
+
+		// set API timeout.
+		if ( ! get_option( 'easy_language_api_timeout' ) ) {
+			update_option( 'easy_language_api_timeout', '30' );
 		}
 
 		// generate random-installation-hash if it does not already exist (will never be removed or changed).

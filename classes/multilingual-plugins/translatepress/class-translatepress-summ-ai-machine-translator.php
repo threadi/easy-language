@@ -59,7 +59,7 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 	}
 
 	/**
-	 * Returns an array with the API provided translations of the $new_strings array.
+	 * Returns an array with the API provided simplification of the $new_strings array.
 	 *
 	 * @param array       $new_strings                    array with the strings that need translation. The keys are the node number in the DOM so we need to preserve them.
 	 * @param string      $target_language_code          language code of the language that we will be translating to. Not equal to the language code.

@@ -46,15 +46,15 @@ class Db {
 		// set the table-name for objects which are using original-texts.
 		$wpdb->easy_language_originals_objects = $this->get_wpdb_prefix() . 'easy_language_originals_objects';
 
-		// set the table-name for translations.
+		// set the table-name for simplifications.
 		$wpdb->easy_language_translations = $this->get_wpdb_prefix() . 'easy_language_translations';
 	}
 
 	/**
 	 * Return WP-DB-prefix.
 	 *
-	 * On multisite return the prefix of the main blog as we save all translations in the main db
-	 * to prevent double translations.
+	 * On multisite return the prefix of the main blog as we save all simplifications in the main db
+	 * to prevent double simplifications.
 	 *
 	 * @return string
 	 */
@@ -124,7 +124,7 @@ class Db {
         ) $charset_collate;";
 		dbDelta( $sql );
 
-		// table for language- and api-specific translations of texts.
+		// table for language- and api-specific simplifications of texts.
 		$sql = "CREATE TABLE $wpdb->easy_language_translations (
             `oid` mediumint(9) NOT NULL,
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
@@ -150,7 +150,7 @@ class Db {
 	}
 
 	/**
-	 * Adds new text for translation in DB. Returns the text-object for the given text.
+	 * Adds new text for simplification in DB. Returns the text-object for the given text.
 	 *
 	 * @param string $text The original text.
 	 * @param string $source_language The language of this text.
@@ -278,7 +278,7 @@ class Db {
 	}
 
 	/**
-	 * Reset all translations.
+	 * Reset all simplifications.
 	 *
 	 * @return void
 	 */

@@ -1,6 +1,6 @@
 <?php
 /**
- * File for translations-handling of this API.
+ * File for simplification-handling of this API.
  *
  * @package easy-language-test-api
  */
@@ -11,7 +11,7 @@ use easyLanguage\Log_Api;
 use easyLanguage\Multilingual_Plugins;
 
 /**
- * Translations-Handling for this plugin.
+ * SimplificationS-Handling for this plugin.
  */
 class Translations {
     /**
@@ -63,23 +63,15 @@ class Translations {
     }
 
     /**
-     * Run translations of texts via active plugin.
+     * Run simplifications of texts via active plugin.
      *
-     * @param string $token Token to use for translations. If not set the token-setting will be used.
-     *
-     * @return int Count of translations.
+     * @return int Count of simplifications.
      */
-    public function run( string $token = '' ): int {
-        // bail if API is not active.
-        if( false === $this->init->is_active() ) {
-            Log_Api::get_instance()->add_log( 'Translation could not run because API is not active.', 0, '', '' );
-            return 0;
-        }
-
+    public function run(): int {
         // get active language-mappings.
         $mappings = $this->init->get_active_language_mapping();
 
-        // counter for successfully translations.
+        // counter for successfully simplifications.
         $c = 0;
 
         // get active plugins and check if one of them supports APIs.
@@ -89,7 +81,7 @@ class Translations {
             }
         }
 
-        // return count of successfully translations.
+        // return count of successfully simplifications.
         return $c;
     }
 

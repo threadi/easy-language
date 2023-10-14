@@ -7,9 +7,6 @@
 
 namespace easyLanguage;
 
-use easyLanguage\Api\Summ_Ai\Request;
-use easyLanguage\Multilingual_plugins\Easy_Language\Db;
-
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -24,6 +21,7 @@ class Cli {
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
+	 * @noinspection PhpUndefinedClassInspection
 	 */
 	public function reset_plugin(): void {
 		// uninstall everything from the plugin.

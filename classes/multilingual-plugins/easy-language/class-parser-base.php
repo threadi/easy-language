@@ -193,11 +193,7 @@ class Parser_Base {
 				$object_type = $post_object->get_type();
 
 				// get object type name.
-				$object_type_settings = \easyLanguage\Init::get_instance()->get_post_type_settings();
-				$object_type_name = 'page';
-				if( !empty($object_type_settings[$post_object->get_type()]) ) {
-					$object_type_name = $object_type_settings[$post_object->get_type()]['label_singular'];
-				}
+				$object_type_name = Helper::get_objekt_type_name( $post_object );
 
 				// do not show simplify-button if characters to simplify are more than quota characters.
 				if ( 'above_limit' === $quota_state['status'] ) {
@@ -332,7 +328,7 @@ class Parser_Base {
 	}
 
 	/**
-	 * Replace original title with translation.
+	 * Replace original title with simplification.
 	 *
 	 * @param string $original_complete Complete original content.
 	 * @param string $translated_part The translated content.

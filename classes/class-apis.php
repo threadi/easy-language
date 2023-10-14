@@ -47,7 +47,7 @@ class Apis {
 	}
 
 	/**
-	 * Return available APIs for translations with this plugin.
+	 * Return available APIs for simplifications with this plugin.
 	 *
 	 * @return array
 	 */

@@ -1,6 +1,6 @@
 <?php
 /**
- * File for initializing the easy-language-own translations.
+ * File for initializing the easy-language-own simplifications.
  *
  * @package easy-language
  */
@@ -264,11 +264,11 @@ class Post_Object implements Easy_Language_Object {
 	/**
 	 * Delete changed marker.
 	 *
-	 * @param int|string $language_code The language-code. TODO int?.
+	 * @param string $language_code The language-code.
 	 *
 	 * @return void
 	 */
-	public function remove_changed_marker( int|string $language_code ): void {
+	public function remove_changed_marker( string $language_code ): void {
 		if ( false === $this->is_translatable() ) {
 			return;
 		}

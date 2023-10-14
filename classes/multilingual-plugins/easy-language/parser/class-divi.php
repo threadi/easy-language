@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Divi pagebuilder for translations.
+ * File for handling Divi pagebuilder for simplifications.
  *
  * @package easy-language
  */

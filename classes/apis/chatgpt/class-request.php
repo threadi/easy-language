@@ -196,7 +196,7 @@ class Request {
 			'method'      => $this->get_method(),
 			'headers'     => $headers,
 			'httpversion' => '1.1',
-			'timeout'     => 300, // TODO einstellbar machen
+			'timeout'     => get_option( 'easy_language_api_timeout', 30 ),
 			'redirection' => 10,
 		);
 
@@ -211,7 +211,7 @@ class Request {
 					'content' => $this->get_text()
 				)
 			);
-			$data['model'] = 'gpt-3.5-turbo'; // TODO änderbar machen
+			$data['model'] = get_option( 'easy_language_chatgpt_model', 'gpt-3.5-turbo' );
 			$payload = wp_json_encode( $data );
 			$args['body']        = $payload;
 			$args['headers']['Content-Length'] = strlen($payload);

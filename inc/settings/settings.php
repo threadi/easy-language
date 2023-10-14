@@ -422,10 +422,6 @@ function easy_language_admin_multiple_checkboxes_field( array $attr ): void {
 			</div>
 			<?php
 		}
-
-		// show pro hint.
-		/* translators: %1$s is replaced with the name of the Pro-plugin */
-		do_action( 'easy_language_admin_show_pro_hint', __( 'Use all languages supported by SUMM AI with %1$s.', 'easy-language' ) );
 	}
 }
 
@@ -486,9 +482,28 @@ function easy_language_admin_multiple_radio_field( array $attr ): void {
 		if ( empty( $attr['description_above'] ) && ! empty( $attr['description'] ) ) {
 			echo '<p>' . wp_kses_post( $attr['description'] ) . '</p>';
 		}
-
-		// show pro hint.
-		/* translators: %1$s is replaced with the name of the Pro-plugin */
-		do_action( 'easy_language_admin_show_pro_hint', __( 'Use all languages supported by SUMM AI with %1$s.', 'easy-language' ) );
 	}
 }
+
+/**
+ * Add pro hint via settings-field for better position in list.
+ *
+ * @return void
+ */
+function easy_language_admin_advanced_pro_hint(): void {
+	// pro hint.
+	/* translators: %1$s is replaced with the plugin name */
+	do_action('easy_language_admin_show_pro_hint', __('With %s you get more settings options, e.g. support for any post-type and simplify of taxonomies.', 'easy-language'));
+}
+
+/**
+ * Show hint for our Pro-version.
+ *
+ * @param $hint
+ * @return void
+ */
+function easy_language_admin_show_pro_hint( $hint ): void
+{
+	echo '<p class="easy-language-pro-hint">'.sprintf(wp_kses_post($hint), '<a href="'.esc_url(Helper::get_pro_url()).'" target="_blank">Easy Language Pro (opens new window)</a>').'</p>';
+}
+add_action( 'easy_language_admin_show_pro_hint', 'easy_language_admin_show_pro_hint' );

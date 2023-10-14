@@ -97,13 +97,9 @@ class ChatGpt extends Base implements Api_Base {
 		$translations_obj = Translations::get_instance();
 		$translations_obj->init( $this );
 		add_action( 'easy_language_chatgpt_automatic', array( $translations_obj, 'run' ) );
-		//add_action( 'easy_language_chatgpt_request_quota', array( $this, 'get_quota_from_api' ) );
 
 		// add hook to remove token.
 		add_action( 'admin_action_easy_language_chatgpt_remove_token', array( $this, 'remove_token' ) );
-
-		// add hook to get actual quota via link.
-		//add_action( 'admin_action_easy_language_chatgpt_get_quota', array( $this, 'get_quota_from_api_via_link' ) );
 	}
 
 	/**
@@ -129,11 +125,8 @@ class ChatGpt extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_description(): string {
-		// get quota.
-		$quota = $this->get_quota();
-
 		/* translators: %1$d will be replaced by the link to Chatgpt */
-		$text = sprintf( __( '<p><a href="%1$s" target="_blank"><strong>ChatGpt</strong> (opens new window)</a> is an AI-tool for any conversations.<br>It helps you to answer questions you have.</p><p>This API tries to simplify texts based on its on artificial intelligence.<br>The results are based on no standards for Easy or Plain language.</p><p>The number of simplifications with CHatGpt is limited to <strong>quotas</strong>.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+		$text = sprintf( __( '<p><a href="%1$s" target="_blank"><strong>ChatGpt</strong> (opens new window)</a> is an AI-tool for any conversations.<br>It helps you to answer questions you have.</p><p>This API tries to simplify texts based on its on artificial intelligence.<br>The results are based on no standards for Easy or Plain language.</p><p>The number of simplifications with ChatGpt is limited to <strong>tokens</strong>.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 		$text .= '<p><strong>'.__( 'You will use tokens on ChatGpt for every simplification. Please consult your ChatGpt-account about the usage.', 'easy-language' ).'</strong></p>';
 
 		// wrapper for buttons.
@@ -210,7 +203,6 @@ class ChatGpt extends Base implements Api_Base {
 	 * Return supported target languages.
 	 *
 	 * @return array
-	 * @noinspection DuplicatedCode
 	 */
 	public function get_active_target_languages(): array {
 		// get actual enabled target-languages.
@@ -219,7 +211,7 @@ class ChatGpt extends Base implements Api_Base {
 			$target_languages = array();
 		}
 
-		// define resulting list
+		// define resulting list.
 		$list = array();
 
 		foreach ( $this->get_supported_target_languages() as $language_code => $language ) {
@@ -313,49 +305,6 @@ class ChatGpt extends Base implements Api_Base {
 			?>
 		</form>
 		<?php
-		/*
-		?>
-		<h2 id="statistics"><?php esc_html_e( 'ChatGpt Quota', 'easy-language' ); ?></h2>
-		<?php
-		*/
-		if ( $this->is_chatgpt_token_set() ) {
-			/**
-			 * Get and show the quota we received from API.
-			 */
-			$api_quota = $this->get_quota();
-			if ( empty( $api_quota ) ) {
-				$quota_text = esc_html__( 'No quota consumed so far', 'easy-language' );
-			} elseif ( -1 === $api_quota['character_limit'] ) {
-				$quota_text = __( 'Update quota now.', 'easy-language' );
-			} elseif ( 0 === $api_quota['character_limit'] ) {
-				$quota_text = __( 'Unlimited.', 'easy-language' );
-			} else {
-				$quota_text = $api_quota['character_spent'] . ' / ' . $api_quota['character_limit'];
-			}
-
-			// get the update quota link.
-			/*$update_quota_url = add_query_arg(
-				array(
-					'action' => 'easy_language_chatgpt_get_quota',
-					'nonce'  => wp_create_nonce( 'easy-language-chatgpt-get-quota' ),
-				),
-				get_admin_url() . 'admin.php'
-			);
-
-			// output.
-			?>
-			<p>
-				<strong><?php echo esc_html__( 'Quota', 'easy-language' ); ?>:</strong> <?php echo $quota_text; ?>
-				<a href="<?php echo esc_url( $update_quota_url ); ?>#statistics" class="button button-secondary"><?php echo esc_html__( 'Update now', 'easy-language' ); ?></a>
-			</p>
-			<?php*/
-		} else {
-			/*
-			?>
-			<p><?php echo esc_html__( 'Info about quota will be available until the API token is set', 'easy-language' ); ?></p>
-			<?php
-			*/
-		}
 	}
 
 	/**
@@ -418,6 +367,27 @@ class ChatGpt extends Base implements Api_Base {
 		);
 		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_api_key', array( 'sanitize_callback' => array( $this, 'validate_api_key' ) ) );
 
+		// Choose language model.
+		add_settings_field(
+			'easy_language_chatgpt_model',
+			__( 'Choose language model', 'easy-language' ),
+			'easy_language_admin_select_field',
+			'easyLanguageChatGptPage',
+			'settings_section_chatgpt',
+			array(
+				'label_for'   => 'easy_language_chatgpt_model',
+				'fieldId'     => 'easy_language_chatgpt_model',
+				'values'      => apply_filters( 'easy_language_chatgpt_models', array(
+					'gpt-4' => 'gpt-4',
+					'gpt-3.5-turbo' => 'gpt-3.5-turbo',
+				)),
+				'disable_empty' => true,
+				'readonly'    => ! $this->is_chatgpt_token_set(),
+				'description' => __( 'The choice of language model determines the quality of the texts generated by ChatGpt.', 'easy-language' ),
+			)
+		);
+		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_model' );
+
 		// Enable source-languages
 		// -> defaults to WP-locale
 		// -> if WPML, Polylang or TranslatePress is available, show additional languages
@@ -431,7 +401,7 @@ class ChatGpt extends Base implements Api_Base {
 			array(
 				'label_for'   => 'easy_language_chatgpt_source_languages',
 				'fieldId'     => 'easy_language_chatgpt_source_languages',
-				'description' => __( 'These are the possible source languages for ChatGpt-translations. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
+				'description' => __( 'These are the possible source languages for ChatGpt-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
 				'options'     => $this->get_supported_source_languages(),
 				'readonly'    => false === $this->is_chatgpt_token_set() || $foreign_translation_plugin_with_api_support,
 			)
@@ -448,7 +418,7 @@ class ChatGpt extends Base implements Api_Base {
 			array(
 				'label_for'   => 'easy_language_chatgpt_target_languages',
 				'fieldId'     => 'easy_language_chatgpt_target_languages',
-				'description' => __( 'These are the possible target languages for ChatGpt-translations.', 'easy-language' ),
+				'description' => __( 'These are the possible target languages for ChatGpt-simplifications.', 'easy-language' ),
 				'options'     => $this->get_supported_target_languages(),
 				'readonly'    => false === $this->is_chatgpt_token_set() || $foreign_translation_plugin_with_api_support,
 			)
@@ -479,7 +449,7 @@ class ChatGpt extends Base implements Api_Base {
 					'manuell'   => array(
 						'label'       => __( 'Simplify texts manually, use API as helper.', 'easy-language' ),
 						'enabled'     => true,
-						'description' => __( 'The system will not check automatically for translations. Its your decision.', 'easy-language' ),
+						'description' => __( 'The system will not check automatically for simplifications. Its your decision.', 'easy-language' ),
 					),
 				),
 				'readonly'  => false === $this->is_chatgpt_token_set() || $foreign_translation_plugin_with_api_support,
@@ -505,27 +475,10 @@ class ChatGpt extends Base implements Api_Base {
 				'fieldId'     => 'easy_language_chatgpt_interval',
 				'values'      => $intervals,
 				'readonly'    => ! $this->is_chatgpt_token_set() || 'automatic' !== get_option( 'easy_language_chatgpt_automatic_mode', '' ) || $foreign_translation_plugin_with_api_support,
-				'description' => __( 'The interval is only used for automatic translations.', 'easy-language' ),
+				'description' => __( 'The interval is only used for automatic simplifications.', 'easy-language' ),
 			)
 		);
 		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_interval', array( 'sanitize_callback' => array( $this, 'set_interval' ) ) );
-
-		// Interval for quota-request.
-		add_settings_field(
-			'easy_language_chatgpt_quota_interval',
-			__( 'Interval for quota request', 'easy-language' ),
-			'easy_language_admin_select_field',
-			'easyLanguageChatGptPage',
-			'settings_section_chatgpt',
-			array(
-				'label_for'   => 'easy_language_chatgpt_quota_interval',
-				'fieldId'     => 'easy_language_chatgpt_quota_interval',
-				'values'      => $intervals,
-				'readonly'    => ! $this->is_chatgpt_token_set(),
-				'description' => __( 'The actual API quota will be requested in this interval.', 'easy-language' ),
-			)
-		);
-		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_quota_interval', array( 'sanitize_callback' => array( $this, 'set_quota_interval' ) ) );
 	}
 
 	/**
@@ -555,10 +508,7 @@ class ChatGpt extends Base implements Api_Base {
 		// set target language depending on source-language and if only one target could be possible.
 		if ( ! get_option( 'easy_language_chatgpt_target_languages' ) ) {
 			$language  = helper::get_wp_lang();
-			$languages = array( 'de_b1' => '1' );
-			if ( false !== str_contains( $language, 'en_' ) ) {
-				$languages = array( 'en_b1' => '1' );
-			}
+			$languages = array( 'de_EL' => '1' );
 			update_option( 'easy_language_chatgpt_target_languages', $languages );
 		}
 
@@ -571,13 +521,13 @@ class ChatGpt extends Base implements Api_Base {
 		$this->set_automatic_mode( get_option( 'easy_language_chatgpt_automatic_mode', 'disabled' ) );
 
 		// set interval for automatic translation to daily.
-		if ( ! get_option( 'easy_language_chatgpt_quota_interval' ) ) {
-			update_option( 'easy_language_chatgpt_quota_interval', 'daily' );
-		}
-
-		// set interval for automatic translation to daily.
 		if ( ! get_option( 'easy_language_chatgpt_interval' ) ) {
 			update_option( 'easy_language_chatgpt_interval', 'daily' );
+		}
+
+		// set language model.
+		if ( ! get_option( 'easy_language_chatgpt_model' ) ) {
+			update_option( 'easy_language_chatgpt_model', 'gpt-4' );
 		}
 
 		$charset_collate = $wpdb->get_charset_collate();
@@ -631,8 +581,7 @@ class ChatGpt extends Base implements Api_Base {
 			'easy_language_chatgpt_target_languages',
 			'easy_language_chatgpt_automatic_mode',
 			'easy_language_chatgpt_interval',
-			'easy_language_chatgpt_quota',
-			'easy_language_chatgpt_quota_interval',
+			'easy_language_chatgpt_model'
 		);
 	}
 
@@ -763,11 +712,15 @@ class ChatGpt extends Base implements Api_Base {
 		if ( empty( $value ) ) {
 			add_settings_error( 'easy_language_chatgpt_api_key', 'easy_language_chatgpt_api_key', __( 'You did not enter an API token. All translation options via the ChatGpt API have been disabled.', 'easy-language' ) );
 		}
-		// TODO validate key against the API.
 		// if token has been changed, delete settings hint.
 		elseif ( 0 !== strcmp( $value, get_option( 'easy_language_chatgpt_api_key', '' ) ) ) {
 			// delete api-settings hint.
 			Transients::get_instance()->get_transient_by_name( 'easy_language_api_changed' )->delete();
+		}
+
+		// show intro if it has not been shown until now.
+		if( !empty( $value ) && !get_option( 'easy_language_intro_step_2') ) {
+			update_option( 'easy_language_intro_step_2', 1 );
 		}
 
 		// return the entered token.
@@ -796,47 +749,6 @@ class ChatGpt extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return whether a valid language-combination is set.
-	 *
-	 * Any active source language must be translatable to any active target-language.
-	 *
-	 * @param array $target_languages List of target languages to check.
-	 * @return bool true if valid language-combination exist
-	 */
-	private function is_language_set( array $target_languages = array() ): bool {
-		if ( empty( $target_languages ) ) {
-			// get actual enabled source-languages.
-			$target_languages = get_option( 'easy_language_chatgpt_target_languages', array() );
-		}
-
-		if ( ! is_array( $target_languages ) ) {
-			$target_languages = array();
-		}
-
-		// get mappings.
-		$mappings = $this->get_mapping_languages();
-
-		// get actual enabled source-languages.
-		$source_languages = get_option( 'easy_language_chatgpt_source_languages', array() );
-		if ( ! is_array( $source_languages ) ) {
-			$source_languages = array();
-		}
-
-		// check if all source-languages mapping all target-languages.
-		$match = array();
-		foreach ( $source_languages as $source_language => $enabled ) {
-			foreach ( $target_languages as $value => $enabled2 ) {
-				if ( 1 === absint( $enabled ) && 1 === absint( $enabled2 ) && ! empty( $mappings[ $source_language ] ) && false !== in_array( $value, $mappings[ $source_language ], true ) ) {
-					$match[] = $source_language;
-				}
-			}
-		}
-
-		// return false if no valid combination has been found.
-		return ! empty( $match );
-	}
-
-	/**
 	 * Set the interval for the automatic-schedule, if it is enabled.
 	 *
 	 * @param $value
@@ -855,23 +767,6 @@ class ChatGpt extends Base implements Api_Base {
 	}
 
 	/**
-	 * Set the interval for the automatic-schedule, if it is enabled.
-	 *
-	 * @param $value
-	 *
-	 * @return ?string
-	 */
-	public function set_quota_interval( $value ): ?string {
-		$value = Helper::settings_validate_select_field( $value );
-		if ( ! empty( $value ) ) {
-			//wp_schedule_event( time(), $value, 'easy_language_quota_request_quota' ); // TODO eindeutiger Name nötig
-		}
-
-		// return setting.
-		return $value;
-	}
-
-	/**
 	 * Remove token via click.
 	 *
 	 * @return void
@@ -883,30 +778,6 @@ class ChatGpt extends Base implements Api_Base {
 
 		// delete settings.
 		delete_option( 'easy_language_chatgpt_api_key' );
-		delete_option( 'easy_language_chatgpt_quota' );
-
-		// delete quota-hint.
-		$transients_obj = Transients::get_instance();
-		$transient_obj  = $transients_obj->get_transient_by_name( 'easy_language_chatgpt_quota' );
-		$transient_obj->delete();
-
-		// redirect user.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
-		exit;
-	}
-
-	/**
-	 * Get quota via link request.
-	 *
-	 * @return void
-	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
-	 */
-	public function get_quota_from_api_via_link(): void {
-		// check nonce.
-		check_ajax_referer( 'easy-language-chatgpt-get-quota', 'nonce' );
-
-		// get quota.
-		$this->get_quota_from_api();
 
 		// redirect user.
 		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
@@ -916,103 +787,17 @@ class ChatGpt extends Base implements Api_Base {
 	/**
 	 * Get quota as array containing 'character_spent' and 'character_limit'.
 	 *
+	 * ChatGpt uses tokens which we can't request. So we set this to unlimited.
+	 *
 	 * @return array
 	 */
 	public function get_quota(): array {
-		$quota = get_option( 'easy_language_chatgpt_quota', array() );
-
-		// TODO
-
 		// return initial values.
 		return array(
 			'character_spent' => 0,
 			'character_limit' => -1,
 			'unlimited' => true
 		);
-	}
-
-	/**
-	 * Get quota.
-	 *
-	 * TODO is it possible to get info about used and limited tokens?
-	 *
-	 * @param string $token
-	 *
-	 * @return array
-	 */
-	public function request_quota( string $token = '' ): array {
-		// send request.
-		$request = new Request();
-		$request->set_token( empty( $token ) ? $this->get_token() : $token );
-		$request->set_url( EASY_LANGUAGE_CHATGPT_API_URL_QUOTA );
-		$request->send();
-
-		// get the response.
-		$response = $request->get_response();
-
-		// transform it to an array and return it.
-		$results = json_decode( $response, ARRAY_A );
-		if ( is_array( $results ) ) {
-			return $results;
-		}
-
-		// return empty array if request for quota does not give any result.
-		return array();
-	}
-
-	/**
-	 * Get quota from API.
-	 *
-	 * @param string $token The optional token.
-	 *
-	 * @return array
-	 */
-	public function get_quota_from_api( string $token = '' ): array {
-		// get quota from api.
-		$quota = $this->request_quota( $token );
-
-		// get the transients object.
-		$transients_obj = Transients::get_instance();
-
-		// save value in db.
-		if ( ! empty( $quota ) ) {
-			update_option( 'easy_language_chatgpt_quota', $quota );
-
-			// check if key is limited.
-			if ( !empty($quota['simplification']) && absint( $quota['simplification']['subscription']['available'] ) > 0 ) {
-				// show hint of 80% of limit is used.
-				$percent = absint( $quota['simplification']['subscription']['remaining'] ) / absint( $quota['simplification']['subscription']['available'] );
-				if ( 1 === $percent ) {
-					// get the transients-object to add the new one.
-					$transient_obj = $transients_obj->add();
-					$transient_obj->set_dismissible_days( 2 );
-					$transient_obj->set_name( 'easy_language_chatgpt_quota' );
-					/* translators: %1$s will be replaced by the URL for ChatGpt support. */
-					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the ChatGpt API is completely depleted.</strong> You will not be able to use any translation from ChatGpt. Please contact the <a href="%1$s" target="_blank">ChatGpt support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
-					$transient_obj->set_type( 'error' );
-					$transient_obj->save();
-				} elseif ( $percent > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
-					// get the transients-object to add the new one.
-					$transient_obj = $transients_obj->add();
-					$transient_obj->set_dismissible_days( 2 );
-					$transient_obj->set_name( 'easy_language_chatgpt_quota' );
-					/* translators: %1$s will be replaced by the URL for ChatGpt support. */
-					$transient_obj->set_message( sprintf( __( '<strong>More than 80%% of your quota for the ChatGpt API has already been used.</strong> Please contact the <a href="%1$s" target="_blank">ChatGpt support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
-					$transient_obj->set_type( 'error' );
-					$transient_obj->save();
-				}
-			}
-		} else {
-			// delete quota-array in db.
-			delete_option( 'easy_language_chatgpt_ai_quota' );
-
-			// delete hint.
-			$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_chatgpt_ai_quota' );
-			$transient_obj->delete();
-		}
-
-		// return quota.
-		return $quota;
 	}
 
 	/**
@@ -1052,16 +837,25 @@ class ChatGpt extends Base implements Api_Base {
 	/**
 	 * Return language-specific request text for the API.
 	 *
-	 * @param string $source_language
+	 * @param string $target_language The target-language.
 	 *
 	 * @return string
 	 */
-	public function get_request_text_by_language( string $source_language ): string {
+	public function get_request_text_by_language( string $target_language ): string {
+		// TODO änderbar machen
 		$request_texts = array(
-			'de_DE' => 'Vereinfache bitte den folgenden Text in Leichter Sprache. Verwende dabei pro Absatz eine Zeile.',
-			'de_AT' => 'Vereinfache bitte den folgenden Text in Leichter Sprache. Verwende dabei pro Absatz eine Zeile.',
-			'de_CH' => 'Vereinfache bitte den folgenden Text in Leichter Sprache. Verwende dabei pro Absatz eine Zeile.',
+			'de_EL' => 'Vereinfache bitte den folgenden deutschen Text in Einfache Sprache.',
+			'de_LS' => 'Vereinfache bitte den folgenden deutschen Text in Leichte Sprache. Verwende dabei pro Absatz eine Zeile.',
 		);
-		return $request_texts[$source_language];
+		return $request_texts[$target_language];
+	}
+
+	/**
+	 * Return true if token is set.
+	 *
+	 * @return bool
+	 */
+	public function is_configured(): bool {
+		return $this->is_chatgpt_token_set();
 	}
 }

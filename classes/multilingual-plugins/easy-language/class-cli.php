@@ -19,24 +19,25 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Cli {
 	/**
-	 * Reset translations.
+	 * Reset simplifications.
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
+	 * @noinspection PhpUndefinedClassInspection
 	 */
-	public function reset_translations(): void {
+	public function reset_simplifications(): void {
 		// get db-object.
 		$db_obj = Db::get_instance();
 
-		// reset the translations.
+		// reset the simplifications.
 		$db_obj->reset_translations();
 
 		// return ok-message.
-		\WP_CLI::success( 'All translations has been reset.' );
+		\WP_CLI::success( 'All simplifications has been reset.' );
 	}
 
 	/**
-	 * Process open translations via active API.
+	 * Process open simplifications via active API.
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
@@ -54,6 +55,6 @@ class Cli {
 		}
 
 		// return message.
-		\WP_CLI::error( ' No API activated to automatic translations.' );
+		\WP_CLI::error( 'No API activated to automatic simplifications.' );
 	}
 }

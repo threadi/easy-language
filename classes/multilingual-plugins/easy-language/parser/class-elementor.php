@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Elementor pagebuilder for translations.
+ * File for handling Elementor pagebuilder for simplifications.
  *
  * @package easy-language
  */

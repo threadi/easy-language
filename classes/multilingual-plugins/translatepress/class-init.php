@@ -1,6 +1,6 @@
 <?php
 /**
- * File for initializing the easy-language-own translations.
+ * File for initializing the easy-language-own simplifications.
  *
  * @package easy-language
  */

@@ -9,6 +9,7 @@ namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
 use easyLanguage\Apis;
 use easyLanguage\Base;
+use easyLanguage\Helper;
 use easyLanguage\Multilingual_Plugins;
 use WP_Post;
 
@@ -105,7 +106,7 @@ class Pagebuilder_Support {
 	 * Content of meta-box with infos about ..
 	 * .. the actual edited language.
 	 * .. which language is also available.
-	 * .. the possibility to delete this translation complete.
+	 * .. the possibility to delete this simplification complete.
 	 *
 	 * @param WP_Post $post The Post-object.
 	 *
@@ -129,11 +130,7 @@ class Pagebuilder_Support {
 		$language       = reset( $language_array );
 
 		// get object type name.
-		$object_type_settings = \easyLanguage\Init::get_instance()->get_post_type_settings();
-		$object_type_name = 'page';
-		if( !empty($object_type_settings[$post_object->get_type()]) ) {
-			$object_type_name = $object_type_settings[$post_object->get_type()]['label_singular'];
-		}
+		$object_type_name = Helper::get_objekt_type_name( $post_object );
 
 		// output.
 		if ( ! empty( $language ) ) {

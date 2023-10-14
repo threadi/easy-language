@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Gutenberg pagebuilder for translations.
+ * File for handling Gutenberg pagebuilder for simplifications.
  *
  * @package easy-language
  */

@@ -69,7 +69,7 @@ class No_Api extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_description(): string {
-		return __( '<p>This is a pseudo-API.<br>It does not use any API for translations.</p><p>Use this "API" if you do not want to use any other API.<br>You will be able to write your own texts in Leichte and Einfache Sprache.</p><p><strong>No quota, no costs.</strong></p>', 'easy-language' );
+		return __( '<p>This is a pseudo-API.<br>It does not use any API for simplifications.</p><p>Use this "API" if you do not want to use any other API.<br>You will be able to write your own texts in Leichte and Einfache Sprache.</p><p><strong>No automatic simplifications, no quota, no costs.</strong></p>', 'easy-language' );
 	}
 
 	public function get_supported_source_languages(): array {

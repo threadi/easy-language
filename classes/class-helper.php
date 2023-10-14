@@ -8,6 +8,8 @@
 namespace easyLanguage;
 
 // prevent direct access.
+use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -263,5 +265,29 @@ class Helper {
 	 */
 	public static function get_support_url(): string {
 		return 'https://laolaweb.com/kontakt/';
+	}
+
+	/**
+	 * Return language-specific title for the type of the given object.
+	 *
+	 * @param Post_Object $post_object
+	 * @return string
+	 */
+	public static function get_objekt_type_name(Post_Object $post_object): string {
+		$object_type_settings = Init::get_instance()->get_post_type_settings();
+		$object_type_name = 'page';
+		if( !empty($object_type_settings[$post_object->get_type()]) ) {
+			$object_type_name = $object_type_settings[$post_object->get_type()]['label_singular'];
+		}
+		return $object_type_name;
+	}
+
+	/**
+	 * Return the URL for laolaweb.com where we can order the Pro-Version.
+	 *
+	 * @return string
+	 */
+	public static function get_pro_url(): string {
+		return 'https://laolaweb.com/plugins/leichte-sprache-fuer-wordpress/';
 	}
 }

@@ -463,7 +463,6 @@ class Capito extends Base implements Api_Base {
 	 * Return supported target languages.
 	 *
 	 * @return array
-	 * @noinspection DuplicatedCode
 	 */
 	public function get_active_target_languages(): array {
 		// get actual enabled target-languages.
@@ -900,47 +899,6 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return whether a valid language-combination is set.
-	 *
-	 * Any active source language must be translatable to any active target-language.
-	 *
-	 * @param array $target_languages List of target languages to check.
-	 * @return bool true if valid language-combination exist
-	 */
-	private function is_language_set( array $target_languages = array() ): bool {
-		if ( empty( $target_languages ) ) {
-			// get actual enabled source-languages.
-			$target_languages = get_option( 'easy_language_capito_target_languages', array() );
-		}
-
-		if ( ! is_array( $target_languages ) ) {
-			$target_languages = array();
-		}
-
-		// get mappings.
-		$mappings = $this->get_mapping_languages();
-
-		// get actual enabled source-languages.
-		$source_languages = get_option( 'easy_language_capito_source_languages', array() );
-		if ( ! is_array( $source_languages ) ) {
-			$source_languages = array();
-		}
-
-		// check if all source-languages mapping all target-languages.
-		$match = array();
-		foreach ( $source_languages as $source_language => $enabled ) {
-			foreach ( $target_languages as $value => $enabled2 ) {
-				if ( 1 === absint( $enabled ) && 1 === absint( $enabled2 ) && ! empty( $mappings[ $source_language ] ) && false !== in_array( $value, $mappings[ $source_language ], true ) ) {
-					$match[] = $source_language;
-				}
-			}
-		}
-
-		// return false if no valid combination has been found.
-		return ! empty( $match );
-	}
-
-	/**
 	 * Set the automatic mode for the translations.
 	 *
 	 * @param $value
@@ -990,7 +948,7 @@ class Capito extends Base implements Api_Base {
 	public function set_quota_interval( $value ): ?string {
 		$value = Helper::settings_validate_select_field( $value );
 		if ( ! empty( $value ) ) {
-			wp_schedule_event( time(), $value, 'easy_language_quota_request_quota' ); // TODO eindeutiger Name nötig
+			wp_schedule_event( time(), $value, 'easy_language_capito_request_quota' );
 		}
 
 		// return setting.
@@ -1078,7 +1036,7 @@ class Capito extends Base implements Api_Base {
 					$transient_obj->set_dismissible_days( 2 );
 					$transient_obj->set_name( 'easy_language_capito_quota' );
 					/* translators: %1$s will be replaced by the URL for Capito support. */
-					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the Capito API is completely depleted.</strong> You will not be able to use any translation from Capito. Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
+					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the Capito API is completely depleted.</strong> You will not be able to use any simplifications from Capito. Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 					$transient_obj->set_type( 'error' );
 					$transient_obj->save();
 				} elseif ( $percent > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {

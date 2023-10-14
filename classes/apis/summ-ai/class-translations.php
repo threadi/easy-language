@@ -1,6 +1,6 @@
 <?php
 /**
- * File for translations-handling of the SUMM AI API.
+ * File for simplifications-handling of the SUMM AI API.
  *
  * @package easy-language
  */
@@ -67,15 +67,15 @@ class Translations {
 	}
 
 	/**
-	 * Run translations of texts via active plugin.
+	 * Run simplifications of texts via active plugin.
 	 *
-	 * @return int Count of translations.
+	 * @return int Count of simplifications.
 	 */
 	public function run(): int {
 		// get active language-mappings.
 		$mappings = $this->init->get_active_language_mapping();
 
-		// counter for successfully translations.
+		// counter for successfully simplifications.
 		$c = 0;
 
 		// get active plugins and check if one of them supports APIs.
