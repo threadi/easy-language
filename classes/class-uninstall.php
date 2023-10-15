@@ -143,7 +143,7 @@ class Uninstall {
 		 * Delete DB-tables.
 		 */
 		Log_Api::get_instance()->delete_table();
-		Db::get_instance()->delete_table();
+		Db::get_instance()->delete_tables();
 
 		/**
 		 * Remove settings.
@@ -179,7 +179,7 @@ class Uninstall {
 			'easy_language_debug_mode',
 			'easy_language_api',
 			'easy_language_log_max_age',
-			'easy_language_api_timeout'
+			'easy_language_api_timeout',
 		);
 	}
 }

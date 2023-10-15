@@ -214,6 +214,8 @@ body .text-translations-table #source_language, body .text-translations-table #t
 	width: 32px;
 }
 
+.easylanguage-simplification-dialog-no-close { z-index: 2000 !important }
+
 #easylanguage-simplification-dialog-step-description { line-height: 1.4; }
 
 .pro-marker {

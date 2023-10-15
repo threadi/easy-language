@@ -8,7 +8,9 @@
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Wp_Bakery;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Add WPBakery-object to list of supported pagebuilder.
@@ -19,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 function easy_language_pagebuilder_wp_bakery( array $list ): array {
 	$wp_bakery_obj = Wp_Bakery::get_instance();
-	if( $wp_bakery_obj->is_active() ) {
+	if ( $wp_bakery_obj->is_active() ) {
 		// add wpBakery to list.
 		$list[] = $wp_bakery_obj;
 	}

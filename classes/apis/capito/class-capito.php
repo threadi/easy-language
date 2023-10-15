@@ -94,9 +94,9 @@ class Capito extends Base implements Api_Base {
 		add_action( 'easy_language_settings_capito_page', array( $this, 'add_settings_page' ) );
 
 		// add hook für schedules.
-		$translations_obj = Translations::get_instance();
-		$translations_obj->init( $this );
-		add_action( 'easy_language_capito_automatic', array( $translations_obj, 'run' ) );
+		$simplifications_obj = Simplifications::get_instance();
+		$simplifications_obj->init( $this );
+		add_action( 'easy_language_capito_automatic', array( $simplifications_obj, 'run' ) );
 		add_action( 'easy_language_capito_request_quota', array( $this, 'get_quota_from_api' ) );
 
 		// add hook to remove token.
@@ -140,18 +140,18 @@ class Capito extends Base implements Api_Base {
 		} elseif ( ! empty( $quota['unlimited'] ) ) {
 			$text .= __( '<p><strong>Unlimited quota</strong></p>', 'easy-language' );
 		} elseif ( -1 === $quota['character_limit'] ) {
-			$text .= '<p><strong>'.__( 'The available quota is retrieved after entering the API key in the API settings.', 'easy-language' ).'</strong></p>';
+			$text .= '<p><strong>' . __( 'The available quota is retrieved after entering the API key in the API settings.', 'easy-language' ) . '</strong></p>';
 		}
 
 		// wrapper for buttons.
 		$text .= '<p>';
 
 		// help-button.
-		$text .= '<a href="'.esc_url($this->get_language_specific_support_page()).'" target="_blank" class="button button-primary" title="'.esc_attr( __( 'Get help for this API', 'easy-language' ) ).'"><span class="dashicons dashicons-editor-help"></span></a>';
+		$text .= '<a href="' . esc_url( $this->get_language_specific_support_page() ) . '" target="_blank" class="button button-primary" title="' . esc_attr( __( 'Get help for this API', 'easy-language' ) ) . '"><span class="dashicons dashicons-editor-help"></span></a>';
 
 		// Show setting-button if this API is enabled.
-		if( $this->is_active() ) {
-			$text .= '<a href="'.esc_html($this->get_settings_url()).'" class="button button-primary" title="'.esc_html__( 'Go to settings', 'easy-languag'  ).'"><span class="dashicons dashicons-admin-generic"></span></a>';
+		if ( $this->is_active() ) {
+			$text .= '<a href="' . esc_html( $this->get_settings_url() ) . '" class="button button-primary" title="' . esc_html__( 'Go to settings', 'easy-languag' ) . '"><span class="dashicons dashicons-admin-generic"></span></a>';
 		}
 
 		$text .= '</p>';
@@ -353,20 +353,20 @@ class Capito extends Base implements Api_Base {
 			update_option( 'easy_language_capito_target_languages', $languages );
 		}
 
-		// set translation mode to manuell.
+		// set simplification mode to manuell.
 		if ( ! get_option( 'easy_language_capito_automatic_mode' ) ) {
 			update_option( 'easy_language_capito_automatic_mode', 'manuell' );
 		}
 
-		// set schedule for automatic translation.
+		// set schedule for automatic simplification.
 		$this->set_automatic_mode( get_option( 'easy_language_capito_automatic_mode', 'disabled' ) );
 
-		// set interval for automatic translation to daily.
+		// set interval for automatic simplification to daily.
 		if ( ! get_option( 'easy_language_capito_quota_interval' ) ) {
 			update_option( 'easy_language_capito_quota_interval', 'daily' );
 		}
 
-		// set interval for automatic translation to daily.
+		// set interval for automatic simplification to daily.
 		if ( ! get_option( 'easy_language_capito_interval' ) ) {
 			update_option( 'easy_language_capito_interval', 'daily' );
 		}
@@ -444,13 +444,13 @@ class Capito extends Base implements Api_Base {
 	public function cli(): void {}
 
 	/**
-	 * Return the translations-object.
+	 * Return the simplifications-object.
 	 *
-	 * @return Translations
+	 * @return Simplifications
 	 */
-	public function get_translations_obj(): Translations {
+	public function get_simplifications_obj(): Simplifications {
 		// get the object.
-		$obj = Translations::get_instance();
+		$obj = Simplifications::get_instance();
 
 		// initialize it.
 		$obj->init( $this );
@@ -635,7 +635,7 @@ class Capito extends Base implements Api_Base {
 			$description .= '<br><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
 		}
 
-		// if foreign translation-plugin with API-support is used, hide the language-settings.
+		// if foreign simplification-plugin with API-support is used, hide the language-settings.
 		$foreign_translation_plugin_with_api_support = false;
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
 			if ( $plugin_obj->is_foreign_plugin() && $plugin_obj->is_supporting_apis() ) {
@@ -673,7 +673,7 @@ class Capito extends Base implements Api_Base {
 			array(
 				'label_for'   => 'easy_language_capito_source_languages',
 				'fieldId'     => 'easy_language_capito_source_languages',
-				'description' => __( 'These are the possible source languages for Capito-translations. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
+				'description' => __( 'These are the possible source languages for Capito-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
 				'options'     => $this->get_supported_source_languages(),
 				'readonly'    => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
 			)
@@ -690,17 +690,17 @@ class Capito extends Base implements Api_Base {
 			array(
 				'label_for'   => 'easy_language_capito_target_languages',
 				'fieldId'     => 'easy_language_capito_target_languages',
-				'description' => __( 'These are the possible target languages for Capito-translations.', 'easy-language' ),
+				'description' => __( 'These are the possible target languages for Capito-simplifications.', 'easy-language' ),
 				'options'     => $this->get_supported_target_languages(),
 				'readonly'    => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
 			)
 		);
 		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_target_languages', array( 'sanitize_callback' => array( $this, 'validate_language_settings' ) ) );
 
-		// Set translation mode.
+		// Set simplification mode.
 		add_settings_field(
 			'easy_language_capito_automatic_mode',
-			__( 'Choose translation-mode', 'easy-language' ),
+			__( 'Choose simplification-mode', 'easy-language' ),
 			'easy_language_admin_multiple_radio_field',
 			'easyLanguageCapitoPage',
 			'settings_section_capito',
@@ -714,14 +714,14 @@ class Capito extends Base implements Api_Base {
 						'description' => __( 'You have to write all simplifications manually. The API will not be used.', 'easy-language' ),
 					),
 					'automatic' => array(
-						'label'       => __( 'Automatic translation of each text.', 'easy-language' ),
+						'label'       => __( 'Automatic simplification of each text.', 'easy-language' ),
 						'enabled'     => true,
-						'description' => __( 'Each for translation requested text will be translated automatic in the intervall set below. Be aware that this is not an automatic translation in frontend initiated through the visitor.', 'easy-language' ),
+						'description' => __( 'Each for simplification requested text will be simplified automatic in the intervall set below. Be aware that this is not an automatic simplification in frontend initiated through the visitor.', 'easy-language' ),
 					),
 					'manuell'   => array(
 						'label'       => __( 'Simplify texts manually, use API as helper.', 'easy-language' ),
 						'enabled'     => true,
-						'description' => __( 'The system will not check automatically for translations. Its your decision.', 'easy-language' ),
+						'description' => __( 'The system will not check automatically for simplifications. Its your decision.', 'easy-language' ),
 					),
 				),
 				'readonly'  => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
@@ -735,10 +735,10 @@ class Capito extends Base implements Api_Base {
 			$intervals[ $name ] = $schedule['display'];
 		}
 
-		// Interval for automatic translations.
+		// Interval for automatic simplifications.
 		add_settings_field(
 			'easy_language_capito_interval',
-			__( 'Interval for automatic translation', 'easy-language' ),
+			__( 'Interval for automatic simplification', 'easy-language' ),
 			'easy_language_admin_select_field',
 			'easyLanguageCapitoPage',
 			'settings_section_capito',
@@ -747,7 +747,7 @@ class Capito extends Base implements Api_Base {
 				'fieldId'     => 'easy_language_capito_interval',
 				'values'      => $intervals,
 				'readonly'    => ! $this->is_capito_token_set() || 'automatic' !== get_option( 'easy_language_capito_automatic_mode', '' ) || $foreign_translation_plugin_with_api_support,
-				'description' => __( 'The interval is only used for automatic translations.', 'easy-language' ),
+				'description' => __( 'The interval is only used for automatic simplifications.', 'easy-language' ),
 			)
 		);
 		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_interval', array( 'sanitize_callback' => array( $this, 'set_interval' ) ) );
@@ -862,7 +862,7 @@ class Capito extends Base implements Api_Base {
 
 		// if no token has been entered, show hint.
 		if ( empty( $value ) ) {
-			add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __( 'You did not enter an API token. All translation options via the Capito API have been disabled.', 'easy-language' ) );
+			add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __( 'You did not enter an API token. All simplification options via the Capito API have been disabled.', 'easy-language' ) );
 		}
 		// TODO validate key against the API.
 		// if token has been changed, get the quota and delete settings hint.
@@ -889,7 +889,7 @@ class Capito extends Base implements Api_Base {
 	public function validate_language_settings( $values ): ?array {
 		$values = Helper::settings_validate_multiple_checkboxes( $values );
 		if ( empty( $values ) ) {
-			add_settings_error( 'easy_language_capito_target_languages', 'easy_language_capito_target_languages', __( 'You have to set a target-language for translations.', 'easy-language' ) );
+			add_settings_error( 'easy_language_capito_target_languages', 'easy_language_capito_target_languages', __( 'You have to set a target-language for simplifications.', 'easy-language' ) );
 		} elseif ( false === $this->is_language_set( $values ) ) {
 			add_settings_error( 'easy_language_capito_target_languages', 'easy_language_capito_target_languages', __( 'At least one language cannot (currently) be translated into the selected target languages by the API.', 'easy-language' ) );
 		}
@@ -899,7 +899,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Set the automatic mode for the translations.
+	 * Set the automatic mode for the simplifications.
 	 *
 	 * @param $value
 	 * @return string|null
@@ -1027,7 +1027,7 @@ class Capito extends Base implements Api_Base {
 			update_option( 'easy_language_capito_quota', $quota );
 
 			// check if key is limited.
-			if ( !empty($quota['simplification']) && absint( $quota['simplification']['subscription']['available'] ) > 0 ) {
+			if ( ! empty( $quota['simplification'] ) && absint( $quota['simplification']['subscription']['available'] ) > 0 ) {
 				// show hint of 80% of limit is used.
 				$percent = absint( $quota['simplification']['subscription']['remaining'] ) / absint( $quota['simplification']['subscription']['available'] );
 				if ( 1 === $percent ) {
@@ -1082,6 +1082,11 @@ class Capito extends Base implements Api_Base {
 		$transient_obj  = $transients_obj->get_transient_by_name( 'easy_language_capito_quota' );
 		$transient_obj->delete();
 
+		// Remove intro-hint if it is enabled.
+		if ( 1 === absint( get_option( 'easy_language_intro_step_2', 0 ) ) ) {
+			delete_option( 'easy_language_intro_step_2' );
+		}
+
 		// redirect user.
 		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 		exit;
@@ -1111,6 +1116,6 @@ class Capito extends Base implements Api_Base {
 	 * @return bool
 	 */
 	public function is_configured(): bool {
-		return !empty($this->get_token());
+		return ! empty( $this->get_token() );
 	}
 }

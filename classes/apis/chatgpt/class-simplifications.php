@@ -8,7 +8,6 @@
 namespace easyLanguage\Apis\ChatGpt;
 
 use easyLanguage\Api_Base;
-use easyLanguage\Multilingual_Plugins;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,13 +17,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Simplifications-Handling for this plugin.
  */
-class Translations {
+class Simplifications {
 	/**
 	 * Instance of this object.
 	 *
-	 * @var ?Translations
+	 * @var ?Simplifications
 	 */
-	private static ?Translations $instance = null;
+	private static ?Simplifications $instance = null;
 
 	/**
 	 * Init-Object of this API.
@@ -48,7 +47,7 @@ class Translations {
 	/**
 	 * Return the instance of this Singleton object.
 	 */
-	public static function get_instance(): Translations {
+	public static function get_instance(): Simplifications {
 		if ( ! static::$instance instanceof static ) {
 			static::$instance = new static();
 		}
@@ -67,29 +66,6 @@ class Translations {
 	}
 
 	/**
-	 * Run simplifications of texts via active plugin.
-	 *
-	 * @return int Count of simplifications.
-	 */
-	public function run(): int {
-		// get active language-mappings.
-		$mappings = $this->init->get_active_language_mapping();
-
-		// counter for successfully simplifications.
-		$c = 0;
-
-		// get active plugins and check if one of them supports APIs.
-		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if ( $plugin_obj->is_supporting_apis() ) {
-				$c = $c + $plugin_obj->process_translations( $this, $mappings );
-			}
-		}
-
-		// return count of successfully simplifications.
-		return $c;
-	}
-
-	/**
 	 * Call API to simplify single text.
 	 *
 	 * @param string $text_to_translate
@@ -105,7 +81,7 @@ class Translations {
 		$request_obj = $this->init->get_request_object();
 		$request_obj->set_token( $this->init->get_token() );
 		$request_obj->set_url( $this->init->get_api_url() );
-		$request_obj->set_text( $request_text.$text_to_translate );
+		$request_obj->set_text( $request_text . $text_to_translate );
 		$request_obj->set_source_language( $source_language );
 		$request_obj->set_target_language( $target_language );
 		$request_obj = apply_filters( 'easy_language_chatgpt_request_object', $request_obj );
@@ -117,17 +93,17 @@ class Translations {
 			$response = $request_obj->get_response();
 
 			// transform it to array.
-			$request_array = json_decode($response, true);
+			$request_array = json_decode( $response, true );
 
 			// get the text only if it has returned from API.
-			if (!empty($request_array['choices'][0]['message']['content'])) {
+			if ( ! empty( $request_array['choices'][0]['message']['content'] ) ) {
 				// get translated text.
-				$translated_text = apply_filters('easy_language_translated_text', $request_array['choices'][0]['message']['content'], $request_array, $this);
+				$translated_text = apply_filters( 'easy_language_simplified_text', $request_array['choices'][0]['message']['content'], $request_array, $this );
 
-				// return translation to plugin which will save it.
+				// return simplification to plugin which will save it.
 				return array(
 					'translated_text' => $translated_text,
-					'jobid' => 0,
+					'jobid'           => 0,
 				);
 			}
 		}

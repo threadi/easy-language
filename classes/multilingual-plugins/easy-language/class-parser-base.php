@@ -137,7 +137,7 @@ class Parser_Base {
 		$link = get_edit_post_link( $this->get_object_id(), 'edit' );
 
 		// return empty string if link does not exist.
-		if( is_null($link) ) {
+		if ( is_null( $link ) ) {
 			return '';
 		}
 
@@ -154,13 +154,13 @@ class Parser_Base {
 	 * @noinspection PhpUnused
 	 */
 	public function get_language_switch( int $post_id = 0 ): void {
-		// bail if user has no translation capabilities.
+		// bail if user has no simplification capabilities.
 		if ( false === current_user_can( 'edit_el_translate' ) ) {
 			return;
 		}
 
 		// get the post_id.
-		if( 0 === $post_id ) {
+		if ( 0 === $post_id ) {
 			$post_id = get_the_ID();
 		}
 
@@ -179,12 +179,12 @@ class Parser_Base {
 		// show translate-button if this is not the original post and an API is active.
 		if ( $post_object->get_id() !== $original_post_object->get_id() ) {
 
-			// check if API for automatic translation is active.
+			// check if API for automatic simplification is active.
 			$api_obj = Apis::get_instance()->get_active_api();
 			if ( false !== $api_obj ) {
 
-				// link to get automatic translation via API.
-				$do_translation = $post_object->get_translation_via_api_link();
+				// link to get automatic simplification via API.
+				$do_simplification = $post_object->get_simplification_via_api_link();
 
 				// get quota-state for this object.
 				$quota_state = $post_object->get_quota_state( $api_obj );
@@ -196,7 +196,7 @@ class Parser_Base {
 				$object_type_name = Helper::get_objekt_type_name( $post_object );
 
 				// do not show simplify-button if characters to simplify are more than quota characters.
-				if ( 'above_limit' === $quota_state['status'] ) {
+				if ( 'above_limit' === $quota_state['status'] && $api_obj->is_configured() ) {
 					?>
 					<p class="alert">
 						<?php
@@ -205,7 +205,7 @@ class Parser_Base {
 						?>
 					</p>
 					<?php
-				} elseif ( 'exceeded' !== $quota_state['status'] ) {
+				} elseif ( 'exceeded' !== $quota_state['status'] && $api_obj->is_configured() ) {
 					// output.
 					?>
 					<p>
@@ -215,7 +215,7 @@ class Parser_Base {
 						?>
 					</p>
 					<?php /* translators: %1$s will be replaced by tne object-type-name (e.g. post oder page), %2$s will be replaced by the API-name */ ?>
-					<p><a href="<?php echo esc_url( $do_translation ); ?>" class="button button-secondary easy-language-translate-object elementor-button" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url(get_permalink($post_id)); ?>" title="<?php echo esc_attr( sprintf( __( 'Simplify this %1$s with %2$s', 'easy-language' ), esc_html($object_type_name), esc_html( $api_obj->get_title() ) ) ); ?>">
+					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary easy-language-translate-object elementor-button" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( sprintf( __( 'Simplify this %1$s with %2$s', 'easy-language' ), esc_html( $object_type_name ), esc_html( $api_obj->get_title() ) ) ); ?>">
 						<?php
 							/* translators: %1$s will be replaced by the API-title */
 							printf( esc_html__( 'Simplify with %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ) );
@@ -226,14 +226,28 @@ class Parser_Base {
 						?>
 						</a></p>
 					<?php
-				} else {
+				} elseif ( $api_obj->is_configured() ) {
 					?>
 						<p class="alert">
 							<?php
 								/* translators: %1$s will be replaced by the API-title */
-								printf( esc_html__( 'No quota for automatic translation with %1$s available.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
+								printf( esc_html__( 'No quota for automatic simplification with %1$s available.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
 							?>
 						</p>
+					<?php
+				} elseif ( $api_obj->has_settings() ) {
+					?>
+					<p class="alert">
+						<?php
+						/* translators: %1$s will be replaced by the API-title */
+						printf( esc_html__( 'API %1$s not configured.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
+						if ( current_user_can( 'manage_options' ) ) {
+							?>
+								<a href="<?php echo esc_url( $api_obj->get_settings_url() ); ?>"><span class="dashicons dashicons-admin-tools"></span></a>
+							<?php
+						}
+						?>
+					</p>
 					<?php
 				}
 			} elseif ( current_user_can( 'manage_options' ) ) {
@@ -241,9 +255,9 @@ class Parser_Base {
 				?>
 				<p>
 					<?php
-						echo esc_html__( 'No translation-API active.', 'easy-language' );
+						echo esc_html__( 'No simplification-API active.', 'easy-language' );
 					?>
-						<a href="<?php echo esc_url( Helper::get_settings_page_url() ); ?>"><span class="dashicons dashicons-admin-tools"></span></a>				</p>
+					<a href="<?php echo esc_url( Helper::get_settings_page_url() ); ?>"><span class="dashicons dashicons-admin-tools"></span></a></p>
 				<?php
 			}
 		}
@@ -254,17 +268,17 @@ class Parser_Base {
 			<table>
 			<?php
 			foreach ( $languages as $language_code => $settings ) {
-				// set link to add translation for this language.
-				$link = $original_post_object->get_translate_link( $language_code );
+				// set link to add simplification for this language.
+				$link = $original_post_object->get_simplification_link( $language_code );
 				/* translators: %1$s will be replaced by the language title */
-				$link_title   = __( 'Add translation in %1$s', 'easy-language' );
+				$link_title   = __( 'Add simplification in %1$s', 'easy-language' );
 				$link_content = '<span class="dashicons dashicons-plus"></span>';
 
 				// get translated post for this language (if it is not the original).
 				if ( empty( $settings['url'] ) ) {
 					$link = $original_post_object->get_page_builder()->get_edit_link();
 					/* translators: %1$s will be replaced by the page-title where the original content resides */
-					$link_title   = __( 'Original Content in %1$s', 'easy-language' );
+					$link_title   = __( 'Original content in %1$s', 'easy-language' );
 					$link_content = '<span class="dashicons dashicons-admin-home"></span>';
 				} else {
 					$query   = array(
@@ -273,12 +287,12 @@ class Parser_Base {
 						'meta_query'                      => array(
 							'relation' => 'AND',
 							array(
-								'key'     => 'easy_language_translation_original_id',
+								'key'     => 'easy_language_simplification_original_id',
 								'value'   => $this->get_object_id(),
 								'compare' => '=',
 							),
 							array(
-								'key'     => 'easy_language_translation_language',
+								'key'     => 'easy_language_simplification_language',
 								'value'   => $language_code,
 								'compare' => '=',
 							),
@@ -293,14 +307,14 @@ class Parser_Base {
 						$post_obj = new Post_Object( $results->posts[0] );
 						$link     = $post_obj->get_page_builder()->get_edit_link();
 						/* translators: %1$s is the name of the language */
-						$link_title   = __( 'Edit translation in %1$s', 'easy-language' );
+						$link_title   = __( 'Edit simplification in %1$s', 'easy-language' );
 						$link_content = '<span class="dashicons dashicons-edit"></span>';
 					}
 				}
 
 				// output.
 				?>
-				<tr><th><?php echo esc_html( $settings['label'] ); ?></th><td><a href="<?php echo esc_url( $link ); ?>" title="<?php echo esc_attr( sprintf( $link_title, $settings['label'] ) ); ?>"><?php echo wp_kses_post($link_content); ?></a></td></tr>
+				<tr><th><?php echo esc_html( $settings['label'] ); ?></th><td><a href="<?php echo esc_url( $link ); ?>" title="<?php echo esc_attr( sprintf( $link_title, $settings['label'] ) ); ?>"><?php echo wp_kses_post( $link_content ); ?></a></td></tr>
 				<?php
 			}
 			?>
@@ -336,7 +350,7 @@ class Parser_Base {
 	 * @return string
 	 * @noinspection PhpUnused
 	 */
-	public function get_title_with_translations( string $original_complete, string $translated_part ): string {
+	public function get_title_with_simplifications( string $original_complete, string $translated_part ): string {
 		return str_replace( $this->get_title(), $translated_part, $original_complete );
 	}
 

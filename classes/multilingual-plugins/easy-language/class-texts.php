@@ -38,13 +38,6 @@ class Texts {
 	private Db $db;
 
 	/**
-	 * Init-object.
-	 *
-	 * @var Init
-	 */
-	private Init $init;
-
-	/**
 	 * Constructor for this object.
 	 */
 	private function __construct() {
@@ -75,16 +68,15 @@ class Texts {
 	 * @return void
 	 */
 	public function init( Init $init ): void {
-		$this->init = $init;
 
-		// add object for translation.
+		// add object for simplification.
 		add_action( 'admin_action_easy_language_add_simplification', array( $this, 'add_object_to_simplification' ) );
 
-		// get automatic translation of given object.
-		add_action( 'admin_action_easy_language_get_automatic_translation', array( $this, 'get_automatic_translation' ) );
+		// get automatic simplification of given object.
+		add_action( 'admin_action_easy_language_get_automatic_simplification', array( $this, 'get_automatic_simplification' ) );
 
 		// check updated post-types.
-		foreach ( $this->init->get_supported_post_types() as $post_type => $enabled ) {
+		foreach ( $init->get_supported_post_types() as $post_type => $enabled ) {
 			add_action( 'save_post_' . $post_type, array( $this, 'update_translation_of_post' ), 10, 3 );
 		}
 
@@ -93,9 +85,6 @@ class Texts {
 
 		// delete simplifications if object is really deleted.
 		add_action( 'delete_post', array( $this, 'delete_translation_of_post' ) );
-		add_action( 'admin_init', function() {
-			$this->delete_translation_of_post( 1706 );
-		} );
 	}
 
 	/**
@@ -106,6 +95,7 @@ class Texts {
 	 * The author will after this be able to simplify this object manually or via API.
 	 *
 	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function add_object_to_simplification(): void {
 		// check nonce.
@@ -150,13 +140,13 @@ class Texts {
 				helper::copy_cpt( $original_post_id, $copied_post_id );
 
 				// mark the copied post as translation-object of the original.
-				update_post_meta( $copied_post_id, 'easy_language_translation_original_id', $original_post_id );
+				update_post_meta( $copied_post_id, 'easy_language_simplification_original_id', $original_post_id );
 
 				// save the source-language of the copied object.
 				update_post_meta( $copied_post_id, 'easy_language_source_language', $source_language );
 
 				// save the target-language of the copied object.
-				update_post_meta( $copied_post_id, 'easy_language_translation_language', $target_language );
+				update_post_meta( $copied_post_id, 'easy_language_simplification_language', $target_language );
 
 				// save the API used for this simplification.
 				update_post_meta( $copied_post_id, 'easy_language_api', $api_object->get_name() );
@@ -236,9 +226,9 @@ class Texts {
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
-	public function get_automatic_translation(): void {
+	public function get_automatic_simplification(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-get-automatic-translation', 'nonce' );
+		check_ajax_referer( 'easy-language-get-automatic-simplification', 'nonce' );
 
 		// get api.
 		$api_obj = Apis::get_instance()->get_active_api();
@@ -253,7 +243,8 @@ class Texts {
 
 		if ( $object_id > 0 ) {
 			// run simplification of this object.
-			$this->init->process_translations( $api_obj->get_translations_obj(), $api_obj->get_active_language_mapping(), $object_id );
+			$post_obj = new Post_Object( $object_id );
+			$post_obj->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping() );
 		}
 
 		// redirect user back to editor.
@@ -310,8 +301,77 @@ class Texts {
 			}
 		}
 
-		// if this is a translated object, reset the changed-marker on its original.
+		/**
+		 * Liste der aktuellen Texte laden.
+		 *
+		 * Dann durch die Texte der neuen Liste gehen.
+		 * Pro Eintrag einen Neueintrag vornehmen.
+		 * Dann pro Eintrag prüfen, ob der auf der alten Liste steht.
+		 * Wenn ja, dann diesen hier entfernen.
+		 *
+		 * Abschließend die Liste zum Entfernen durchgehen und alle über delete() löschen.
+		 */
+
+		// if this is a translated object, update the translatable contents and reset the changed-marker on its original.
 		if ( $post_obj->is_translated() ) {
+			// get all texts of this object.
+			$actual_entries = array();
+			foreach ( $this->db->get_entries( array( 'object_id' => $post_id ) ) as $entry ) {
+				$actual_entries[ $entry->get_id() ] = $entry;
+			}
+
+			// parse text depending on used pagebuilder for this object.
+			$pagebuilder_obj = $post_obj->get_page_builder();
+
+			// set object-id to pagebuilder-object.
+			$pagebuilder_obj->set_object_id( $post_id );
+
+			// set original title to simplify in pagebuilder-object.
+			$pagebuilder_obj->set_title( $post_obj->get_title() );
+
+			// set original text to simplify in pagebuilder-object.
+			$pagebuilder_obj->set_text( $post_obj->get_content() );
+
+			// get source language from original object.
+			$parent_post_obj  = new Post_Object( $post_obj->get_original_object_as_int() );
+			$source_languages = $parent_post_obj->get_language();
+			$source_language  = array_key_first( $source_languages );
+
+			// loop through the resulting texts and compare them with the existing texts in object.
+			foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
+				// check if the text is already saved as original text for simplification.
+				$original_text_obj = $this->db->get_entry_by_text( $text, $source_language );
+				if ( false === $original_text_obj ) {
+					// save the text for simplification.
+					$original_text_obj = $this->db->add( $text, $source_language, 'post_content' );
+				}
+
+				if ( ! empty( $actual_entries[ $original_text_obj->get_id() ] ) ) {
+					unset( $actual_entries[ $original_text_obj->get_id() ] );
+				} else {
+					$original_text_obj->set_object( get_post_type( $post_id ), $post_id, $pagebuilder_obj->get_name() );
+				}
+			}
+
+			// check if the title has already saved as original text for simplification.
+			$original_title_obj = $this->db->get_entry_by_text( $pagebuilder_obj->get_title(), $source_language );
+			if ( false === $original_title_obj ) {
+				// save the text for simplification.
+				$original_title_obj = $this->db->add( $pagebuilder_obj->get_title(), $source_language, 'title' );
+			}
+
+			if ( ! empty( $actual_entries[ $original_title_obj->get_id() ] ) ) {
+				unset( $actual_entries[ $original_title_obj->get_id() ] );
+			} else {
+				$original_title_obj->set_object( get_post_type( $post_id ), $post_id, $pagebuilder_obj->get_name() );
+			}
+
+			// remove all not updated entries of this obejct.
+			foreach ( $actual_entries as $entry ) {
+				$entry->delete( $post_id );
+			}
+
+			// remove changed-marker on original object.
 			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
 			// get all simplifications for this object in all active languages.
 			foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
@@ -337,10 +397,19 @@ class Texts {
 			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
 			$languages     = $post_obj->get_language();
 			$language_code = array_key_first( $languages );
-			if( !empty($language_code) ) {
+			if ( ! empty( $language_code ) ) {
 				$original_post->remove_translated_language( $language_code );
 				$original_post->remove_changed_marker( $language_code );
 			}
 		}
+	}
+
+	/**
+	 * Return all texts.
+	 *
+	 * @return array
+	 */
+	public function get_texts(): array {
+		return $this->db->get_entries();
 	}
 }

@@ -189,7 +189,7 @@ class Request {
 			return;
 		}
 
-		// bail if no text for translation is given.
+		// bail if no text for simplification is given.
 		if ( ! $this->has_text() ) {
 			return;
 		}

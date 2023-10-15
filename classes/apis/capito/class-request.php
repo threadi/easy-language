@@ -175,7 +175,7 @@ class Request {
 			return;
 		}
 
-		// bail if no text for translation is given.
+		// bail if no text for simplification is given.
 		if ( 'PUT' === $this->get_method() && ! $this->has_text() ) {
 			return;
 		}

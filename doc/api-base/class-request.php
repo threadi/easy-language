@@ -7,7 +7,6 @@
 
 namespace easyLanguage\Apis\Your_Api;
 
-use easyLanguage\Log_Api;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use WP_Error;
 use wpdb;
@@ -68,6 +67,13 @@ class Request {
 	 * @var string
 	 */
 	private string $target_language;
+
+	/**
+	 * Source-language for this request.
+	 *
+	 * @var string
+	 */
+	private string $source_language;
 
 	/**
 	 * Name for database-table with request-response.

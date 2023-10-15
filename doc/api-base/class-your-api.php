@@ -202,6 +202,7 @@ class Your_Api extends Base implements Api_Base {
 	/**
 	 * We to not add settings for this plugin.
 	 *
+	 * @param string $tab The tab.
 	 * @return void
 	 */
 	public function add_settings_tab( $tab ): void {}
@@ -230,11 +231,11 @@ class Your_Api extends Base implements Api_Base {
 	/**
 	 * Return the simplification-object.
 	 *
-	 * @return Translations
+	 * @return Simplifications
 	 */
-	public function get_translations_obj(): Translations {
+	public function get_simplifications_obj(): Simplifications {
 		// get the object.
-		$obj = Translations::get_instance();
+		$obj = Simplifications::get_instance();
 
 		// initialize it.
 		$obj->init( $this );

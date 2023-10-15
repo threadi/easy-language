@@ -15,7 +15,9 @@ use easyLanguage\Multilingual_plugins\Easy_Language\Parser_Base;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Handler for parsing Elementor-blocks.
@@ -67,7 +69,7 @@ class Elementor extends Parser_Base implements Parser {
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if elementor is not active.
-		if( false === $this->is_elementor_active() ) {
+		if ( false === $this->is_elementor_active() ) {
 			return array();
 		}
 
@@ -76,11 +78,11 @@ class Elementor extends Parser_Base implements Parser {
 
 		// get the actual elementor_data to get the texts of supported widgets.
 		$data = Plugin::$instance->documents->get( $this->get_object_id() )->get_elements_data();
-		if( !empty($data) ) {
-			foreach( $data as $container ) {
-				if( !empty($container['elements']) ) {
-					foreach ($container['elements'] as $widget) {
-						$resulting_texts = $this->get_widgets((array)$widget, $resulting_texts);
+		if ( ! empty( $data ) ) {
+			foreach ( $data as $container ) {
+				if ( ! empty( $container['elements'] ) ) {
+					foreach ( $container['elements'] as $widget ) {
+						$resulting_texts = $this->get_widgets( (array) $widget, $resulting_texts );
 					}
 				}
 			}
@@ -96,27 +98,30 @@ class Elementor extends Parser_Base implements Parser {
 	 * @return array
 	 */
 	private function get_flow_text_widgets(): array {
-		return apply_filters( 'easy_language_elementor_text_widgets', array(
-			'text-editor' => array(
-				'editor'
-			),
-			'heading' => array(
-				'title'
-			),
-			'testimonial-carousel' => array(
-				'slides' => array(
-					'content'
-				)
-			),
-			'icon-list' => array(
-				'icon_list' => array(
-					'text'
-				)
-			),
-			'button' => array(
-				'text'
+		return apply_filters(
+			'easy_language_elementor_text_widgets',
+			array(
+				'text-editor'          => array(
+					'editor',
+				),
+				'heading'              => array(
+					'title',
+				),
+				'testimonial-carousel' => array(
+					'slides' => array(
+						'content',
+					),
+				),
+				'icon-list'            => array(
+					'icon_list' => array(
+						'text',
+					),
+				),
+				'button'               => array(
+					'text',
+				),
 			)
-		));
+		);
 	}
 
 	/**
@@ -124,23 +129,23 @@ class Elementor extends Parser_Base implements Parser {
 	 *
 	 * We replace the text complete 1:1.
 	 *
-	 * @param string $original_complete
-	 * @param string $translated_part
+	 * @param string $original_complete The original text.
+	 * @param string $simplified_part The simplified text-part.
 	 * @return string
 	 */
-	public function get_text_with_translations( string $original_complete, string $translated_part ): string {
+	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
 		// do nothing if elementor is not active.
-		if( false === $this->is_elementor_active() ) {
+		if ( false === $this->is_elementor_active() ) {
 			return $original_complete;
 		}
 
 		// replace content in postmeta "_elementor_data".
 		$data = Plugin::$instance->documents->get( $this->get_object_id() )->get_elements_data();
-		if( !empty($data) ) {
-			foreach( $data as $index1 => $container ) {
-				if( !empty($container['elements']) ) {
-					foreach ($container['elements'] as $index2 => $widget) {
-						$data[$index1]['elements'][$index2] = $this->replace_content_in_widgets($widget, $translated_part);
+		if ( ! empty( $data ) ) {
+			foreach ( $data as $index1 => $container ) {
+				if ( ! empty( $container['elements'] ) ) {
+					foreach ( $container['elements'] as $index2 => $widget ) {
+						$data[ $index1 ]['elements'][ $index2 ] = $this->replace_content_in_widgets( $widget, $simplified_part );
 					}
 				}
 			}
@@ -148,41 +153,38 @@ class Elementor extends Parser_Base implements Parser {
 		update_post_meta( $this->get_object_id(), '_elementor_data', wp_slash( wp_json_encode( $data ) ) );
 
 		// replacement for post_content.
-		return str_replace( $this->get_text(), $translated_part, $original_complete );
+		return str_replace( $this->get_text(), $simplified_part, $original_complete );
 	}
 
 	/**
 	 * Loop through the elementor-widget to get the contents of the defined
 	 * flow-text-widgets.
 	 *
-	 * @param array $widget
-	 * @param array $resulting_texts
+	 * @param array $widget The widget-array.
+	 * @param array $resulting_texts The resulting texts as array.
 	 * @return array
 	 */
 	private function get_widgets( array $widget, array $resulting_texts ): array {
 		// get content if it is a valid flow-text-widget.
 		$flow_text_widgets = $this->get_flow_text_widgets();
-		if( !empty($widget['widgetType']) && !empty($flow_text_widgets[$widget['widgetType']]) ) {
-			foreach( $flow_text_widgets[$widget['widgetType']] as $name => $text ) {
-				if ( is_array($text) ) {
-					foreach( $widget['settings'][$name] as $index => $content ) {
-						foreach( $text as $content_key ) {
-							if (!empty($widget['settings'][$name][$index][$content_key])) {
-								$resulting_texts[] = $widget['settings'][$name][$index][$content_key];
+		if ( ! empty( $widget['widgetType'] ) && ! empty( $flow_text_widgets[ $widget['widgetType'] ] ) ) {
+			foreach ( $flow_text_widgets[ $widget['widgetType'] ] as $name => $text ) {
+				if ( is_array( $text ) ) {
+					foreach ( $widget['settings'][ $name ] as $index => $content ) {
+						foreach ( $text as $content_key ) {
+							if ( ! empty( $widget['settings'][ $name ][ $index ][ $content_key ] ) ) {
+								$resulting_texts[] = $widget['settings'][ $name ][ $index ][ $content_key ];
 							}
 						}
 					}
-				}
-				else {
-					if (!empty($widget['settings'][$text])) {
-						$resulting_texts[] = $widget['settings'][$text];
-					}
+				} elseif ( ! empty( $widget['settings'][ $text ] ) ) {
+						$resulting_texts[] = $widget['settings'][ $text ];
 				}
 			}
 		}
 
 		// loop through inner-widgets.
-		foreach( $widget['elements'] as $sub_widget ) {
+		foreach ( $widget['elements'] as $sub_widget ) {
 			$resulting_texts = $this->get_widgets( $sub_widget, $resulting_texts );
 		}
 
@@ -194,35 +196,32 @@ class Elementor extends Parser_Base implements Parser {
 	 * Replace the original widget texts with the translated texts.
 	 * Only in the supported flow-text-elements.
 	 *
-	 * @param array $widget
-	 * @param string $part_translation
+	 * @param array  $widget The widget-array.
+	 * @param string $simplified_text The simplified text-part.
 	 * @return array
 	 */
-	private function replace_content_in_widgets( array $widget, string $part_translation ): array {
+	private function replace_content_in_widgets( array $widget, string $simplified_text ): array {
 		// get content if it is a valid flow-text-widget.
 		$flow_text_widgets = $this->get_flow_text_widgets();
-		if( !empty($widget['widgetType']) && !empty($flow_text_widgets[$widget['widgetType']]) ) {
-			foreach( $flow_text_widgets[$widget['widgetType']] as $name => $text ) {
-				if( is_array($text) ) {
-					foreach( $widget['settings'][$name] as $index => $content ) {
-						foreach( $text as $content_key ) {
-							if ( $this->get_text() === $widget['settings'][$name][$index][$content_key] ) {
-								$widget['settings'][$name][$index][$content_key] = $part_translation;
+		if ( ! empty( $widget['widgetType'] ) && ! empty( $flow_text_widgets[ $widget['widgetType'] ] ) ) {
+			foreach ( $flow_text_widgets[ $widget['widgetType'] ] as $name => $text ) {
+				if ( is_array( $text ) ) {
+					foreach ( $widget['settings'][ $name ] as $index => $content ) {
+						foreach ( $text as $content_key ) {
+							if ( $this->get_text() === $widget['settings'][ $name ][ $index ][ $content_key ] ) {
+								$widget['settings'][ $name ][ $index ][ $content_key ] = $simplified_text;
 							}
 						}
 					}
-				}
-				else {
-					if ($this->get_text() === $widget['settings'][$text]) {
-						$widget['settings'][$text] = $part_translation;
-					}
+				} elseif ( $this->get_text() === $widget['settings'][ $text ] ) {
+						$widget['settings'][ $text ] = $simplified_text;
 				}
 			}
 		}
 
 		// loop through inner-widgets.
-		foreach( $widget['elements'] as $index => $sub_widget ) {
-			$widget['elements'][$index] = $this->replace_content_in_widgets( $sub_widget, $part_translation );
+		foreach ( $widget['elements'] as $index => $sub_widget ) {
+			$widget['elements'][ $index ] = $this->replace_content_in_widgets( $sub_widget, $simplified_text );
 		}
 
 		// return resulting widget.

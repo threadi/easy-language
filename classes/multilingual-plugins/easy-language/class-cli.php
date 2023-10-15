@@ -30,7 +30,7 @@ class Cli {
 		$db_obj = Db::get_instance();
 
 		// reset the simplifications.
-		$db_obj->reset_translations();
+		$db_obj->reset_simplifications();
 
 		// return ok-message.
 		\WP_CLI::success( 'All simplifications has been reset.' );
@@ -43,14 +43,17 @@ class Cli {
 	 * @noinspection PhpUnused
 	 * @noinspection PhpUndefinedClassInspection
 	 */
-	public function process_translations(): void {
+	public function process_simplifications(): void {
 		// get active API.
 		$api_obj = Apis::get_instance()->get_active_api();
 		if ( false !== $api_obj ) {
-			$c = $api_obj->get_translations_obj()->run();
+			$c = 0;
+			foreach ( Init::get_instance()->get_objects_with_texts() as $object ) {
+				$c = $c + $object->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping() );
+			}
 
 			// return message.
-			\WP_CLI::success( $c . ' translations has been saved.' );
+			\WP_CLI::success( $c . ' simplifications has been saved.' );
 			exit;
 		}
 

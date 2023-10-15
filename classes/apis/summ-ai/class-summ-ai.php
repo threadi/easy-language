@@ -108,7 +108,7 @@ class Summ_AI extends Base implements Api_Base {
 		$quota = $this->get_quota();
 
 		/* translators: %1$d will be replaced by a number, %2$s will be replaced by the URL for the Pro, %3$s will be replaced by the URL for SUMM AI-product-info */
-		$text = sprintf( __( '<p>Make any complicated text barrier-free and understandable with the <a href="%1$s" target="_blank"><strong>SUMM AI</strong> (opens new window)</a> AI-based tool.<br>Create simple and easy-to-understand texts on your website.</p><p>This API simplifies texts according to the official rules of the Leichte Sprache e.V.<br>This specifies how texts must be written in easy language.</ p><p><strong>With the free Easy Language plugin you have a quota of %2$d characters available for text simplifications.</strong></p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ), absint($quota['character_limit']) );
+		$text = sprintf( __( '<p>Make any complicated text barrier-free and understandable with the <a href="%1$s" target="_blank"><strong>SUMM AI</strong> (opens new window)</a> AI-based tool.<br>Create simple and easy-to-understand texts on your website.</p><p>This API simplifies texts according to the official rules of the Leichte Sprache e.V.<br>This specifies how texts must be written in easy language.</ p><p><strong>With the free Easy Language plugin you have a quota of %2$d characters available for text simplifications.</strong></p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ), absint( $quota['character_limit'] ) );
 		if ( $quota['character_limit'] > 0 ) {
 			/* translators: %1$d will be replaced by quota for this API, %2$d will be the characters spent for this API, %3$d will be the rest quota */
 			$text .= $this->get_quota_table();
@@ -118,7 +118,7 @@ class Summ_AI extends Base implements Api_Base {
 		$text .= '<p>';
 
 		// help-button.
-		$text .= '<a href="'.esc_url($this->get_language_specific_support_page()).'" target="_blank" class="button button-primary" title="'.esc_attr( __( 'Get help for this API', 'easy-language' ) ).'"><span class="dashicons dashicons-editor-help"></span></a>';
+		$text .= '<a href="' . esc_url( $this->get_language_specific_support_page() ) . '" target="_blank" class="button button-primary" title="' . esc_attr( __( 'Get help for this API', 'easy-language' ) ) . '"><span class="dashicons dashicons-editor-help"></span></a>';
 
 		$text .= '</p>';
 
@@ -227,15 +227,15 @@ class Summ_AI extends Base implements Api_Base {
 		global $wpdb;
 
 		// set source language depending on WP-locale and its support.
-		if ( ! get_option( 'easy_language_source_languages' ) ) {
+		if ( ! get_option( 'easy_language_summ_ai_source_languages' ) ) {
 			$language  = helper::get_wp_lang();
 			$languages = array( $language => '1' );
-			update_option( 'easy_language_source_languages', $languages );
+			update_option( 'easy_language_summ_ai_source_languages', $languages );
 		}
 
 		// set target language depending on source-language and if only one target could be possible.
-		if ( ! get_option( 'easy_language_target_languages' ) ) {
-			$source_languages = get_option( 'easy_language_source_languages', array() );
+		if ( ! get_option( 'easy_language_summ_ai_target_languages' ) ) {
+			$source_languages = get_option( 'easy_language_summ_ai_source_languages', array() );
 			$languages        = array();
 			$mappings         = $this->get_mapping_languages();
 			foreach ( $source_languages as $source_language => $enabled ) {
@@ -245,7 +245,7 @@ class Summ_AI extends Base implements Api_Base {
 					}
 				}
 			}
-			update_option( 'easy_language_target_languages', $languages );
+			update_option( 'easy_language_summ_ai_target_languages', $languages );
 		}
 
 		// set summ ai api as default API.
@@ -297,8 +297,8 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	private function get_options(): array {
 		return array(
-			'easy_language_source_languages',
-			'easy_language_target_languages',
+			'easy_language_summ_ai_source_languages',
+			'easy_language_summ_ai_target_languages',
 		);
 	}
 
@@ -321,11 +321,11 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Return the simplifications-object.
 	 *
-	 * @return Translations
+	 * @return Simplifications
 	 */
-	public function get_translations_obj(): Translations {
+	public function get_simplifications_obj(): Simplifications {
 		// get the object.
-		$obj = Translations::get_instance();
+		$obj = Simplifications::get_instance();
 
 		// initialize it.
 		$obj->init( $this );
@@ -342,7 +342,7 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_active_target_languages(): array {
 		// get actual enabled target-languages.
-		$target_languages = get_option( 'easy_language_target_languages', array() );
+		$target_languages = get_option( 'easy_language_summ_ai_target_languages', array() );
 		if ( ! is_array( $target_languages ) ) {
 			$target_languages = array();
 		}
@@ -431,7 +431,7 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_active_source_languages(): array {
 		// get actual enabled source-languages.
-		$source_languages = get_option( 'easy_language_source_languages', array() );
+		$source_languages = get_option( 'easy_language_summ_ai_source_languages', array() );
 		if ( ! is_array( $source_languages ) ) {
 			$source_languages = array();
 		}
@@ -475,6 +475,6 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_pro_hint(): string {
 		/* translators: %1$s will be replaced by the link to laolaweb.com */
-		return sprintf(__( 'Use your own API Key with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a>', 'easy-language' ), esc_url(Helper::get_pro_url()) );
+		return sprintf( __( 'Use your own API Key with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a>', 'easy-language' ), esc_url( Helper::get_pro_url() ) );
 	}
 }

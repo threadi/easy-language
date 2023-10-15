@@ -142,7 +142,7 @@ class Helper {
 	 */
 	public static function copy_cpt( int $old_id, int $new_id ): void {
 		// prevent copy to its own.
-		if( $old_id === $new_id ) {
+		if ( $old_id === $new_id ) {
 			return;
 		}
 
@@ -157,7 +157,7 @@ class Helper {
 
 		// duplicate all post meta.
 		$post_meta = get_post_meta( $old_id );
-		if ( is_array($post_meta) ) {
+		if ( is_array( $post_meta ) ) {
 			foreach ( $post_meta as $meta_key => $meta_values ) {
 				// ignore some keys.
 				if ( in_array( $meta_key, array( '_edit_lock', '_edit_last', '_wp_page_template', '_wp_old_slug' ), true ) ) {
@@ -273,11 +273,11 @@ class Helper {
 	 * @param Post_Object $post_object
 	 * @return string
 	 */
-	public static function get_objekt_type_name(Post_Object $post_object): string {
+	public static function get_objekt_type_name( Post_Object $post_object ): string {
 		$object_type_settings = Init::get_instance()->get_post_type_settings();
-		$object_type_name = 'page';
-		if( !empty($object_type_settings[$post_object->get_type()]) ) {
-			$object_type_name = $object_type_settings[$post_object->get_type()]['label_singular'];
+		$object_type_name     = 'page';
+		if ( ! empty( $object_type_settings[ $post_object->get_type() ] ) ) {
+			$object_type_name = $object_type_settings[ $post_object->get_type() ]['label_singular'];
 		}
 		return $object_type_name;
 	}

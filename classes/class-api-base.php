@@ -43,7 +43,7 @@ interface Api_Base {
 	public function get_active_target_languages(): array;
 
 	/**
-	 * Return the list of supported languages which could be translated with this API into each other.
+	 * Return the list of supported languages which could be simplified with this API into each other.
 	 *
 	 * @return array
 	 */
@@ -111,7 +111,7 @@ interface Api_Base {
 	 *
 	 * @return object
 	 */
-	public function get_translations_obj(): object;
+	public function get_simplifications_obj(): object;
 
 	/**
 	 * Get quota as array containing 'character_spent' and 'character_limit'.
@@ -156,7 +156,7 @@ interface Api_Base {
 	public function get_request_object();
 
 	/**
-	 * Return all by this API translated post type objects.
+	 * Return all by this API simplified post type objects.
 	 *
 	 * @return array
 	 */

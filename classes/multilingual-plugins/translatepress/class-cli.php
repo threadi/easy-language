@@ -21,8 +21,8 @@ class Cli {
 	 * @return void
 	 * @noinspection PhpUnused
 	 */
-	public function trp_reset_simplification(): void {
-		easy_language_trp_reset_translations();
+	public function trp_reset_simplifications(): void {
+		easy_language_trp_reset_simplifications();
 
 		// return ok-message.
 		\WP_CLI::success( 'All TranslatePress-simplifications has been reset.' );

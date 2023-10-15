@@ -7,19 +7,18 @@
 
 namespace easyLanguage\Apis\Your_Api;
 
-use easyLanguage\Log_Api;
 use easyLanguage\Multilingual_Plugins;
 
 /**
  * SimplificationS-Handling for this plugin.
  */
-class Translations {
+class Simplifications {
     /**
      * Instance of this object.
      *
-     * @var ?Translations
+     * @var ?Simplifications
      */
-    private static ?Translations $instance = null;
+    private static ?Simplifications $instance = null;
 
     /**
      * Init-Object of this API.
@@ -43,7 +42,7 @@ class Translations {
     /**
      * Return the instance of this Singleton object.
      */
-    public static function get_instance(): Translations
+    public static function get_instance(): Simplifications
     {
         if (!static::$instance instanceof static) {
             static::$instance = new static();
@@ -77,7 +76,7 @@ class Translations {
         // get active plugins and check if one of them supports APIs.
         foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
             if( $plugin_obj->is_supporting_apis() ) {
-                $c = $c + $plugin_obj->process_translations( $this, $mappings );
+                $c = $c + $plugin_obj->process_simplifications( $this, $mappings );
             }
         }
 

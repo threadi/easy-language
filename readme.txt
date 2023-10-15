@@ -1,6 +1,6 @@
 === Easy Language ===
 Contributors: laolaweb, threadi
-Tags: easy language, plain language, leichte sprache, summ ai
+Tags: easy language, plain language, leichte sprache, summ ai, simplify, capito
 Requires at least: 6.0
 Tested up to: 6.3
 Requires PHP: 8.0
@@ -10,21 +10,32 @@ Stable tag: 2.0.0
 
 == Description ==
 
-Have all texts on your website automatically translated into easy language. Use [SUMM AI](https://summ-ai.com)'s API to make your site even more accessible for your visitors.
+Have all texts on your website automatically simplified into easy language. Use a simplify-API like SUMM AI or Capito to make your site even more accessible for your visitors.
 
-=== Restrictions ===
+#### Highlights ####
 
-You will be able to translate 1800 characters via SUMM AI API without any costs. If you want to translate more characters, use our Pro-version of this plugin together with an API Key from SUMM AI.
+The [SUMM AI](https://summ-ai.com) API is usable without API Key to simplify 18000 characters FOR FREE.
 
-=== Features ===
+#### Features ####
 
+* Supported APIs to simplify texts in your website: [SUMM AI](https://summ-ai.com), [Capito](https://www.capito.eu), [ChatGpt](https://chat.openai.com)
+* The SUMM AI API is also usable with TranslatePress
 * Adds easy language to other multilingual plugins like WPML, Polylang, Sublanguage, TranslatePress
-* Use SUMM AI API to automatically translate texts with our plugin or TranslatePress
-* PageBuilder: native support for Block Editor (Gutenberg); other page builder (like Elementor, Divi, WPBakery) are supported in Pro-plugin
-* Multisite: all translated texts will be available to any other blog in the network
-* Own translator role for users to only translate texts.
+* PageBuilder: native support for Block Editor (Gutenberg) and Elementor
+* Multisite: all simplified texts will be available to any other blog in the network to prevent double simplification
+* Own translator role for users to only simplified texts.
 
 The development repository is on [GitHub](https://github.com/threadi/easy-language).
+
+#### Requirements
+
+If you want to use [Capito](https://www.capito.eu) or [ChatGpt](https://chat.openai.com) you need an API Key for their API. Please contact their websites for more information.
+
+#### the Pro license includes:
+
+* Support for any post-type (e.g. product description in WooCommerce)
+* Support for any taxonomies (e.g. product attributes)
+* Usage of custom SUMM AI API Key
 
 ---
 
@@ -35,13 +46,13 @@ The development repository is on [GitHub](https://github.com/threadi/easy-langua
 
 == Frequently Asked Questions ==
 
-= Can I use the plugin without a SUMM AI account? =
-
-The plugin can be installed even without SUMM AI account. You could translate all of your texts in easy language manually.
-
 = Does this plugin has an impact to the performance in the frontend? =
 
-No. By this plugin translated texts are handled as if they are Wordpress-native data.
+No. By this plugin simplified texts are handled as if they are Wordpress-native data. We do not output anything in fronted except the language switcher.
+
+= Is this plugin GPRD-compatible? =
+
+Yes, it is. We do not load any external files. API requests happen between your server and the API - not between them and your visitor.
 
 = Can I use this plugin in a multisite-installation? =
 
@@ -61,11 +72,10 @@ Yes, an icon is displayed in the page or post list for this purpose. As soon as 
 
 = 2.0.0 =
 * Plugin completely revised
-* Added translation for posts and pages in Einfache or Leichte Sprache, manually or automatic
-* Added support for API-based translations via SUMM AI and Capito
+* Added simplification for posts and pages in Einfache or Leichte Sprache, manually or automatic
+* Added support for API-based simplifications via SUMM AI and Capito
 * Added support for different source and target languages
 * Added support for different PageBuilder (Block Editor, Classic Editor)
 * Added multiple hooks
-* Initially support for translating taxonomies
-* Extended support for translations with TranslatePress
+* Extended support for simplifications with TranslatePress
 * WordPress Coding Standard 3.0 compatible

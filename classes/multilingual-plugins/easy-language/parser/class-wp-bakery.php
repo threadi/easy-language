@@ -13,7 +13,9 @@ use easyLanguage\Multilingual_plugins\Easy_Language\Parser_Base;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Handler for parsing wp bakery-content.
@@ -63,7 +65,7 @@ class WP_Bakery extends Parser_Base implements Parser {
 	 */
 	private function get_flow_text_shortcodes(): array {
 		return array(
-			'vc_column_text'
+			'vc_column_text',
 		);
 	}
 
@@ -76,7 +78,7 @@ class WP_Bakery extends Parser_Base implements Parser {
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if wp bakery is not active.
-		if( false === $this->is_wp_bakery_active() ) {
+		if ( false === $this->is_wp_bakery_active() ) {
 			return array();
 		}
 
@@ -84,7 +86,7 @@ class WP_Bakery extends Parser_Base implements Parser {
 		$resulting_texts = array();
 
 		// get content of supported flow-text-shortcodes.
-		foreach( $this->get_flow_text_shortcodes() as $shortcode ) {
+		foreach ( $this->get_flow_text_shortcodes() as $shortcode ) {
 			preg_match_all( '/' . get_shortcode_regex( array( $shortcode ) ) . '/s', $this->get_text(), $matches );
 			if ( ! empty( $matches[5][0] ) ) {
 				$resulting_texts[] = $matches[5][0];
@@ -100,17 +102,17 @@ class WP_Bakery extends Parser_Base implements Parser {
 	 *
 	 * We replace the text complete 1:1.
 	 *
-	 * @param string $original_complete
-	 * @param string $translated_part
+	 * @param string $original_complete Complete original content.
+	 * @param string $simplified_part The translated content.
 	 * @return string
 	 */
-	public function get_text_with_translations( string $original_complete, string $translated_part ): string {
+	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
 		// do nothing if wp bakery is not active.
-		if( false === $this->is_wp_bakery_active() ) {
+		if ( false === $this->is_wp_bakery_active() ) {
 			return $original_complete;
 		}
 
-		return str_replace( $this->get_text(), $translated_part, $original_complete );
+		return str_replace( $this->get_text(), $simplified_part, $original_complete );
 	}
 
 	/**
@@ -125,12 +127,12 @@ class WP_Bakery extends Parser_Base implements Parser {
 	/**
 	 * Return whether the given object is using this page builder.
 	 *
-	 * @param Post_Object $object
+	 * @param Post_Object $post_object The object to check.
 	 *
 	 * @return bool
 	 */
-	public function is_object_using_pagebuilder( Post_Object $object ): bool {
-		return 'true' === get_post_meta( $object->get_id(), '_wpb_vc_js_status', true );
+	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
+		return 'true' === get_post_meta( $post_object->get_id(), '_wpb_vc_js_status', true );
 	}
 
 	/**
@@ -141,9 +143,9 @@ class WP_Bakery extends Parser_Base implements Parser {
 	public function get_edit_link(): string {
 		return add_query_arg(
 			array(
-				'vc_action'     => 'vc_inline',
-				'post_id' => $this->get_object_id(),
-				'post_type' => 'page'
+				'vc_action' => 'vc_inline',
+				'post_id'   => $this->get_object_id(),
+				'post_type' => 'page',
 			),
 			get_admin_url() . 'post.php'
 		);

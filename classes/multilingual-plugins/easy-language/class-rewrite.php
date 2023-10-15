@@ -202,7 +202,7 @@ class Rewrite {
 	 */
 	public function page_link( string $url, WP_Post $post ): string {
 		// get language of this post.
-		$language = get_post_meta( $post->ID, 'easy_language_translation_language', true );
+		$language = get_post_meta( $post->ID, 'easy_language_simplification_language', true );
 		if ( ! empty( $language ) ) {
 			// get all supported languages.
 			$languages = Languages::get_instance()->get_active_languages();
@@ -225,7 +225,7 @@ class Rewrite {
 	 */
 	public function post_link( string $url, WP_Post $post ): string {
 		// get language of this post.
-		$language = get_post_meta( $post->ID, 'easy_language_translation_language', true );
+		$language = get_post_meta( $post->ID, 'easy_language_simplification_language', true );
 		if ( ! empty( $language ) ) {
 			// get all supported languages.
 			$languages = Languages::get_instance()->get_active_languages();

@@ -177,5 +177,5 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 *
 	 * @return void
 	 */
-	public function get_translations_script(): void {}
+	public function get_simplifications_scripts(): void {}
 }

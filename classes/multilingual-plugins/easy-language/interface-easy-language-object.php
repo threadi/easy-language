@@ -67,4 +67,15 @@ interface Easy_Language_Object {
 	 * @return object|false
 	 */
 	public function get_page_builder(): object|false;
+
+	/**
+	 * Process multiple simplification of a single post-object.
+	 *
+	 * @param Object $simplification_obj The simplification-object.
+	 * @param array  $language_mappings The language-mappings.
+	 *
+	 * @return int
+	 * @noinspection PhpUnused
+	 */
+	public function process_simplifications( object $simplification_obj, array $language_mappings ): int;
 }

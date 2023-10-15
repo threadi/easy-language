@@ -81,12 +81,12 @@ class Undetected extends Parser_Base implements Parser {
 	 * We replace the text complete 1:1.
 	 *
 	 * @param string $original_complete Complete original content.
-	 * @param string $translated_part The translated content.
+	 * @param string $simplified_part The translated content.
 	 *
 	 * @return string
 	 */
-	public function get_text_with_translations( string $original_complete, string $translated_part ): string {
-		return $translated_part;
+	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
+		return $simplified_part;
 	}
 
 	/**

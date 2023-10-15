@@ -106,12 +106,12 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 			if ( is_array( $response ) && ! is_wp_error( $response ) && isset( $response['response'] ) && isset( $response['response']['code'] ) ) {
 				if ( 200 === $response['response']['code'] ) {
 
-					// update translation count.
+					// update simplification count.
 					$this->machine_translator_logger->count_towards_quota( $string_to_translate );
 
 					$translation_response = json_decode( $response['body'] );
 					if ( ! empty( $translation_response->translated_text ) ) {
-						// update the translated string.
+						// update the simplification string.
 						$translated_strings[ $key ] = nl2br( $translation_response->translated_text );
 					}
 

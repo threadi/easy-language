@@ -1,6 +1,6 @@
 <?php
 /**
- * File for our own translation-machine.
+ * File for DB-handling.
  *
  * @package easy-language
  */
@@ -8,7 +8,6 @@
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
 use easyLanguage\Helper;
-use wpdb;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -47,7 +46,7 @@ class Db {
 		$wpdb->easy_language_originals_objects = $this->get_wpdb_prefix() . 'easy_language_originals_objects';
 
 		// set the table-name for simplifications.
-		$wpdb->easy_language_translations = $this->get_wpdb_prefix() . 'easy_language_translations';
+		$wpdb->easy_language_simplifications = $this->get_wpdb_prefix() . 'easy_language_simplifications';
 	}
 
 	/**
@@ -64,7 +63,6 @@ class Db {
 		if ( is_multisite() ) {
 			$current_blog = get_current_blog_id();
 			switch_to_blog( get_current_site()->blog_id );
-			$prefix = $wpdb->prefix;
 			switch_to_blog( $current_blog );
 		}
 		return $prefix;
@@ -88,7 +86,7 @@ class Db {
 	}
 
 	/**
-	 * Create translation table.
+	 * Create tables.
 	 *
 	 * @return void
 	 */
@@ -125,7 +123,7 @@ class Db {
 		dbDelta( $sql );
 
 		// table for language- and api-specific simplifications of texts.
-		$sql = "CREATE TABLE $wpdb->easy_language_translations (
+		$sql = "CREATE TABLE $wpdb->easy_language_simplifications (
             `oid` mediumint(9) NOT NULL,
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
             `translation` text DEFAULT '' NOT NULL,
@@ -142,11 +140,11 @@ class Db {
 	 *
 	 * @return void
 	 */
-	public function delete_table(): void {
+	public function delete_tables(): void {
 		global $wpdb;
 		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->easy_language_originals );
 		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->easy_language_originals_objects );
-		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->easy_language_translations );
+		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->easy_language_simplifications );
 	}
 
 	/**
@@ -177,7 +175,7 @@ class Db {
 			'original' => $text,
 			'hash'     => $this->get_string_hash( $text ),
 			'lang'     => $source_language,
-			'state'    => 'to_translate',
+			'state'    => 'to_simplify',
 			'field'    => $field,
 		);
 		$wpdb->insert( $wpdb->easy_language_originals, $query );
@@ -238,6 +236,10 @@ class Db {
 				$sql_where .= ' AND oo.blog_id = %d';
 				$vars[]     = absint( $filter['object_id'] );
 				$vars[]     = absint( get_current_blog_id() );
+				if ( ! empty( $filter['object_state'] ) ) {
+					$sql_where .= ' AND oo.state = %s';
+					$vars[]     = $filter['object_state'];
+				}
 			}
 			if ( ! empty( $filter['object_type'] ) ) {
 				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
@@ -282,9 +284,9 @@ class Db {
 	 *
 	 * @return void
 	 */
-	public function reset_translations(): void {
+	public function reset_simplifications(): void {
 		global $wpdb;
-		$wpdb->query( 'TRUNCATE TABLE ' . $wpdb->easy_language_translations );
+		$wpdb->query( 'TRUNCATE TABLE ' . $wpdb->easy_language_simplifications );
 	}
 
 	/**

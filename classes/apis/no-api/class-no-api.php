@@ -72,8 +72,40 @@ class No_Api extends Base implements Api_Base {
 		return __( '<p>This is a pseudo-API.<br>It does not use any API for simplifications.</p><p>Use this "API" if you do not want to use any other API.<br>You will be able to write your own texts in Leichte and Einfache Sprache.</p><p><strong>No automatic simplifications, no quota, no costs.</strong></p>', 'easy-language' );
 	}
 
+	/**
+	 * Return list of supported source-languages.
+	 *
+	 * @return array
+	 * @noinspection DuplicatedCode
+	 */
 	public function get_supported_source_languages(): array {
-		return array();
+		return array(
+			'de_DE'          => array(
+				'label'       => __( 'German', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in Germany.', 'easy-language' ),
+			),
+			'de_DE_formal'   => array(
+				'label'       => __( 'German (Formal)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Formal german spoken in Germany.', 'easy-language' ),
+			),
+			'de_CH'          => array(
+				'label'       => __( 'Suisse german', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Formal german spoken in Suisse.', 'easy-language' ),
+			),
+			'de_CH_informal' => array(
+				'label'       => __( 'Suisse german (Informal)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in Suisse.', 'easy-language' ),
+			),
+			'de_AT'          => array(
+				'label'       => __( 'Austria German', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'German spoken in Austria.', 'easy-language' ),
+			),
+		);
 	}
 
 	public function get_supported_target_languages(): array {
@@ -114,7 +146,7 @@ class No_Api extends Base implements Api_Base {
 
 	public function uninstall(): void {}
 
-	public function get_translations_obj(): object {
+	public function get_simplifications_obj(): object {
 		return new \stdClass();
 	}
 

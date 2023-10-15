@@ -16,15 +16,15 @@ function easy_language_get_simplification( obj_id, link ) {
 					{
 						text: easyLanguageSimplificationJsVars.label_open_link,
 						click: function () {
-							location.href=link;
+							location.href = link;
 						}
-					},
+				},
 					{
 						text: easyLanguageSimplificationJsVars.label_ok,
 						click: function () {
 							location.reload();
 						}
-					}
+				}
 				]
 			}
 		);
@@ -53,7 +53,7 @@ function easy_language_get_simplification( obj_id, link ) {
 			type: "POST",
 			url: easyLanguageSimplificationJsVars.ajax_url,
 			data: {
-				'action': 'easy_language_run_translation',
+				'action': 'easy_language_run_simplification',
 				'post': obj_id,
 				'nonce': easyLanguageSimplificationJsVars.run_simplification_nonce
 			},
@@ -82,7 +82,7 @@ function easy_language_get_simplification_info(obj_id, progressbar, stepDescript
 			type: "POST",
 			url: easyLanguageSimplificationJsVars.ajax_url,
 			data: {
-				'action': 'easy_language_get_info_translation',
+				'action': 'easy_language_get_info_simplification',
 				'post': obj_id,
 				'nonce': easyLanguageSimplificationJsVars.get_simplification_nonce
 			},
@@ -91,7 +91,7 @@ function easy_language_get_simplification_info(obj_id, progressbar, stepDescript
 				let count    = parseInt( stepData[0] );
 				let max      = parseInt( stepData[1] );
 				let running  = parseInt( stepData[2] );
-				let result  = stepData[3];
+				let result   = stepData[3];
 
 				// update progressbar
 				progressbar.progressbar(

@@ -11,7 +11,9 @@ use Elementor\Base_Data_Control;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Define the custom control.
@@ -40,9 +42,9 @@ class Languages extends Base_Data_Control {
 	 */
 	protected function get_default_settings(): array {
 		// get the ID of the original post.
-		$original_post_id = absint(get_post_meta( get_the_ID(), 'easy_language_translation_original_id', true ));
-		if( $original_post_id == 0 ) {
-			$original_post_id = absint(get_the_ID());
+		$original_post_id = absint( get_post_meta( get_the_ID(), 'easy_language_simplification_original_id', true ) );
+		if ( 0 === $original_post_id ) {
+			$original_post_id = absint( get_the_ID() );
 		}
 
 		// get the original-object.
@@ -53,20 +55,6 @@ class Languages extends Base_Data_Control {
 
 		// return merge of both settings.
 		return array_merge( $language_array, \easyLanguage\Languages::get_instance()->get_active_languages() );
-	}
-
-	/**
-	 * Get currency control default value.
-	 *
-	 * Retrieve the default value of the currency control. Used to return the
-	 * default value while initializing the control.
-	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @return string Currency control default value.
-	 */
-	public function get_default_value(): string {
-		return 'EUR';
 	}
 
 	/**
@@ -81,29 +69,31 @@ class Languages extends Base_Data_Control {
 	 * @return void
 	 */
 	public function content_template(): void {
-		$post_id = absint($_GET['post']);
+		$post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
 
-		// get the ID of the original post.
-		$original_post_id = absint(get_post_meta( $post_id, 'easy_language_translation_original_id', true ));
-		if( $original_post_id == 0 ) {
-			$original_post_id = $post_id;
-		}
+		if ( $post_id > 0 ) {
+			// get the ID of the original post.
+			$original_post_id = absint( get_post_meta( $post_id, 'easy_language_simplification_original_id', true ) );
+			if ( 0 === $original_post_id ) {
+				$original_post_id = $post_id;
+			}
 
-		// get the original-object.
-		$post_object = new Post_Object( $original_post_id );
+			// get the original-object.
+			$post_object = new Post_Object( $original_post_id );
 
-		?>
-		<# if ( data.description ) { #>
-			<div class="elementor-control-field-description">{{{ data.description }}}</div>
-		<# } #>
+			?>
+			<# if ( data.description ) { #>
+				<div class="elementor-control-field-description">{{{ data.description }}}</div>
+			<# } #>
 
-		<div class="elementor-control-field easy-language-table">
-			<div class="elementor-control-input-wrapper">
-				<?php
-					$post_object->get_page_builder()->get_language_switch( $post_id );
-				?>
+			<div class="elementor-control-field easy-language-table">
+				<div class="elementor-control-input-wrapper">
+					<?php
+						$post_object->get_page_builder()->get_language_switch( $post_id );
+					?>
+				</div>
 			</div>
-		</div>
-		<?php
+			<?php
+		}
 	}
 }

@@ -33,7 +33,7 @@ class Text {
 	 *
 	 * @var array
 	 */
-	private array $translations = array();
+	private array $simplifications = array();
 
 	/**
 	 * Source language.
@@ -60,7 +60,7 @@ class Text {
 		$wpdb->easy_language_originals_objects = DB::get_instance()->get_wpdb_prefix() . 'easy_language_originals_objects';
 
 		// set the table-name for simplifications.
-		$wpdb->easy_language_translations = DB::get_instance()->get_wpdb_prefix() . 'easy_language_translations';
+		$wpdb->easy_language_simplifications = DB::get_instance()->get_wpdb_prefix() . 'easy_language_simplifications';
 	}
 
 	/**
@@ -149,19 +149,21 @@ class Text {
 	private function get_translation_from_db( string $language ): string {
 		global $wpdb;
 
-		if ( ! empty( $this->translations[ $language ] ) ) {
-			return $this->translations[ $language ];
+		if ( ! empty( $this->simplifications[ $language ] ) ) {
+			return $this->simplifications[ $language ];
 		}
 
 		// get from DB.
-		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `translation` FROM ' . $wpdb->easy_language_translations . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
+		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `translation` FROM ' . $wpdb->easy_language_simplifications . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
 		if ( ! empty( $result ) ) {
 			// save in object.
-			$this->translations[ $language ] = $result['translation'];
+			$this->simplifications[ $language ] = $result['translation'];
 
 			// return result.
 			return $result['translation'];
 		}
+
+		// return empty string if no translation exist.
 		return '';
 	}
 
@@ -185,7 +187,7 @@ class Text {
 			$user_id = $user->ID;
 		}
 
-		// save the translation for this text.
+		// save the simplification for this text.
 		$query = array(
 			'oid'         => $this->get_id(),
 			'time'        => gmdate( 'Y-m-d H:i:s' ),
@@ -195,29 +197,29 @@ class Text {
 			'jobid'       => $job_id,
 			'user_id'     => $user_id,
 		);
-		$wpdb->insert( $wpdb->easy_language_translations, $query );
+		$wpdb->insert( $wpdb->easy_language_simplifications, $query );
 
-		// change state of text to "translated".
-		$this->set_state( 'translated' );
+		// change state of text to "simplified".
+		$this->set_state( 'simplified' );
 
-		// save translation in object.
-		$this->translations[ $target_language ] = $translated_text;
+		// save simplification in object.
+		$this->simplifications[ $target_language ] = $translated_text;
 	}
 
 	/**
 	 * Replace the original with the translation and save this in object.
 	 *
-	 * @param int $object_id The object-ID where the text should be replaced.
+	 * @param int    $object_id The object-ID where the text should be replaced.
 	 * @param string $target_language The target language for the translated text.
 	 *
 	 * @return bool
 	 */
 	public function replace_original_with_translation( int $object_id, string $target_language ): bool {
-		// get translation objects.
-		$translation_objects = $this->get_objects();
+		// get simplification objects.
+		$simplification_objects = $this->get_objects();
 
 		// bail if translation-objects could not be loaded.
-		if ( empty( $translation_objects ) ) {
+		if ( empty( $simplification_objects ) ) {
 			return false;
 		}
 
@@ -232,7 +234,7 @@ class Text {
 		/**
 		 * Replace content depending on the field.
 		 */
-		foreach ( $translation_objects as $translation_object ) {
+		foreach ( $simplification_objects as $translation_object ) {
 			switch ( $translation_object['field'] ) {
 				case 'title':
 					// replace text depending on used pagebuilder for original text.
@@ -240,7 +242,7 @@ class Text {
 					$obj->set_title( $object->get_title() );
 
 					// get title.
-					$title = $obj->get_title_with_translations( $object->get_title(), $this->get_translation( $target_language ) );
+					$title = $obj->get_title_with_simplifications( $object->get_title(), $this->get_translation( $target_language ) );
 
 					// update post-entry.
 					$query = array(
@@ -276,7 +278,7 @@ class Text {
 					$obj->set_text( $this->get_original() );
 
 					// get the resulting text depending on pagebuilder.
-					$content = $obj->get_text_with_translations( $object->get_content(), $this->get_translation( $target_language ) );
+					$content = $obj->get_text_with_simplifications( $object->get_content(), $this->get_translation( $target_language ) );
 
 					// update post-entry.
 					$query = array(
@@ -317,37 +319,37 @@ class Text {
 	 *
 	 * @return void
 	 */
-	public function delete( int $object_id ): void {
+	public function delete( int $object_id = 0 ): void {
 		global $wpdb;
 
 		// get object count before we do anything.
-		$object_count = count($this->get_objects());
+		$object_count = count( $this->get_objects() );
 
 		// delete connection between text and given object_id.
-		if( $object_count > 0 ) {
+		if ( $object_count > 0 ) {
 			$wpdb->delete(
 				$wpdb->easy_language_originals_objects,
 				array(
-					'oid' => $this->get_id(),
-					'blog_id' => get_current_blog_id(),
-					'object_id' => $object_id
+					'oid'       => $this->get_id(),
+					'blog_id'   => get_current_blog_id(),
+					'object_id' => $object_id,
 				)
 			);
-		}
-		else {
+		} else {
 			$wpdb->delete(
 				$wpdb->easy_language_originals_objects,
 				array(
-					'oid' => $this->get_id(),
+					'oid'     => $this->get_id(),
 					'blog_id' => get_current_blog_id(),
 				)
 			);
 		}
 
-		// if this text is used only from 1 object, delete it completely.
-		if( 1 === $object_count ) {
-			$wpdb->delete($wpdb->easy_language_originals, array('id' => $this->get_id()));
-			$wpdb->delete($wpdb->easy_language_translations, array('oid' => $this->get_id()));
+		// if this text is used only from 1 object, delete it completely with its simplifications.
+		// TODO einstellbar machen, ob wirklich alle übersetzungen gelöscht werden sollen (um datenbank clean zu halten)
+		if ( 1 === $object_count ) {
+			$wpdb->delete( $wpdb->easy_language_originals, array( 'id' => $this->get_id() ) );
+			$wpdb->delete( $wpdb->easy_language_simplifications, array( 'oid' => $this->get_id() ) );
 		}
 	}
 
@@ -361,7 +363,7 @@ class Text {
 
 		// get from DB.
 		$prepared_sql = $wpdb->prepare(
-			'SELECT oo.`object_type`, oo.`object_id`, oo.`page_builder`, o.`field`
+			'SELECT oo.`object_type`, oo.`object_id`, oo.`page_builder`, o.`field`, oo.`state`
 				FROM ' . $wpdb->easy_language_originals_objects . ' oo
 				JOIN ' . $wpdb->easy_language_originals . ' o ON (o.id = oo.oid)
 				WHERE oo.`oid` = %d AND oo.`blog_id` = %d',
@@ -376,18 +378,17 @@ class Text {
 	 * Set given ID and type as object which is using this text.
 	 *
 	 * @param string $type The object-type (e.g. post, page, category).
-	 * @param int    $id The object-ID from WP.
+	 * @param int    $item_id The object-ID from WP.
 	 * @param string $page_builder The used pagebuilder.
-	 *
 	 * @return void
 	 */
-	public function set_object( string $type, int $id, string $page_builder ): void {
+	public function set_object( string $type, int $item_id, string $page_builder ): void {
 		global $wpdb;
 		$query = array(
 			'oid'          => $this->get_id(),
 			'time'         => gmdate( 'Y-m-d H:i:s' ),
 			'object_type'  => $type,
-			'object_id'    => $id,
+			'object_id'    => $item_id,
 			'blog_id'      => get_current_blog_id(),
 			'page_builder' => $page_builder,
 		);

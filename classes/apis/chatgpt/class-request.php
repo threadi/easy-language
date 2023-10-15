@@ -175,7 +175,7 @@ class Request {
 			return;
 		}
 
-		// bail if no text for translation is given.
+		// bail if no text for simplification is given.
 		if ( 'PUT' === $this->get_method() && ! $this->has_text() ) {
 			return;
 		}
@@ -205,16 +205,16 @@ class Request {
 
 		// set request-data for PUT.
 		if ( 'POST' === $this->get_method() ) {
-			$data['messages']     = array(
+			$data['messages']                  = array(
 				array(
-					'role' => 'user',
-					'content' => $this->get_text()
-				)
+					'role'    => 'user',
+					'content' => $this->get_text(),
+				),
 			);
-			$data['model'] = get_option( 'easy_language_chatgpt_model', 'gpt-3.5-turbo' );
-			$payload = wp_json_encode( $data );
-			$args['body']        = $payload;
-			$args['headers']['Content-Length'] = strlen($payload);
+			$data['model']                     = get_option( 'easy_language_chatgpt_model', 'gpt-3.5-turbo' );
+			$payload                           = wp_json_encode( $data );
+			$args['body']                      = $payload;
+			$args['headers']['Content-Length'] = strlen( $payload );
 		}
 
 		// secure request.

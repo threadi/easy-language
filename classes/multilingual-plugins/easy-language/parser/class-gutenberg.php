@@ -116,12 +116,12 @@ class Gutenberg extends Parser_Base implements Parser {
 	 * This is done 1:1 for Gutenberg.
 	 *
 	 * @param string $original_complete Complete original content.
-	 * @param string $translated_part The translated content.
+	 * @param string $simplified_part The translated content.
 	 *
 	 * @return string
 	 */
-	public function get_text_with_translations( string $original_complete, string $translated_part ): string {
-		return str_replace( $this->get_text(), $translated_part, $original_complete );
+	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
+		return str_replace( $this->get_text(), $simplified_part, $original_complete );
 	}
 
 	/**

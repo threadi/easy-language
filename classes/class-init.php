@@ -147,7 +147,7 @@ class Init {
 				$message = sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional language.', 'easy-language' ), $plugin_obj->get_title() );
 				if ( false === $plugin_obj->is_supporting_apis() ) {
 					/* translators: %1$s will be replaced by the name of the multilingual-plugin */
-					$message .= '<br><br>' . sprintf( __( 'Due to limitations of this plugin, it is unfortunately not possible for us to provide automatic translation for plain language. If you want to use this, deactivate %1$s and use only the <i>Easy Language</i> plugin for this.', 'easy-language' ), $plugin_obj->get_title() );
+					$message .= '<br><br>' . sprintf( __( 'Due to limitations of this plugin, it is unfortunately not possible for us to provide automatic simplification for easy or plain language. If you want to use this, deactivate %1$s and use only the <i>Easy Language</i> plugin for this.', 'easy-language' ), $plugin_obj->get_title() );
 				}
 				$transient_obj->set_message( $message );
 				$transient_obj->save();
@@ -156,7 +156,7 @@ class Init {
 
 		// remove first step hint if API-settings are called.
 		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_intro_step_1' );
-		if( 'options-general.php' === $pagenow && !empty($_GET['page']) && 'easy_language_settings' === $_GET['page'] && $transient_obj->is_set() ) {
+		if ( 'options-general.php' === $pagenow && ! empty( $_GET['page'] ) && 'easy_language_settings' === $_GET['page'] && $transient_obj->is_set() ) {
 			$transient_obj->delete();
 		}
 	}
@@ -210,21 +210,21 @@ class Init {
 		return array(
 			'post' => array(
 				'label_singular' => __( 'post', 'easy-language' ),
-				'label_plural' => __( 'posts', 'easy-language' ),
+				'label_plural'   => __( 'posts', 'easy-language' ),
 				'admin_edit_url' => add_query_arg(
 					array(),
-					admin_url().'edit.php'
-				)
+					admin_url() . 'edit.php'
+				),
 			),
 			'page' => array(
 				'label_singular' => __( 'page', 'easy-language' ),
-				'label_plural' => __( 'pages', 'easy-language' ),
+				'label_plural'   => __( 'pages', 'easy-language' ),
 				'admin_edit_url' => add_query_arg(
 					array(
-						'post_type' => 'page'
+						'post_type' => 'page',
 					),
-					admin_url().'edit.php'
-				)
+					admin_url() . 'edit.php'
+				),
 			),
 		);
 	}

@@ -49,11 +49,11 @@ interface Parser {
 	 * Replace original text with translation.
 	 *
 	 * @param string $original_complete Complete original content.
-	 * @param string $translated_part The translated content.
+	 * @param string $simplified_part The translated content.
 	 *
 	 * @return string
 	 */
-	public function get_text_with_translations( string $original_complete, string $translated_part ): string;
+	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string;
 
 	/**
 	 * Get the object-id which is parsed.

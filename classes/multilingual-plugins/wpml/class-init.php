@@ -149,7 +149,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 *
 	 * @return void
 	 */
-	public function get_translations_script(): void {}
+	public function get_simplifications_scripts(): void {}
 
 	/**
 	 * Task to run on admin initialization.
@@ -189,9 +189,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				}
 
 				// collect possible simplifications.
-				$translations = array();
+				$simplifications = array();
 				foreach ( Languages::get_instance()->get_possible_source_languages() as $source_language_code => $source_language ) {
-					$translations[ $source_language_code ] = array(
+					$simplifications[ $source_language_code ] = array(
 						'language_code'         => $source_language_code,
 						'display_language_code' => $source_language_code,
 						'name'                  => $source_language['label'],
@@ -207,7 +207,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					'default_locale' => $language_code,
 					'encode_url'     => 0,
 					'tag'            => $language_code,
-					'translations'   => $translations,
+					'translations'   => $simplifications,
 					'flag'           => $language_code . '.png',
 					'flag_upload'    => true,
 				);

@@ -114,7 +114,7 @@ class Pagebuilder_Support {
 	 */
 	public function render_meta_box_content( WP_Post $post ): void {
 		// get the ID of the original post.
-		$original_post_id = absint( get_post_meta( $post->ID, 'easy_language_translation_original_id', true ) );
+		$original_post_id = absint( get_post_meta( $post->ID, 'easy_language_simplification_original_id', true ) );
 		if ( 0 === $original_post_id ) {
 			$original_post_id = absint( $post->ID );
 		}
@@ -150,7 +150,7 @@ class Pagebuilder_Support {
 		$page_builder = $original_post_object->get_page_builder();
 
 		/**
-		 * Show list of active languages the content could be translated
+		 * Show list of active languages the content could be simplified
 		 * only if page builder is active.
 		 */
 		if ( $page_builder->is_active() ) {

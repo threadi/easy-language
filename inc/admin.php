@@ -50,7 +50,7 @@ function easy_language_add_styles_and_js_admin(): void {
 
 	// add only scripts and styles of enabled plugins.
 	foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
-		$plugin_obj->get_translations_script();
+		$plugin_obj->get_simplifications_scripts();
 	}
 }
 add_action( 'admin_enqueue_scripts', 'easy_language_add_styles_and_js_admin', PHP_INT_MAX );

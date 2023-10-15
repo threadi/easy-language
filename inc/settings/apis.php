@@ -181,7 +181,7 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 		// loop through the object and change their state.
 		foreach( $post_type_objects as $post_type_object_id ) {
 			// save the previous state.
-			update_post_meta( $post_type_object_id, 'easy_language_translation_state_changed_from', get_post_status($post_type_object_id) );
+			update_post_meta( $post_type_object_id, 'easy_language_simplification_state_changed_from', get_post_status($post_type_object_id) );
 
 			// update object.
 			$array = array(
@@ -208,13 +208,13 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 
 	// if the new API is valid and setting has been changed.
 	if( $new_api && $api && $api->get_name() !== $new_api->get_name() ) {
-		// get the translated objects of the new API (all of them).
+		// get the simplified objects of the new API (all of them).
 		$post_type_objects = $new_api->get_translated_post_type_objects();
 
 		// loop through the object and change their to its previous state.
 		foreach( $post_type_objects as $post_type_object_id ) {
 			// get the previous state.
-			$new_post_state = get_post_meta( $post_type_object_id, 'easy_language_translation_state_changed_from', true );
+			$new_post_state = get_post_meta( $post_type_object_id, 'easy_language_simplification_state_changed_from', true );
 
 			// update object.
 			$array = array(
@@ -224,7 +224,7 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 			wp_update_post($array);
 
 			// delete the setting for previous state.
-			delete_post_meta( $post_type_object_id, 'easy_language_translation_state_changed_from' );
+			delete_post_meta( $post_type_object_id, 'easy_language_simplification_state_changed_from' );
 		}
 
 		// Enable hint if user has not configured the new API yet and if this API has no translation-objects.

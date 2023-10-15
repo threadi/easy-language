@@ -229,14 +229,14 @@ class Base {
 	}
 
 	/**
-	 * Return all by this API translated post type objects.
+	 * Return all by this API simplified post type objects.
 	 *
 	 * @return array
 	 */
 	public function get_translated_post_type_objects(): array {
-		$post_types = \easyLanguage\Multilingual_plugins\Easy_Language\Init::get_instance()->get_supported_post_types();
+		$post_types       = \easyLanguage\Multilingual_plugins\Easy_Language\Init::get_instance()->get_supported_post_types();
 		$post_types_array = array();
-		foreach( $post_types as $post_type => $enabled ) {
+		foreach ( $post_types as $post_type => $enabled ) {
 			$post_types_array[] = $post_type;
 		}
 		$query   = array(
@@ -247,9 +247,9 @@ class Base {
 			'meta_query'                      => array(
 				array(
 					'key'     => 'easy_language_api',
-					'value' => $this->get_name(),
-					'compare' => '='
-				)
+					'value'   => $this->get_name(),
+					'compare' => '=',
+				),
 			),
 			'do_not_use_easy_language_filter' => true,
 		);
@@ -263,12 +263,12 @@ class Base {
 	 * @return string
 	 */
 	public function get_settings_url(): string {
-		if( false === $this->has_settings() ) {
+		if ( false === $this->has_settings() ) {
 			return '';
 		}
 		return add_query_arg(
 			array(
-				'tab' => $this->get_name()
+				'tab' => $this->get_name(),
 			),
 			Helper::get_settings_page_url()
 		);
@@ -308,10 +308,10 @@ class Base {
 		$quota = $this->get_quota();
 
 		// define table.
-		$table = '<table>';
-		$table .= '<tr><th>'.esc_html__('Quota', 'easy-language').':</th><td>'.absint($quota['character_limit']).'</td></tr>';
-		$table .= '<tr><th>'.esc_html__('Character spent', 'easy-language').':</th><td>'.absint($quota['character_spent']).'</td></tr>';
-		$table .= '<tr><th>'.esc_html__('Rest quota', 'easy-language').':</th><td>'.absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ).'</td></tr>';
+		$table  = '<table>';
+		$table .= '<tr><th>' . esc_html__( 'Quota', 'easy-language' ) . ':</th><td>' . absint( $quota['character_limit'] ) . '</td></tr>';
+		$table .= '<tr><th>' . esc_html__( 'Character spent', 'easy-language' ) . ':</th><td>' . absint( $quota['character_spent'] ) . '</td></tr>';
+		$table .= '<tr><th>' . esc_html__( 'Rest quota', 'easy-language' ) . ':</th><td>' . absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) . '</td></tr>';
 		$table .= '</table>';
 
 		// output the resulting table.

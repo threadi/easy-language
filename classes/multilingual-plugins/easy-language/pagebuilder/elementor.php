@@ -15,30 +15,35 @@ use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * Enable Elementor-Support only if it is loaded.
  */
-add_action( 'init', function() {
-	if ( did_action( 'elementor/loaded' ) ) {
-		add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_elementor' );
+add_action(
+	'init',
+	function () {
+		if ( did_action( 'elementor/loaded' ) ) {
+			add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_elementor' );
+		}
 	}
-});
+);
 
 /**
  * Add Elementor-object to list of supported pagebuilder.
  *
- * @param array $list List of supported pagebuilder.
+ * @param array $pagebuilder_list List of supported pagebuilder.
  *
  * @return array
  */
-function easy_language_pagebuilder_elementor( array $list ): array {
+function easy_language_pagebuilder_elementor( array $pagebuilder_list ): array {
 	// add Elementor as PageBuilder.
-	$list[] = Elementor::get_instance();
+	$pagebuilder_list[] = Elementor::get_instance();
 
 	// return list of supported page-builders.
-	return $list;
+	return $pagebuilder_list;
 }
 
 /**
@@ -54,15 +59,16 @@ function easy_language_add_elementor_page_settings_controls( Post $page ): void 
 
 	// get the post-language.
 	$language_array = $post_object->get_language();
-	$language = reset( $language_array );
+	$language       = reset( $language_array );
 
 	/**
 	 * Add section.
 	 */
-	$page->start_controls_section('easy_language',
+	$page->start_controls_section(
+		'easy_language',
 		array(
 			'label' => esc_html__( 'Languages', 'easy-language' ),
-			'tab' => Controls_Manager::TAB_SETTINGS,
+			'tab'   => Controls_Manager::TAB_SETTINGS,
 		)
 	);
 
@@ -72,11 +78,11 @@ function easy_language_add_elementor_page_settings_controls( Post $page ): void 
 	$page->add_control(
 		'menu_item_color_custom',
 		array(
-			'label' => '',
+			'label'       => '',
 			'label_block' => true,
 			/* translators: %1$s will be replaced by the type of the object, %2$s will be replaced by the name of the language */
-			'description' => sprintf(__('You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language'), $post_object->get_type(), $language['label'] ),
-			'type' => 'easy_languages'
+			'description' => sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), $post_object->get_type(), $language['label'] ),
+			'type'        => 'easy_languages',
 		)
 	);
 	$page->end_controls_section();
@@ -96,15 +102,16 @@ function easy_language_add_elementor_page_settings_controls_page( Page $page ): 
 
 	// get the post-language.
 	$language_array = $post_object->get_language();
-	$language = reset( $language_array );
+	$language       = reset( $language_array );
 
 	/**
 	 * Add section.
 	 */
-	$page->start_controls_section('easy_language',
+	$page->start_controls_section(
+		'easy_language',
 		array(
 			'label' => esc_html__( 'Languages', 'easy-language' ),
-			'tab' => Controls_Manager::TAB_SETTINGS,
+			'tab'   => Controls_Manager::TAB_SETTINGS,
 		)
 	);
 
@@ -114,11 +121,11 @@ function easy_language_add_elementor_page_settings_controls_page( Page $page ): 
 	$page->add_control(
 		'menu_item_color_custom',
 		array(
-			'label' => '',
+			'label'       => '',
 			'label_block' => true,
 			/* translators: %1$s will be replaced by the type of the object, %2$s will be replaced by the name of the language */
-			'description' => sprintf(__('You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language'), $post_object->get_type(), $language['label'] ),
-			'type' => 'easy_languages'
+			'description' => sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), $post_object->get_type(), $language['label'] ),
+			'type'        => 'easy_languages',
 		)
 	);
 	$page->end_controls_section();
@@ -145,14 +152,15 @@ add_action( 'elementor/controls/register', 'easy_language_pagebuilder_elementor_
 function easy_language_pagebuilder_elementor_styles(): void {
 	// add only scripts and styles if our own plugin is used.
 	$multilingual_plugin = false;
-	foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
+	foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
 		if ( false === $plugin_obj->is_foreign_plugin() ) {
 			$multilingual_plugin = $plugin_obj;
 		}
 	}
-	if( false !== $multilingual_plugin ) {
-		wp_register_style( 'easy-language-elementor-admin',
-			trailingslashit(plugin_dir_url( EASY_LANGUAGE )). 'classes/multilingual-plugins/easy-language/admin/elementor.css',
+	if ( false !== $multilingual_plugin ) {
+		wp_register_style(
+			'easy-language-elementor-admin',
+			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'classes/multilingual-plugins/easy-language/admin/elementor.css',
 			array(),
 			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/elementor.css' ),
 		);
@@ -161,7 +169,7 @@ function easy_language_pagebuilder_elementor_styles(): void {
 		// elementor-specific backend-JS.
 		wp_register_script(
 			'easy-language-elementor-admin',
-			trailingslashit(plugin_dir_url( EASY_LANGUAGE )). 'classes/multilingual-plugins/easy-language/admin/elementor.js',
+			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'classes/multilingual-plugins/easy-language/admin/elementor.js',
 			array( 'jquery' ),
 			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/elementor.js' ),
 			true
@@ -169,7 +177,7 @@ function easy_language_pagebuilder_elementor_styles(): void {
 		wp_enqueue_script( 'easy-language-elementor-admin' );
 
 		// embed translation scripts.
-		$multilingual_plugin->get_translations_script();
+		$multilingual_plugin->get_simplifications_scripts();
 	}
 }
 add_action( 'elementor/editor/before_enqueue_styles', 'easy_language_pagebuilder_elementor_styles' );
@@ -177,8 +185,11 @@ add_action( 'elementor/editor/before_enqueue_styles', 'easy_language_pagebuilder
 /**
  * Add our custom tag to add language switcher.
  */
-add_action('elementor/dynamic_tags/register_tags', function ($dynamic_tags) {
-	if( Helper::is_plugin_active( 'elementor-pro/elementor-pro.php' ) ) {
-		$dynamic_tags->register( new easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor\Switcher );
+add_action(
+	'elementor/dynamic_tags/register_tags',
+	function ( $dynamic_tags ) {
+		if ( Helper::is_plugin_active( 'elementor-pro/elementor-pro.php' ) ) {
+			$dynamic_tags->register( new easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor\Switcher() );
+		}
 	}
-});
+);

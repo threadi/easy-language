@@ -97,11 +97,11 @@ function easy_language_trp_add_automatic_engine( array $engines ): array {
 add_filter( 'trp_machine_translation_engines', 'easy_language_trp_add_automatic_engine', 30 );
 
 /**
- * Truncate any translations for Leichte Sprache.
+ * Truncate any simplifications for Leichte Sprache.
  *
  * @return void
  */
-function easy_language_trp_reset_translations(): void {
+function easy_language_trp_reset_simplifications(): void {
 	global $wpdb;
 	$trp       = TRP_Translate_Press::get_trp_instance();
 	$trp_query = $trp->get_component( 'query' );

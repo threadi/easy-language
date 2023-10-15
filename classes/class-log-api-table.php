@@ -128,7 +128,7 @@ class Log_Api_Table extends WP_List_Table {
 
 			case 'api':
 				$api_obj = Apis::get_instance()->get_api_by_name( $item[ $column_name ] );
-				if( $api_obj ) {
+				if ( $api_obj ) {
 					return $api_obj->get_title();
 				}
 				return '';

@@ -10,3 +10,11 @@
 * vereinfachte Objekte sind über die Suche auffindbar
 * vereinfachte Objekte sind nicht im RSS-Feed enthalten
 * vereinfachte Objekte sind nicht über die REST-API-Suche zu finden
+
+# Aufbau
+
+Das Plugin besteht aus folgenden Komponenten:
+
+* Basis-Funktionen
+* APIs
+* Plugin-Support
