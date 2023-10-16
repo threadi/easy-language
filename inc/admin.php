@@ -45,6 +45,16 @@ function easy_language_add_styles_and_js_admin(): void {
 		array(
 			'ajax_url'      => admin_url( 'admin-ajax.php' ),
 			'dismiss_nonce' => wp_create_nonce( 'easy-language-dismiss-nonce' ),
+			'reset_intro_nonce' => wp_create_nonce( 'easy-language-reset-intro-nonce' ),
+			'label_reset_intro' => __( 'Intro reset', 'easy-language' ),
+			'label_ok' => __( 'OK', 'easy-language' ),
+			'txt_intro_reset' => __( '<p><strong>Intro has been reset.</strong> You can now start again to configure the plugin.<br><strong>Hint:</strong> No configuration and data has been changed.</p>', 'easy-language' ),
+			'run_delete_data_nonce' => wp_create_nonce( 'easy-language-delete-data-nonce' ),
+			'label_delete_data' => __( 'Deletion of simplified texts', 'easy-language' ),
+			'txt_please_wait' => __( 'Please wait', 'easy-language' ),
+			'get_delete_data_nonce' => wp_create_nonce( 'easy-language-get-delete-data-nonce' ),
+			'txt_deletion_done' => __( '<p><strong>Deletion of simplified texts done.</strong><br>You can now start with simplifications.</p>', 'easy-language' ),
+			'txt_delete_question' => __( 'Do you really want to delete all simplifications?', 'easy-language' )
 		)
 	);
 

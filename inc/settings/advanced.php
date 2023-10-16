@@ -96,6 +96,24 @@ function easy_language_admin_add_settings_advanced(): void {
 	);
 	register_setting( 'easyLanguageAdvancedFields', 'easy_language_api_timeout' );
 
+	// delete data button.
+	add_settings_field(
+		'easy_language_delete_data',
+		__( 'Delete ALL simplifications', 'easy-language' ),
+		'easy_language_admin_delete_data_now',
+		'easyLanguageAdvancedPage',
+		'settings_section_advanced'
+	);
+
+	// intro reset button.
+	add_settings_field(
+		'easy_language_reset_intro',
+		__( 'Plugin Intro', 'easy-language' ),
+		'easy_language_admin_reset_intro_now',
+		'easyLanguageAdvancedPage',
+		'settings_section_advanced'
+	);
+
 	// Debug-Mode.
 	add_settings_field(
 		'easy_language_debug_mode',
@@ -112,3 +130,27 @@ function easy_language_admin_add_settings_advanced(): void {
 	register_setting( 'easyLanguageAdvancedFields', 'easy_language_debug_mode' );
 }
 add_action( 'easy_language_settings_add_settings', 'easy_language_admin_add_settings_advanced' );
+
+/**
+ * Show reset-intro-button.
+ *
+ * @return void
+ */
+function easy_language_admin_reset_intro_now(): void {
+	?>
+	<p><a href="#" class="button button-primary easy-language-reset-intro"><?php _e('Reset Intro', 'easy-language'); ?></a></p>
+	<p><i><?php echo esc_html__('Hint', 'easy-language'); ?>:</i> <?php echo esc_html__('After click on this button the intro for this plugin will be re-initialized.', 'easy-language'); ?></p>
+	<?php
+}
+
+/**
+ * Show button to delete all simplifications.
+ *
+ * @return void
+ */
+function easy_language_admin_delete_data_now(): void {
+	?>
+	<p><a href="#" class="button button-primary easy-language-delete-data"><?php _e('Delete ALL simplification texts', 'easy-language'); ?></a></p>
+	<p><i><?php echo esc_html__('Hint', 'easy-language'); ?>:</i> <?php echo esc_html__('After click on this button the intro for this plugin will be re-initialized.', 'easy-language'); ?></p>
+	<?php
+}

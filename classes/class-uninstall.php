@@ -111,14 +111,14 @@ class Uninstall {
 	 */
 	private function tasks(): void {
 		/**
-		 * Call uninstall-routines of the available APIs.
+		 * Call uninstall-routines of all available APIs.
 		 */
 		foreach ( Apis::get_instance()->get_available_apis() as $apis ) {
 			$apis->uninstall();
 		}
 
 		/**
-		 * Call uninstall-routines of the available plugins.
+		 * Call uninstall-routines of all available plugins.
 		 */
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
 			$plugin_obj->uninstall();

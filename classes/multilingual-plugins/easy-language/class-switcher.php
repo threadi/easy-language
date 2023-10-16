@@ -239,7 +239,7 @@ class Switcher {
 
 			// define title or icon.
 			/* translators: %1$s will be replaced by the name of the language */
-			$attribute_title = sprintf( __( 'Show this site in %1$s', 'easy-language' ), $settings['label'] );
+			$attribute_title = sprintf( __( 'Show this site in %1$s.', 'easy-language' ), $settings['label'] );
 			$class           = 'easy-language-switcher-title';
 			$title           = $settings['label'];
 			if ( false !== $attributes['show_icons'] ) {

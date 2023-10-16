@@ -225,6 +225,23 @@ class Helper {
 	}
 
 	/**
+	 * Validate multiple text fields.
+	 *
+	 * @param $values
+	 * @return array|null
+	 */
+	public static function settings_validate_multiple_text_field( $values ): ?array {
+		$filter = current_filter();
+		if ( ! empty( $filter ) ) {
+			$filter = str_replace( 'sanitize_option_', '', $filter );
+			if ( empty( $values ) && ! empty( $_REQUEST[ $filter . '_ro' ] ) ) {
+				$values = (array) $_REQUEST[ $filter . '_ro' ];
+			}
+		}
+		return $values;
+	}
+
+	/**
 	 * Validate multiple radio-fields.
 	 *
 	 * @param $values

@@ -120,7 +120,7 @@ function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): vo
 						'id'     => $id . '-translate-object',
 						'parent' => $id,
 						/* translators: %1$s will be replaced by the API-title */
-						'title'  => sprintf( __( 'Simplify with %1$s', 'easy-language' ), $api_obj->get_title() ),
+						'title'  => sprintf( __( 'Simplify with %1$s.', 'easy-language' ), $api_obj->get_title() ),
 						'href'   => $post_object->get_simplification_via_api_link(),
 					)
 				);

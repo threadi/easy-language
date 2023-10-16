@@ -116,7 +116,7 @@ body .text-translations-table #source_language, body .text-translations-table #t
 
 .easy-api-radio img {
     float: right;
-    width: 120px;
+    height: 32px;
 }
 
 .easy-api-radios input[type='radio'] { display: none }
@@ -234,4 +234,16 @@ body .text-translations-table #source_language, body .text-translations-table #t
 
 .settings_page_easy_language_settings div.wrap > .easy-language-pro-hint {
 	padding: 4px 8px;
+}
+
+.easy-language-input-text, .form-table td p.easy-language-input-text { margin-bottom: 12px }
+
+.easy-language-input-text label {
+	display: block;
+	font-weight: bold;
+	margin-bottom: 4px;
+}
+
+.easy-language-input-text input[type="text"] {
+	width: 80%;
 }

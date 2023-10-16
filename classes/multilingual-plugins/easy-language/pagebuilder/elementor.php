@@ -13,23 +13,12 @@ use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor\Languages;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
+use Elementor\Plugin;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-/**
- * Enable Elementor-Support only if it is loaded.
- */
-add_action(
-	'init',
-	function () {
-		if ( did_action( 'elementor/loaded' ) ) {
-			add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_elementor' );
-		}
-	}
-);
 
 /**
  * Add Elementor-object to list of supported pagebuilder.
@@ -47,6 +36,28 @@ function easy_language_pagebuilder_elementor( array $pagebuilder_list ): array {
 }
 
 /**
+ * Embed additional Elementor-settings only if needed.
+ *
+ * @return void
+ */
+function easy_language_pagebuilder_elementor_init(): void {
+	if ( did_action( 'elementor/loaded' ) ) {
+		add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_elementor' );
+		add_action( 'elementor/widgets/register', 'easy_language_pagebuilder_elementor_register_widgets' );
+	}
+}
+add_action( 'init', 'easy_language_pagebuilder_elementor_init' );
+
+/**
+ * Embed custom Elementor widgets.
+ *
+ * @return void
+ */
+function easy_language_pagebuilder_elementor_register_widgets(): void {
+	Plugin::instance()->widgets_manager->register(new Elementor\Switcher_Widget());
+}
+
+/**
  * Add Elementor control under settings to switch between languages for posts.
  *
  * @param Post $page
@@ -61,31 +72,36 @@ function easy_language_add_elementor_page_settings_controls( Post $page ): void 
 	$language_array = $post_object->get_language();
 	$language       = reset( $language_array );
 
-	/**
-	 * Add section.
-	 */
-	$page->start_controls_section(
-		'easy_language',
-		array(
-			'label' => esc_html__( 'Languages', 'easy-language' ),
-			'tab'   => Controls_Manager::TAB_SETTINGS,
-		)
-	);
+	if( !empty($language) ) {
+		// get object type name.
+		$object_type_name = Helper::get_objekt_type_name( $post_object );
 
-	/**
-	 * Add our custom control in this section.
-	 */
-	$page->add_control(
-		'menu_item_color_custom',
-		array(
-			'label'       => '',
-			'label_block' => true,
-			/* translators: %1$s will be replaced by the type of the object, %2$s will be replaced by the name of the language */
-			'description' => sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), $post_object->get_type(), $language['label'] ),
-			'type'        => 'easy_languages',
-		)
-	);
-	$page->end_controls_section();
+		/**
+		 * Add section.
+		 */
+		$page->start_controls_section(
+			'easy_language',
+			array(
+				'label' => esc_html__( 'Languages', 'easy-language' ),
+				'tab'   => Controls_Manager::TAB_SETTINGS,
+			)
+		);
+
+		/**
+		 * Add our custom control in this section.
+		 */
+		$page->add_control(
+			'menu_item_color_custom',
+			array(
+				'label'       => '',
+				'label_block' => true,
+				/* translators: %1$s will be replaced by the type of the object, %2$s will be replaced by the name of the language */
+				'description' => sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $language['label'] ) ),
+				'type'        => 'easy_languages',
+			)
+		);
+		$page->end_controls_section();
+	}
 }
 add_action( 'elementor/element/wp-post/document_settings/after_section_end', 'easy_language_add_elementor_page_settings_controls' );
 
@@ -104,31 +120,36 @@ function easy_language_add_elementor_page_settings_controls_page( Page $page ): 
 	$language_array = $post_object->get_language();
 	$language       = reset( $language_array );
 
-	/**
-	 * Add section.
-	 */
-	$page->start_controls_section(
-		'easy_language',
-		array(
-			'label' => esc_html__( 'Languages', 'easy-language' ),
-			'tab'   => Controls_Manager::TAB_SETTINGS,
-		)
-	);
+	if( !empty($language) ) {
+		// get object type name.
+		$object_type_name = Helper::get_objekt_type_name( $post_object );
 
-	/**
-	 * Add our custom control in this section.
-	 */
-	$page->add_control(
-		'menu_item_color_custom',
-		array(
-			'label'       => '',
-			'label_block' => true,
-			/* translators: %1$s will be replaced by the type of the object, %2$s will be replaced by the name of the language */
-			'description' => sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), $post_object->get_type(), $language['label'] ),
-			'type'        => 'easy_languages',
-		)
-	);
-	$page->end_controls_section();
+		/**
+		 * Add section.
+		 */
+		$page->start_controls_section(
+			'easy_language',
+			array(
+				'label' => esc_html__( 'Languages', 'easy-language' ),
+				'tab'   => Controls_Manager::TAB_SETTINGS,
+			)
+		);
+
+		/**
+		 * Add our custom control in this section.
+		 */
+		$page->add_control(
+			'menu_item_color_custom',
+			array(
+				'label'       => '',
+				'label_block' => true,
+				/* translators: %1$s will be replaced by the type of the object, %2$s will be replaced by the name of the language */
+				'description' => sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $language['label'] ) ),
+				'type'        => 'easy_languages',
+			)
+		);
+		$page->end_controls_section();
+	}
 }
 add_action( 'elementor/element/wp-page/document_settings/after_section_end', 'easy_language_add_elementor_page_settings_controls_page' );
 

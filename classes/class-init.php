@@ -78,6 +78,9 @@ class Init {
 		add_action( 'init', array( $this, 'plugin_init' ) );
 		add_action( 'cli_init', array( $this, 'cli' ) );
 		add_action( 'update_option_easy_language_api', array( $this, 'update_easy_language_api' ), 10, 2 );
+
+		// ajax-hooks.
+		add_action( 'wp_ajax_easy_language_reset_intro', array( $this, 'reset_intro' ) );
 	}
 
 	/**
@@ -242,5 +245,29 @@ class Init {
 		if ( false !== $api_obj ) {
 			$api_obj->disable();
 		}
+	}
+
+	/**
+	 * Reset the intro-settings.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function reset_intro(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-reset-intro-nonce', 'nonce' );
+
+		// delete transient for step 1.
+		$transients_obj = Transients::get_instance();
+		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_intro_step_1' );
+		$transient_obj->delete();
+
+		// delete option for step 2.
+		delete_option( 'easy_language_intro_step_2' );
+
+		wp_send_json( array('result' => 'ok') );
+
+		// return nothing.
+		wp_die();
 	}
 }

@@ -3,12 +3,12 @@ ToDo
 
 Funktionales
 ------------
-* Button bei erweitert ergänzen der alle vereinfachungen aller APIs entfernt
-* Elementor: Switcher als Widget
 * Divi-Support erweitern (in Light)
 * WP Bakery & Avada ergänzen
 * Test-Matrix dokumentieren (aka: welche Kombinationen von Plugins sollten getestet werden)
 * Optionen für Handling in Tabellen ergänzen ("+" => sofort übersetzen / nur erstellen, "translate" => sichtbar/nicht sichtbar
+* Option an Post-Types ergänzen mit denen ein Redakteur weitere/erneute Übersetzungen verhindern kann
+-> kann nur vom Redakteur, der das Schloss setzte gelöst werden
 * Divi: prüfen wie Sprachwechsel hinterlegt wird
 * Test-Übersetzung ermöglichen mit einfachem Eingabefeld, welches die Eingabe an die aktive API schickt und die Übersetzung danach anzeigt.
 * Keys nur demjenigen anzeigen der sie eingegeben hat. wenn ein anderer nutzer das formular aufruft, den Key nicht anzeigen.

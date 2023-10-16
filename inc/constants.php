@@ -59,12 +59,19 @@ const EASY_LANGUAGE_LANGUAGE_EMERGENCY = 'en_US';
 const EASY_LANGUAGE_TRANSIENT_LIST = 'easy_language_transients';
 
 /**
- * Define names for progressbar during translation.
+ * Define names for progressbar during simplification.
  */
 const EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT   = 'easy_language_simplification_count';
 const EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX     = 'easy_language_simplification_max';
 const EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING = 'easy_language_simplification_running';
 const EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS = 'easy_language_simplification_results';
+
+/**
+ * Define names for progressbar during data deletion.
+ */
+const EASY_LANGUAGE_OPTION_DELETION_COUNT   = 'easy_language_deletion_count';
+const EASY_LANGUAGE_OPTION_DELETION_MAX     = 'easy_language_deletion_max';
+const EASY_LANGUAGE_OPTION_DELETION_RUNNING = 'easy_language_deletion_running';
 
 /**
  * Hash for plugin-installation.

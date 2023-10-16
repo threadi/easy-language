@@ -215,10 +215,10 @@ class Parser_Base {
 						?>
 					</p>
 					<?php /* translators: %1$s will be replaced by tne object-type-name (e.g. post oder page), %2$s will be replaced by the API-name */ ?>
-					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary easy-language-translate-object elementor-button" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( sprintf( __( 'Simplify this %1$s with %2$s', 'easy-language' ), esc_html( $object_type_name ), esc_html( $api_obj->get_title() ) ) ); ?>">
+					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary easy-language-translate-object elementor-button" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( sprintf( __( 'Simplify this %1$s with %2$s.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $api_obj->get_title() ) ) ); ?>">
 						<?php
 							/* translators: %1$s will be replaced by the API-title */
-							printf( esc_html__( 'Simplify with %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ) );
+							echo sprintf( esc_html__( 'Simplify with %1$s.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
 						if ( $quota_state['quota_percent'] > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
 							/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
 							echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';
@@ -271,14 +271,14 @@ class Parser_Base {
 				// set link to add simplification for this language.
 				$link = $original_post_object->get_simplification_link( $language_code );
 				/* translators: %1$s will be replaced by the language title */
-				$link_title   = __( 'Add simplification in %1$s', 'easy-language' );
+				$link_title   = __( 'Add simplification in %1$s.', 'easy-language' );
 				$link_content = '<span class="dashicons dashicons-plus"></span>';
 
 				// get translated post for this language (if it is not the original).
 				if ( empty( $settings['url'] ) ) {
 					$link = $original_post_object->get_page_builder()->get_edit_link();
 					/* translators: %1$s will be replaced by the page-title where the original content resides */
-					$link_title   = __( 'Original content in %1$s', 'easy-language' );
+					$link_title   = __( 'Original content in %1$s.', 'easy-language' );
 					$link_content = '<span class="dashicons dashicons-admin-home"></span>';
 				} else {
 					$query   = array(
@@ -307,7 +307,7 @@ class Parser_Base {
 						$post_obj = new Post_Object( $results->posts[0] );
 						$link     = $post_obj->get_page_builder()->get_edit_link();
 						/* translators: %1$s is the name of the language */
-						$link_title   = __( 'Edit simplification in %1$s', 'easy-language' );
+						$link_title   = __( 'Edit simplification in %1$s.', 'easy-language' );
 						$link_content = '<span class="dashicons dashicons-edit"></span>';
 					}
 				}

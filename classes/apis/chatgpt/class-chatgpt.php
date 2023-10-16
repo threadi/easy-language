@@ -147,6 +147,16 @@ class ChatGpt extends Base implements Api_Base {
 	}
 
 	/**
+	 * Return the URL of the public logo for this API.
+	 *
+	 * @return string
+	 */
+	public function get_logo_url(): string {
+		return Helper::get_plugin_url() . 'classes/apis/chatgpt/gfx/logo.png';
+	}
+
+
+	/**
 	 * Return list of supported source-languages.
 	 *
 	 * @return array
@@ -428,6 +438,23 @@ class ChatGpt extends Base implements Api_Base {
 		);
 		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_target_languages', array( 'sanitize_callback' => array( $this, 'validate_language_settings' ) ) );
 
+		// Define target-language-specific prompts.
+		add_settings_field(
+			'easy_language_chatgpt_target_languages_prompts',
+			__( 'Define prompts', 'easy-language' ),
+			'easy_language_admin_multiple_text_field',
+			'easyLanguageChatGptPage',
+			'settings_section_chatgpt',
+			array(
+				'label_for'   => 'easy_language_chatgpt_target_languages_prompts',
+				'fieldId'     => 'easy_language_chatgpt_target_languages_prompts',
+				'description' => __( 'The prompt defines the requirement for the ChatGpt AI to simplify the text that follows.', 'easy-language' ),
+				'options'     => $this->get_supported_target_languages(),
+				'readonly'    => false === $this->is_chatgpt_token_set() || $foreign_translation_plugin_with_api_support,
+			)
+		);
+		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_target_languages_prompts', array( 'sanitize_callback' => 'easyLanguage\Helper::settings_validate_multiple_text_field' ) );
+
 		// Set translation mode.
 		add_settings_field(
 			'easy_language_chatgpt_automatic_mode',
@@ -515,6 +542,16 @@ class ChatGpt extends Base implements Api_Base {
 			update_option( 'easy_language_chatgpt_target_languages', $languages );
 		}
 
+		// set target language prompts.
+		if ( ! get_option( 'easy_language_chatgpt_target_languages_prompts' ) ) {
+			$language  = helper::get_wp_lang();
+			$languages = array(
+				'de_EL' => 'Vereinfache bitte den folgenden deutschen Text in Einfache Sprache.',
+				'de_LS' => 'Vereinfache bitte den folgenden deutschen Text in Leichte Sprache. Verwende dabei pro Absatz eine Zeile.',
+			);
+			update_option( 'easy_language_chatgpt_target_languages_prompts', $languages );
+		}
+
 		// set translation mode to manuell.
 		if ( ! get_option( 'easy_language_chatgpt_automatic_mode' ) ) {
 			update_option( 'easy_language_chatgpt_automatic_mode', 'manuell' );
@@ -585,6 +622,7 @@ class ChatGpt extends Base implements Api_Base {
 			'easy_language_chatgpt_automatic_mode',
 			'easy_language_chatgpt_interval',
 			'easy_language_chatgpt_model',
+			'easy_language_chatgpt_target_languages_prompts'
 		);
 	}
 
@@ -850,12 +888,16 @@ class ChatGpt extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_request_text_by_language( string $target_language ): string {
-		// TODO änderbar machen
-		$request_texts = array(
-			'de_EL' => 'Vereinfache bitte den folgenden deutschen Text in Einfache Sprache.',
-			'de_LS' => 'Vereinfache bitte den folgenden deutschen Text in Leichte Sprache. Verwende dabei pro Absatz eine Zeile.',
-		);
-		return $request_texts[ $target_language ];
+		// get the settings.
+		$request_texts = get_option( 'easy_language_chatgpt_target_languages_prompts', array() );
+
+		// return language-specific text is it exist.
+		if( !empty($request_texts[ $target_language ]) ) {
+			return $request_texts[ $target_language ];
+		}
+
+		// return nothing if no language-specific text exist.
+		return '';
 	}
 
 	/**

@@ -507,3 +507,44 @@ function easy_language_admin_show_pro_hint( $hint ): void
 	echo '<p class="easy-language-pro-hint">'.sprintf(wp_kses_post($hint), '<a href="'.esc_url(Helper::get_pro_url()).'" target="_blank">Easy Language Pro (opens new window)</a>').'</p>';
 }
 add_action( 'easy_language_admin_show_pro_hint', 'easy_language_admin_show_pro_hint' );
+
+/**
+ * Show multiple input-text fields for a single setting.
+ *
+ * @param array $attr List of attributes.
+ *
+ * @return void
+ */
+function easy_language_admin_multiple_text_field( array $attr ): void {
+	if ( ! empty( $attr['options'] ) ) {
+		if ( ! empty( $attr['description'] ) ) {
+			echo '<p class="easy-language-input-text">' . wp_kses_post( $attr['description'] ) . '</p>';
+		}
+
+		foreach ( $attr['options'] as $key => $settings ) {
+			// get checked-marker.
+			$actual_values = get_option( $attr['fieldId'], array() );
+			$value       = ! empty( $actual_values[ $key ] ) ? $actual_values[ $key ] : '';
+
+			// readonly.
+			$readonly = '';
+			if ( isset( $attr['readonly'] ) && false !== $attr['readonly'] ) {
+				$readonly = ' disabled="disabled"';
+				?>
+				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr($value) ?>">
+				<?php
+			}
+			if ( isset( $settings['enabled'] ) && false === $settings['enabled'] ) {
+				$readonly = ' disabled="disabled"';
+			}
+
+			// output.
+			?>
+			<div class="easy-language-input-text">
+				<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>"><?php echo esc_html( $settings['label'] ); ?></label>
+				<input type="text" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>[<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr($value); ?>"<?php echo esc_attr( $readonly ); ?>>
+			</div>
+			<?php
+		}
+	}
+}

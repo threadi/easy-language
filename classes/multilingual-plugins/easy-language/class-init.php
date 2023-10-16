@@ -138,6 +138,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// add ajax-actions hooks.
 		add_action( 'wp_ajax_easy_language_run_simplification', array( $this, 'ajax_run_simplification' ) );
 		add_action( 'wp_ajax_easy_language_get_info_simplification', array( $this, 'ajax_get_simplification_info' ) );
+		add_action( 'wp_ajax_easy_language_run_data_deletion', array( $this, 'deletion_simplified_data' ) );
+		add_action( 'wp_ajax_easy_language_get_info_delete_data', array( $this, 'get_info_about_deletion_of_simplified_data' ) );
 
 		// embed files.
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), PHP_INT_MAX );
@@ -266,7 +268,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 						// show link to delete the translated post.
 						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+						echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
 						continue;
 					}
 
@@ -276,7 +278,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 						// show link to add simplification for this language.
 						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $edit_simplification ) . '" class="dashicons dashicons-edit" title="' . esc_attr( sprintf( __( 'Edit simplification in %1$s', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+						echo '<a href="' . esc_url( $edit_simplification ) . '" class="dashicons dashicons-edit" title="' . esc_attr( sprintf( __( 'Edit simplification in %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
 					}
 
 					// create link to run simplification of this page via API (if available).
@@ -291,7 +293,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 							// show link to simplify this page via api.
 							/* translators: %1$s is the name of the language, %2$s is the name of the used API, %3$s will be the API-title */
-							echo '<a href="' . esc_url( $do_simplification ) . '" class="dashicons dashicons-translation easy-language-translate-object" data-id="' . absint( $simplified_post_obj->get_id() ) . '" data-link="' . esc_url( get_permalink( $translated_post_id ) ) . '" title="' . esc_attr( sprintf( __( 'Simplify this %1$s in %2$s with %3$s', 'easy-language' ), esc_html( $object_type_name ), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</a>';
+							echo '<a href="' . esc_url( $do_simplification ) . '" class="dashicons dashicons-translation easy-language-translate-object" data-id="' . absint( $simplified_post_obj->get_id() ) . '" data-link="' . esc_url( get_permalink( $translated_post_id ) ) . '" title="' . esc_attr( sprintf( __( 'Simplify this %1$s in %2$s with %3$s.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</a>';
 						} elseif ( $api_obj->is_configured() ) {
 							// show simple not clickable icon if API is configured but no quota available.
 							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
@@ -318,7 +320,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 						// show link to delete the translated post.
 						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $delete_simplification ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
+						echo '<a href="' . esc_url( $delete_simplification ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s.', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
 					}
 
 					// show mark if content of original page has been changed.
@@ -512,7 +514,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'parent' => null,
 				'group'  => null,
 				/* translators: %1$s will be replaced by the object-name (like page or post) */
-				'title'  => sprintf( __( 'Simplify %1$s', 'easy-language' ), esc_html( $object->get_type() ) ),
+				'title'  => sprintf( __( 'Simplify %1$s.', 'easy-language' ), esc_html( $object->get_type() ) ),
 				'href'   => '',
 			)
 		);
@@ -1531,5 +1533,72 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			}
 		}
 		return $object_list;
+	}
+
+	/**
+	 * Delete the simplified data.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function deletion_simplified_data(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-delete-data-nonce', 'nonce' );
+
+		// bail if deletion is already running.
+		if( 1 === absint(get_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING, 0 )) ) {
+			return;
+		}
+
+		// set this as running.
+		update_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING, 1 );
+
+		// get all simplified entries.
+		$entries = DB::get_instance()->get_entries();
+
+		// set max entry count.
+		update_option( EASY_LANGUAGE_OPTION_DELETION_MAX, count($entries) );
+
+		// set counter to 0.
+		update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, 0 );
+
+		// loop through the entries and delete them.
+		foreach( $entries as $entry ) {
+			$entry->delete();
+
+			// update counter.
+			update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, absint(get_option( update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, 0 ))) + 1 );
+		}
+
+		// remove running marker.
+		delete_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING );
+
+		wp_die();
+	}
+
+	/**
+	 * Return info about deletion of simplified data.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function get_info_about_deletion_of_simplified_data(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-get-delete-data-nonce', 'nonce' );
+
+		// get running deletion.
+		$running_deletion = get_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING, 0 );
+
+		// get max value for running deletion.
+		$max_deletions = get_option( EASY_LANGUAGE_OPTION_DELETION_MAX, 0 );
+
+		// get count value for running deletion.
+		$count_deletion = get_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, 0 );
+
+		// collect return value.
+		echo absint( $count_deletion ) . ';' . absint( $max_deletions ) . ';' . absint( $running_deletion );
+
+		// return nothing more.
+		wp_die();
 	}
 }

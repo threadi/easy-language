@@ -475,6 +475,6 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_pro_hint(): string {
 		/* translators: %1$s will be replaced by the link to laolaweb.com */
-		return sprintf( __( 'Use your own API Key with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a>', 'easy-language' ), esc_url( Helper::get_pro_url() ) );
+		return sprintf( __( 'Get more quota with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a> and custom <a href="%2$s" target="_blank">SUMM AP API Key</a>', 'easy-language' ), esc_url( Helper::get_pro_url() ), esc_url( $this->get_language_specific_support_page() ) );
 	}
 }
