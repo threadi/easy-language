@@ -147,16 +147,17 @@ class Install {
 		}
 
 		// add user role for easy-language-translator if it does not exist.
-		$translator_role = get_role( 'el_translator' );
+		$translator_role = get_role( 'el_simplifier' );
 		if ( null === $translator_role ) {
-			$translator_role = add_role( 'el_translator', __( 'Translator for Easy Language', 'easy-language' ) );
+			$translator_role = add_role( 'el_simplifier', __( 'Editor for Easy Language', 'easy-language' ) );
 		}
+		$translator_role->add_cap( 'read' );
 
 		// get admin-role.
 		$admin_role = get_role( 'administrator' );
 
 		// loop through the capabilities and add them to the translator.
-		foreach ( Init::get_instance()->get_capabilities( 'el_translate', 'el_translate' ) as $capability ) {
+		foreach ( Init::get_instance()->get_capabilities( 'el_simplifier', 'el_simplifier' ) as $capability ) {
 			$translator_role->add_cap( $capability );
 			$admin_role->add_cap( $capability );
 		}
@@ -214,7 +215,7 @@ class Install {
 		/**
 		 * Remove our role.
 		 */
-		remove_role( 'el_translator' );
+		remove_role( 'el_simplifier' );
 
 		/**
 		 * Remove our capabilities from other roles.
@@ -222,7 +223,7 @@ class Install {
 		global $wp_roles;
 		foreach ( $wp_roles->roles as $role_name => $settings ) {
 			$role = get_role( $role_name );
-			foreach ( Init::get_instance()->get_capabilities( 'el_translate', 'el_translate' ) as $capability ) {
+			foreach ( Init::get_instance()->get_capabilities( 'el_simplifier', 'el_simplifier' ) as $capability ) {
 				$role->remove_cap( $capability );
 			}
 		}

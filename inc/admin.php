@@ -99,7 +99,7 @@ function easy_language_admin_dismiss(): void {
 	}
 
 	// save value.
-	update_site_option( 'pi-dismissed-' . md5( $option_name ), $dismissible_length );
+	update_option( 'el-dismissed-' . md5( $option_name ), $dismissible_length, true );
 
 	// remove transient.
 	Transients::get_instance()->get_transient_by_name( $option_name )->delete();

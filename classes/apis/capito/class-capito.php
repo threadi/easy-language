@@ -371,6 +371,11 @@ class Capito extends Base implements Api_Base {
 			update_option( 'easy_language_capito_interval', 'daily' );
 		}
 
+		// set capito api key to nothing but with active autoload.
+		if ( ! get_option( 'easy_language_capito_api_key' ) ) {
+			update_option( 'easy_language_capito_api_key', '', true );
+		}
+
 		$charset_collate = $wpdb->get_charset_collate();
 
 		// table for original-texts to translate.

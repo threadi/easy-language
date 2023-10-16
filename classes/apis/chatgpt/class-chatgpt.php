@@ -570,6 +570,11 @@ class ChatGpt extends Base implements Api_Base {
 			update_option( 'easy_language_chatgpt_model', 'gpt-4' );
 		}
 
+		// set chatgpt api key to nothing but with active autoload.
+		if ( ! get_option( 'easy_language_chatgpt_api_key' ) ) {
+			update_option( 'easy_language_chatgpt_api_key', '', true );
+		}
+
 		$charset_collate = $wpdb->get_charset_collate();
 
 		// table for original-texts to translate.

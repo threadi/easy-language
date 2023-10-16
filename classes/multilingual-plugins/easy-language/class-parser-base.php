@@ -155,7 +155,7 @@ class Parser_Base {
 	 */
 	public function get_language_switch( int $post_id = 0 ): void {
 		// bail if user has no simplification capabilities.
-		if ( false === current_user_can( 'edit_el_translate' ) ) {
+		if ( false === current_user_can( 'edit_el_simplifier' ) ) {
 			return;
 		}
 

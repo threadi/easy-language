@@ -44,7 +44,7 @@ add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_divi', 2000 
  */
 function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): void {
 	// bail if user has no translation capabilities.
-	if ( false === current_user_can( 'edit_el_translate' ) ) {
+	if ( false === current_user_can( 'edit_el_simplifier' ) ) {
 		return;
 	}
 

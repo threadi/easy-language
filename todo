@@ -4,6 +4,7 @@ ToDo
 Funktionales
 ------------
 * Divi-Support erweitern (in Light)
+* Cache von Seiten die übersetzt sind um nicht immer datenbankstatements im page/post-view auszuführen
 * WP Bakery & Avada ergänzen
 * Test-Matrix dokumentieren (aka: welche Kombinationen von Plugins sollten getestet werden)
 * Optionen für Handling in Tabellen ergänzen ("+" => sofort übersetzen / nur erstellen, "translate" => sichtbar/nicht sichtbar

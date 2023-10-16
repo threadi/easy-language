@@ -155,7 +155,7 @@ class Uninstall {
 		/**
 		 * Remove our role.
 		 */
-		remove_role( 'el_translator' );
+		remove_role( 'el_simplifier' );
 
 		/**
 		 * Remove our capabilities from other roles.
@@ -163,8 +163,8 @@ class Uninstall {
 		global $wp_roles;
 		foreach ( $wp_roles->roles as $role_name => $settings ) {
 			$role = get_role( $role_name );
-			foreach ( Init::get_instance()->get_capabilities( 'el_translate', 'el_translate' ) as $capability ) {
-				$role->remove_cap( $capability );
+			foreach ( Init::get_instance()->get_capabilities( 'el_simplifier' ) as $capability ) {
+				$role->remove_cap($capability);
 			}
 		}
 	}

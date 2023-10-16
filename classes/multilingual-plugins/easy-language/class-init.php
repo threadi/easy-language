@@ -273,7 +273,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					}
 
 					// get page-builder-specific edit-link if user has capability for it.
-					if ( current_user_can( 'edit_el_translate' ) ) {
+					if ( current_user_can( 'edit_el_simplifier' ) ) {
 						$edit_simplification = $page_builder->get_edit_link();
 
 						// show link to add simplification for this language.
@@ -282,7 +282,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					}
 
 					// create link to run simplification of this page via API (if available).
-					if ( false !== $api_obj && current_user_can( 'edit_el_translate' ) ) {
+					if ( false !== $api_obj && current_user_can( 'edit_el_simplifier' ) ) {
 						// get quota-state of this object.
 						$quota_status = $simplified_post_obj->get_quota_state( $api_obj );
 
@@ -315,7 +315,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					echo '<a href="' . esc_url( $show_link ) . '" class="dashicons dashicons-admin-site-alt3" target="_blank" title="' . esc_attr( __( 'Show in fronted (opens new window)', 'easy-language' ) ) . '">&nbsp;</a>';
 
 					// get link to delete this simplification if user has capability for it.
-					if ( current_user_can( 'delete_el_translate' ) ) {
+					if ( current_user_can( 'delete_el_simplifier' ) ) {
 						$delete_simplification = get_delete_post_link( $translated_post_id );
 
 						// show link to delete the translated post.
@@ -324,7 +324,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					}
 
 					// show mark if content of original page has been changed.
-					if ( $post_object->has_changed( $language_code ) && current_user_can( 'edit_el_translate' ) ) {
+					if ( $post_object->has_changed( $language_code ) && current_user_can( 'edit_el_simplifier' ) ) {
 						echo '<span class="dashicons dashicons-image-rotate" title="' . esc_html__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
 					}
 				} else {
@@ -634,7 +634,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$post_type_names = \easyLanguage\Init::get_instance()->get_post_type_names();
 
 		// get our own translator-role.
-		$translator_role = get_role( 'el_translator' );
+		$translator_role = get_role( 'el_simplifier' );
 
 		// get all translated, draft and marked objects in any supported language to set them to publish.
 		foreach ( $this->get_supported_post_types() as $post_type => $enabled ) {
@@ -1515,7 +1515,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// delete the api change and intro hint if one of the supported post type pages is called.
 		if ( ! empty( $this->get_supported_post_types()[ $screen->post_type ] ) ) {
 			Transients::get_instance()->get_transient_by_name( 'easy_language_api_changed' )->delete();
-			update_option( 'easy_language_intro_step_2', 2 );
+			if( 1 === absint(get_option( 'easy_language_intro_step_2', 0 ) ) ) {
+				update_option('easy_language_intro_step_2', 2 );
+			}
 		}
 	}
 

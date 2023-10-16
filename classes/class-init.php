@@ -181,7 +181,6 @@ class Init {
 			'edit_others_posts'      => 'edit_others_' . $plural,
 			'publish_posts'          => 'publish_' . $plural,
 			'read_private_posts'     => 'read_private_' . $plural,
-			'read'                   => 'read',
 			'delete_posts'           => 'delete_' . $plural,
 			'delete_private_posts'   => 'delete_private_' . $plural,
 			'delete_published_posts' => 'delete_published_' . $plural,
