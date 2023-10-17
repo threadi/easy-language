@@ -376,6 +376,11 @@ class Capito extends Base implements Api_Base {
 			update_option( 'easy_language_capito_api_key', '', true );
 		}
 
+		// set capito quota array.
+		if ( ! get_option( 'easy_language_capito_quota' ) ) {
+			update_option( 'easy_language_capito_quota', array(), true );
+		}
+
 		$charset_collate = $wpdb->get_charset_collate();
 
 		// table for original-texts to translate.

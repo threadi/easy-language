@@ -213,11 +213,6 @@ class Install {
 		}
 
 		/**
-		 * Remove our role.
-		 */
-		remove_role( 'el_simplifier' );
-
-		/**
 		 * Remove our capabilities from other roles.
 		 */
 		global $wp_roles;

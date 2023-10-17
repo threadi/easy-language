@@ -268,7 +268,7 @@ class Elementor extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Run no updates on object per default.
+	 * Run Elementor-specific updates on object.
 	 *
 	 * @param Post_Object $post_object The object.
 	 *

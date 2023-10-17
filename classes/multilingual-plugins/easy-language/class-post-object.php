@@ -50,15 +50,6 @@ class Post_Object implements Easy_Language_Object {
 		if ( get_post_meta( $this->get_id(), 'easy_language_simplification_original_id', true ) ) {
 			$this->translate_type = 'translated';
 		}
-
-		/**
-		 * Set original language for translatable type-objects, if not set.
-		 *
-		 * TODO nur wenn objekt auch übersetzt wird setzen
-		 */
-		if ( 'translatable' === $this->translate_type && empty( get_post_meta( $this->get_id(), 'easy_language_text_language', true ) ) ) {
-			update_post_meta( $this->get_id(), 'easy_language_text_language', helper::get_wp_lang() );
-		}
 	}
 
 	/**
@@ -71,6 +62,9 @@ class Post_Object implements Easy_Language_Object {
 		if ( 'translatable' === $this->translate_type ) {
 			$languages     = Languages::get_instance()->get_possible_source_languages();
 			$language_code = get_post_meta( $this->get_id(), 'easy_language_text_language', true );
+			if( empty($language_code) ) {
+				$language_code = Helper::get_wp_lang();
+			}
 		} else {
 			$language_code = get_post_meta( $this->get_id(), 'easy_language_simplification_language', true );
 		}
@@ -135,6 +129,9 @@ class Post_Object implements Easy_Language_Object {
 	 * @return bool
 	 */
 	public function is_translated_in_language( string $language ): bool {
+		if( false === $this->has_translations() ) {
+			return false;
+		}
 		return $this->get_translated_in_language( $language ) > 0;
 	}
 
@@ -633,5 +630,37 @@ class Post_Object implements Easy_Language_Object {
 		$actual_value                     = get_option( $option, array() );
 		$actual_value[ $this->get_md5() ] = $value;
 		update_option( $option, $actual_value );
+	}
+
+	/**
+	 * Return whether this original object has translations.
+	 *
+	 * @return bool
+	 */
+	public function has_translations(): bool {
+		// bail for translated objects.
+		if( $this->is_translated() ) {
+			return false;
+		}
+
+		// get list of translations in languages.
+		$languages = get_post_meta( $this->get_id(), 'easy_language_simplified_in', true );
+
+		// return true if list is not empty.
+		return !empty($languages);
+	}
+
+	/**
+	 * Return entries which are assigned to this post-object.
+	 *
+	 * @return array
+	 */
+	public function get_entries(): array {
+		return DB::get_instance()->get_entries(
+			array(
+				'object_id'   => $this->get_id(),
+				'object_type' => $this->get_type(),
+			)
+		);
 	}
 }

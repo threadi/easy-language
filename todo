@@ -3,14 +3,13 @@ ToDo
 
 Funktionales
 ------------
-* Divi-Support erweitern (in Light)
-* Cache von Seiten die übersetzt sind um nicht immer datenbankstatements im page/post-view auszuführen
-* WP Bakery & Avada ergänzen
-* Test-Matrix dokumentieren (aka: welche Kombinationen von Plugins sollten getestet werden)
+* E-Mail an SUMM AI wg. Quota & Testmöglichkeit
+* Wenn ein Objekt von einem PageBuilder bearbeitet wurde der aktuell nicht aktiviert ist, Warnung ausgeben und Übersetzung nicht ermöglichen
 * Optionen für Handling in Tabellen ergänzen ("+" => sofort übersetzen / nur erstellen, "translate" => sichtbar/nicht sichtbar
 * Option an Post-Types ergänzen mit denen ein Redakteur weitere/erneute Übersetzungen verhindern kann
 -> kann nur vom Redakteur, der das Schloss setzte gelöst werden
-* Divi: prüfen wie Sprachwechsel hinterlegt wird
+* Avada, Divi und WP Bakery: prüfen wie Sprachwechsel hinterlegt werden kann
+* Test-Matrix dokumentieren (aka: welche Kombinationen von Plugins sollten getestet werden)
 * Test-Übersetzung ermöglichen mit einfachem Eingabefeld, welches die Eingabe an die aktive API schickt und die Übersetzung danach anzeigt.
 * Keys nur demjenigen anzeigen der sie eingegeben hat. wenn ein anderer nutzer das formular aufruft, den Key nicht anzeigen.
 * sprachspezifische suche im frontend

@@ -163,7 +163,7 @@ class Uninstall {
 		global $wp_roles;
 		foreach ( $wp_roles->roles as $role_name => $settings ) {
 			$role = get_role( $role_name );
-			foreach ( Init::get_instance()->get_capabilities( 'el_simplifier' ) as $capability ) {
+			foreach ( Init::get_instance()->get_capabilities( 'el_simplifier', 'el_simplifier' ) as $capability ) {
 				$role->remove_cap($capability);
 			}
 		}

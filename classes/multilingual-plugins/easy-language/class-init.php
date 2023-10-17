@@ -203,7 +203,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// add only one column in trash-view.
 		if ( 'trash' === $status ) {
 			// create new array for columns to get clean ordering.
-			$new_columns['easy-language'] = __( 'Used language', 'easy-language' );
+			$new_columns['easy-language'] = __( 'Used simplification', 'easy-language' );
 			return array_merge( $new_columns, $columns );
 		}
 
@@ -333,7 +333,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 					// show link to add simplification for this language.
 					/* translators: %1$s is the name of the language */
-					echo '<a href="' . esc_url( $create_simplification ) . '" class="dashicons dashicons-plus" title="' . esc_attr( sprintf( esc_html__( 'Add simplification of %1%s', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+					echo '<a href="' . esc_url( $create_simplification ) . '" class="dashicons dashicons-plus" title="' . esc_attr( sprintf( esc_html__( 'Add simplification of %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
 				}
 			}
 		}
@@ -499,6 +499,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			$object = $this->get_object_by_wp_object( get_queried_object(), $object_id );
 		}
 
+		// bail if not object could be loaded.
+		if( false === $object ) {
+			return;
+		}
+
 		// bail if post type is not supported.
 		if ( false === $this->is_post_type_supported( $object->get_type() ) ) {
 			return;
@@ -507,6 +512,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// secure the menu ID.
 		$id = 'easy-language-translate-button';
 
+		// get object type name.
+		$object_type_name = Helper::get_objekt_type_name( $object );
+
 		// add not clickable main menu where all languages will be added as dropdown-items.
 		$admin_bar->add_menu(
 			array(
@@ -514,13 +522,16 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'parent' => null,
 				'group'  => null,
 				/* translators: %1$s will be replaced by the object-name (like page or post) */
-				'title'  => sprintf( __( 'Simplify %1$s.', 'easy-language' ), esc_html( $object->get_type() ) ),
+				'title'  => sprintf( __( 'Simplify this %1$s ', 'easy-language' ), esc_html( $object_type_name ) ),
 				'href'   => '',
 			)
 		);
 
 		// add sub-entry for each possible target language.
 		foreach ( $target_languages as $language_code => $target_language ) {
+			/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
+			$title = sprintf(__( 'Show this %1$s in %2$s ', 'easy-language' ), esc_html($object_type_name), esc_html($target_language['label']) );
+
 			// check if this object is already translated in this language.
 			if ( false !== $object->is_translated_in_language( $language_code ) ) {
 				// generate link-target to default editor with language-marker.
@@ -529,6 +540,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			} else {
 				// create link to generate a new simplification for this object.
 				$url = $object->get_simplification_link( $language_code );
+				/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
+				$title = sprintf(__( 'Create a simplification of this %1$s in %2$s ', 'easy-language' ), esc_html($object_type_name), esc_html($target_language['label']) );
 			}
 
 			// add language as possible simplification-target.
@@ -538,6 +551,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					'parent' => $id,
 					'title'  => $target_language['label'],
 					'href'   => $url,
+					'meta' => array(
+						'title' => esc_html($title)
+					)
 				)
 			);
 		}
@@ -755,10 +771,27 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			$entry->delete();
 		}
 
+		// remove all 'easy_language_text_language'-marker.
+		$query = array(
+			'post_status' => 'any',
+			'meta_query' => array(
+				array(
+					'key' => 'easy_language_text_language',
+					'compare' => 'EXISTS'
+				)
+			),
+			'fields' => 'ids',
+			'posts_per_page' => -1
+		);
+		$results = new WP_Query( $query );
+		foreach( $results->posts as $post_id ) {
+			delete_post_meta( $post_id, 'easy_language_text_language' );
+		}
+
 		// remove custom transients which are not set via Transient-object.
 		delete_transient( 'easy_language_refresh_rewrite_rules' );
 
-		// delete switcher.
+		// delete switcher for classic menu.
 		$query    = array(
 			'post_type'     => EASY_LANGUAGE_CPT_SWITCHER,
 			'post_status'   => 'any',
@@ -1306,7 +1339,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			$results = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, array() );
 
 			// collect return value.
-			echo absint( $count_simplifications[ $post_obj->get_md5() ] ) . ';' . absint( $max_simplifications[ $post_obj->get_md5() ] ) . ';' . absint( $running_simplifications[ $post_obj->get_md5() ] ) . ';' . wp_kses_post( $results[ $post_obj->get_md5() ] );
+			echo absint( $count_simplifications[ $post_obj->get_md5() ] ) . ';' . absint( $max_simplifications[ $post_obj->get_md5() ] ) . ';' . absint( $running_simplifications[ $post_obj->get_md5() ] ) . ';' . wp_kses_post( $results[ $post_obj->get_md5() ] ) . ';'  . get_permalink($post_id);
 		}
 
 		// return nothing.
@@ -1360,6 +1393,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'run_simplification_nonce'        => wp_create_nonce( 'easy-language-simplification-start-nonce' ),
 				'get_simplification_nonce'        => wp_create_nonce( 'easy-language-simplification-get-nonce' ),
 				'txt_simplification_has_been_run' => __( 'Simplification has been run.', 'easy-language' ),
+				'translate_confirmation_question' => __( 'Simplify the texts in this object?', 'easy-language' ),
 			)
 		);
 
@@ -1409,7 +1443,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easyLanguagePluginJsVars',
 			array(
 				'ajax_url'                        => admin_url( 'admin-ajax.php' ),
-				'translate_confirmation_question' => __( 'Simplify the texts in this object?', 'easy-language' ),
 				'delete_confirmation_question'    => __( 'Do you really want to delete this translated object?', 'easy-language' ),
 				'dismiss_intro_nonce'             => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),
 				/* translators: %1$s will be replaced by the path to the easy language icon */

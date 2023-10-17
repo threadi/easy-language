@@ -1,17 +1,5 @@
 jQuery( document ).ready(
 	function ($) {
-		// start to translate an object via AJAX.
-		$( '.easy-language-translate-object' ).on(
-			'click',
-			function (e) {
-				e.preventDefault();
-
-				if ( confirm( easyLanguagePluginJsVars.translate_confirmation_question ) ) {
-					easy_language_get_simplification( $( this ).data( 'id' ), $( this ).data( 'link' ) );
-				}
-			}
-		);
-
 		// confirm deletion of translated object.
 		$( '.easy-language-trash' ).on(
 			'click',

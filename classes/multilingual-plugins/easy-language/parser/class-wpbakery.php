@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Handler for parsing wp bakery-content.
  */
-class WP_Bakery extends Parser_Base implements Parser {
+class WPBakery extends Parser_Base implements Parser {
 	/**
 	 * Internal name of the parser.
 	 *
@@ -31,9 +31,9 @@ class WP_Bakery extends Parser_Base implements Parser {
 	/**
 	 * Instance of this object.
 	 *
-	 * @var ?WP_Bakery
+	 * @var ?WPBakery
 	 */
-	private static ?WP_Bakery $instance = null;
+	private static ?WPBakery $instance = null;
 
 	/**
 	 * Constructor for this object.
@@ -50,7 +50,7 @@ class WP_Bakery extends Parser_Base implements Parser {
 	/**
 	 * Return the instance of this Singleton object.
 	 */
-	public static function get_instance(): WP_Bakery {
+	public static function get_instance(): WPBakery {
 		if ( ! static::$instance instanceof static ) {
 			static::$instance = new static();
 		}
@@ -64,8 +64,20 @@ class WP_Bakery extends Parser_Base implements Parser {
 	 * @return array
 	 */
 	private function get_flow_text_shortcodes(): array {
-		return array(
-			'vc_column_text',
+		return apply_filters(
+			'easy_language_wpbakery_text_widgets',
+			array(
+				'vc_column_text' => array(),
+				'vc_btn' => array(
+					'title'
+				),
+				'block_title' => array(
+					'title'
+				),
+				'vc_toggle' => array(
+					'title'
+				)
+			)
 		);
 	}
 
@@ -86,10 +98,30 @@ class WP_Bakery extends Parser_Base implements Parser {
 		$resulting_texts = array();
 
 		// get content of supported flow-text-shortcodes.
-		foreach ( $this->get_flow_text_shortcodes() as $shortcode ) {
+		foreach ( $this->get_flow_text_shortcodes() as $shortcode => $attributes ) {
 			preg_match_all( '/' . get_shortcode_regex( array( $shortcode ) ) . '/s', $this->get_text(), $matches );
-			if ( ! empty( $matches[5][0] ) ) {
-				$resulting_texts[] = $matches[5][0];
+			if ( empty($attributes) && ! empty( $matches[5] ) ) {
+				foreach( $matches[5] as $texts ) {
+					if (!empty($texts)) {
+						$resulting_texts[] = $texts;
+					}
+				}
+			}
+			elseif( !empty($attributes) && !empty($matches[2]) && !empty($matches[3]) ) {
+				if( ! empty(! empty( $matches[5])) ) {
+					foreach ( $matches[5] as $texts ) {
+						if ( ! empty( $texts ) ) {
+							$resulting_texts[] = $texts;
+						}
+					}
+				}
+				foreach( $matches[2] as $key => $value ) {
+					foreach( shortcode_parse_atts($matches[3][$key]) as $attribute => $attribute_value ) {
+						if( in_array( $attribute, $attributes, true ) && !empty($attribute_value) ) {
+							$resulting_texts[] = $attribute_value;
+						}
+					}
+				}
 			}
 		}
 
@@ -167,5 +199,16 @@ class WP_Bakery extends Parser_Base implements Parser {
 	 */
 	public function hide_translate_menu_in_frontend(): bool {
 		return true;
+	}
+
+	/**
+	 * Run WPBakery-specific updates on object.
+	 *
+	 * @param Post_Object $post_object The object.
+	 *
+	 * @return void
+	 */
+	public function update_object( Post_Object $post_object ): void {
+		do_action( 'save_post' );
 	}
 }

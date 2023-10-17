@@ -1,13 +1,12 @@
 <?php
 /**
- * File for handling Divi pagebuilder for simplifications.
+ * File for handling Avada pagebuilder for simplifications.
  *
  * @package easy-language
  */
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language\Parser;
 
-use easyLanguage\Helper;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser_Base;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
@@ -18,22 +17,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Handler for parsing divi-content.
+ * Handler for parsing avada-content.
  */
-class Divi extends Parser_Base implements Parser {
+class Avada extends Parser_Base implements Parser {
 	/**
 	 * Internal name of the parser.
 	 *
 	 * @var string
 	 */
-	protected string $name = 'Divi';
+	protected string $name = 'Avada';
 
 	/**
 	 * Instance of this object.
 	 *
-	 * @var ?Divi
+	 * @var ?Avada
 	 */
-	private static ?Divi $instance = null;
+	private static ?Avada $instance = null;
 
 	/**
 	 * Constructor for this object.
@@ -50,7 +49,7 @@ class Divi extends Parser_Base implements Parser {
 	/**
 	 * Return the instance of this Singleton object.
 	 */
-	public static function get_instance(): Divi {
+	public static function get_instance(): Avada {
 		if ( ! static::$instance instanceof static ) {
 			static::$instance = new static();
 		}
@@ -65,13 +64,10 @@ class Divi extends Parser_Base implements Parser {
 	 */
 	private function get_flow_text_shortcodes(): array {
 		return apply_filters(
-			'easy_language_divi_text_widgets',
+			'easy_language_avada_text_widgets',
 			array(
-				'et_pb_text' => array(),
-				'et_pb_button' => array(
-					'button_text'
-				),
-				'et_pb_blurb' => array()
+				'fusion_title' => array(),
+				'fusion_text' => array()
 			)
 		);
 	}
@@ -79,13 +75,13 @@ class Divi extends Parser_Base implements Parser {
 	/**
 	 * Return parsed texts.
 	 *
-	 * Get the divi-content and parse its widgets to get the content of flow-text-widgets.
+	 * Get the avada-content and parse its widgets to get the content of flow-text-widgets.
 	 *
 	 * @return array
 	 */
 	public function get_parsed_texts(): array {
-		// do nothing if divi is not active.
-		if ( false === $this->is_divi_active() ) {
+		// do nothing if avada is not active.
+		if ( false === $this->is_avada_active() ) {
 			return array();
 		}
 
@@ -122,13 +118,13 @@ class Divi extends Parser_Base implements Parser {
 	 *
 	 * We replace the text complete 1:1.
 	 *
-	 * @param string $original_complete The original text.
-	 * @param string $simplified_part The simplified text-part.
+	 * @param string $original_complete Complete original content.
+	 * @param string $simplified_part The translated content.
 	 * @return string
 	 */
 	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
-		// do nothing if divi is not active.
-		if ( false === $this->is_divi_active() ) {
+		// do nothing if avada is not active.
+		if ( false === $this->is_avada_active() ) {
 			return $original_complete;
 		}
 
@@ -136,20 +132,20 @@ class Divi extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether Divi is active.
+	 * Return whether Avada is active.
 	 *
 	 * @return bool
 	 */
-	private function is_divi_active(): bool {
-		$is_divi = Helper::is_plugin_active( 'divi-builder/divi-builder.php' );
+	private function is_avada_active(): bool {
+		$is_avada = false;
 		$theme   = wp_get_theme();
-		if ( 'Divi' === $theme->get( 'Name' ) ) {
-			$is_divi = true;
+		if ( 'Avada' === $theme->get( 'Name' ) ) {
+			$is_avada = true;
 		}
-		if ( $theme->parent() && 'Divi' === $theme->parent()->get( 'Name' ) ) {
-			$is_divi = true;
+		if ( $theme->parent() && 'Avada' === $theme->parent()->get( 'Name' ) ) {
+			$is_avada = true;
 		}
-		return $is_divi;
+		return $is_avada;
 	}
 
 	/**
@@ -160,22 +156,7 @@ class Divi extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return 'on' === get_post_meta( $post_object->get_id(), '_et_pb_use_builder', true );
-	}
-
-	/**
-	 * Return edit link for divi-object.
-	 *
-	 * @return string
-	 */
-	public function get_edit_link(): string {
-		return add_query_arg(
-			array(
-				'et_fb'     => '1',
-				'PageSpeed' => 'Off',
-			),
-			et_fb_prepare_ssl_link( get_permalink( $this->get_object_id() ) )
-		);
+		return 'active' === get_post_meta( $post_object->get_id(), 'fusion_builder_status', true );
 	}
 
 	/**
@@ -184,7 +165,7 @@ class Divi extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_active(): bool {
-		return $this->is_divi_active();
+		return $this->is_avada_active();
 	}
 
 	/**
@@ -193,6 +174,6 @@ class Divi extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function hide_translate_menu_in_frontend(): bool {
-		return et_core_is_fb_enabled();
+		return true;
 	}
 }

@@ -1,3 +1,28 @@
+jQuery( document ).ready(
+	function ($) {
+		// start to translate an object via AJAX.
+		$('.easy-language-translate-object').on(
+			'click',
+			function (e) {
+				e.preventDefault();
+				easy_language_simplification_init($(this).data('id'), $(this).data('link'));
+			}
+		);
+	}
+);
+
+/**
+ * Initialize the simplification incl. confirmation.
+ *
+ * @param id
+ * @param link
+ */
+function easy_language_simplification_init( id, link ) {
+	if (confirm(easyLanguageSimplificationJsVars.translate_confirmation_question)) {
+		easy_language_get_simplification( id, link );
+	}
+}
+
 /**
  * Start loading of simplifications of actual object.
  */
@@ -18,13 +43,13 @@ function easy_language_get_simplification( obj_id, link ) {
 						click: function () {
 							location.href = link;
 						}
-				},
+					},
 					{
 						text: easyLanguageSimplificationJsVars.label_ok,
 						click: function () {
 							location.reload();
 						}
-				}
+					}
 				]
 			}
 		);
@@ -92,6 +117,7 @@ function easy_language_get_simplification_info(obj_id, progressbar, stepDescript
 				let max      = parseInt( stepData[1] );
 				let running  = parseInt( stepData[2] );
 				let result   = stepData[3];
+				let link = stepData[4];
 
 				// update progressbar
 				progressbar.progressbar(
@@ -108,9 +134,23 @@ function easy_language_get_simplification_info(obj_id, progressbar, stepDescript
 						500
 					);
 				} else {
+					// show result.
 					stepDescription.html( '<p>' + result + '</p>' );
+
+					// hide progressbar.
 					progressbar.addClass( "hidden" );
+
+					// update dialog-title.
 					jQuery( '#easylanguage-simplification-dialog' ).dialog( { title:easyLanguageSimplificationJsVars.label_simplification_done } );
+
+					// update link-target of the buttons.
+					if( link ) {
+						jQuery( '.easylanguage-simplification-dialog-no-close .ui-button' ).off('click').on('click', function() {
+							location.href = link;
+						});
+					}
+
+					// enable buttons.
 					jQuery( '.easylanguage-simplification-dialog-no-close .ui-button' ).prop( 'disabled', false );
 				}
 			}

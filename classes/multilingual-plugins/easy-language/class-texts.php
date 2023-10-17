@@ -84,7 +84,7 @@ class Texts {
 		add_action( 'wp_trash_post', array( $this, 'trash_object' ) );
 
 		// delete simplifications if object is really deleted.
-		add_action( 'delete_post', array( $this, 'delete_translation_of_post' ) );
+		add_action( 'before_delete_post', array( $this, 'delete_object' ) );
 	}
 
 	/**
@@ -117,7 +117,7 @@ class Texts {
 			// check if this object is already translated in this language.
 			if ( false === $post_obj->is_translated_in_language( $target_language ) ) {
 				// get the source-language.
-				$source_language = get_post_meta( $original_post_id, 'easy_language_text_language', true );
+				$source_language = helper::get_wp_lang();
 				if ( empty( $source_language ) ) {
 					$source_language = Helper::get_wp_lang();
 				}
@@ -151,6 +151,9 @@ class Texts {
 				// save the API used for this simplification.
 				update_post_meta( $copied_post_id, 'easy_language_api', $api_object->get_name() );
 
+				// ste the language for the original object.
+				update_post_meta( $original_post_id, 'easy_language_text_language', $source_language );
+
 				// parse text depending on used pagebuilder for this object.
 				$pagebuilder_obj = $post_obj->get_page_builder();
 				$pagebuilder_obj->set_object_id( $copied_post_id );
@@ -159,6 +162,11 @@ class Texts {
 
 				// loop through the resulting texts and add each one for simplification.
 				foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
+					// bail if text is empty.
+					if( empty($text) ) {
+						continue;
+					}
+
 					// check if the text is already saved as original text for simplification.
 					$original_text_obj = $this->db->get_entry_by_text( $text, $source_language );
 					if ( false === $original_text_obj ) {
@@ -202,20 +210,27 @@ class Texts {
 	/**
 	 * Delete simplification of a post if it will be deleted.
 	 *
+	 * Not limited to supported post-types to clean up data even after settings has been changed.
+	 *
 	 * @param int $post_id The ID of this post.
 	 * @return void
 	 */
-	public function delete_translation_of_post( int $post_id ): void {
-		// get entries by post-type.
-		$entries = $this->db->get_entries(
-			array(
-				'object_id'   => $post_id,
-				'object_type' => get_post_type( $post_id ),
-			)
-		);
+	public function delete_object( int $post_id ): void {
+		// get the object.
+		$post_obj = new Post_Object( $post_id );
+
+		// if this is a translated object, clean it up.
+		if ( $post_obj->is_translated() ) {
+			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
+
+			// cleanup language marker on original post, if it does not have any translations.
+			if( false === $original_post->has_translations() ) {
+				delete_post_meta( $original_post->get_id(), 'easy_language_text_language' );
+			}
+		}
 
 		// delete them.
-		foreach ( $entries as $entry ) {
+		foreach ( $post_obj->get_entries() as $entry ) {
 			$entry->delete( $post_id );
 		}
 	}
@@ -274,28 +289,36 @@ class Texts {
 		// if this is an original object, check its contents.
 		if ( $post_obj->is_translatable() ) {
 			// parse text depending on used pagebuilder.
-			$obj = $post_obj->get_page_builder();
+			$pagebuilder_obj = $post_obj->get_page_builder();
 
-			// set object-id to pagebuilder-object.
-			$obj->set_object_id( $post_obj->get_id() );
+			// only get texts if pagebuilder is known.
+			if( false !== $pagebuilder_obj ) {
+				// set object-id to pagebuilder-object.
+				$pagebuilder_obj->set_object_id( $post_obj->get_id() );
 
-			// set original text to simplify in pagebuilder-object.
-			$obj->set_text( $post_obj->get_content() );
+				// set original text to simplify in pagebuilder-object.
+				$pagebuilder_obj->set_text( $post_obj->get_content() );
 
-			// get all simplifications for this object in all active languages.
-			foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
-				$translated_post_id = $post_obj->get_translated_in_language( $language_code );
+				// get all simplifications for this object in all active languages.
+				foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+					$translated_post_id = $post_obj->get_translated_in_language( $language_code );
 
-				// loop through the resulting texts and check if the text has been changed (aka: is not available in translation-db).
-				foreach ( $obj->get_parsed_texts() as $text ) {
-					$filter = array(
-						'object_id'   => $translated_post_id,
-						'object_type' => $post_obj->get_type(),
-						'hash'        => $this->db->get_string_hash( $text ),
-					);
-					if ( empty( Db::get_instance()->get_entries( $filter ) ) ) {
-						// mark the object as changed as translated content has been changed or new content has been added in the given language.
-						$post_obj->mark_as_changed_in_language( $language_code );
+					// loop through the resulting texts and check if the text has been changed (aka: is not available in translation-db).
+					foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
+						// bail if text is empty.
+						if ( empty( $text ) ) {
+							continue;
+						}
+
+						$filter = array(
+							'object_id'   => $translated_post_id,
+							'object_type' => $post_obj->get_type(),
+							'hash'        => $this->db->get_string_hash( $text ),
+						);
+						if ( empty( Db::get_instance()->get_entries( $filter ) ) ) {
+							// mark the object as changed as translated content has been changed or new content has been added in the given language.
+							$post_obj->mark_as_changed_in_language( $language_code );
+						}
 					}
 				}
 			}
@@ -339,6 +362,11 @@ class Texts {
 
 			// loop through the resulting texts and compare them with the existing texts in object.
 			foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
+				// bail if text is empty.
+				if( empty($text) ) {
+					continue;
+				}
+
 				// check if the text is already saved as original text for simplification.
 				$original_text_obj = $this->db->get_entry_by_text( $text, $source_language );
 				if ( false === $original_text_obj ) {
@@ -398,7 +426,10 @@ class Texts {
 			$languages     = $post_obj->get_language();
 			$language_code = array_key_first( $languages );
 			if ( ! empty( $language_code ) ) {
+				// remove language from list of translated languages on original post.
 				$original_post->remove_translated_language( $language_code );
+
+				// remove changed marker on original post.
 				$original_post->remove_changed_marker( $language_code );
 			}
 		}
