@@ -170,7 +170,7 @@ class Switcher {
 		wp_insert_post( $query );
 
 		// mark that we have done the work.
-		update_option( 'easy_language_switcher_default', 1 );
+		update_option( 'easy_language_switcher_default', 1, true );
 	}
 
 	/**
@@ -301,6 +301,8 @@ class Switcher {
 
 		// get active languages and bail if none available.
 		$languages = array_merge( $object->get_language(), Languages::get_instance()->get_active_languages() );
+
+		// bail if no active languages are set.
 		if ( empty( $languages ) ) {
 			return $items;
 		}
@@ -335,10 +337,15 @@ class Switcher {
 						continue;
 					}
 
+					// bail if icon is requested, but not available for this language.
+					if( $show_icons && empty($settings['icon']) ) {
+						continue;
+					}
+
 					// create own object for this menu item.
 					$new_item = clone $items[ $index ];
 					// set title for menu item.
-					$new_item->title      = $show_icons ? 'icon' : $settings['label']; // TODO icon-support for classic menus.
+					$new_item->title      = $show_icons ? $settings['icon'] : $settings['label']; // TODO icon-support for classic menus.
 					$new_item->menu_order = $items[ $index ]->menu_order + $language_counter;
 					// set URL for menu item.
 					$new_item->url = $object->get_language_specific_url( empty( $settings['url'] ) ? get_permalink( $object->get_id() ) : $settings['url'], $language_code );
@@ -395,6 +402,12 @@ class Switcher {
 	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function save_menu_options( int $menu_id, int $item_id ): void {
+		// bail on save via ajax.
+		if( wp_doing_ajax() ) {
+			return;
+		}
+
+		// check nonce.
 		check_admin_referer( 'update-nav_menu', 'update-nav-menu-nonce' );
 
 		// get value.

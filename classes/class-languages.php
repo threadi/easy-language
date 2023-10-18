@@ -90,22 +90,27 @@ class Languages {
 				'de_DE'          => array(
 					'label'   => __( 'German', 'easy-language' ),
 					'enabled' => true,
+					'icon' => 'de_icon_url'
 				),
 				'de_DE-formal'   => array(
 					'label'   => __( 'German (formal)', 'easy-language' ),
 					'enabled' => true,
+					'icon' => 'de_icon_url'
 				),
 				'de_AT'          => array(
 					'label'   => __( 'German (Austria)', 'easy-language' ),
 					'enabled' => true,
+					'icon' => 'at_icon_url'
 				),
 				'de_CH'          => array(
 					'label'   => __( 'German (Suisse)', 'easy-language' ),
 					'enabled' => true,
+					'icon' => 'ch_icon_url'
 				),
 				'de_CH_informal' => array(
 					'label'   => __( 'German (Suisse, informal)', 'easy-language' ),
 					'enabled' => true,
+					'icon' => 'ch_icon_url'
 				),
 			)
 		);

@@ -180,6 +180,8 @@ class Uninstall {
 			'easy_language_api',
 			'easy_language_log_max_age',
 			'easy_language_api_timeout',
+			'easy_language_api_text_limit_per_process',
+			'easy_language_delete_unused_simplifications',
 		);
 	}
 }

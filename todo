@@ -3,12 +3,16 @@ ToDo
 
 Funktionales
 ------------
+* Icons:
+-> bei installation in media-db importieren
+-> in einstellungen eine icon-zuordnung zu jeder sprache hinterlegen
+-> an jeder sprache den verweis auf die attachment_id hinterlegen
+-> in Ausgabe die attachment-id verwenden um auf die Grafik zuzugreifen
 * E-Mail an SUMM AI wg. Quota & Testmöglichkeit
 * Wenn ein Objekt von einem PageBuilder bearbeitet wurde der aktuell nicht aktiviert ist, Warnung ausgeben und Übersetzung nicht ermöglichen
 * Optionen für Handling in Tabellen ergänzen ("+" => sofort übersetzen / nur erstellen, "translate" => sichtbar/nicht sichtbar
 * Option an Post-Types ergänzen mit denen ein Redakteur weitere/erneute Übersetzungen verhindern kann
 -> kann nur vom Redakteur, der das Schloss setzte gelöst werden
-* Avada, Divi und WP Bakery: prüfen wie Sprachwechsel hinterlegt werden kann
 * Test-Matrix dokumentieren (aka: welche Kombinationen von Plugins sollten getestet werden)
 * Test-Übersetzung ermöglichen mit einfachem Eingabefeld, welches die Eingabe an die aktive API schickt und die Übersetzung danach anzeigt.
 * Keys nur demjenigen anzeigen der sie eingegeben hat. wenn ein anderer nutzer das formular aufruft, den Key nicht anzeigen.

@@ -245,18 +245,18 @@ class Text {
 					$title = $obj->get_title_with_simplifications( $object->get_title(), $this->get_translation( $target_language ) );
 
 					// update post-entry.
-					$query = array(
+					$array = array(
 						'ID'         => $object_id,
 						'post_title' => wp_strip_all_tags( $title ),
 					);
 
 					// add individual post-name for permalink of enabled.
 					if ( 1 === absint( get_option( 'easy_language_generate_permalink', 0 ) ) ) {
-						$query['post_name'] = wp_unique_post_slug( $title, $object_id, $object->get_status(), $object->get_type(), 0 );
+						$array['post_name'] = wp_unique_post_slug( $title, $object_id, $object->get_status(), $object->get_type(), 0 );
 					}
 
 					// save it.
-					wp_update_post( $query );
+					wp_update_post( $array );
 
 					// run pagebuilder-specific tasks to update settings or trigger third party events.
 					$obj->update_object( $object );
@@ -281,15 +281,15 @@ class Text {
 					$content = $obj->get_text_with_simplifications( $object->get_content(), $this->get_translation( $target_language ) );
 
 					// update post-entry.
-					$query = array(
+					$array = array(
 						'ID'           => $object_id,
 						'post_type'    => $translation_object['object_type'],
 						'post_content' => $content,
 					);
-					wp_update_post( $query );
+					wp_update_post( $array );
 					break;
 				default:
-					do_action( 'easy_language_replace_texts', $this, $target_language, $object_id, $translation_objects );
+					do_action( 'easy_language_replace_texts', $this, $target_language, $object_id, $simplification_objects );
 			}
 		}
 
@@ -323,7 +323,7 @@ class Text {
 		global $wpdb;
 
 		// get object count before we do anything.
-		$object_count = count( $this->get_objects() );
+		$object_count = count($this->get_objects());
 
 		// delete connection between text and given object_id.
 		if ( $object_count > 0 ) {
@@ -346,8 +346,7 @@ class Text {
 		}
 
 		// if this text is used only from 1 object, delete it completely with its simplifications.
-		// TODO einstellbar machen, ob wirklich alle übersetzungen gelöscht werden sollen (um datenbank clean zu halten)
-		if ( 1 === $object_count ) {
+		if ( 1 === absint(get_option( 'easy_language_delete_unused_simplifications', 0 ) ) && 1 === $object_count ) {
 			$wpdb->delete( $wpdb->easy_language_originals, array( 'id' => $this->get_id() ) );
 			$wpdb->delete( $wpdb->easy_language_simplifications, array( 'oid' => $this->get_id() ) );
 		}
@@ -363,7 +362,7 @@ class Text {
 
 		// get from DB.
 		$prepared_sql = $wpdb->prepare(
-			'SELECT oo.`object_type`, oo.`object_id`, oo.`page_builder`, o.`field`, oo.`state`
+			'SELECT o.`id`, oo.`object_type`, oo.`object_id`, oo.`page_builder`, o.`field`, oo.`state`
 				FROM ' . $wpdb->easy_language_originals_objects . ' oo
 				JOIN ' . $wpdb->easy_language_originals . ' o ON (o.id = oo.oid)
 				WHERE oo.`oid` = %d AND oo.`blog_id` = %d',

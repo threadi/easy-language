@@ -233,7 +233,7 @@ class Base {
 	 *
 	 * @return array
 	 */
-	public function get_translated_post_type_objects(): array {
+	public function get_simplified_post_type_objects(): array {
 		$post_types       = \easyLanguage\Multilingual_plugins\Easy_Language\Init::get_instance()->get_supported_post_types();
 		$post_types_array = array();
 		foreach ( $post_types as $post_type => $enabled ) {

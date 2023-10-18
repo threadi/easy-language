@@ -176,7 +176,7 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 	// if the actual API is not the new API and changing post-state is not disabled, go further.
 	if( $api && $value !== $api->get_name() && 'disabled' !== $post_state ) {
 		// get the translated objects of the former API (all of them).
-		$post_type_objects = $api->get_translated_post_type_objects();
+		$post_type_objects = $api->get_simplified_post_type_objects();
 
 		// loop through the object and change their state.
 		foreach( $post_type_objects as $post_type_object_id ) {
@@ -188,7 +188,7 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 				'ID' => $post_type_object_id,
 				'post_status' => $post_state
 			);
-			wp_update_post($array);
+			wp_update_post( $array );
 		}
 	}
 
@@ -209,7 +209,7 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 	// if the new API is valid and setting has been changed.
 	if( $new_api && $api && $api->get_name() !== $new_api->get_name() ) {
 		// get the simplified objects of the new API (all of them).
-		$post_type_objects = $new_api->get_translated_post_type_objects();
+		$post_type_objects = $new_api->get_simplified_post_type_objects();
 
 		// loop through the object and change their to its previous state.
 		foreach( $post_type_objects as $post_type_object_id ) {
@@ -221,7 +221,7 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 				'ID' => $post_type_object_id,
 				'post_status' => $new_post_state
 			);
-			wp_update_post($array);
+			wp_update_post( $array );
 
 			// delete the setting for previous state.
 			delete_post_meta( $post_type_object_id, 'easy_language_simplification_state_changed_from' );

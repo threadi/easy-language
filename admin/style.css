@@ -247,3 +247,11 @@ body .text-translations-table #source_language, body .text-translations-table #t
 .easy-language-input-text input[type="text"] {
 	width: 80%;
 }
+
+.settings_page_easy_language_settings input[type="number"] {
+	width: 80px;
+}
+
+.easy-language-transient h3 {
+	margin: 15px 0;
+}

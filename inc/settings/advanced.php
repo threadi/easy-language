@@ -91,10 +91,41 @@ function easy_language_admin_add_settings_advanced(): void {
 		'settings_section_advanced',
 		array(
 			'label_for'   => 'easy_language_api_timeout',
-			'fieldId'     => 'easy_language_api_timeout'
+			'fieldId'     => 'easy_language_api_timeout',
+			'description' => __( 'This value is in seconds. If you get a timeout from an API try to set this to a higher value.', 'easy-language' )
 		)
 	);
 	register_setting( 'easyLanguageAdvancedFields', 'easy_language_api_timeout' );
+
+	// Set limit for texts per requests.
+	add_settings_field(
+		'easy_language_api_text_limit_per_process',
+		__( 'Simplifications per process', 'easy-language' ),
+		'easy_language_admin_number_field',
+		'easyLanguageAdvancedPage',
+		'settings_section_advanced',
+		array(
+			'label_for'   => 'easy_language_api_text_limit_per_process',
+			'fieldId'     => 'easy_language_api_text_limit_per_process',
+			'description' => __( 'This value is in seconds. If you get a timeout from an API try to set this to a higher value.', 'easy-language' )
+		)
+	);
+	register_setting( 'easyLanguageAdvancedFields', 'easy_language_api_text_limit_per_process' );
+
+	// Set if unused simplifications should be deleted.
+	add_settings_field(
+		'easy_language_delete_unused_simplifications',
+		__( 'Delete unused simplifications', 'easy-language' ),
+		'easy_language_admin_checkbox_field',
+		'easyLanguageAdvancedPage',
+		'settings_section_advanced',
+		array(
+			'label_for'   => 'easy_language_delete_unused_simplifications',
+			'fieldId'     => 'easy_language_delete_unused_simplifications',
+			'description' => __( 'If enabled any unused simplified texts will be deleted. To simplify the same text again, a new request must be sent to the API you are using, at the expense of your quota.<br>If disabled all simplified texts will be hold in your database. This could be at the expense of the size and performance of your database.', 'easy-language' )
+		)
+	);
+	register_setting( 'easyLanguageAdvancedFields', 'easy_language_delete_unused_simplifications' );
 
 	// delete data button.
 	add_settings_field(

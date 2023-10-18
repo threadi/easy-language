@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-10-17T17:13:33+02:00\n"
+"POT-Creation-Date: 2023-10-18T09:21:57+02:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: easy-language\n"
@@ -466,7 +466,7 @@ msgstr ""
 
 #. translators: %1$s will be replaced by the link to laolaweb.com
 #: classes/apis/summ-ai/class-summ-ai.php:478
-msgid "Get more quota with <a href=\"%1$s\" target=\"_blank\" title=\"link opens new window\">Easy Language Pro</a> and custom <a href=\"%2$s\" target=\"_blank\">SUMM AP API Key</a>"
+msgid "Get more quota with <a href=\"%1$s\" target=\"_blank\" title=\"link opens new window\">Easy Language Pro</a> and custom <a href=\"%2$s\" target=\"_blank\">SUMM AI API Key</a>"
 msgstr ""
 
 #: classes/class-base.php:313

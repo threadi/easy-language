@@ -160,7 +160,7 @@ interface Api_Base {
 	 *
 	 * @return array
 	 */
-	public function get_translated_post_type_objects(): array;
+	public function get_simplified_post_type_objects(): array;
 
 	/**
 	 * Return the settings-URL for the API.

@@ -138,7 +138,17 @@ class Install {
 
 		// set API timeout.
 		if ( ! get_option( 'easy_language_api_timeout' ) ) {
-			update_option( 'easy_language_api_timeout', '30' );
+			update_option( 'easy_language_api_timeout', 60 );
+		}
+
+		// set text-simplification limit per process.
+		if ( ! get_option( 'easy_language_api_text_limit_per_process' ) ) {
+			update_option( 'easy_language_api_text_limit_per_process', 1 );
+		}
+
+		// enable deletion of unused simplification.
+		if ( ! get_option( 'easy_language_delete_unused_simplifications' ) ) {
+			update_option( 'easy_language_delete_unused_simplifications', 1 );
 		}
 
 		// generate random-installation-hash if it does not already exist (will never be removed or changed).

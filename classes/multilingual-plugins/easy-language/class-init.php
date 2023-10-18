@@ -137,7 +137,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// add ajax-actions hooks.
 		add_action( 'wp_ajax_easy_language_run_simplification', array( $this, 'ajax_run_simplification' ) );
-		add_action( 'wp_ajax_easy_language_get_info_simplification', array( $this, 'ajax_get_simplification_info' ) );
 		add_action( 'wp_ajax_easy_language_run_data_deletion', array( $this, 'deletion_simplified_data' ) );
 		add_action( 'wp_ajax_easy_language_get_info_delete_data', array( $this, 'get_info_about_deletion_of_simplified_data' ) );
 
@@ -678,11 +677,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				$post_state = get_post_meta( $post_id, 'easy_language_simplification_state_changed_from', true );
 
 				// set the state.
-				$query = array(
+				$array = array(
 					'ID'          => $post_id,
 					'post_status' => $post_state,
 				);
-				wp_update_post( $query );
+				wp_update_post( $array );
 
 				// remove marker.
 				delete_post_meta( $post_id, 'easy_language_simplification_state_changed_from' );
@@ -747,11 +746,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					$post_state = get_post_status( $post_id );
 
 					// update post-state.
-					$query = array(
+					$array = array(
 						'ID'          => $post_id,
 						'post_status' => $new_state_setting,
 					);
-					wp_update_post( $query );
+					wp_update_post( $array );
 
 					// save which state the post had before.
 					update_post_meta( $post_id, 'easy_language_simplification_state_changed_from', $post_state );
@@ -1277,54 +1276,33 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * Run translation of given object via AJAX.
+	 * Run simplification via AJAX.
+	 *
+	 * Output-Format: count-of-simplifications;count-of-total-simplifications;running-marker;result-as-text;link
 	 *
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function ajax_run_simplification(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-simplification-start-nonce', 'nonce' );
+		check_ajax_referer( 'easy-language-run-simplification-nonce', 'nonce' );
 
 		// get api.
 		$api_obj = Apis::get_instance()->get_active_api();
-		if ( false === $api_obj ) {
-			// no api active => forward user.
-			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
-			exit;
-		}
+		// TODO check for API
 
 		// get the post-id from request.
 		$post_id = isset( $_POST['post'] ) ? absint( $_POST['post'] ) : 0;
+
+		// get info if this is a simplification-initialization.
+		$initialization = isset( $_POST['initialization'] ) ? filter_var($_POST['initialization'], FILTER_VALIDATE_BOOLEAN) : false;
 
 		if ( absint( $post_id ) > 0 ) {
-			// run simplification of this object.
-			$post_obj = new Post_Object( $post_id );
-			$post_obj->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping() );
-		}
-
-		// return nothing.
-		wp_die();
-	}
-
-	/**
-	 * Get info about running translation of given object via AJAX.
-	 *
-	 * Format: count-of-simplifications;count-of-total-simplifications;running-marker;result-as-text
-	 *
-	 * @return void
-	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
-	 */
-	public function ajax_get_simplification_info(): void {
-		// check nonce.
-		check_ajax_referer( 'easy-language-simplification-get-nonce', 'nonce' );
-
-		// get the post-id from request.
-		$post_id = isset( $_POST['post'] ) ? absint( $_POST['post'] ) : 0;
-
-		if ( $post_id > 0 ) {
 			// get object.
 			$post_obj = new Post_Object( $post_id );
+
+			// run simplification of one text-entry in given object.
+			$post_obj->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping(), absint(get_option( 'easy_language_api_text_limit_per_process', 1 ) ), $initialization );
 
 			// get running simplifications.
 			$running_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, array() );
@@ -1390,8 +1368,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'label_open_link'                 => __( 'Open frontend', 'easy-language' ),
 				'label_ok'                        => __( 'OK', 'easy-language' ),
 				'txt_please_wait'                 => __( 'Please wait', 'easy-language' ),
-				'run_simplification_nonce'        => wp_create_nonce( 'easy-language-simplification-start-nonce' ),
-				'get_simplification_nonce'        => wp_create_nonce( 'easy-language-simplification-get-nonce' ),
+				'run_simplification_nonce'        => wp_create_nonce( 'easy-language-run-simplification-nonce' ),
 				'txt_simplification_has_been_run' => __( 'Simplification has been run.', 'easy-language' ),
 				'translate_confirmation_question' => __( 'Simplify the texts in this object?', 'easy-language' ),
 			)

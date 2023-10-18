@@ -198,6 +198,7 @@ class ChatGpt extends Base implements Api_Base {
 				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
 				'url'         => 'de_el',
 				'api_value'   => 'plain',
+				'icon' => 'myicon_url'
 			),
 			'de_LS' => array(
 				'label'       => __( 'Leichte Sprache', 'easy-language' ),
@@ -205,6 +206,7 @@ class ChatGpt extends Base implements Api_Base {
 				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
 				'url'         => 'de_ls',
 				'api_value'   => 'easy',
+				'icon' => 'myicon_url2'
 			),
 		);
 	}

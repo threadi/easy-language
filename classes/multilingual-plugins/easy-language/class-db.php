@@ -195,9 +195,11 @@ class Db {
 	 * Return all actual entries as Easy_Language_Text-object-array.
 	 *
 	 * @param array $filter Optional filter.
+	 * @param int $limit Limit the list.
+	 *
 	 * @return array
 	 */
-	public function get_entries( array $filter = array() ): array {
+	public function get_entries( array $filter = array(), int $limit = 0 ): array {
 		global $wpdb;
 
 		// initialize return array.
@@ -251,6 +253,12 @@ class Db {
 			}
 		}
 
+		// limit the list of entries.
+		$sql_limit = '';
+		if( absint($limit) > 0 ) {
+			$sql_limit = ' LIMIT '.absint($limit);
+		}
+
 		// define base-statement.
 		$sql = 'SELECT `id`, `original`, `lang`%1$s FROM ' . $wpdb->easy_language_originals . ' AS o';
 
@@ -258,7 +266,7 @@ class Db {
 		$sql = sprintf( $sql, $sql_select );
 
 		// concat sql-statement.
-		$sql = $sql . implode( ' ', $sql_join ) . $sql_where;
+		$sql = $sql . implode( ' ', $sql_join ) . $sql_where . $sql_limit;
 
 		// prepare SQL-statement.
 		$prepared_sql = $wpdb->prepare( $sql, $vars );

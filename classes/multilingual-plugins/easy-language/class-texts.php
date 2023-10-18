@@ -77,7 +77,7 @@ class Texts {
 
 		// check updated post-types.
 		foreach ( $init->get_supported_post_types() as $post_type => $enabled ) {
-			add_action( 'save_post_' . $post_type, array( $this, 'update_translation_of_post' ), 10, 3 );
+			add_action( 'save_post_' . $post_type, array( $this, 'update_simplification_of_post' ), 10, 3 );
 		}
 
 		// if object is trashed.
@@ -221,6 +221,38 @@ class Texts {
 
 		// if this is a translated object, clean it up.
 		if ( $post_obj->is_translated() ) {
+			/**
+			 * Get the simplification-process marker and remove the object from its array.
+			 */
+			// update running marker.
+			$running_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, array() );
+			if( !empty($running_simplifications[$post_obj->get_md5()]) ) {
+				unset($running_simplifications[$post_obj->get_md5()]);
+			}
+			update_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, $running_simplifications );
+
+			// update max marker.
+			$max_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, array() );
+			if( !empty($max_simplifications[$post_obj->get_md5()]) ) {
+				unset($max_simplifications[$post_obj->get_md5()]);
+			}
+			update_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, $max_simplifications );
+
+			// update counter.
+			$count_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, array() );
+			if( !empty($count_simplifications[$post_obj->get_md5()]) ) {
+				unset($count_simplifications[$post_obj->get_md5()]);
+			}
+			update_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, $count_simplifications );
+
+			// update results.
+			$results = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, array() );
+			if( !empty($results[$post_obj->get_md5()]) ) {
+				unset($results[$post_obj->get_md5()]);
+			}
+			update_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $results );
+
+			// get original post.
 			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
 
 			// cleanup language marker on original post, if it does not have any translations.
@@ -268,7 +300,7 @@ class Texts {
 	}
 
 	/**
-	 * Check updated translatable post-type-object.
+	 * Check an updated simplification post-type-object.
 	 *
 	 * @param int     $post_id The Post-ID.
 	 * @param WP_Post $post The post-object.
@@ -277,8 +309,8 @@ class Texts {
 	 * @return void
 	 * @noinspection PhpUnusedParameterInspection
 	 */
-	public function update_translation_of_post( int $post_id, WP_Post $post, bool $update ): void {
-		// bail if this is not an update to prevent confusing during creation of translation-objects.
+	public function update_simplification_of_post( int $post_id, WP_Post $post, bool $update ): void {
+		// bail if this is not an update to prevent confusing during creation of simplification-objects.
 		if ( false === $update ) {
 			return;
 		}
@@ -324,19 +356,18 @@ class Texts {
 			}
 		}
 
-		/**
-		 * Liste der aktuellen Texte laden.
-		 *
-		 * Dann durch die Texte der neuen Liste gehen.
-		 * Pro Eintrag einen Neueintrag vornehmen.
-		 * Dann pro Eintrag prüfen, ob der auf der alten Liste steht.
-		 * Wenn ja, dann diesen hier entfernen.
-		 *
-		 * Abschließend die Liste zum Entfernen durchgehen und alle über delete() löschen.
-		 */
-
 		// if this is a translated object, update the translatable contents and reset the changed-marker on its original.
 		if ( $post_obj->is_translated() ) {
+			// bail if a simplification of this object is actual running.
+			$running_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, array() );
+			if( !empty($running_simplifications[$post_obj->get_md5()]) && absint($running_simplifications[$post_obj->get_md5()]) > 0 ) {
+				return;
+			}
+
+			// do nothing.
+			// TODO aktualisierung überarbeiten
+			return;
+
 			// get all texts of this object.
 			$actual_entries = array();
 			foreach ( $this->db->get_entries( array( 'object_id' => $post_id ) ) as $entry ) {
@@ -394,7 +425,7 @@ class Texts {
 				$original_title_obj->set_object( get_post_type( $post_id ), $post_id, $pagebuilder_obj->get_name() );
 			}
 
-			// remove all not updated entries of this obejct.
+			// remove all not updated entries of this object.
 			foreach ( $actual_entries as $entry ) {
 				$entry->delete( $post_id );
 			}

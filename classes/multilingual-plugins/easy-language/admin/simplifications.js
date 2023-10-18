@@ -64,7 +64,7 @@ function easy_language_get_simplification( obj_id, link ) {
 	let stepDescription = jQuery( '#easylanguage-simplification-dialog-step-description' );
 	stepDescription.html( '<p>' + easyLanguageSimplificationJsVars.txt_please_wait + '</p>' );
 
-	// init progressbar.
+	// init and show progressbar.
 	let progressbar = jQuery( "#easylanguage-simplification-dialog-progressbar" );
 	progressbar.progressbar(
 		{
@@ -73,25 +73,7 @@ function easy_language_get_simplification( obj_id, link ) {
 	).removeClass( "hidden" );
 
 	// start simplification.
-	jQuery.ajax(
-		{
-			type: "POST",
-			url: easyLanguageSimplificationJsVars.ajax_url,
-			data: {
-				'action': 'easy_language_run_simplification',
-				'post': obj_id,
-				'nonce': easyLanguageSimplificationJsVars.run_simplification_nonce
-			},
-			beforeSend: function () {
-				// get import-infos
-				setTimeout(
-					function () {
-						easy_language_get_simplification_info( obj_id, progressbar, stepDescription ); },
-					1000
-				);
-			}
-		}
-	);
+	easy_language_get_simplification_info( obj_id, progressbar, stepDescription, true );
 }
 
 /**
@@ -100,16 +82,18 @@ function easy_language_get_simplification( obj_id, link ) {
  * @param obj_id
  * @param progressbar
  * @param stepDescription
+ * @param initialization
  */
-function easy_language_get_simplification_info(obj_id, progressbar, stepDescription) {
+function easy_language_get_simplification_info(obj_id, progressbar, stepDescription, initialization) {
 	jQuery.ajax(
 		{
 			type: "POST",
 			url: easyLanguageSimplificationJsVars.ajax_url,
 			data: {
-				'action': 'easy_language_get_info_simplification',
+				'action': 'easy_language_run_simplification',
 				'post': obj_id,
-				'nonce': easyLanguageSimplificationJsVars.get_simplification_nonce
+				'initialization': initialization,
+				'nonce': easyLanguageSimplificationJsVars.run_simplification_nonce
 			},
 			success: function (data) {
 				let stepData = data.split( ";" );
@@ -130,8 +114,8 @@ function easy_language_get_simplification_info(obj_id, progressbar, stepDescript
 				if ( running >= 1 ) {
 					setTimeout(
 						function () {
-							easy_language_get_simplification_info( obj_id, progressbar, stepDescription ) },
-						500
+							easy_language_get_simplification_info( obj_id, progressbar, stepDescription, false ) },
+						200
 					);
 				} else {
 					// show result.
@@ -143,15 +127,18 @@ function easy_language_get_simplification_info(obj_id, progressbar, stepDescript
 					// update dialog-title.
 					jQuery( '#easylanguage-simplification-dialog' ).dialog( { title:easyLanguageSimplificationJsVars.label_simplification_done } );
 
-					// update link-target of the buttons.
+					// get buttons.
+					let buttons = jQuery( '.easylanguage-simplification-dialog-no-close .ui-button' );
+
+					// update link-target of the first button.
 					if( link ) {
-						jQuery( '.easylanguage-simplification-dialog-no-close .ui-button' ).off('click').on('click', function() {
+						buttons.first().off('click').on('click', function() {
 							location.href = link;
 						});
 					}
 
 					// enable buttons.
-					jQuery( '.easylanguage-simplification-dialog-no-close .ui-button' ).prop( 'disabled', false );
+					buttons.prop( 'disabled', false );
 				}
 			}
 		}
