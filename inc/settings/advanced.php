@@ -115,7 +115,7 @@ function easy_language_admin_add_settings_advanced(): void {
 	// Set if unused simplifications should be deleted.
 	add_settings_field(
 		'easy_language_delete_unused_simplifications',
-		__( 'Delete unused simplifications', 'easy-language' ),
+		__( 'Delete unused simplified texts', 'easy-language' ),
 		'easy_language_admin_checkbox_field',
 		'easyLanguageAdvancedPage',
 		'settings_section_advanced',

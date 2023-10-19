@@ -97,7 +97,16 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_settings_page_url(): string {
-		return admin_url() . 'options-general.php?page=easy_language_settings';
+		return add_query_arg( array( 'page' => 'easy_language_settings' ), admin_url() . 'options-general.php' );
+	}
+
+	/**
+	 * Return the API-logs-URL.
+	 *
+	 * @return string
+	 */
+	public static function get_api_logs_page_url(): string {
+		return add_query_arg( array( 'page' => 'easy_language_settings', 'tab' => 'api_logs' ), admin_url() . 'options-general.php' );
 	}
 
 	/**

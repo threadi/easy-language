@@ -175,7 +175,7 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 
 	// if the actual API is not the new API and changing post-state is not disabled, go further.
 	if( $api && $value !== $api->get_name() && 'disabled' !== $post_state ) {
-		// get the translated objects of the former API (all of them).
+		// get the simplified objects of the former API (all of them).
 		$post_type_objects = $api->get_simplified_post_type_objects();
 
 		// loop through the object and change their state.

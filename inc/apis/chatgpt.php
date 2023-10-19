@@ -22,4 +22,4 @@ function easy_language_register_chatgpt( array $api_list ): array {
 	$api_list[] = ChatGpt::get_instance();
 	return $api_list;
 }
-add_filter( 'easy_language_register_api', 'easy_language_register_chatgpt', 20 );
+add_filter( 'easy_language_register_api', 'easy_language_register_chatgpt', 200 );

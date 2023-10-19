@@ -17,4 +17,4 @@ function easy_language_register_capito_api( array $api_list ): array {
 	$api_list[] = Capito::get_instance();
 	return $api_list;
 }
-add_filter( 'easy_language_register_api', 'easy_language_register_capito_api', 10 );
+add_filter( 'easy_language_register_api', 'easy_language_register_capito_api', 100 );

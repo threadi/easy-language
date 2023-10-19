@@ -34,6 +34,13 @@ class Db {
 	private array $texts = array();
 
 	/**
+	 * List of simplification-objects.
+	 *
+	 * @var array
+	 */
+	private array $simplifications = array();
+
+	/**
 	 * Constructor for this object.
 	 */
 	private function __construct() {
@@ -126,7 +133,8 @@ class Db {
 		$sql = "CREATE TABLE $wpdb->easy_language_simplifications (
             `oid` mediumint(9) NOT NULL,
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-            `translation` text DEFAULT '' NOT NULL,
+            `simplification` text DEFAULT '' NOT NULL,
+            `hash` varchar(32) DEFAULT '' NOT NULL,
             `language` varchar(20) DEFAULT '' NOT NULL,
             `used_api` varchar(40) DEFAULT '' NOT NULL,
             `jobid` int(11) DEFAULT 0 NOT NULL,
@@ -221,7 +229,7 @@ class Db {
 			}
 			if ( ! empty( $filter['state'] ) ) {
 				$sql_where .= ' AND o.state = %s';
-				$vars[]     = $filter['state'];
+				$vars[]    = $filter['state'];
 			}
 			if ( ! empty( $filter['lang'] ) ) {
 				$sql_where .= ' AND o.lang = %s';
@@ -250,6 +258,11 @@ class Db {
 				$sql_where .= ' AND oo.blog_id = %d';
 				$vars[]     = $filter['object_type'];
 				$vars[]     = absint( get_current_blog_id() );
+			}
+			if ( ! empty( $filter['simplification_hash'] ) ) {
+				$sql_join[ $wpdb->easy_language_simplifications ] = ' INNER JOIN ' . $wpdb->easy_language_simplifications . ' s ON s.oid = o.id';
+				$sql_where .= ' AND s.hash = %s';
+				$vars[]     = $filter['simplification_hash'];
 			}
 		}
 
@@ -298,7 +311,7 @@ class Db {
 	}
 
 	/**
-	 * Return the text-object for the given text in the given language
+	 * Return the text-object for the given text in the given language.
 	 *
 	 * @param string $text The original text we search.
 	 * @param string $language The language we search.
@@ -306,7 +319,7 @@ class Db {
 	 */
 	public function get_entry_by_text( string $text, string $language ): bool|Text {
 		// check if object has already been loaded.
-		if ( empty( $this->texts[ md5( $text . $language ) ] ) ) {
+		if ( empty( $this->texts[ $this->get_string_hash( $text . $language ) ] ) ) {
 			// get object via DB-request.
 			$query     = array(
 				'hash' => $this->get_string_hash( $text ),
@@ -315,14 +328,47 @@ class Db {
 			$text_objs = $this->get_entries( $query );
 			if ( ! empty( $text_objs ) ) {
 				// secure text-object.
-				$this->texts[ md5( $text . $language ) ] = $text_objs[0];
+				$this->texts[ $this->get_string_hash( $text . $language ) ] = $text_objs[0];
 
 				// return text-object.
 				return $text_objs[0];
 			}
+
+			// return false if no entry could be found for this text.
 			return false;
 		}
-		return $this->texts[ md5( $text . $language ) ];
+		return $this->texts[ $this->get_string_hash( $text . $language ) ];
+	}
+
+	/**
+	 * Return the text-object for the given simplification in the given language.
+	 *
+	 * @param string $simplification The searched simplification.
+	 * @param string $language The language we use to search.
+	 *
+	 * @return bool|Text
+	 */
+	public function get_entry_by_simplification( string $simplification, string $language ): bool|Text {
+		// check if object has already been loaded.
+		if ( empty( $this->simplifications[ $this->get_string_hash( $simplification . $language ) ] ) ) {
+			// get object via DB-request.
+			$query     = array(
+				'simplification_hash' => $this->get_string_hash( $simplification ),
+				'lang' => $language,
+			);
+			$text_objs = $this->get_entries( $query );
+			if ( ! empty( $text_objs ) ) {
+				// secure text-object.
+				$this->simplifications[ $this->get_string_hash( $simplification . $language ) ] = $text_objs[0];
+
+				// return text-object.
+				return $text_objs[0];
+			}
+
+			// return false if no simplification could be found for this simplification.
+			return false;
+		}
+		return $this->simplifications[ $this->get_string_hash( $simplification . $language ) ];
 	}
 
 	/**

@@ -228,37 +228,16 @@ class Capito extends Base implements Api_Base {
 			'de_a2' => array(
 				'label'       => __( 'German A2', 'easy-language' ),
 				'enabled'     => true,
-				'description' => '',
+				'description' => __( 'Capito compares this with Leichte Sprache', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'a2',
 			),
 			'de_b1' => array(
 				'label'       => __( 'German B1', 'easy-language' ),
 				'enabled'     => true,
-				'description' => '',
+				'description' => __( 'Capito compares this with Einfache Sprache', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'b1',
-			),
-			'de_b2' => array(
-				'label'       => __( 'German B2', 'easy-language' ),
-				'enabled'     => true,
-				'description' => '',
-				'url'         => 'de_a2',
-				'api_value'   => 'b2',
-			),
-			'de_c1' => array(
-				'label'       => __( 'German C1', 'easy-language' ),
-				'enabled'     => true,
-				'description' => '',
-				'url'         => 'de_c1',
-				'api_value'   => 'c1',
-			),
-			'de_c2' => array(
-				'label'       => __( 'German C2', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'highest complexity', 'easy-language' ),
-				'url'         => 'de_c2',
-				'api_value'   => 'c2',
 			),
 			'en_a1' => array(
 				'label'       => __( 'English A1', 'easy-language' ),
@@ -270,37 +249,16 @@ class Capito extends Base implements Api_Base {
 			'en_a2' => array(
 				'label'       => __( 'English A2', 'easy-language' ),
 				'enabled'     => true,
-				'description' => '',
+				'description' => __( 'Capito compares this with Plain Sprache', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'a2',
 			),
 			'en_b1' => array(
 				'label'       => __( 'English B1', 'easy-language' ),
 				'enabled'     => true,
-				'description' => '',
+				'description' => __( 'Capito compares this with Easy Language', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'b1',
-			),
-			'en_b2' => array(
-				'label'       => __( 'English B2', 'easy-language' ),
-				'enabled'     => true,
-				'description' => '',
-				'url'         => 'de_a2',
-				'api_value'   => 'b2',
-			),
-			'en_c1' => array(
-				'label'       => __( 'English C1', 'easy-language' ),
-				'enabled'     => true,
-				'description' => '',
-				'url'         => 'de_c1',
-				'api_value'   => 'c1',
-			),
-			'en_c2' => array(
-				'label'       => __( 'English C2', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'highest complexity', 'easy-language' ),
-				'url'         => 'de_c2',
-				'api_value'   => 'c2',
 			),
 		);
 	}
@@ -314,8 +272,8 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_mapping_languages(): array {
 		return array(
-			'de_DE' => array( 'de_a1', 'de_a2', 'de_b1', 'de_b2', 'de_c1', 'de_c2' ),
-			'en'    => array( 'en_a1', 'en_a2', 'en_b1', 'en_b2', 'en_c1', 'en_c2' ),
+			'de_DE' => array( 'de_a1', 'de_a2', 'de_b1' ),
+			'en'    => array( 'en_a1', 'en_a2', 'en_b1' ),
 		);
 	}
 

@@ -1316,8 +1316,16 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			// get result (if set).
 			$results = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, array() );
 
-			// collect return value.
-			echo absint( $count_simplifications[ $post_obj->get_md5() ] ) . ';' . absint( $max_simplifications[ $post_obj->get_md5() ] ) . ';' . absint( $running_simplifications[ $post_obj->get_md5() ] ) . ';' . wp_kses_post( $results[ $post_obj->get_md5() ] ) . ';'  . get_permalink($post_id);
+			// collect return array.
+			$return = array(
+				absint( $count_simplifications[ $post_obj->get_md5() ] ),
+				absint( $max_simplifications[ $post_obj->get_md5() ] ),
+				absint( $running_simplifications[ $post_obj->get_md5() ] ),
+				wp_kses_post( $results[ $post_obj->get_md5() ] ),
+				get_permalink($post_id)
+			);
+			wp_send_json( $return );
+			//echo absint( $count_simplifications[ $post_obj->get_md5() ] ) . ';' . absint( $max_simplifications[ $post_obj->get_md5() ] ) . ';' . absint( $running_simplifications[ $post_obj->get_md5() ] ) . ';' . wp_kses_post( $results[ $post_obj->get_md5() ] ) . ';'  . get_permalink($post_id);
 		}
 
 		// return nothing.

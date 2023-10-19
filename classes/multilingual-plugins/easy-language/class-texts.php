@@ -75,7 +75,7 @@ class Texts {
 		// get automatic simplification of given object.
 		add_action( 'admin_action_easy_language_get_automatic_simplification', array( $this, 'get_automatic_simplification' ) );
 
-		// check updated post-types.
+		// check texts in updated post-types-objects.
 		foreach ( $init->get_supported_post_types() as $post_type => $enabled ) {
 			add_action( 'save_post_' . $post_type, array( $this, 'update_simplification_of_post' ), 10, 3 );
 		}
@@ -174,6 +174,7 @@ class Texts {
 						$original_text_obj = $this->db->add( $text, $source_language, 'post_content' );
 					}
 					$original_text_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $pagebuilder_obj->get_name() );
+					$original_text_obj->set_state( 'to_simplify' );
 				}
 
 				// check if the title has already saved as original text for simplification.
@@ -183,6 +184,7 @@ class Texts {
 					$original_title_obj = $this->db->add( $pagebuilder_obj->get_title(), $source_language, 'title' );
 				}
 				$original_title_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $pagebuilder_obj->get_name() );
+				$original_title_obj->set_state( 'to_simplify' );
 
 				// add this language as translated language to original post.
 				$post_obj->add_translated_language( $target_language );
@@ -222,35 +224,12 @@ class Texts {
 		// if this is a translated object, clean it up.
 		if ( $post_obj->is_translated() ) {
 			/**
-			 * Get the simplification-process marker and remove the object from its array.
+			 * Remove the object from the simplification-marker arrays.
 			 */
-			// update running marker.
-			$running_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, array() );
-			if( !empty($running_simplifications[$post_obj->get_md5()]) ) {
-				unset($running_simplifications[$post_obj->get_md5()]);
-			}
-			update_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, $running_simplifications );
-
-			// update max marker.
-			$max_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, array() );
-			if( !empty($max_simplifications[$post_obj->get_md5()]) ) {
-				unset($max_simplifications[$post_obj->get_md5()]);
-			}
-			update_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, $max_simplifications );
-
-			// update counter.
-			$count_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, array() );
-			if( !empty($count_simplifications[$post_obj->get_md5()]) ) {
-				unset($count_simplifications[$post_obj->get_md5()]);
-			}
-			update_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, $count_simplifications );
-
-			// update results.
-			$results = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, array() );
-			if( !empty($results[$post_obj->get_md5()]) ) {
-				unset($results[$post_obj->get_md5()]);
-			}
-			update_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $results );
+			$post_obj->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING );
+			$post_obj->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX );
+			$post_obj->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT );
+			$post_obj->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS );
 
 			// get original post.
 			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
@@ -261,7 +240,7 @@ class Texts {
 			}
 		}
 
-		// delete them.
+		// delete the text-entries of the deleted object.
 		foreach ( $post_obj->get_entries() as $entry ) {
 			$entry->delete( $post_id );
 		}
@@ -300,7 +279,7 @@ class Texts {
 	}
 
 	/**
-	 * Check an updated simplification post-type-object.
+	 * Check an updated post-type-object regarding its simplifications.
 	 *
 	 * @param int     $post_id The Post-ID.
 	 * @param WP_Post $post The post-object.
@@ -364,15 +343,16 @@ class Texts {
 				return;
 			}
 
-			// do nothing.
-			// TODO aktualisierung überarbeiten
-			return;
-
-			// get all texts of this object.
-			$actual_entries = array();
-			foreach ( $this->db->get_entries( array( 'object_id' => $post_id ) ) as $entry ) {
-				$actual_entries[ $entry->get_id() ] = $entry;
-			}
+			/**
+			 * Ermittle alle aktuellen Texte im Objekt.
+			 * Prüfe pro Text, ob dieser bereits vorhanden und mit dem Objekt verbunden ist.
+			 * Wenn nein, ergänze ihn als neuen zu vereinfachenden Text und verbinde ihn mit dem Objekt.
+			 * Wenn ja, mache nichts.
+			 *
+			 * TODO
+			 * Ermittle alle Original-Texte des Objektes in der DB, die von diesem - auch in ihrer Vereinfachung - nicht mehr genutzt werden.
+			 * Nur wenn deren Vereinfachung (wenn vorhanden) von keinem anderen Objekt genutzt wird.
+			 */
 
 			// parse text depending on used pagebuilder for this object.
 			$pagebuilder_obj = $post_obj->get_page_builder();
@@ -391,6 +371,24 @@ class Texts {
 			$source_languages = $parent_post_obj->get_language();
 			$source_language  = array_key_first( $source_languages );
 
+			// get target language from object.
+			$target_languages = $post_obj->get_language();
+			$target_language  = array_key_first( $target_languages );
+
+			// get parsed texts from object.
+			$parsed_texts = $pagebuilder_obj->get_parsed_texts();
+
+			// delete in DB existing texts of this object which are not part of the actual content.
+			// also check for their simplifications.
+			$entries = $this->db->get_entries( array( 'object_id' => $post_id, 'lang' => $source_language ) );
+			if( !empty($target_language) && !empty($entries) ) {
+				foreach ( $entries as $entry ) {
+					if ( false === in_array( trim( $entry->get_translation( $target_language ) ), $parsed_texts, true ) && false === in_array( $entry->get_original(), $parsed_texts, true ) ) {
+						$entry->delete();
+					}
+				}
+			}
+
 			// loop through the resulting texts and compare them with the existing texts in object.
 			foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
 				// bail if text is empty.
@@ -401,33 +399,27 @@ class Texts {
 				// check if the text is already saved as original text for simplification.
 				$original_text_obj = $this->db->get_entry_by_text( $text, $source_language );
 				if ( false === $original_text_obj ) {
-					// save the text for simplification.
-					$original_text_obj = $this->db->add( $text, $source_language, 'post_content' );
-				}
-
-				if ( ! empty( $actual_entries[ $original_text_obj->get_id() ] ) ) {
-					unset( $actual_entries[ $original_text_obj->get_id() ] );
-				} else {
-					$original_text_obj->set_object( get_post_type( $post_id ), $post_id, $pagebuilder_obj->get_name() );
+					// also check if this is a simplified text of the given language.
+					if( false === $this->db->get_entry_by_simplification( trim($text), $source_language ) ) {
+						// if not save the text for simplification.
+						$original_text_obj = $this->db->add( $text, $source_language, 'post_content' );
+						$original_text_obj->set_object( get_post_type( $post_obj->get_id() ), $post_obj->get_id(), $pagebuilder_obj->get_name() );
+						$original_text_obj->set_state( 'to_simplify' );
+					}
 				}
 			}
 
 			// check if the title has already saved as original text for simplification.
-			$original_title_obj = $this->db->get_entry_by_text( $pagebuilder_obj->get_title(), $source_language );
+			$title = $pagebuilder_obj->get_title();
+			$original_title_obj = $this->db->get_entry_by_text( $title, $source_language );
 			if ( false === $original_title_obj ) {
-				// save the text for simplification.
-				$original_title_obj = $this->db->add( $pagebuilder_obj->get_title(), $source_language, 'title' );
-			}
-
-			if ( ! empty( $actual_entries[ $original_title_obj->get_id() ] ) ) {
-				unset( $actual_entries[ $original_title_obj->get_id() ] );
-			} else {
-				$original_title_obj->set_object( get_post_type( $post_id ), $post_id, $pagebuilder_obj->get_name() );
-			}
-
-			// remove all not updated entries of this object.
-			foreach ( $actual_entries as $entry ) {
-				$entry->delete( $post_id );
+				// also check if this is a simplified text of the given language.
+				if( false === $this->db->get_entry_by_simplification( trim($title), $source_language ) ) {
+					// save the text for simplification.
+					$original_title_obj = $this->db->add( $title, $source_language, 'title' );
+					$original_title_obj->set_object( get_post_type( $post_id ), $post_id, $pagebuilder_obj->get_name() );
+					$original_title_obj->set_state( 'to_simplify' );
+				}
 			}
 
 			// remove changed-marker on original object.

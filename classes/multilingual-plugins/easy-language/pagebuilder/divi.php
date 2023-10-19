@@ -134,7 +134,7 @@ function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): vo
 						'title'  => sprintf( __( 'Simplify with %1$s.', 'easy-language' ), $api_obj->get_title() ),
 						'href'   => $post_object->get_simplification_via_api_link(),
 						'meta' => array(
-							'onclick' => 'easy_language_simplification_init("'.absint($post_object->get_id()).'", "'.esc_url(get_permalink($post_object->get_id())).'");return false;'
+							'onclick' => 'easy_language_simplification_init("'.absint($post_object->get_id()).'", "'.esc_url(get_permalink($post_object->get_id())).'", true);return false;'
 						)
 					)
 				);

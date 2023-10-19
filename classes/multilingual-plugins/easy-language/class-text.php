@@ -43,24 +43,23 @@ class Text {
 	private string $source_language;
 
 	/**
+	 * The db-object.
+	 *
+	 * @var Db
+	 */
+	private Db $db;
+
+	/**
 	 * Constructor for this object.
 	 *
 	 * @param int $id The original object id of this text from originals-table.
 	 */
 	public function __construct( int $id ) {
-		global $wpdb;
+		// get db-object.
+		$this->db = DB::get_instance();
 
 		// secure id of this object.
 		$this->id = $id;
-
-		// set the table-name for originals.
-		$wpdb->easy_language_originals = DB::get_instance()->get_wpdb_prefix() . 'easy_language_originals';
-
-		// set the table-name for originals.
-		$wpdb->easy_language_originals_objects = DB::get_instance()->get_wpdb_prefix() . 'easy_language_originals_objects';
-
-		// set the table-name for simplifications.
-		$wpdb->easy_language_simplifications = DB::get_instance()->get_wpdb_prefix() . 'easy_language_simplifications';
 	}
 
 	/**
@@ -154,13 +153,13 @@ class Text {
 		}
 
 		// get from DB.
-		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `translation` FROM ' . $wpdb->easy_language_simplifications . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
+		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `simplification` FROM ' . $wpdb->easy_language_simplifications . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
 		if ( ! empty( $result ) ) {
 			// save in object.
-			$this->simplifications[ $language ] = $result['translation'];
+			$this->simplifications[ $language ] = $result['simplification'];
 
 			// return result.
-			return $result['translation'];
+			return $result['simplification'];
 		}
 
 		// return empty string if no translation exist.
@@ -191,7 +190,8 @@ class Text {
 		$query = array(
 			'oid'         => $this->get_id(),
 			'time'        => gmdate( 'Y-m-d H:i:s' ),
-			'translation' => $translated_text,
+			'simplification' => $translated_text,
+			'hash' => $this->db->get_string_hash( $translated_text ),
 			'language'    => $target_language,
 			'used_api'    => $used_api,
 			'jobid'       => $job_id,
@@ -305,9 +305,10 @@ class Text {
 	 * Will save it also in DB.
 	 *
 	 * @param string $state The state for this translation.
+	 *
 	 * @return void
 	 */
-	private function set_state( string $state ): void {
+	public function set_state( string $state ): void {
 		global $wpdb;
 		$wpdb->update( $wpdb->easy_language_originals, array( 'state' => $state ), array( 'id' => $this->get_id() ) );
 	}
