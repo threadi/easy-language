@@ -232,17 +232,26 @@ class Init {
 	}
 
 	/**
-	 * If chosen api changes, cleanup the former api (e.g. let it delete its transients).
+	 * If chosen api changes, cleanup the former API (e.g. let it delete its transients) and enable the new API
+	 * with individual settings.
+	 * Global settings are run via @function easy_language_admin_validate_chosen_api().
 	 *
-	 * @param $old_value
-	 * @param $value
+	 * @param string $old_value The name of the former API.
+	 * @param string $value The name of the new API.
 	 *
 	 * @return void
 	 */
-	public function update_easy_language_api( $old_value, $value ): void {
-		$api_obj = Apis::get_instance()->get_api_by_name( $old_value );
-		if ( false !== $api_obj ) {
-			$api_obj->disable();
+	public function update_easy_language_api( string $old_value, string $value ): void {
+		// run disable tasks on former API.
+		$old_api_obj = Apis::get_instance()->get_api_by_name( $old_value );
+		if ( false !== $old_api_obj ) {
+			$old_api_obj->disable();
+		}
+
+		// run enable tasks on new API.
+		$new_api_obj = Apis::get_instance()->get_api_by_name( $value );
+		if ( false !== $new_api_obj ) {
+			$new_api_obj->enable();
 		}
 	}
 

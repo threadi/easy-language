@@ -94,9 +94,6 @@ class Capito extends Base implements Api_Base {
 		add_action( 'easy_language_settings_capito_page', array( $this, 'add_settings_page' ) );
 
 		// add hook für schedules.
-		$simplifications_obj = Simplifications::get_instance();
-		$simplifications_obj->init( $this );
-		add_action( 'easy_language_capito_automatic', array( $simplifications_obj, 'run' ) );
 		add_action( 'easy_language_capito_request_quota', array( $this, 'get_quota_from_api' ) );
 
 		// add hook to remove token.
@@ -287,7 +284,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Install-routines for the API, called during plugin-activation and API-change.
+	 * Install-routines for the API, called during plugin-activation.
 	 *
 	 * @return void
 	 */
@@ -324,11 +321,6 @@ class Capito extends Base implements Api_Base {
 			update_option( 'easy_language_capito_quota_interval', 'daily' );
 		}
 
-		// set interval for automatic simplification to daily.
-		if ( ! get_option( 'easy_language_capito_interval' ) ) {
-			update_option( 'easy_language_capito_interval', 'daily' );
-		}
-
 		// set capito api key to nothing but with active autoload.
 		if ( ! get_option( 'easy_language_capito_api_key' ) ) {
 			update_option( 'easy_language_capito_api_key', '', true );
@@ -337,6 +329,12 @@ class Capito extends Base implements Api_Base {
 		// set capito quota array.
 		if ( ! get_option( 'easy_language_capito_quota' ) ) {
 			update_option( 'easy_language_capito_quota', array(), true );
+		}
+
+		// check if quota-interval does already exist.
+		if (!wp_next_scheduled('easy_language_capito_request_quota')) {
+			// add it.
+			wp_schedule_event(time(), get_option('easy_language_capito_quota_interval', 'daily' ), 'easy_language_capito_request_quota');
 		}
 
 		$charset_collate = $wpdb->get_charset_collate();
@@ -359,11 +357,24 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
+	 * Deactivate-routines for the API, called during plugin-deactivation.
+	 *
+	 * @return void
+	 */
+	public function deactivate(): void {
+		// remove our own schedule.
+		wp_clear_scheduled_hook( 'easy_language_capito_request_quota' );
+	}
+
+	/**
 	 * Install-routines for the API, called during plugin-activation and API-change.
 	 *
 	 * @return void
 	 */
 	public function uninstall(): void {
+		// remove our own schedule.
+		wp_clear_scheduled_hook( 'easy_language_capito_request_quota' );
+
 		/**
 		 * Remove settings.
 		 */
@@ -458,6 +469,9 @@ class Capito extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function disable(): void {
+		// remove our own schedule.
+		wp_clear_scheduled_hook( 'easy_language_capito_request_quota' );
+
 		$transients_obj = Transients::get_instance();
 		foreach ( $this->get_transients() as $transient_name ) {
 			$transient_obj = $transients_obj->get_transient_by_name( $transient_name );
@@ -675,22 +689,22 @@ class Capito extends Base implements Api_Base {
 			array(
 				'label_for' => 'easy_language_capito_automatic_mode',
 				'fieldId'   => 'easy_language_capito_automatic_mode',
-				'options'   => array(
+				'options'   => apply_filters( 'easy_language_capito_automatic_mode', array(
 					'disabled'  => array(
 						'label'       => __( 'Disabled', 'easy-language' ),
 						'enabled'     => true,
 						'description' => __( 'You have to write all simplifications manually. The API will not be used.', 'easy-language' ),
-					),
-					'automatic' => array(
-						'label'       => __( 'Automatic simplification of each text.', 'easy-language' ),
-						'enabled'     => true,
-						'description' => __( 'Each for simplification requested text will be simplified automatic in the intervall set below. Be aware that this is not an automatic simplification in frontend initiated through the visitor.', 'easy-language' ),
 					),
 					'manuell'   => array(
 						'label'       => __( 'Simplify texts manually, use API as helper.', 'easy-language' ),
 						'enabled'     => true,
 						'description' => __( 'The system will not check automatically for simplifications. Its your decision.', 'easy-language' ),
 					),
+					'automatic' => array(
+						'label'       => __( 'Automatic simplification of each text.', 'easy-language' ),
+						'enabled'     => false,
+						'pro_hint' => __( 'Use this mode and many other options with %1$s.', 'easy-language' )
+					)),
 				),
 				'readonly'  => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
 			)
@@ -703,22 +717,7 @@ class Capito extends Base implements Api_Base {
 			$intervals[ $name ] = $schedule['display'];
 		}
 
-		// Interval for automatic simplifications.
-		add_settings_field(
-			'easy_language_capito_interval',
-			__( 'Interval for automatic simplification', 'easy-language' ),
-			'easy_language_admin_select_field',
-			'easyLanguageCapitoPage',
-			'settings_section_capito',
-			array(
-				'label_for'   => 'easy_language_capito_interval',
-				'fieldId'     => 'easy_language_capito_interval',
-				'values'      => $intervals,
-				'readonly'    => ! $this->is_capito_token_set() || 'automatic' !== get_option( 'easy_language_capito_automatic_mode', '' ) || $foreign_translation_plugin_with_api_support,
-				'description' => __( 'The interval is only used for automatic simplifications.', 'easy-language' ),
-			)
-		);
-		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_interval', array( 'sanitize_callback' => array( $this, 'set_interval' ) ) );
+		do_action( 'easy_language_capito_automatic_interval', $intervals, $foreign_translation_plugin_with_api_support );
 
 		// Interval for quota-request.
 		add_settings_field(
@@ -796,7 +795,7 @@ class Capito extends Base implements Api_Base {
 	 *
 	 * @return bool
 	 */
-	private function is_capito_token_set(): bool {
+	public function is_capito_token_set(): bool {
 		return ! empty( $this->get_token() );
 	}
 
@@ -874,16 +873,8 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function set_automatic_mode( $value ): ?string {
 		$value = Helper::settings_validate_multiple_radios( $value );
-		switch ( $value ) {
-			case 'disabled':
-			case 'manuell':
-				wp_clear_scheduled_hook( 'easy_language_capito_automatic' );
-				break;
-			case 'automatic':
-				wp_clear_scheduled_hook( 'easy_language_capito_automatic' );
-				wp_schedule_event( time(), get_option( 'easy_language_capito_interval', 'daily' ), 'easy_language_capito_automatic' );
-				break;
-		}
+
+		do_action( 'easy_language_capito_automatic_sanitize', $value );
 
 		return $value;
 	}
@@ -896,11 +887,11 @@ class Capito extends Base implements Api_Base {
 	 * @return ?string
 	 */
 	public function set_interval( $value ): ?string {
+		// validate value.
 		$value = Helper::settings_validate_select_field( $value );
-		// reset schedule if it is set to automatic.
-		if ( ! empty( $value ) && 'automatic' === get_option( 'easy_language_capito_automatic_mode' ) ) {
-			wp_schedule_event( time(), $value, 'easy_language_capito_automatic_mode' );
-		}
+
+		// run additional tasks.
+		do_action( 'easy_language_capito_automatic_sanitize', $value );
 
 		// return setting.
 		return $value;
@@ -916,6 +907,7 @@ class Capito extends Base implements Api_Base {
 	public function set_quota_interval( $value ): ?string {
 		$value = Helper::settings_validate_select_field( $value );
 		if ( ! empty( $value ) ) {
+			wp_clear_scheduled_hook( 'easy_language_capito_request_quota' );
 			wp_schedule_event( time(), $value, 'easy_language_capito_request_quota' );
 		}
 
@@ -1085,5 +1077,18 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function is_configured(): bool {
 		return ! empty( $this->get_token() );
+	}
+
+	/**
+	 * Enable-routines for the API, called on the new API if another API is chosen.
+	 *
+	 * @return void
+	 */
+	public function enable(): void {
+		// check if quota-interval does already exist.
+		if (!wp_next_scheduled('easy_language_capito_request_quota')) {
+			// add it.
+			wp_schedule_event(time(), get_option('easy_language_capito_quota_interval', 'daily' ), 'easy_language_capito_request_quota');
+		}
 	}
 }

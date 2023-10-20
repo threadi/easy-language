@@ -140,6 +140,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		add_action( 'wp_ajax_easy_language_run_data_deletion', array( $this, 'deletion_simplified_data' ) );
 		add_action( 'wp_ajax_easy_language_get_info_delete_data', array( $this, 'get_info_about_deletion_of_simplified_data' ) );
 
+		add_action( 'wp_ajax_easy_language_reset_processing_simplification', array( $this, 'ajax_reset_processing_simplification' ) );
+		add_action( 'wp_ajax_easy_language_ignore_processing_simplification', array( $this, 'ajax_ignore_processing_simplification' ) );
+
 		// embed files.
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), PHP_INT_MAX );
 
@@ -1379,6 +1382,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'run_simplification_nonce'        => wp_create_nonce( 'easy-language-run-simplification-nonce' ),
 				'txt_simplification_has_been_run' => __( 'Simplification has been run.', 'easy-language' ),
 				'translate_confirmation_question' => __( 'Simplify the texts in this object?', 'easy-language' ),
+				'label_simplification_error' => __( 'Error', 'easy-language' ),
+				/* translators: [error] will be replaced by the http-error-message (e.g. "Gateway timed our") */
+				'txt_simplification_error' => sprintf( __( '<p><strong>The following error occurred during: [error]</strong> - at least one simplification could not be processed.<br><br><strong>Possible causes:</strong></p><ul><li>The server settings for WordPress hosting prevent longer lasting requests. Contact your hosters support for a solution.</li><li>The API used took too long to simplify the text. Shorten particularly long texts or contact API support for further assistance.</li><li>Use <a href="%1$s" target="_blank">Easy Language Pro</a> for automatic translations in the background without the risk of hitting timeouts on your own hosting.</li></ul>', 'easy-language' ), esc_url( Helper::get_pro_url() ) ),
+				'ignore_processing_simplification_nonce' => wp_create_nonce( 'easy-language-ignore-processing-simplification-nonce' ),
+				'reset_processing_simplification_nonce' => wp_create_nonce( 'easy-language-reset-processing-simplification-nonce' ),
 			)
 		);
 
@@ -1593,6 +1601,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// remove running marker.
 		delete_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING );
 
+		// return nothing more.
 		wp_die();
 	}
 
@@ -1617,6 +1626,68 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// collect return value.
 		echo absint( $count_deletion ) . ';' . absint( $max_deletions ) . ';' . absint( $running_deletion );
+
+		// return nothing more.
+		wp_die();
+	}
+
+	/**
+	 * Reset processing simplifications of given object to 'to_simplify'.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function ajax_reset_processing_simplification(): void {
+		check_ajax_referer( 'easy-language-reset-processing-simplification-nonce', 'nonce' );
+
+		// get the post-id from request.
+		$post_id = isset( $_POST['post'] ) ? absint( $_POST['post'] ) : 0;
+
+		if( absint($post_id) > 0 ) {
+			$filter = array(
+				'object_id' => $post_id,
+				'state' => 'processing'
+			);
+
+			// get all simplified entries.
+			$entries = DB::get_instance()->get_entries($filter);
+
+			// loop through the results and set the state.
+			foreach( $entries as $entry ) {
+				$entry->set_state('to_simplify');
+			}
+		}
+
+		// return nothing more.
+		wp_die();
+	}
+
+	/**
+	 * Set processing simplifications of given object to 'ignore'.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function ajax_ignore_processing_simplification(): void {
+		check_ajax_referer( 'easy-language-ignore-processing-simplification-nonce', 'nonce' );
+
+		// get the post-id from request.
+		$post_id = isset( $_POST['post'] ) ? absint( $_POST['post'] ) : 0;
+
+		if( absint($post_id) > 0 ) {
+			$filter = array(
+				'object_id' => $post_id,
+				'state' => 'processing'
+			);
+
+			// get all simplified entries.
+			$entries = DB::get_instance()->get_entries($filter);
+
+			// loop through the results and set the state.
+			foreach( $entries as $entry ) {
+				$entry->set_state('ignore');
+			}
+		}
 
 		// return nothing more.
 		wp_die();

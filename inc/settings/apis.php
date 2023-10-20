@@ -258,7 +258,7 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 			$transient_obj->save();
 		}
 		else {
-			// delete api-settings hint.
+			// delete API-settings hint.
 			Transients::get_instance()->get_transient_by_name( 'easy_language_api_changed' )->delete();
 		}
 	}

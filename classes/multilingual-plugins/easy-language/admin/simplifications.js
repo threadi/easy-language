@@ -97,6 +97,21 @@ function easy_language_get_simplification_info(obj_id, progressbar, stepDescript
 				'initialization': initialization,
 				'nonce': easyLanguageSimplificationJsVars.run_simplification_nonce
 			},
+			error: function(e) {
+				//
+
+				// hide progressbar.
+				progressbar.addClass( "hidden" );
+
+				// update dialog-title.
+				jQuery( '#easylanguage-simplification-dialog' ).dialog( { title:easyLanguageSimplificationJsVars.label_simplification_error } );
+
+				// show error.
+				stepDescription.html( easyLanguageSimplificationJsVars.txt_simplification_error.replace('[error]', e.statusText));
+
+				// get buttons.
+				jQuery( '.easylanguage-simplification-dialog-no-close .ui-button' ).prop( 'disabled', false );
+			},
 			success: function (data) {
 				let count    = parseInt( data[0] );
 				let max      = parseInt( data[1] );
@@ -120,27 +135,27 @@ function easy_language_get_simplification_info(obj_id, progressbar, stepDescript
 					);
 				} else {
 					// show result.
-					stepDescription.html( '<p>' + result + '</p>' );
+					stepDescription.html('<p>' + result + '</p>');
 
 					// hide progressbar.
-					progressbar.addClass( "hidden" );
+					progressbar.addClass("hidden");
 
 					// update dialog-title.
-					jQuery( '#easylanguage-simplification-dialog' ).dialog( { title:easyLanguageSimplificationJsVars.label_simplification_done } );
+					jQuery('#easylanguage-simplification-dialog').dialog({title: easyLanguageSimplificationJsVars.label_simplification_done});
 
 					// get buttons.
-					let buttons = jQuery( '.easylanguage-simplification-dialog-no-close .ui-button' );
+					let buttons = jQuery('.easylanguage-simplification-dialog-no-close .ui-button');
 
 					// update link-target of the first button.
-					if( link ) {
-						buttons.first().off('click').on('click', function(e) {
+					if (link) {
+						buttons.first().off('click').on('click', function (e) {
 							e.preventDefault();
 							location.href = link;
 						});
 
 						// in frontend edit is used, change also the second button.
-						if( frontend_edit ) {
-							buttons.off('click').on('click', function(e) {
+						if (frontend_edit) {
+							buttons.off('click').on('click', function (e) {
 								e.preventDefault();
 								location.href = link;
 							});
@@ -148,9 +163,83 @@ function easy_language_get_simplification_info(obj_id, progressbar, stepDescript
 					}
 
 					// enable buttons.
-					buttons.prop( 'disabled', false );
+					buttons.prop('disabled', false);
+
+					// set events on buttons in texts.
+					stepDescription.find('a.button').each(function() {
+						if( jQuery(this).data('run-again') ) {
+							jQuery(this).on('click', function (e) {
+								e.preventDefault();
+
+								// first reset the processing texts to state "to_simplify".
+								jQuery.ajax(
+									{
+										type: "POST",
+										url: easyLanguageSimplificationJsVars.ajax_url,
+										data: {
+											'action': 'easy_language_reset_processing_simplification',
+											'post': obj_id,
+											'nonce': easyLanguageSimplificationJsVars.reset_processing_simplification_nonce
+										},
+										error: function (e) {
+											// hide progressbar.
+											progressbar.addClass("hidden");
+
+											// update dialog-title.
+											jQuery('#easylanguage-simplification-dialog').dialog({title: easyLanguageSimplificationJsVars.label_simplification_error});
+
+											// show error.
+											stepDescription.html(easyLanguageSimplificationJsVars.txt_simplification_error.replace('[error]', e.statusText));
+
+											// get buttons.
+											jQuery('.easylanguage-simplification-dialog-no-close .ui-button').prop('disabled', false);
+										},
+										success: function (data) {
+											// then run normal simplification again.
+											easy_language_get_simplification_info( obj_id, progressbar, stepDescription, true, frontend_edit );
+										}
+									}
+								);
+							});
+						}
+						if( jQuery(this).data('ignore-texts') ) {
+							jQuery(this).on('click', function (e) {
+								e.preventDefault();
+
+								// first set the processing texts to state "ignore".
+								jQuery.ajax(
+									{
+										type: "POST",
+										url: easyLanguageSimplificationJsVars.ajax_url,
+										data: {
+											'action': 'easy_language_ignore_processing_simplification',
+											'post': obj_id,
+											'nonce': easyLanguageSimplificationJsVars.ignore_processing_simplification_nonce
+										},
+										error: function (e) {
+											// hide progressbar.
+											progressbar.addClass("hidden");
+
+											// update dialog-title.
+											jQuery('#easylanguage-simplification-dialog').dialog({title: easyLanguageSimplificationJsVars.label_simplification_error});
+
+											// show error.
+											stepDescription.html(easyLanguageSimplificationJsVars.txt_simplification_error.replace('[error]', e.statusText));
+
+											// get buttons.
+											jQuery('.easylanguage-simplification-dialog-no-close .ui-button').prop('disabled', false);
+										},
+										success: function (data) {
+											// then run normal simplification again.
+											easy_language_get_simplification_info( obj_id, progressbar, stepDescription, true, frontend_edit );
+										}
+									}
+								);
+							});
+						}
+					});
 				}
 			}
 		}
-	)
+	);
 }

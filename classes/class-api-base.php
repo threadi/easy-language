@@ -86,14 +86,21 @@ interface Api_Base {
 	public function is_active(): bool;
 
 	/**
-	 * Install-routines for the API, called during plugin-activation and API-change.
+	 * Install-routines for the API, called during plugin-activation.
 	 *
 	 * @return void
 	 */
 	public function install(): void;
 
 	/**
-	 * Uninstall-routines for the API, called during plugin-activation and API-change.
+	 * Deactivate-routines for the API, called during plugin-deactivation.
+	 *
+	 * @return void
+	 */
+	public function deactivate(): void;
+
+	/**
+	 * Uninstall-routines for the API, called during plugin-activation.
 	 *
 	 * @return void
 	 */
@@ -105,6 +112,13 @@ interface Api_Base {
 	 * @return void
 	 */
 	public function disable(): void;
+
+	/**
+	 * Enable-routines for the API, called on the new API if another API is chosen.
+	 *
+	 * @return void
+	 */
+	public function enable(): void;
 
 	/**
 	 * Get the API-specific simplifications-object (used to run simplifications).

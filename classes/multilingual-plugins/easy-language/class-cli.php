@@ -47,10 +47,7 @@ class Cli {
 		// get active API.
 		$api_obj = Apis::get_instance()->get_active_api();
 		if ( false !== $api_obj ) {
-			$c = 0;
-			foreach ( Init::get_instance()->get_objects_with_texts() as $object ) {
-				$c = $c + $object->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping() );
-			}
+			$c = $api_obj->get_simplifications_obj()->run();
 
 			// return message.
 			\WP_CLI::success( $c . ' simplifications has been saved.' );

@@ -467,22 +467,22 @@ class ChatGpt extends Base implements Api_Base {
 			array(
 				'label_for' => 'easy_language_chatgpt_automatic_mode',
 				'fieldId'   => 'easy_language_chatgpt_automatic_mode',
-				'options'   => array(
+				'options'   => apply_filters( 'easy_language_chatgpt_automatic_mode', array(
 					'disabled'  => array(
 						'label'       => __( 'Disabled', 'easy-language' ),
 						'enabled'     => true,
 						'description' => __( 'You have to write all simplifications manually. The API will not be used.', 'easy-language' ),
-					),
-					'automatic' => array(
-						'label'       => __( 'Automatic simplification of each text.', 'easy-language' ),
-						'enabled'     => true,
-						'description' => __( 'Each for simplification requested text will be simplified automatic in the intervall set below. Be aware that this is not an automatic simplification in frontend initiated through the visitor.', 'easy-language' ),
 					),
 					'manuell'   => array(
 						'label'       => __( 'Simplify texts manually, use API as helper.', 'easy-language' ),
 						'enabled'     => true,
 						'description' => __( 'The system will not check automatically for simplifications. Its your decision.', 'easy-language' ),
 					),
+					'automatic' => array(
+						'label'       => __( 'Automatic simplification of each text.', 'easy-language' ),
+						'enabled'     => false,
+						'pro_hint' => __( 'Use this mode and many other options with %1$s.', 'easy-language' )
+					)),
 				),
 				'readonly'  => false === $this->is_chatgpt_token_set() || $foreign_translation_plugin_with_api_support,
 			)
@@ -495,22 +495,7 @@ class ChatGpt extends Base implements Api_Base {
 			$intervals[ $name ] = $schedule['display'];
 		}
 
-		// Interval for automatic simplifications.
-		add_settings_field(
-			'easy_language_chatgpt_interval',
-			__( 'Interval for automatic simplification', 'easy-language' ),
-			'easy_language_admin_select_field',
-			'easyLanguageChatGptPage',
-			'settings_section_chatgpt',
-			array(
-				'label_for'   => 'easy_language_chatgpt_interval',
-				'fieldId'     => 'easy_language_chatgpt_interval',
-				'values'      => $intervals,
-				'readonly'    => ! $this->is_chatgpt_token_set() || 'automatic' !== get_option( 'easy_language_chatgpt_automatic_mode', '' ) || $foreign_translation_plugin_with_api_support,
-				'description' => __( 'The interval is only used for automatic simplifications.', 'easy-language' ),
-			)
-		);
-		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_interval', array( 'sanitize_callback' => array( $this, 'set_interval' ) ) );
+		do_action( 'easy_language_chatgpt_automatic_interval', $intervals, $foreign_translation_plugin_with_api_support );
 	}
 
 	/**
@@ -562,11 +547,6 @@ class ChatGpt extends Base implements Api_Base {
 		// set schedule for automatic simplification.
 		$this->set_automatic_mode( get_option( 'easy_language_chatgpt_automatic_mode', 'disabled' ) );
 
-		// set interval for automatic simplification to daily.
-		if ( ! get_option( 'easy_language_chatgpt_interval' ) ) {
-			update_option( 'easy_language_chatgpt_interval', 'daily' );
-		}
-
 		// set language model.
 		if ( ! get_option( 'easy_language_chatgpt_model' ) ) {
 			update_option( 'easy_language_chatgpt_model', 'gpt-4' );
@@ -594,6 +574,15 @@ class ChatGpt extends Base implements Api_Base {
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
+	}
+
+	/**
+	 * Deactivate-routines for the API, called during plugin-deactivation.
+	 *
+	 * @return void
+	 */
+	public function deactivate(): void {
+		// nothing to do.
 	}
 
 	/**
@@ -692,7 +681,7 @@ class ChatGpt extends Base implements Api_Base {
 	 *
 	 * @return bool
 	 */
-	private function is_chatgpt_token_set(): bool {
+	public function is_chatgpt_token_set(): bool {
 		return ! empty( $this->get_token() );
 	}
 
@@ -712,18 +701,13 @@ class ChatGpt extends Base implements Api_Base {
 	 * @return string|null
 	 */
 	public function set_automatic_mode( $value ): ?string {
+		// validate value.
 		$value = Helper::settings_validate_multiple_radios( $value );
-		switch ( $value ) {
-			case 'disabled':
-			case 'manuell':
-				wp_clear_scheduled_hook( 'easy_language_chatgpt_automatic' );
-				break;
-			case 'automatic':
-				wp_clear_scheduled_hook( 'easy_language_chatgpt_automatic' );
-				wp_schedule_event( time(), get_option( 'easy_language_chatgpt_interval', 'daily' ), 'easy_language_chatgpt_automatic' );
-				break;
-		}
 
+		// run additional tasks.
+		do_action( 'easy_language_chatgpt_automatic_sanitize', $value );
+
+		// return value.
 		return $value;
 	}
 
@@ -794,24 +778,6 @@ class ChatGpt extends Base implements Api_Base {
 
 		// return value.
 		return $values;
-	}
-
-	/**
-	 * Set the interval for the automatic-schedule, if it is enabled.
-	 *
-	 * @param $value
-	 *
-	 * @return ?string
-	 */
-	public function set_interval( $value ): ?string {
-		$value = Helper::settings_validate_select_field( $value );
-		// reset schedule if it is set to automatic.
-		if ( ! empty( $value ) && 'automatic' === get_option( 'easy_language_chatgpt_automatic_mode' ) ) {
-			wp_schedule_event( time(), $value, 'easy_language_chatgpt_automatic_mode' );
-		}
-
-		// return setting.
-		return $value;
 	}
 
 	/**
@@ -914,5 +880,14 @@ class ChatGpt extends Base implements Api_Base {
 	 */
 	public function is_configured(): bool {
 		return $this->is_chatgpt_token_set();
+	}
+
+	/**
+	 * Enable-routines for the API, called on the new API if another API is chosen.
+	 *
+	 * @return void
+	 */
+	public function enable(): void {
+		// nothing to do.
 	}
 }

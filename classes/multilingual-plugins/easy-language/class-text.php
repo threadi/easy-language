@@ -293,7 +293,7 @@ class Text {
 			}
 		}
 
-		// set state to "in_use" to mark text as translated and inserted.
+		// set state to "in_use" to mark text as simplified and inserted.
 		$this->set_state( 'in_use' );
 
 		// return true as we have replaced contents.
@@ -302,13 +302,23 @@ class Text {
 
 	/**
 	 * Set state of this text.
-	 * Will save it also in DB.
+	 * Only if it is a valid state:
+	 * - to_simplify => text will be simplified
+	 * - processing => text is simplified
+	 * - in_use => text has been simplified
+	 * - ignore => will not be simplified
 	 *
-	 * @param string $state The state for this translation.
+	 * Will save this state in DB.
+	 *
+	 * @param string $state The state for this simplification.
 	 *
 	 * @return void
 	 */
 	public function set_state( string $state ): void {
+		if( !in_array( $state, array( 'to_simplify', 'processing', 'in_use', 'ignore' ), true ) ) {
+			return;
+		}
+
 		global $wpdb;
 		$wpdb->update( $wpdb->easy_language_originals, array( 'state' => $state ), array( 'id' => $this->get_id() ) );
 	}

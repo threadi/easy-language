@@ -3,7 +3,6 @@ ToDo
 
 Funktionales
 ------------
-* Server-Timeouts bei JavaScript-Initialisierung beachten und Nutzer darauf hinweisen
 * Icons:
 -> bei installation in media-db importieren
 -> in einstellungen eine icon-zuordnung zu jeder sprache hinterlegen

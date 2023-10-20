@@ -217,6 +217,12 @@ class Install {
 	 * @return void
 	 */
 	private function deactivation_tasks(): void {
+		// get the active APIs to call its install-routines.
+		$apis_obj = Apis::get_instance();
+		foreach ( $apis_obj->get_available_apis() as $api_obj ) {
+			$api_obj->deactivate();
+		}
+
 		// get the plugin-supports by call its install-routines.
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
 			$plugin_obj->deactivation();

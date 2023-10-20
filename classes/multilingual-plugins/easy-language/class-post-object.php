@@ -493,6 +493,29 @@ class Post_Object implements Easy_Language_Object {
 				return 0;
 			}
 
+			/**
+			 * Ermittle alle zu dem Projekt hinterlegten Texte die noch auf "in_process" stehen.
+			 * Wenn es sie gibt, dann brich den Vorgang ab und stell den Nutzer vor die Wahl:
+			 * - Fehlgeschlagene Vereinfachungen nochmal angehen
+			 * - Ignorieren und nicht vereinfachen
+			 */
+			// define filter for entry-loading to check max count of entries for this object.
+			$filter = array(
+				'object_id' => $this->get_id(),
+				'state' => 'processing'
+			);
+
+			// get entries which are in process.
+			$entries_in_process = Db::get_instance()->get_entries( $filter );
+			if( !empty($entries_in_process) ) {
+				// set result.
+				/* translators: %1$s will be replaced by the object-title */
+				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, sprintf( __( 'A previously running simplification of texts of this %1$s failed. How do you want to deal with it?<br><br><a href="#" class="button button-primary" data-run-again="1">Run simplifications again</a> <a href="#" class="button button-primary" data-ignore-texts="1">Ignore the failed simplifications</a>', 'easy-language' ), esc_html( $object_type_name ) ) );
+
+				// return 0 as we have not simplified anything.
+				return 0;
+			}
+
 			// mark simplification for this object as running.
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, time() );
 
@@ -608,6 +631,9 @@ class Post_Object implements Easy_Language_Object {
 	private function process_simplification( object $simplification_obj, array $language_mappings, Text $entry ): int {
 		// counter for simplifications.
 		$c = 0;
+
+		// set state for the entry to "processing".
+		$entry->set_state( 'processing' );
 
 		// get object the text belongs to, to get the target language.
 		$object_language = $this->get_language();

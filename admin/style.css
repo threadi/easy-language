@@ -162,7 +162,11 @@ body .text-translations-table #source_language, body .text-translations-table #t
 	z-index: 10;
 }
 
-.easy-api-radios input[type='radio']:checked + label {
+.easy-api-radios input[type='radio'] + label:hover {
+	background-color: rgba(0,0,0,0.1);
+}
+
+.easy-api-radios input[type='radio']:checked + label, .easy-api-radios input[type='radio']:checked + label:hover {
     background-color: #fff;
 }
 
@@ -217,6 +221,8 @@ body .text-translations-table #source_language, body .text-translations-table #t
 .easylanguage-simplification-dialog-no-close { z-index: 2000 !important }
 
 #easylanguage-simplification-dialog-step-description { line-height: 1.4; }
+
+#easylanguage-simplification-dialog-step-description li { font-size: 13px; }
 
 .pro-marker {
 	background-color: var(--lwel-pro-bg);

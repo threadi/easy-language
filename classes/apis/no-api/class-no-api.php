@@ -144,6 +144,15 @@ class No_Api extends Base implements Api_Base {
 
 	public function install(): void {}
 
+	/**
+	 * Deactivate-routines for the API, called during plugin-deactivation.
+	 *
+	 * @return void
+	 */
+	public function deactivate(): void {
+		// nothing to do.
+	}
+
 	public function uninstall(): void {}
 
 	public function get_simplifications_obj(): object {
@@ -159,5 +168,14 @@ class No_Api extends Base implements Api_Base {
 	 */
 	public function get_api_url(): string {
 		return '';
+	}
+
+	/**
+	 * Enable-routines for the API, called on the new API if another API is chosen.
+	 *
+	 * @return void
+	 */
+	public function enable(): void {
+		// nothing to do.
 	}
 }

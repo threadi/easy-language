@@ -8,6 +8,7 @@
 namespace easyLanguage\Apis\Capito;
 
 use easyLanguage\Api_Base;
+use easyLanguage\Multilingual_plugins\Easy_Language\Init;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -109,5 +110,18 @@ class Simplifications {
 
 		// return nothing.
 		return array();
+	}
+
+	/**
+	 * Run simplification of all objects with texts.
+	 *
+	 * @return int
+	 */
+	public function run(): int {
+		$c = 0;
+		foreach ( Init::get_instance()->get_objects_with_texts() as $object ) {
+			$c = $c + $object->process_simplifications( $this->init->get_simplifications_obj(), $this->init->get_active_language_mapping() );
+		}
+		return $c;
 	}
 }

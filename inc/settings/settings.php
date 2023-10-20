@@ -474,6 +474,9 @@ function easy_language_admin_multiple_radio_field( array $attr ): void {
 				if ( ! empty( $settings['description'] ) ) {
 					echo '<p>' . wp_kses_post( $settings['description'] ) . '</p>';
 				}
+				if( ! empty( $settings['pro_hint']) ) {
+					do_action( 'easy_language_admin_show_pro_hint', $settings['pro_hint'] );
+				}
 				?>
 			</div>
 			<?php
@@ -493,7 +496,7 @@ function easy_language_admin_multiple_radio_field( array $attr ): void {
 function easy_language_admin_advanced_pro_hint(): void {
 	// pro hint.
 	/* translators: %1$s is replaced with the plugin name */
-	do_action('easy_language_admin_show_pro_hint', __('With %s you get more settings options, e.g. support for any post-type and simplify of taxonomies.', 'easy-language'));
+	do_action('easy_language_admin_show_pro_hint', __('With %1$s you get more settings options, e.g. support for any post-type and simplify of taxonomies.', 'easy-language'));
 }
 
 /**
