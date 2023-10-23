@@ -182,6 +182,57 @@ class Install {
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
 			$plugin_obj->install();
 		}
+
+		// get all target languages of all APIs for import the assigned language-images.
+		$languages = array();
+		foreach( APIS::get_instance()->get_available_apis() as $api_object ) {
+			$languages = array_merge( $languages, $api_object->get_supported_target_languages() );
+		}
+		foreach( $languages as $language_code => $settings ) {
+			if( !empty($settings['img']) ) {
+				// get path.
+				$img_path = trailingslashit(Helper::get_plugin_path()).'gfx/'.$settings['img'];
+
+				// check if file exists there.
+				if( file_exists( $img_path ) ) {
+					// check if file exist in db.
+					$attachment = Helper::get_attachment_by_post_name( pathinfo($img_path, PATHINFO_FILENAME) );
+
+					// if an attachment for this file does not exist, check also for postmeta.
+					if( false === $attachment ) {
+						$attachment = Helper::get_attachment_by_language_code( $language_code );
+					}
+
+					// if no attachment could be found, add it.
+					if( false === $attachment ) {
+						// Prepare an array of post data for the attachment.
+						$attachment = array(
+							'name'     => basename( $settings['img'] ),
+							'tmp_name' => $img_path,
+						);
+
+						// Insert the attachment and get its ID.
+						$attachment_id = media_handle_sideload( $attachment );
+
+						// get attachment as object.
+						if( absint($attachment_id) > 0 ) {
+							$attachment = get_post( $attachment_id );
+						}
+					}
+
+					if( false !== $attachment ) {
+						// get actual list of languages mapped to this icon.
+						$language_list = (array)get_post_meta( $attachment->ID, 'easy_language_code', true );
+
+						if( empty($language_list[$language_code]) ) {
+							// add language-code to this icon.
+							$language_list[$language_code] = 1;
+							update_post_meta( $attachment->ID, 'easy_language_code', $language_list );
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/**

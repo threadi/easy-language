@@ -130,12 +130,18 @@ class Languages {
 					'enabled'     => true,
 					'description' => '', // __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language'),
 					'url'         => 'de_el',
+					'icon' => 'icon-de-el',
+					'img' => 'de_EL.png',
+					'img_icon' => Helper::get_icon_img_for_language_code( 'de_EL' )
 				),
 				'de_LS' => array(
-					'label'       => 'Leichte Sprache', // __( 'Leichte Sprache', 'easy-language'),
+					'label'       => __( 'Leichte Sprache', 'easy-language'),
 					'enabled'     => true,
 					'description' => '', // __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language'),
 					'url'         => 'de_ls',
+					'icon' => 'icon-de-ls',
+					'img' => 'de_LS.png',
+					'img_icon' => Helper::get_icon_img_for_language_code( 'de_LS' )
 				),
 			)
 		);

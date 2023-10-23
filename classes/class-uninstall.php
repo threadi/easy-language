@@ -8,6 +8,7 @@
 namespace easyLanguage;
 
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
+use WP_Query;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -110,6 +111,23 @@ class Uninstall {
 	 * @return void
 	 */
 	private function tasks(): void {
+		// get all images which have assigned 'easy_language_code' post meta and delete them.
+		$query           = array(
+			'posts_per_page' => -1,
+			'post_type'      => 'attachment',
+			'post_status' => 'inherit',
+			'meta_query' => array(
+				array(
+					'key' => 'easy_language_code',
+					'compare' => 'EXIST'
+				)
+			)
+		);
+		$attachments_with_language_marker = new WP_Query( $query );
+		foreach( $attachments_with_language_marker->posts as $attachment ) {
+			wp_delete_attachment( $attachment->ID );
+		}
+
 		/**
 		 * Call uninstall-routines of all available APIs.
 		 */
@@ -133,7 +151,7 @@ class Uninstall {
 		}
 
 		/**
-		 * Delete manual transients.
+		 * Delete manuel transients.
 		 */
 		foreach ( EASY_LANGUAGE_TRANSIENTS as $transient_name => $settings ) {
 			delete_transient( $transient_name );

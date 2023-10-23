@@ -104,7 +104,7 @@ class Switcher {
 			// register switcher block for navigation in FSE-themes.
 			// hint: https://github.com/WordPress/gutenberg/issues/31387 .
 			register_block_type(
-				helper::get_plugin_path() . 'classes/multilingual-plugins/easy-language/blocks/navigation-switcher/',
+				Helper::get_plugin_path() . 'classes/multilingual-plugins/easy-language/blocks/navigation-switcher/',
 				array(
 					'render_callback' => array( $this, 'get' ),
 					'attributes'      => array(
@@ -127,7 +127,7 @@ class Switcher {
 
 			// register switcher block outside of navigation in FSE-themes.
 			register_block_type(
-				helper::get_plugin_path() . 'classes/multilingual-plugins/easy-language/blocks/switcher/',
+				Helper::get_plugin_path() . 'classes/multilingual-plugins/easy-language/blocks/switcher/',
 				array(
 					'render_callback' => array( $this, 'get' ),
 					'attributes'      => array(

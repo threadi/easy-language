@@ -8,6 +8,8 @@
 namespace easyLanguage;
 
 // prevent direct access.
+use WP_Query;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -89,6 +91,7 @@ class Init {
 	 * @return void
 	 */
 	public function plugin_init(): void {
+		// TODO remove if languages are in WP-repo
 		load_plugin_textdomain( 'easy-language', false, dirname( plugin_basename( EASY_LANGUAGE ) ) . '/languages' );
 	}
 
@@ -120,6 +123,62 @@ class Init {
 	 */
 	public function admin_init(): void {
 		global $pagenow;
+
+		// get all target languages of all APIs for import the assigned language-images.
+		$languages = array();
+		foreach( APIS::get_instance()->get_available_apis() as $api_object ) {
+			$languages = array_merge( $languages, $api_object->get_supported_target_languages() );
+		}
+		foreach( $languages as $language_code => $settings ) {
+			if( !empty($settings['img']) ) {
+				// get path.
+				$img_path = trailingslashit(Helper::get_plugin_path()).'gfx/'.$settings['img'];
+
+				// check if file exists there.
+				if( file_exists( $img_path ) ) {
+					// check if file exist in db.
+					$attachment = Helper::get_attachment_by_post_name( pathinfo($img_path, PATHINFO_FILENAME) );
+
+					// if an attachment for this file does not exist, check also for postmeta.
+					if( false === $attachment ) {
+						$attachment = Helper::get_attachment_by_language_code( $language_code );
+					}
+
+					// if no attachment could be found, add it.
+					if( false === $attachment ) {
+						// Prepare an array of post data for the attachment.
+						$attachment = array(
+							'name'     => basename( $settings['img'] ),
+							'tmp_name' => $img_path,
+						);
+
+						// Insert the attachment by prevent removing the original file and get its attachment ID.
+						add_filter( 'pre_move_uploaded_file', '__return_false' );
+						$attachment_id = media_handle_sideload( $attachment );
+						remove_filter( 'pre_move_uploaded_file', '__return_false' );
+
+						// get attachment as object.
+						if( absint($attachment_id) > 0 ) {
+							$attachment = get_post( $attachment_id );
+						}
+					}
+
+					if( false !== $attachment ) {
+						// get actual list of languages mapped to this icon.
+						$language_list = get_post_meta( $attachment->ID, 'easy_language_code', true );
+						if( !is_array($language_list) ) {
+							$language_list = array();
+						}
+
+						if( empty($language_list[$language_code]) ) {
+							// add language-code to this icon.
+							$language_list[$language_code] = 1;
+							update_post_meta( $attachment->ID, 'easy_language_code', $language_list );
+						}
+					}
+				}
+			}
+		}
 
 		// get transients objects-object.
 		$transients_obj = Transients::get_instance();

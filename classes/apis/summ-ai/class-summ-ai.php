@@ -185,6 +185,8 @@ class Summ_AI extends Base implements Api_Base {
 				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
 				'url'         => 'de_el',
 				'api_value'   => 'plain',
+				'icon' => 'icon-de-el',
+				'img' => 'en_EL.png',
 			),
 			'de_LS' => array(
 				'label'       => __( 'Leichte Sprache', 'easy-language' ),
@@ -192,6 +194,8 @@ class Summ_AI extends Base implements Api_Base {
 				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
 				'url'         => 'de_ls',
 				'api_value'   => 'easy',
+				'icon' => 'icon-de-ls',
+				'img' => 'en_LS.png',
 			),
 		);
 	}

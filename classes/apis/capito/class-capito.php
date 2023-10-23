@@ -221,6 +221,9 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'The easiest level of german language.', 'easy-language' ),
 				'url'         => 'de_a1',
 				'api_value'   => 'a1',
+				'icon' => 'icon-de-ls',
+				'img' => 'de_LS.png',
+				'img_icon' => Helper::get_icon_img_for_language_code( 'de_a1' )
 			),
 			'de_a2' => array(
 				'label'       => __( 'German A2', 'easy-language' ),
@@ -228,6 +231,9 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'Capito compares this with Leichte Sprache', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'a2',
+				'icon' => 'icon-de-ls',
+				'img' => 'de_LS.png',
+				'img_icon' => Helper::get_icon_img_for_language_code( 'de_a2' )
 			),
 			'de_b1' => array(
 				'label'       => __( 'German B1', 'easy-language' ),
@@ -235,6 +241,9 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'Capito compares this with Einfache Sprache', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'b1',
+				'icon' => 'icon-de-el',
+				'img' => 'de_EL.png',
+				'img_icon' => Helper::get_icon_img_for_language_code( 'de_b1' )
 			),
 			'en_a1' => array(
 				'label'       => __( 'English A1', 'easy-language' ),
@@ -242,6 +251,9 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'The easiest level of english language.', 'easy-language' ),
 				'url'         => 'de_a1',
 				'api_value'   => 'a1',
+				'icon' => 'icon-de-ls',
+				'img' => 'en_LS.png',
+				'img_icon' => Helper::get_icon_img_for_language_code( 'en_a1' )
 			),
 			'en_a2' => array(
 				'label'       => __( 'English A2', 'easy-language' ),
@@ -249,6 +261,9 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'Capito compares this with Plain Sprache', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'a2',
+				'icon' => 'icon-de-ls',
+				'img' => 'en_LS.png',
+				'img_icon' => Helper::get_icon_img_for_language_code( 'en_a2' )
 			),
 			'en_b1' => array(
 				'label'       => __( 'English B1', 'easy-language' ),
@@ -256,6 +271,9 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'Capito compares this with Easy Language', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'b1',
+				'icon' => 'icon-de-ls',
+				'img' => 'en_EL.png',
+				'img_icon' => Helper::get_icon_img_for_language_code( 'en_b1' )
 			),
 		);
 	}

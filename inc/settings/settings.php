@@ -409,11 +409,17 @@ function easy_language_admin_multiple_checkboxes_field( array $attr ): void {
 				$title    = '';
 			}
 
+			// get icon, if set.
+			$icon = '';
+			if( !empty($settings['img_icon']) ) {
+				$icon = $settings['img_icon'];
+			}
+
 			// output.
 			?>
 			<div class="easy-language-checkbox">
 				<input type="checkbox" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>[<?php echo esc_attr( $key ); ?>]" value="1"<?php echo esc_attr( $checked ) . esc_attr( $readonly ); ?> title="<?php echo esc_attr( $title ); ?>">
-				<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>"><?php echo esc_html( $settings['label'] ); ?></label>
+				<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>"><?php echo esc_html( $settings['label'] ).wp_kses_post($icon); ?></label>
 				<?php
 				if ( ! empty( $settings['description'] ) ) {
 					echo '<p>' . wp_kses_post( $settings['description'] ) . '</p>';

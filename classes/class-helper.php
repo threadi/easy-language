@@ -9,6 +9,8 @@ namespace easyLanguage;
 
 // prevent direct access.
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
+use WP_Post;
+use WP_Query;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -316,4 +318,74 @@ class Helper {
 	public static function get_pro_url(): string {
 		return 'https://laolaweb.com/plugins/leichte-sprache-fuer-wordpress/';
 	}
+
+	/**
+	 * Get attachment-object by given filename.
+	 *
+	 * @param string $post_name The searched filename.
+	 *
+	 * @return WP_Post|false
+	 */
+	public static function get_attachment_by_post_name( string $post_name ): WP_Post|false {
+		$query           = array(
+			'posts_per_page' => 1,
+			'post_type'      => 'attachment',
+			'name'           => trim( $post_name ),
+			'post_status' => 'inherit',
+		);
+		$get_attachment = new WP_Query( $query );
+
+		if ( ! $get_attachment || ! isset( $get_attachment->posts, $get_attachment->posts[0] ) ) {
+			return false;
+		}
+
+		// return resulting object.
+		return $get_attachment->posts[0];
+	}
+
+	/**
+	 * Get attachment by given language-code via postmeta of the attachment.
+	 *
+	 * @param string $language_code The search language code.
+	 *
+	 * @return WP_Post|false
+	 */
+	public static function get_attachment_by_language_code( string $language_code ): WP_Post|false {
+		$query           = array(
+			'posts_per_page' => 1,
+			'post_type'      => 'attachment',
+			'post_status' => 'inherit',
+			'meta_query' => array(
+				array(
+					'key' => 'easy_language_code',
+					'value' => trim($language_code),
+					'compare' => 'LIKE'
+				)
+			)
+		);
+		$get_attachment = new WP_Query( $query );
+
+		if ( 0 === $get_attachment->post_count ) {
+			return false;
+		}
+
+		// return resulting object.
+		return $get_attachment->posts[0];
+	}
+
+	/**
+	 * Get img for given language code.
+	 *
+	 * @param string $language_code
+	 *
+	 * @return string
+	 */
+	public static function get_icon_img_for_language_code( string $language_code ): string {
+		$attachment = self::get_attachment_by_language_code( $language_code );
+		if( false !== $attachment ) {
+			return ' '.wp_get_attachment_image( $attachment->ID );
+		}
+		return '';
+	}
+
 }
