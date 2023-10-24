@@ -11,6 +11,7 @@ use easyLanguage\Apis;
 use easyLanguage\Base;
 use easyLanguage\Api_Base;
 use easyLanguage\Helper;
+use easyLanguage\Language_Icon;
 use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use easyLanguage\Transients;
@@ -485,6 +486,7 @@ class ChatGpt extends Base implements Api_Base {
 					'automatic' => array(
 						'label'       => __( 'Automatic simplification of each text.', 'easy-language' ),
 						'enabled'     => false,
+						/* translators: %1$s will be replaced by the Pro-plugin-name */
 						'pro_hint' => __( 'Use this mode and many other options with %1$s.', 'easy-language' )
 					)),
 				),
@@ -892,6 +894,11 @@ class ChatGpt extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function enable(): void {
-		// nothing to do.
+		// save language-icons in db.
+		foreach( $this->get_supported_target_languages() as $language_code => $settings ) {
+			$icon_obj = new Language_Icon();
+			$icon_obj->set_file( $settings['img'] );
+			$icon_obj->save( $language_code );
+		}
 	}
 }

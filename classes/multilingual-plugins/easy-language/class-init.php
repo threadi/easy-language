@@ -145,6 +145,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// embed files.
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), PHP_INT_MAX );
+		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), PHP_INT_MAX );
 
 		// misc hooks.
 		add_filter( 'admin_body_class', array( $this, 'add_body_class' ) );
@@ -248,9 +249,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// get actual supported languages.
 		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
 			if ( 'easy-language-' . strtolower( $language_code ) === $column ) {
-				// check if this object is already translated in this language.
+				// check if this object is already simplified in this language.
 				if ( false !== $post_object->is_translated_in_language( $language_code ) ) {
-					// get the post-ID of the translated page.
+					// yes, it is simplified.
+
+					// get the post-ID of the simplified page.
 					$translated_post_id = $post_object->get_translated_in_language( $language_code );
 
 					// get page-builder of this object.
@@ -330,12 +333,35 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						echo '<span class="dashicons dashicons-image-rotate" title="' . esc_html__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
 					}
 				} else {
-					// create link to simplify this post.
-					$create_simplification = $post_object->get_simplification_link( $language_code );
+					// get object type name.
+					$object_type_name = Helper::get_objekt_type_name( $post_object );
 
-					// show link to add simplification for this language.
-					/* translators: %1$s is the name of the language */
-					echo '<a href="' . esc_url( $create_simplification ) . '" class="dashicons dashicons-plus" title="' . esc_attr( sprintf( esc_html__( 'Add simplification of %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+					// create link to simplify this post if used pagebuilder is active.
+					$page_builder = $post_object->get_page_builder();
+					if( $page_builder->is_active() ) {
+						$create_simplification = $post_object->get_simplification_link( $language_code );
+
+						// add warning before adding simplified object if used pagebuilder is unknown.
+						$add_class = '';
+						$show_page_builder_warning = false;
+						if( 'Undetected' === $page_builder->get_name() ) {
+							$show_page_builder_warning = true;
+							$add_class = ' easy-language-missing-pagebuilder-warning';
+						}
+
+						// show link to add simplification for this language.
+						/* translators: %1$s is the name of the language */
+						echo '<a href="' . esc_url( $create_simplification ) . '" class="dashicons dashicons-plus'. esc_attr($add_class). '" title="' . esc_attr( sprintf( esc_html__( 'Add simplification of %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+
+						// if the detected pagebuilder is "undetected" show warning.
+						if( false !== $show_page_builder_warning ) {
+							echo '<span class="dashicons dashicons-warning" title="' . esc_attr( sprintf( __( 'This %1$s has been edited with an unknown page builder or the classic editor', 'easy-language' ), esc_html($object_type_name) ) ) . '"></span>';
+						}
+					}
+					else {
+						// otherwise should warning that the for this object used page builder is not active or not supported.
+						echo '<span class="dashicons dashicons-warning" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html($page_builder->get_name()) ) ) . '"></span>';
+					}
 				}
 			}
 		}
@@ -707,14 +733,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// load language file.
 		load_plugin_textdomain( 'easy-language', false, dirname( plugin_basename( EASY_LANGUAGE ) ) . '/languages' );
 
-		// set transient for hint where to start.
-		$transient_obj = Transients::get_instance()->add();
-		$transient_obj->set_dismissible_days( 2 );
-		$transient_obj->set_name( 'easy_language_intro_step_1' );
-		/* translators: %1$s will be replaced by the URL for api settings-URL. */
-		$transient_obj->set_message( sprintf( __( '<strong>You have installed Easy Language - nice and thank you!</strong> Now check the <a href="%1$s">API-settings</a>, select one and start simplifying the texts in your website in easy or plain language.', 'easy-language' ), esc_url( Helper::get_settings_page_url() ) ) );
-		$transient_obj->set_type( 'hint' );
-		$transient_obj->save();
+		// set transient for intro step 1 with hint where to start.
+		Helper::set_intro_step1();
 	}
 
 	/**
@@ -768,7 +788,18 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return void
 	 */
 	public function uninstall(): void {
-		// remove translated contents.
+		// remove all by any API simplified objects.
+		foreach( Apis::get_instance()->get_available_apis() as $api_object ) {
+			foreach ( $api_object->get_simplified_post_type_objects() as $post_id ) {
+				wp_delete_post( $post_id, true );
+			}
+		}
+
+		// delete meta keys on parent objects.
+		delete_post_meta_by_key( 'easy_language_simplified_in' );
+		delete_post_meta_by_key( 'easy_language_text_language' );
+
+		// remove simplified texts.
 		foreach ( DB::get_instance()->get_entries() as $entry ) {
 			$entry->delete();
 		}
@@ -813,6 +844,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING,
 			EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT,
 			EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX,
+			EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS,
 			'easy_language_switcher_default',
 			'easy_language_state_on_deactivation',
 			'easy_language_state_on_api_change',
@@ -1440,7 +1472,22 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'dismiss_intro_nonce'             => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),
 				/* translators: %1$s will be replaced by the path to the easy language icon */
 				'intro_step_2'                    => sprintf( __( '<p><img src="%1$s" alt=""><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
+				'txt_pagebuilder_unknown_warnung' => __( 'This page has been created with an unknown pagebuilder or the classic editor. Are you sure you want to create a simplified text from this object?', 'easy-language' )
 			)
+		);
+	}
+
+	/**
+	 * Embed styles in frontend (for classic themes).
+	 *
+	 * @return void
+	 */
+	public function wp_enqueue_scripts(): void {
+		wp_enqueue_style(
+			'easy-language',
+			plugins_url( '/classes/multilingual-plugins/easy-language/frontend/style.css', EASY_LANGUAGE ),
+			array(),
+			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/frontend/style.css' )
 		);
 	}
 

@@ -83,7 +83,7 @@ class Gutenberg extends Parser_Base implements Parser {
 	private function get_block_text( array $block, array $resulting_texts ): array {
 		// get content if it is a valid flow-text-block.
 		if ( in_array( $block['blockName'], $this->get_flow_text_blocks(), true ) ) {
-			$resulting_texts[] = trim($block['innerHTML']);
+			$resulting_texts[] = trim( $block['innerHTML'] );
 		}
 
 		// loop through inner-blocks.

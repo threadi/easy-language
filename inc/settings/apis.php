@@ -15,7 +15,7 @@ use easyLanguage\Transients;
  * @return void
  * @noinspection PhpUnused
  */
-function easy_language_admin_add_menu_content_settings(): void {
+function easy_language_admin_add_api_settings_content(): void {
 	// check user capabilities.
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
@@ -32,7 +32,7 @@ function easy_language_admin_add_menu_content_settings(): void {
 	</form>
 	<?php
 }
-add_action( 'easy_language_settings_api_page', 'easy_language_admin_add_menu_content_settings' );
+add_action( 'easy_language_settings_api_page', 'easy_language_admin_add_api_settings_content' );
 
 /**
  * Get general options.
@@ -101,58 +101,60 @@ function easy_language_admin_choose_api( array $attr ): void {
 		// add wrapper for list.
 		?>
 		<div class="easy-api-radios">
-		<?php
-
-		// loop through the options (available APIs).
-		foreach ( $attr['options'] as $key => $settings ) {
-			// get checked-marker.
-			$actual_value = get_option( $attr['fieldId'], '' );
-			$checked      = $actual_value === $key ? ' checked="checked"' : '';
-
-			// set marker for Pro-extension of this API.
-			$css_class = '';
-			$pro_hint = '';
-			if( $settings->is_extended_in_pro() ) {
-				$css_class .= ' easy-language-api-pro-hint';
-				$pro_hint = $settings->get_pro_hint();
-			}
-			if( !empty($checked) ) {
-				$css_class .= ' easy-language-api-active';
-			}
-
-			// output.
-			?>
-			<div class="easy-api-radio<?php echo esc_attr($css_class); ?>">
-				<input type="radio" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>" value="<?php echo esc_attr( $key ); ?>"<?php echo esc_attr( $checked ); ?>>
-				<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" data-active-title="<?php echo esc_html__( 'Activated', 'easy-language' ); ?>" data-choose-title="<?php echo esc_html__( 'Chosen', 'easy-language' ); ?>">
 			<?php
-				// get api-logo, if it exists.
-				$logo_url = $settings->get_logo_url();
-				if ( ! empty( $logo_url ) ) {
-					?>
-						<img src="<?php echo esc_url( $logo_url ); ?>" alt="<?php echo esc_attr( $settings->get_title() ); ?>">
-					<?php
+
+			// loop through the options (available APIs).
+			foreach ( $attr['options'] as $key => $settings ) {
+				// get checked-marker.
+				$actual_value = get_option( $attr['fieldId'], '' );
+				$checked      = $actual_value === $key ? ' checked="checked"' : '';
+
+				// set marker for Pro-extension of this API.
+				$css_class = '';
+				$pro_hint  = '';
+				if ( $settings->is_extended_in_pro() ) {
+					$css_class .= ' easy-language-api-pro-hint';
+					$pro_hint   = $settings->get_pro_hint();
+				}
+				if ( ! empty( $checked ) ) {
+					$css_class .= ' easy-language-api-active';
 				}
 
-				// show api-title.
-				echo '<h2>' . esc_html( $settings->get_title() ) . '</h2>';
-
-				// show api-description, if available.
-				if ( ! empty( $settings->get_description() ) ) {
-					echo wp_kses_post( $settings->get_description() );
-				}
-
-				if( !empty($pro_hint) ) {
-					?><span class="pro-hint"><?php echo wp_kses_post($pro_hint); ?></span><?php
-				}
+				// output.
 				?>
-				</label>
-			</div>
-			<?php
-		}
+				<div class="easy-api-radio<?php echo esc_attr( $css_class ); ?>">
+					<input type="radio" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>" value="<?php echo esc_attr( $key ); ?>"<?php echo esc_attr( $checked ); ?>>
+					<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" data-active-title="<?php echo esc_html__( 'Activated', 'easy-language' ); ?>" data-choose-title="<?php echo esc_html__( 'Chosen', 'easy-language' ); ?>">
+						<?php
+						// get api-logo, if it exists.
+						$logo_url = $settings->get_logo_url();
+						if ( ! empty( $logo_url ) ) {
+							?>
+							<img src="<?php echo esc_url( $logo_url ); ?>" alt="<?php echo esc_attr( $settings->get_title() ); ?>">
+							<?php
+						}
 
-		// end wrapper for list.
-		?>
+						// show api-title.
+						echo '<h2>' . esc_html( $settings->get_title() ) . '</h2>';
+
+						// show api-description, if available.
+						if ( ! empty( $settings->get_description() ) ) {
+							echo wp_kses_post( $settings->get_description() );
+						}
+
+						if ( ! empty( $pro_hint ) ) {
+							?>
+							<span class="pro-hint"><?php echo wp_kses_post( $pro_hint ); ?></span>
+							<?php
+						}
+						?>
+					</label>
+				</div>
+				<?php
+			}
+
+			// end wrapper for list.
+			?>
 		</div>
 		<?php
 	}
@@ -161,32 +163,32 @@ function easy_language_admin_choose_api( array $attr ): void {
 /**
  * Validate the chosen API.
  *
- * @param string $value
+ * @param string $value The internal name of the chosen API.
  *
  * @return string
  * @noinspection PhpUnused
  */
 function easy_language_admin_validate_chosen_api( string $value ): string {
 	// get the new post-state for objects of the former API.
-	$post_state = get_option('easy_language_state_on_api_change', 'draft' );
+	$post_state = get_option( 'easy_language_state_on_api_change', 'draft' );
 
 	// get the actual API.
-	$api = Apis::get_instance()->get_api_by_name( get_option('easy_language_api', '' ) );
+	$api = Apis::get_instance()->get_api_by_name( get_option( 'easy_language_api', '' ) );
 
 	// if the actual API is not the new API and changing post-state is not disabled, go further.
-	if( $api && $value !== $api->get_name() && 'disabled' !== $post_state ) {
+	if ( $api && $value !== $api->get_name() && 'disabled' !== $post_state ) {
 		// get the simplified objects of the former API (all of them).
 		$post_type_objects = $api->get_simplified_post_type_objects();
 
 		// loop through the object and change their state.
-		foreach( $post_type_objects as $post_type_object_id ) {
+		foreach ( $post_type_objects as $post_type_object_id ) {
 			// save the previous state.
-			update_post_meta( $post_type_object_id, 'easy_language_simplification_state_changed_from', get_post_status($post_type_object_id) );
+			update_post_meta( $post_type_object_id, 'easy_language_simplification_state_changed_from', get_post_status( $post_type_object_id ) );
 
 			// update object.
 			$array = array(
-				'ID' => $post_type_object_id,
-				'post_status' => $post_state
+				'ID'          => $post_type_object_id,
+				'post_status' => $post_state,
 			);
 			wp_update_post( $array );
 		}
@@ -196,30 +198,30 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 	$new_api = Apis::get_instance()->get_api_by_name( $value );
 
 	// Remove intro-hint if it is enabled.
-	if( 1 === absint(get_option( 'easy_language_intro_step_2', 0 ) ) ) {
+	if ( 1 === absint( get_option( 'easy_language_intro_step_2', 0 ) ) ) {
 		delete_option( 'easy_language_intro_step_2' );
 	}
 
 	// Check if API has been saved first time and the new API is already configured (or no configuration at all),
 	// to show intro part 2.
-	if( !get_option( 'easy_language_intro_step_2') && ( false !== $new_api->is_configured() || false === $new_api->has_settings() ) ) {
+	if ( ! get_option( 'easy_language_intro_step_2' ) && ( false !== $new_api->is_configured() || false === $new_api->has_settings() ) ) {
 		update_option( 'easy_language_intro_step_2', 1 );
 	}
 
 	// if the new API is valid and setting has been changed.
-	if( $new_api && $api && $api->get_name() !== $new_api->get_name() ) {
+	if ( $new_api && $api && $api->get_name() !== $new_api->get_name() ) {
 		// get the simplified objects of the new API (all of them).
 		$post_type_objects = $new_api->get_simplified_post_type_objects();
 
 		// loop through the object and change their to its previous state.
-		foreach( $post_type_objects as $post_type_object_id ) {
+		foreach ( $post_type_objects as $post_type_object_id ) {
 			// get the previous state.
 			$new_post_state = get_post_meta( $post_type_object_id, 'easy_language_simplification_state_changed_from', true );
 
 			// update object.
 			$array = array(
-				'ID' => $post_type_object_id,
-				'post_status' => $new_post_state
+				'ID'          => $post_type_object_id,
+				'post_status' => $new_post_state,
 			);
 			wp_update_post( $array );
 
@@ -228,18 +230,18 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 		}
 
 		// Enable hint if user has not configured the new API yet and if this API has no translation-objects.
-		if( empty($post_type_objects) && false === $new_api->is_configured() ) {
+		if ( empty( $post_type_objects ) && false === $new_api->is_configured() ) {
 			$links              = '';
 			$post_type_settings = \easyLanguage\Init::get_instance()->get_post_type_settings();
 			$post_types         = Init::get_instance()->get_supported_post_types();
 			$post_types_count   = count( $post_types );
 			$post_types_counter = 0;
 			foreach ( $post_types as $post_type => $enabled ) {
-				if ( $post_types_counter === ( $post_types_count - 1 ) ) {
+				if ( ( $post_types_count - 1 ) === $post_types_counter ) {
 					$links .= ' ' . esc_html__( 'and', 'easy-language' ) . ' ';
 				}
 				$links .= '<a href="' . esc_url( $post_type_settings[ $post_type ]['admin_edit_url'] ) . '">' . $post_type_settings[ $post_type ]['label_plural'] . '</a>';
-				++ $post_types_counter;
+				++$post_types_counter;
 			}
 			$transient_obj = Transients::get_instance()->add();
 			$transient_obj->set_dismissible_days( 90 );
@@ -256,8 +258,7 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 			}
 			$transient_obj->set_type( 'hint' );
 			$transient_obj->save();
-		}
-		else {
+		} else {
 			// delete API-settings hint.
 			Transients::get_instance()->get_transient_by_name( 'easy_language_api_changed' )->delete();
 		}

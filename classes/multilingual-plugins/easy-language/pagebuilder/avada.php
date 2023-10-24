@@ -15,18 +15,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Add Avada-object to list of supported pagebuilder.
  *
- * @param array $list List of supported pagebuilder.
+ * @param array $pagebuilder_list List of supported pagebuilder.
  *
  * @return array
  */
-function easy_language_pagebuilder_avada( array $list ): array {
-	$avada_obj = Avada::get_instance();
-	if ( $avada_obj->is_active() ) {
-		// add avada to list.
-		$list[] = $avada_obj;
-	}
+function easy_language_pagebuilder_avada( array $pagebuilder_list ): array {
+	// add avada to list.
+	$pagebuilder_list[] = Avada::get_instance();
 
 	// return resulting list of page-builders.
-	return $list;
+	return $pagebuilder_list;
 }
 add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_avada' );

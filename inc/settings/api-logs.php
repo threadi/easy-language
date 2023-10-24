@@ -16,7 +16,7 @@ use easyLanguage\Log_Api_Table;
  * @noinspection PhpUnused
  */
 function easy_language_settings_add_api_logs_tab( string $tab ): void {
-	if( ! current_user_can( 'manage_options' ) ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 
@@ -38,7 +38,7 @@ add_action( 'easy_language_settings_add_tab', 'easy_language_settings_add_api_lo
  * @noinspection PhpUnused
  */
 function easy_language_admin_add_menu_content_api_logs(): void {
-	if( ! current_user_can( 'manage_options' ) ) {
+	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
 

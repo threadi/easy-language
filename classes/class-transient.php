@@ -274,6 +274,15 @@ class Transient {
 	}
 
 	/**
+	 * Delete dismiss-marker.
+	 *
+	 * @return void
+	 */
+	public function delete_dismiss(): void {
+		delete_option( 'el-dismissed-'.md5( $this->get_name()) );
+	}
+
+	/**
 	 * Get the dismissible days.
 	 *
 	 * @return int

@@ -111,7 +111,25 @@ class Uninstall {
 	 * @return void
 	 */
 	private function tasks(): void {
-		// get all images which have assigned 'easy_language_code' post meta and delete them.
+		// get all images which have assigned 'easy_language_icon' post meta and delete them.
+		$query           = array(
+			'posts_per_page' => -1,
+			'post_type'      => 'attachment',
+			'post_status' => 'inherit',
+			'meta_query' => array(
+				array(
+					'key' => 'easy_language_icon',
+					'value' => '1',
+					'compare' => '='
+				)
+			)
+		);
+		$attachments_with_language_marker = new WP_Query( $query );
+		foreach( $attachments_with_language_marker->posts as $attachment ) {
+			wp_delete_attachment( $attachment->ID );
+		}
+
+		// delete all post-meta 'easy_language_code' on images.
 		$query           = array(
 			'posts_per_page' => -1,
 			'post_type'      => 'attachment',
@@ -125,7 +143,7 @@ class Uninstall {
 		);
 		$attachments_with_language_marker = new WP_Query( $query );
 		foreach( $attachments_with_language_marker->posts as $attachment ) {
-			wp_delete_attachment( $attachment->ID );
+			delete_post_meta( $attachment->ID, 'easy_language_code' );
 		}
 
 		/**
@@ -200,6 +218,7 @@ class Uninstall {
 			'easy_language_api_timeout',
 			'easy_language_api_text_limit_per_process',
 			'easy_language_delete_unused_simplifications',
+			EASY_LANGUAGE_TRANSIENT_LIST
 		);
 	}
 }

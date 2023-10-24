@@ -41,8 +41,8 @@ function easy_language_pagebuilder_elementor( array $pagebuilder_list ): array {
  * @return void
  */
 function easy_language_pagebuilder_elementor_init(): void {
+	add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_elementor' );
 	if ( did_action( 'elementor/loaded' ) ) {
-		add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_elementor' );
 		add_action( 'elementor/widgets/register', 'easy_language_pagebuilder_elementor_register_widgets' );
 	}
 }
@@ -54,13 +54,13 @@ add_action( 'init', 'easy_language_pagebuilder_elementor_init' );
  * @return void
  */
 function easy_language_pagebuilder_elementor_register_widgets(): void {
-	Plugin::instance()->widgets_manager->register(new Elementor\Switcher_Widget());
+	Plugin::instance()->widgets_manager->register( new Elementor\Switcher_Widget() );
 }
 
 /**
  * Add Elementor control under settings to switch between languages for posts.
  *
- * @param Post $page
+ * @param Post $page The Post-object.
  *
  * @return void
  */
@@ -72,7 +72,7 @@ function easy_language_add_elementor_page_settings_controls( Post $page ): void 
 	$language_array = $post_object->get_language();
 	$language       = reset( $language_array );
 
-	if( !empty($language) ) {
+	if ( ! empty( $language ) ) {
 		// get object type name.
 		$object_type_name = Helper::get_objekt_type_name( $post_object );
 
@@ -108,7 +108,7 @@ add_action( 'elementor/element/wp-post/document_settings/after_section_end', 'ea
 /**
  * Add Elementor control under settings to switch between languages for pages.
  *
- * @param Page $page
+ * @param Page $page The Page-object.
  *
  * @return void
  */
@@ -120,7 +120,7 @@ function easy_language_add_elementor_page_settings_controls_page( Page $page ): 
 	$language_array = $post_object->get_language();
 	$language       = reset( $language_array );
 
-	if( !empty($language) ) {
+	if ( ! empty( $language ) ) {
 		// get object type name.
 		$object_type_name = Helper::get_objekt_type_name( $post_object );
 
@@ -156,11 +156,11 @@ add_action( 'elementor/element/wp-page/document_settings/after_section_end', 'ea
 /**
  * Register custom controls for elementor.
  *
- * @param $controls_manager
+ * @param object $controls_manager Object of Controls Manager from Elementor.
  *
  * @return void
  */
-function easy_language_pagebuilder_elementor_add_custom_control( $controls_manager ): void {
+function easy_language_pagebuilder_elementor_add_custom_control( object $controls_manager ): void {
 	$controls_manager->register( new Languages() );
 }
 add_action( 'elementor/controls/register', 'easy_language_pagebuilder_elementor_add_custom_control' );

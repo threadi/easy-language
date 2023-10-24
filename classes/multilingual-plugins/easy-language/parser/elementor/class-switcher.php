@@ -77,11 +77,13 @@ class Switcher extends Tag {
 	 * @access public
 	 */
 	public function render(): void {
-		echo wp_kses_post(\EasyLanguage\Multilingual_plugins\Easy_Language\Switcher::get_instance()->get(
-			array(
-				'hide_actual_language' => false,
-				'show_icons'           => false,
+		echo wp_kses_post(
+			\EasyLanguage\Multilingual_plugins\Easy_Language\Switcher::get_instance()->get(
+				array(
+					'hide_actual_language' => false,
+					'show_icons'           => false,
+				)
 			)
-		));
+		);
 	}
 }

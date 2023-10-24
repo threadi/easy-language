@@ -112,14 +112,14 @@ function easy_language_trp_reset_simplifications(): void {
 	// add them to the list.
 	foreach ( $languages as $language_code => $language ) {
 		// get table names.
-		$table_name         = $trp_query->get_table_name( strtolower( $language_code ) );
-		$gettext_table_name = $trp_query->get_gettext_table_name( strtolower( $language_code ) );
+		$wpdb->trp_table_name         = $trp_query->get_table_name( strtolower( $language_code ) );
+		$wpdb->trp_gettext_table_name = $trp_query->get_gettext_table_name( strtolower( $language_code ) );
 
 		// check if table exist.
-		if ( ! empty( $wpdb->get_results( $wpdb->prepare( 'SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = %s', array( $table_name ) ) ) ) ) {
+		if ( ! empty( $wpdb->get_results( $wpdb->prepare( 'SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = %s', array( $wpdb->trp_table_name ) ) ) ) ) {
 			// truncate tables.
-			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', $table_name ) );
-			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', $gettext_table_name ) );
+			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', $wpdb->trp_table_name ) );
+			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', $wpdb->trp_gettext_table_name ) );
 		}
 	}
 }

@@ -49,7 +49,7 @@ jQuery(document).ready(function($) {
 									{
 										text: easyLanguageJsVars.label_ok,
 										click: function () {
-											location.reload();
+											location.href = easyLanguageJsVars.admin_start;
 										}
 									}
 								]
@@ -131,6 +131,51 @@ jQuery(document).ready(function($) {
 
 	// prevent leaving of posts-form if it has changes.
 	$("body.settings_page_easy_language_settings form").dirty({preventLeaving: true});
+
+	/**
+	 * Image handling: choose new icon vor language.
+	 */
+	$('body.settings_page_easy_language_settings a.replace-icon').on( 'click',function(e){
+		e.preventDefault();
+		let obj = $(this);
+		console.log(obj.parent().find('span'));
+		let custom_uploader = wp.media({
+			title: easyLanguageJsVars.label_icon_chooser,
+			library : {
+				type : 'image'
+			},
+			button: {
+				text: easyLanguageJsVars.button_icon_chooser
+			},
+			multiple: false
+		}).on('select', function() { // it also has "open" and "close" events
+			// get attachment-data.
+			let attachment = custom_uploader.state().get('selection').first().toJSON();
+
+			// save new attachment for language via ajax.
+			// start data deletion.
+			jQuery.ajax(
+				{
+					type: "POST",
+					url: easyLanguageJsVars.ajax_url,
+					data: {
+						'action': 'easy_language_set_icon_for_language',
+						'icon': attachment.id,
+						'language': obj.parent().find('span').data( 'language-code' ),
+						'nonce': easyLanguageJsVars.set_icon_for_language_nonce
+					},
+					success: function() {
+						// replace img in list.
+						obj.parent().find('img').attr( 'src', attachment.url );
+
+						// show success message.
+						alert(easyLanguageJsVars.txt_icon_changed);
+					}
+				}
+			);
+
+		}).open();
+	});
 });
 
 /**

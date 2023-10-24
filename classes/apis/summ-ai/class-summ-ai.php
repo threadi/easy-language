@@ -10,6 +10,7 @@ namespace easyLanguage\Apis\Summ_Ai;
 use easyLanguage\Base;
 use easyLanguage\Api_Base;
 use easyLanguage\Helper;
+use easyLanguage\Language_Icon;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use easyLanguage\Transients;
 use wpdb;
@@ -143,30 +144,45 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_supported_source_languages(): array {
 		return array(
-			'de_DE'          => array(
-				'label'       => __( 'German', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Informal german spoken in Germany.', 'easy-language' ),
+			'de_DE' => array(
+				'label' => __( 'German', 'easy-language'),
+				'enable' => true,
+				'description' => __( 'Informal german spoken in Germany.', 'easy-language'),
+				'icon' => 'icon-de-de',
+				'img' => 'de_de.png',
+				'img_icon' => Helper::get_icon_img_for_language_code( 'de_de' )
 			),
-			'de_DE_formal'   => array(
-				'label'       => __( 'German (Formal)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Formal german spoken in Germany.', 'easy-language' ),
+			'de_DE_formal' => array(
+				'label' => __( 'German (Formal)', 'easy-language'),
+				'enable' => true,
+				'description' => __( 'Formal german spoken in Germany.', 'easy-language'),
+				'icon' => 'icon-de-de',
+				'img' => 'de_de.png',
+				'img_icon' => Helper::get_icon_img_for_language_code( 'de_DE_formal' )
 			),
-			'de_CH'          => array(
-				'label'       => __( 'Suisse german', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Formal german spoken in Suisse.', 'easy-language' ),
+			'de_CH' => array(
+				'label' => __( 'Suisse german', 'easy-language'),
+				'enable' => true,
+				'description' => __( 'Formal german spoken in Suisse.', 'easy-language'),
+				'icon' => 'icon-de-ch',
+				'img' => 'de_ch.png',
+				'img_icon' => Helper::get_icon_img_for_language_code( 'de_CH' )
 			),
 			'de_CH_informal' => array(
-				'label'       => __( 'Suisse german (Informal)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Informal german spoken in Suisse.', 'easy-language' ),
+				'label' => __( 'Suisse german (Informal)', 'easy-language'),
+				'enable' => true,
+				'description' => __( 'Informal german spoken in Suisse.', 'easy-language'),
+				'icon' => 'icon-de-ch',
+				'img' => 'de_ch.png',
+				'img_icon' => Helper::get_icon_img_for_language_code( 'de_CH_informal' )
 			),
-			'de_AT'          => array(
-				'label'       => __( 'Austria German', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'German spoken in Austria.', 'easy-language' ),
+			'de_AT' => array(
+				'label' => __( 'Austria German', 'easy-language'),
+				'enable' => true,
+				'description' => __( 'German spoken in Austria.', 'easy-language'),
+				'icon' => 'icon-de-at',
+				'img' => 'de_at.png',
+				'img_icon' => Helper::get_icon_img_for_language_code( 'de_AT' )
 			),
 		);
 	}
@@ -186,7 +202,7 @@ class Summ_AI extends Base implements Api_Base {
 				'url'         => 'de_el',
 				'api_value'   => 'plain',
 				'icon' => 'icon-de-el',
-				'img' => 'en_EL.png',
+				'img' => 'de_EL.png',
 			),
 			'de_LS' => array(
 				'label'       => __( 'Leichte Sprache', 'easy-language' ),
@@ -195,7 +211,7 @@ class Summ_AI extends Base implements Api_Base {
 				'url'         => 'de_ls',
 				'api_value'   => 'easy',
 				'icon' => 'icon-de-ls',
-				'img' => 'en_LS.png',
+				'img' => 'de_LS.png',
 			),
 		);
 	}
@@ -252,8 +268,10 @@ class Summ_AI extends Base implements Api_Base {
 			update_option( 'easy_language_summ_ai_target_languages', $languages );
 		}
 
-		// set summ ai api as default API.
-		update_option( 'easy_language_api', $this->get_name() );
+		// set SUMM AI API as default API, if not already set.
+		if( !get_option('easy_language_api') ) {
+			update_option( 'easy_language_api', $this->get_name() );
+		}
 
 		$charset_collate = $wpdb->get_charset_collate();
 
@@ -497,6 +515,11 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function enable(): void {
-		// nothing to do.
+		// save language-icons in db.
+		foreach( array_merge( $this->get_supported_source_languages(), $this->get_supported_target_languages() ) as $language_code => $settings ) {
+			$icon_obj = new Language_Icon();
+			$icon_obj->set_file( $settings['img'] );
+			$icon_obj->save( $language_code );
+		}
 	}
 }

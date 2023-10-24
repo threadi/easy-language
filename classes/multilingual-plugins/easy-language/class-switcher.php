@@ -243,12 +243,12 @@ class Switcher {
 			$class           = 'easy-language-switcher-title';
 			$title           = $settings['label'];
 			if ( false !== $attributes['show_icons'] ) {
-				$class = 'easy-language-switcher-icon easy-language-switcher-icon-' . strtolower( $language_code );
-				$title = '';
+				$class = 'easy-language-switcher-icon';
+				$title = Helper::get_icon_img_for_language_code( $language_code );
 			}
 
 			// add item to menu.
-			$html .= '<a href="' . esc_url( $url ) . '" class="' . esc_attr( $class ) . '" title="' . esc_attr( $attribute_title ) . '">' . esc_html( $title ) . '</a>';
+			$html .= '<a href="' . esc_url( $url ) . '" class="' . esc_attr( $class ) . '" title="' . esc_attr( $attribute_title ) . '">' . wp_kses_post( $title ) . '</a>';
 		}
 
 		// return resulting links.
@@ -345,7 +345,7 @@ class Switcher {
 					// create own object for this menu item.
 					$new_item = clone $items[ $index ];
 					// set title for menu item.
-					$new_item->title      = $show_icons ? $settings['icon'] : $settings['label']; // TODO icon-support for classic menus.
+					$new_item->title      = $show_icons ? Helper::get_icon_img_for_language_code( $language_code ) : $settings['label']; // TODO icon-support for classic menus.
 					$new_item->menu_order = $items[ $index ]->menu_order + $language_counter;
 					// set URL for menu item.
 					$new_item->url = $object->get_language_specific_url( empty( $settings['url'] ) ? get_permalink( $object->get_id() ) : $settings['url'], $language_code );

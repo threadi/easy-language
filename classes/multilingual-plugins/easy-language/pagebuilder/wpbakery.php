@@ -15,18 +15,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Add WPBakery-object to list of supported pagebuilder.
  *
- * @param array $list List of supported pagebuilder.
+ * @param array $pagebuilder_list List of supported pagebuilder.
  *
  * @return array
  */
-function easy_language_pagebuilder_wp_bakery( array $list ): array {
-	$wp_bakery_obj = WPBakery::get_instance();
-	if ( $wp_bakery_obj->is_active() ) {
-		// add wpBakery to list.
-		$list[] = $wp_bakery_obj;
-	}
+function easy_language_pagebuilder_wp_bakery( array $pagebuilder_list ): array {
+	// add wpBakery to list.
+	$pagebuilder_list[] = WPBakery::get_instance();
 
 	// return resulting list of page-builders.
-	return $list;
+	return $pagebuilder_list;
 }
 add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_wp_bakery' );

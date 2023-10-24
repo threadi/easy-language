@@ -65,7 +65,7 @@ class Post_Object implements Easy_Language_Object {
 		if ( 'translatable' === $this->translate_type ) {
 			$languages     = Languages::get_instance()->get_possible_source_languages();
 			$language_code = get_post_meta( $this->get_id(), 'easy_language_text_language', true );
-			if( empty($language_code) ) {
+			if ( empty( $language_code ) ) {
 				$language_code = Helper::get_wp_lang();
 			}
 		} else {
@@ -132,7 +132,7 @@ class Post_Object implements Easy_Language_Object {
 	 * @return bool
 	 */
 	public function is_translated_in_language( string $language ): bool {
-		if( false === $this->has_translations() ) {
+		if ( false === $this->has_translations() ) {
 			return false;
 		}
 		return $this->get_translated_in_language( $language ) > 0;
@@ -460,9 +460,9 @@ class Post_Object implements Easy_Language_Object {
 	 * Process multiple simplification of a single post-object.
 	 *
 	 * @param Object $simplification_obj The simplification-object.
-	 * @param array $language_mappings The language-mappings.
-	 * @param int $limit Limit the entries processed during this request.
-	 * @param bool $initialization Mark if this is the initialization of a simplification.
+	 * @param array  $language_mappings The language-mappings.
+	 * @param int    $limit Limit the entries processed during this request.
+	 * @param bool   $initialization Mark if this is the initialization of a simplification.
 	 *
 	 * @return int
 	 */
@@ -474,7 +474,7 @@ class Post_Object implements Easy_Language_Object {
 		$object_type_name = Helper::get_objekt_type_name( $this );
 
 		// initialize the simplification.
-		if( false !== $initialization ) {
+		if ( false !== $initialization ) {
 			$simplification_results = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, array() );
 			if ( ! empty( $simplification_results[ $hash ] ) ) {
 				// remove previous results.
@@ -502,12 +502,12 @@ class Post_Object implements Easy_Language_Object {
 			// define filter for entry-loading to check max count of entries for this object.
 			$filter = array(
 				'object_id' => $this->get_id(),
-				'state' => 'processing'
+				'state'     => 'processing',
 			);
 
 			// get entries which are in process.
 			$entries_in_process = Db::get_instance()->get_entries( $filter );
-			if( !empty($entries_in_process) ) {
+			if ( ! empty( $entries_in_process ) ) {
 				// set result.
 				/* translators: %1$s will be replaced by the object-title */
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, sprintf( __( 'A previously running simplification of texts of this %1$s failed. How do you want to deal with it?<br><br><a href="#" class="button button-primary" data-run-again="1">Run simplifications again</a> <a href="#" class="button button-primary" data-ignore-texts="1">Ignore the failed simplifications</a>', 'easy-language' ), esc_html( $object_type_name ) ) );
@@ -540,39 +540,38 @@ class Post_Object implements Easy_Language_Object {
 		// define filter to get all entries for this object which should be simplified.
 		$filter = array(
 			'object_id' => $this->get_id(),
-			'state' => 'to_simplify',
+			'state'     => 'to_simplify',
 		);
 
 		// get limited entries.
 		$entries = Db::get_instance()->get_entries( $filter, $limit );
 
 		// if no more texts to simplify found, break the process and show hint depending on progress.
-		if( empty($entries) ) {
+		if ( empty( $entries ) ) {
 			// get max value.
-			$simplification_max = get_option(EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, array() );
+			$simplification_max = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, array() );
 
 			// get actual count.
 			$simplification_counts = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, array() );
 
 			// set result if count is 0.
-			if( isset($simplification_counts[ $hash ]) && absint($simplification_counts[ $hash ]) == 0 ) {
+			if ( isset( $simplification_counts[ $hash ] ) && 0 === absint( $simplification_counts[ $hash ] ) ) {
 				/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, sprintf( __( '<strong>The texts in this %1$s are already simplified.</strong><br>%2$s was not used. Nothing has been changed.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $simplification_obj->init->get_title() ) ) );
-			}
-			else {
+			} else {
 				// otherwise show hint that some texts are already optimized.
 				/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, sprintf( __( '<strong>Some texts in this %1$s are already simplified.</strong><br>Other missing simplifications has been run via %2$s and are insert into the text.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $simplification_obj->init->get_title() ) ) );
 			}
 
 			// set max value as count.
-			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, absint($simplification_max[ $hash ]) );
+			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, absint( $simplification_max[ $hash ] ) );
 
 			// remove running marker to mark end of process.
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
 
 			// return max value.
-			return absint($simplification_max[ $hash ]);
+			return absint( $simplification_max[ $hash ] );
 		}
 
 		// initialize CLI process.
@@ -597,7 +596,7 @@ class Post_Object implements Easy_Language_Object {
 		if ( $c > 0 ) {
 			// set result.
 			/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
-			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, sprintf( __( '<strong>Simplifications have been returned from %2$s.</strong><br>They were inserted into the %1$s.', 'easy-language' ), esc_html( $object_type_name ), esc_html($simplification_obj->init->get_title()) ) );
+			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, sprintf( __( '<strong>Simplifications have been returned from %2$s.</strong><br>They were inserted into the %1$s.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $simplification_obj->init->get_title() ) ) );
 		}
 
 		// get count value for running simplifications.
@@ -607,11 +606,11 @@ class Post_Object implements Easy_Language_Object {
 		$max_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, array() );
 
 		// remove marker for running simplification on this object.
-		if( absint($max_simplifications[$hash]) <= absint($count_simplifications[$hash]) ) {
+		if ( absint( $max_simplifications[ $hash ] ) <= absint( $count_simplifications[ $hash ] ) ) {
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
 
 			// trigger object-update.
-			do_action( 'save_post_'.$this->get_type(), $this->get_id(), $this->get_object_as_object(), true );
+			do_action( 'save_post_' . $this->get_type(), $this->get_id(), $this->get_object_as_object(), true );
 		}
 
 		// return simplification-count.
@@ -657,11 +656,10 @@ class Post_Object implements Easy_Language_Object {
 
 		// set result if we have not got any simplification from API and no simplifications are available.
 		if ( 0 === $c ) {
-			if( current_user_can( 'manage_options' ) ) {
+			if ( current_user_can( 'manage_options' ) ) {
 				/* translators: %1$s will be replaced by the URL for the API-log in plugin-settings */
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, sprintf( __( '<strong>No simplifications get from API.</strong><br>Please check the <a href="%1$s">API-log</a> for errors.', 'easy-language' ), esc_url( Helper::get_api_logs_page_url() ) ) );
-			}
-			else {
+			} else {
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, __( '<strong>No simplifications get from API.</strong><br>Please consult an administrator to check the API-log.', 'easy-language' ) );
 			}
 		}
@@ -702,7 +700,7 @@ class Post_Object implements Easy_Language_Object {
 	/**
 	 * Set marker during simplification.
 	 *
-	 * @param string $option The option to change.
+	 * @param string     $option The option to change.
 	 * @param string|int $value The value to set.
 	 *
 	 * @return void
@@ -720,7 +718,7 @@ class Post_Object implements Easy_Language_Object {
 	 */
 	public function has_translations(): bool {
 		// bail for translated objects.
-		if( $this->is_translated() ) {
+		if ( $this->is_translated() ) {
 			return false;
 		}
 
@@ -728,7 +726,7 @@ class Post_Object implements Easy_Language_Object {
 		$languages = get_post_meta( $this->get_id(), 'easy_language_simplified_in', true );
 
 		// return true if list is not empty.
-		return !empty($languages);
+		return ! empty( $languages );
 	}
 
 	/**
@@ -748,14 +746,14 @@ class Post_Object implements Easy_Language_Object {
 	/**
 	 * Cleanup single simplification marker of this object.
 	 *
-	 * @param string $marker
+	 * @param string $marker The marker to cleanup.
 	 *
 	 * @return void
 	 */
 	public function cleanup_simplification_marker( string $marker ): void {
 		$values = get_option( $marker, array() );
-		if( isset($values[$this->get_md5()]) ) {
-			unset($values[$this->get_md5()]);
+		if ( isset( $values[ $this->get_md5() ] ) ) {
+			unset( $values[ $this->get_md5() ] );
 		}
 		update_option( $marker, $values );
 	}

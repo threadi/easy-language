@@ -68,15 +68,15 @@ class WPBakery extends Parser_Base implements Parser {
 			'easy_language_wpbakery_text_widgets',
 			array(
 				'vc_column_text' => array(),
-				'vc_btn' => array(
-					'title'
+				'vc_btn'         => array(
+					'title',
 				),
-				'block_title' => array(
-					'title'
+				'block_title'    => array(
+					'title',
 				),
-				'vc_toggle' => array(
-					'title'
-				)
+				'vc_toggle'      => array(
+					'title',
+				),
 			)
 		);
 	}
@@ -100,24 +100,23 @@ class WPBakery extends Parser_Base implements Parser {
 		// get content of supported flow-text-shortcodes.
 		foreach ( $this->get_flow_text_shortcodes() as $shortcode => $attributes ) {
 			preg_match_all( '/' . get_shortcode_regex( array( $shortcode ) ) . '/s', $this->get_text(), $matches );
-			if ( empty($attributes) && ! empty( $matches[5] ) ) {
-				foreach( $matches[5] as $texts ) {
-					if (!empty($texts)) {
+			if ( empty( $attributes ) && ! empty( $matches[5] ) ) {
+				foreach ( $matches[5] as $texts ) {
+					if ( ! empty( $texts ) ) {
 						$resulting_texts[] = $texts;
 					}
 				}
-			}
-			elseif( !empty($attributes) && !empty($matches[2]) && !empty($matches[3]) ) {
-				if( ! empty(! empty( $matches[5])) ) {
+			} elseif ( ! empty( $attributes ) && ! empty( $matches[2] ) && ! empty( $matches[3] ) ) {
+				if ( ! empty( ! empty( $matches[5] ) ) ) {
 					foreach ( $matches[5] as $texts ) {
 						if ( ! empty( $texts ) ) {
 							$resulting_texts[] = $texts;
 						}
 					}
 				}
-				foreach( $matches[2] as $key => $value ) {
-					foreach( shortcode_parse_atts($matches[3][$key]) as $attribute => $attribute_value ) {
-						if( in_array( $attribute, $attributes, true ) && !empty($attribute_value) ) {
+				foreach ( $matches[2] as $key => $value ) {
+					foreach ( shortcode_parse_atts( $matches[3][ $key ] ) as $attribute => $attribute_value ) {
+						if ( in_array( $attribute, $attributes, true ) && ! empty( $attribute_value ) ) {
 							$resulting_texts[] = $attribute_value;
 						}
 					}

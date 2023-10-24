@@ -29,5 +29,9 @@ jQuery( document ).ready(
 				}
 			}
 		).pointer( 'open' );
+
+		$( 'a.easy-language-missing-pagebuilder-warning' ).on( 'click', function() {
+			return confirm(easyLanguagePluginJsVars.txt_pagebuilder_unknown_warnung);
+		});
 	}
 );

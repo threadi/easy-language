@@ -92,7 +92,7 @@ function easy_language_admin_add_settings_advanced(): void {
 		array(
 			'label_for'   => 'easy_language_api_timeout',
 			'fieldId'     => 'easy_language_api_timeout',
-			'description' => __( 'This value is in seconds. If you get a timeout from an API try to set this to a higher value.', 'easy-language' )
+			'description' => __( 'This value is in seconds. If you get a timeout from an API try to set this to a higher value.', 'easy-language' ),
 		)
 	);
 	register_setting( 'easyLanguageAdvancedFields', 'easy_language_api_timeout' );
@@ -107,7 +107,7 @@ function easy_language_admin_add_settings_advanced(): void {
 		array(
 			'label_for'   => 'easy_language_api_text_limit_per_process',
 			'fieldId'     => 'easy_language_api_text_limit_per_process',
-			'description' => __( 'This value is in seconds. If you get a timeout from an API try to set this to a higher value.', 'easy-language' )
+			'description' => __( 'This value is in seconds. If you get a timeout from an API try to set this to a higher value.', 'easy-language' ),
 		)
 	);
 	register_setting( 'easyLanguageAdvancedFields', 'easy_language_api_text_limit_per_process' );
@@ -122,7 +122,7 @@ function easy_language_admin_add_settings_advanced(): void {
 		array(
 			'label_for'   => 'easy_language_delete_unused_simplifications',
 			'fieldId'     => 'easy_language_delete_unused_simplifications',
-			'description' => __( 'If enabled any unused simplified texts will be deleted. To simplify the same text again, a new request must be sent to the API you are using, at the expense of your quota.<br>If disabled all simplified texts will be hold in your database. This could be at the expense of the size and performance of your database.', 'easy-language' )
+			'description' => __( 'If enabled any unused simplified texts will be deleted. To simplify the same text again, a new request must be sent to the API you are using, at the expense of your quota.<br>If disabled all simplified texts will be hold in your database. This could be at the expense of the size and performance of your database.', 'easy-language' ),
 		)
 	);
 	register_setting( 'easyLanguageAdvancedFields', 'easy_language_delete_unused_simplifications' );
@@ -169,8 +169,8 @@ add_action( 'easy_language_settings_add_settings', 'easy_language_admin_add_sett
  */
 function easy_language_admin_reset_intro_now(): void {
 	?>
-	<p><a href="#" class="button button-primary easy-language-reset-intro"><?php _e('Reset Intro', 'easy-language'); ?></a></p>
-	<p><i><?php echo esc_html__('Hint', 'easy-language'); ?>:</i> <?php echo esc_html__('After click on this button the intro for this plugin will be re-initialized.', 'easy-language'); ?></p>
+	<p><a href="#" class="button button-primary easy-language-reset-intro"><?php echo esc_html__( 'Reset Intro', 'easy-language' ); ?></a></p>
+	<p><i><?php echo esc_html__( 'Hint', 'easy-language' ); ?>:</i> <?php echo esc_html__( 'After click on this button the intro for this plugin will be re-initialized.', 'easy-language' ); ?></p>
 	<?php
 }
 
@@ -181,7 +181,7 @@ function easy_language_admin_reset_intro_now(): void {
  */
 function easy_language_admin_delete_data_now(): void {
 	?>
-	<p><a href="#" class="button button-primary easy-language-delete-data"><?php _e('Delete ALL simplification texts', 'easy-language'); ?></a></p>
-	<p><i><?php echo esc_html__('Hint', 'easy-language'); ?>:</i> <?php echo esc_html__('After click on this button the intro for this plugin will be re-initialized.', 'easy-language'); ?></p>
+	<p><a href="#" class="button button-primary easy-language-delete-data"><?php echo esc_html__( 'Delete ALL simplification texts', 'easy-language' ); ?></a></p>
+	<p><i><?php echo esc_html__( 'Hint', 'easy-language' ); ?>:</i> <?php echo esc_html__( 'After click on this button the intro for this plugin will be re-initialized.', 'easy-language' ); ?></p>
 	<?php
 }

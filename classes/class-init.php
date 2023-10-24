@@ -83,6 +83,7 @@ class Init {
 
 		// ajax-hooks.
 		add_action( 'wp_ajax_easy_language_reset_intro', array( $this, 'reset_intro' ) );
+		add_action( 'wp_ajax_easy_language_set_icon_for_language', array( $this, 'set_icon_for_language_via_ajax' ) );
 	}
 
 	/**
@@ -123,62 +124,6 @@ class Init {
 	 */
 	public function admin_init(): void {
 		global $pagenow;
-
-		// get all target languages of all APIs for import the assigned language-images.
-		$languages = array();
-		foreach( APIS::get_instance()->get_available_apis() as $api_object ) {
-			$languages = array_merge( $languages, $api_object->get_supported_target_languages() );
-		}
-		foreach( $languages as $language_code => $settings ) {
-			if( !empty($settings['img']) ) {
-				// get path.
-				$img_path = trailingslashit(Helper::get_plugin_path()).'gfx/'.$settings['img'];
-
-				// check if file exists there.
-				if( file_exists( $img_path ) ) {
-					// check if file exist in db.
-					$attachment = Helper::get_attachment_by_post_name( pathinfo($img_path, PATHINFO_FILENAME) );
-
-					// if an attachment for this file does not exist, check also for postmeta.
-					if( false === $attachment ) {
-						$attachment = Helper::get_attachment_by_language_code( $language_code );
-					}
-
-					// if no attachment could be found, add it.
-					if( false === $attachment ) {
-						// Prepare an array of post data for the attachment.
-						$attachment = array(
-							'name'     => basename( $settings['img'] ),
-							'tmp_name' => $img_path,
-						);
-
-						// Insert the attachment by prevent removing the original file and get its attachment ID.
-						add_filter( 'pre_move_uploaded_file', '__return_false' );
-						$attachment_id = media_handle_sideload( $attachment );
-						remove_filter( 'pre_move_uploaded_file', '__return_false' );
-
-						// get attachment as object.
-						if( absint($attachment_id) > 0 ) {
-							$attachment = get_post( $attachment_id );
-						}
-					}
-
-					if( false !== $attachment ) {
-						// get actual list of languages mapped to this icon.
-						$language_list = get_post_meta( $attachment->ID, 'easy_language_code', true );
-						if( !is_array($language_list) ) {
-							$language_list = array();
-						}
-
-						if( empty($language_list[$language_code]) ) {
-							// add language-code to this icon.
-							$language_list[$language_code] = 1;
-							update_post_meta( $attachment->ID, 'easy_language_code', $language_list );
-						}
-					}
-				}
-			}
-		}
 
 		// get transients objects-object.
 		$transients_obj = Transients::get_instance();
@@ -327,14 +272,60 @@ class Init {
 		// delete transient for step 1.
 		$transients_obj = Transients::get_instance();
 		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_intro_step_1' );
+		$transient_obj->delete_dismiss();
 		$transient_obj->delete();
 
 		// delete option for step 2.
 		delete_option( 'easy_language_intro_step_2' );
 
+		// set intro step 1.
+		Helper::set_intro_step1();
+
+		// return ok.
 		wp_send_json( array('result' => 'ok') );
+
+		// return nothing more.
+		wp_die();
+	}
+
+	/**
+	 * Set icon for language via AJAX.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function set_icon_for_language_via_ajax(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-set-icon-for-language', 'nonce' );
+
+		// get icon from request.
+		$icon = isset($_POST['icon']) ? absint($_POST['icon']) : 0;
+
+		// get language code from request.
+		$language_code = isset($_POST['language']) ? sanitize_text_field( wp_unslash( $_POST['language']) ) : '';
+
+		if( $icon > 0 && !empty($language_code) ) {
+			// get actual assignments of the language.
+			$attachment = Helper::get_attachment_by_language_code( $language_code );
+
+			// remove the language from this assignment.
+			$assigned_languages = get_post_meta( $attachment->ID, 'easy_language_code', true );
+			if( !empty($assigned_languages[$language_code]) ) {
+				unset($assigned_languages[$language_code]);
+			}
+			update_post_meta( $attachment->ID, 'easy_language_code', $assigned_languages );
+
+			// add the language to the new attachment.
+			$assigned_languages = get_post_meta( $icon, 'easy_language_code', true );
+			if( !is_array($assigned_languages) ) {
+				$assigned_languages = array();
+			}
+			$assigned_languages[$language_code] = 1;
+			update_post_meta( $icon, 'easy_language_code', $assigned_languages );
+		}
 
 		// return nothing.
 		wp_die();
 	}
+
 }

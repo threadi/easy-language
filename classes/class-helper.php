@@ -388,4 +388,19 @@ class Helper {
 		return '';
 	}
 
+	/**
+	 * Set intro step 1.
+	 *
+	 * @return void
+	 */
+	public static function set_intro_step1(): void {
+		$transient_obj = Transients::get_instance()->add();
+		$transient_obj->set_dismissible_days( 2 );
+		$transient_obj->set_name( 'easy_language_intro_step_1' );
+		/* translators: %1$s will be replaced by the URL for api settings-URL. */
+		$transient_obj->set_message( sprintf( __( '<strong>You have installed Easy Language - nice and thank you!</strong> Now check the <a href="%1$s">API-settings</a>, select one and start simplifying the texts in your website in easy or plain language.', 'easy-language' ), esc_url( Helper::get_settings_page_url() ) ) );
+		$transient_obj->set_type( 'hint' );
+		$transient_obj->save();
+	}
+
 }

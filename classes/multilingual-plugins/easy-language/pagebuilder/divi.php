@@ -26,11 +26,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array
  */
 function easy_language_pagebuilder_divi( array $pagebuilder_list ): array {
-	$divi_obj = Divi::get_instance();
-	if ( $divi_obj->is_active() ) {
-		// add divi to list.
-		$pagebuilder_list[] = $divi_obj;
-	}
+	// add divi to list.
+	$pagebuilder_list[] = Divi::get_instance();
 
 	// return resulting list of page-builders.
 	return $pagebuilder_list;
@@ -82,6 +79,7 @@ function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): vo
 				'id'     => $id,
 				'parent' => null,
 				'group'  => null,
+				/* translators: %1$s will be replaced by the object-name (e.g. page oder post) */
 				'title'  => sprintf( __( 'Simplify this %1$s ', 'easy-language' ), esc_html( $object_type_name ) ),
 				'href'   => '',
 			)
@@ -90,7 +88,7 @@ function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): vo
 		// add sub-entry for each possible target language.
 		foreach ( array_merge( $original_post_object->get_language(), $target_languages ) as $language_code => $target_language ) {
 			/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
-			$title = sprintf(__( 'Show this %1$s in %2$s ', 'easy-language' ), esc_html($object_type_name), esc_html($target_language['label']) );
+			$title = sprintf( __( 'Show this %1$s in %2$s ', 'easy-language' ), esc_html( $object_type_name ), esc_html( $target_language['label'] ) );
 
 			// check if this object is already translated in this language.
 			if ( false !== $original_post_object->is_translated_in_language( $language_code ) ) {
@@ -101,7 +99,7 @@ function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): vo
 				// create link to generate a new simplification for this object.
 				$url = $original_post_object->get_simplification_link( $language_code );
 				/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
-				$title = sprintf(__( 'Create a simplification of this %1$s in %2$s ', 'easy-language' ), esc_html($object_type_name), esc_html($target_language['label']) );
+				$title = sprintf( __( 'Create a simplification of this %1$s in %2$s ', 'easy-language' ), esc_html( $object_type_name ), esc_html( $target_language['label'] ) );
 			}
 
 			// add language as possible translation-target.
@@ -112,9 +110,9 @@ function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): vo
 						'parent' => $id,
 						'title'  => $target_language['label'],
 						'href'   => $url,
-						'meta' => array(
-							'title' => $title
-						)
+						'meta'   => array(
+							'title' => $title,
+						),
 					)
 				);
 			}
@@ -133,9 +131,9 @@ function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): vo
 						/* translators: %1$s will be replaced by the API-title */
 						'title'  => sprintf( __( 'Simplify with %1$s.', 'easy-language' ), $api_obj->get_title() ),
 						'href'   => $post_object->get_simplification_via_api_link(),
-						'meta' => array(
-							'onclick' => 'easy_language_simplification_init("'.absint($post_object->get_id()).'", "'.esc_url(get_permalink($post_object->get_id())).'", true);return false;'
-						)
+						'meta'   => array(
+							'onclick' => 'easy_language_simplification_init("' . absint( $post_object->get_id() ) . '", "' . esc_url( get_permalink( $post_object->get_id() ) ) . '", true);return false;',
+						),
 					)
 				);
 			} elseif ( current_user_can( 'manage_options' ) ) {

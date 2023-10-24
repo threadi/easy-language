@@ -9,13 +9,13 @@ use easyLanguage\Helper;
 use easyLanguage\Multilingual_plugins\Easy_Language\Texts_Table;
 
 /**
- * Add settings-tab for this plugin.
+ * Add settings-tab for simplification overview.
  *
  * @param string $tab The actually called tab.
  *
  * @return void
  */
-function easy_language_pro_add_simplifications_tab( string $tab ): void {
+function easy_language_settings_add_simplifications_tab( string $tab ): void {
 	// check active tab.
 	$active_class = '';
 	if ( 'simplifications' === $tab ) {
@@ -25,7 +25,7 @@ function easy_language_pro_add_simplifications_tab( string $tab ): void {
 	// output tab.
 	echo '<a href="' . esc_url( Helper::get_settings_page_url() ) . '&tab=simplifications" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'Simplified texts', 'easy-language' ) . '</a>';
 }
-add_action( 'easy_language_settings_add_tab', 'easy_language_pro_add_simplifications_tab', 50 );
+add_action( 'easy_language_settings_add_tab', 'easy_language_settings_add_simplifications_tab', 50 );
 
 /**
  * Show simplification-table.
@@ -45,8 +45,3 @@ function easy_language_pro_add_simplifications(): void {
 	<?php
 }
 add_action( 'easy_language_settings_simplifications_page', 'easy_language_pro_add_simplifications', 15 );
-
-/**
- * Remove the light-hint for simplifications in pro.
- */
-remove_action( 'easy_language_settings_add_tab', 'easy_language_add_simplifications_tab', 50, 0 );

@@ -92,7 +92,7 @@ class Languages {
 					'enabled' => true,
 					'icon' => 'de_icon_url'
 				),
-				'de_DE-formal'   => array(
+				'de_DE_formal'   => array(
 					'label'   => __( 'German (formal)', 'easy-language' ),
 					'enabled' => true,
 					'icon' => 'de_icon_url'

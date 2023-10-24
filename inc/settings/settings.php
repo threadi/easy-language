@@ -411,7 +411,7 @@ function easy_language_admin_multiple_checkboxes_field( array $attr ): void {
 
 			// get icon, if set.
 			$icon = '';
-			if( !empty($settings['img_icon']) ) {
+			if ( ! empty( $settings['img_icon'] ) ) {
 				$icon = $settings['img_icon'];
 			}
 
@@ -419,7 +419,7 @@ function easy_language_admin_multiple_checkboxes_field( array $attr ): void {
 			?>
 			<div class="easy-language-checkbox">
 				<input type="checkbox" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>[<?php echo esc_attr( $key ); ?>]" value="1"<?php echo esc_attr( $checked ) . esc_attr( $readonly ); ?> title="<?php echo esc_attr( $title ); ?>">
-				<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>"><?php echo esc_html( $settings['label'] ).wp_kses_post($icon); ?></label>
+				<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>"><?php echo esc_html( $settings['label'] ) . wp_kses_post( $icon ); ?></label>
 				<?php
 				if ( ! empty( $settings['description'] ) ) {
 					echo '<p>' . wp_kses_post( $settings['description'] ) . '</p>';
@@ -480,7 +480,7 @@ function easy_language_admin_multiple_radio_field( array $attr ): void {
 				if ( ! empty( $settings['description'] ) ) {
 					echo '<p>' . wp_kses_post( $settings['description'] ) . '</p>';
 				}
-				if( ! empty( $settings['pro_hint']) ) {
+				if ( ! empty( $settings['pro_hint'] ) ) {
 					do_action( 'easy_language_admin_show_pro_hint', $settings['pro_hint'] );
 				}
 				?>
@@ -502,18 +502,17 @@ function easy_language_admin_multiple_radio_field( array $attr ): void {
 function easy_language_admin_advanced_pro_hint(): void {
 	// pro hint.
 	/* translators: %1$s is replaced with the plugin name */
-	do_action('easy_language_admin_show_pro_hint', __('With %1$s you get more settings options, e.g. support for any post-type and simplify of taxonomies.', 'easy-language'));
+	do_action( 'easy_language_admin_show_pro_hint', __( 'With %1$s you get more settings options, e.g. support for any post-type and simplify of taxonomies.', 'easy-language' ) );
 }
 
 /**
  * Show hint for our Pro-version.
  *
- * @param $hint
+ * @param string $hint The hint.
  * @return void
  */
-function easy_language_admin_show_pro_hint( $hint ): void
-{
-	echo '<p class="easy-language-pro-hint">'.sprintf(wp_kses_post($hint), '<a href="'.esc_url(Helper::get_pro_url()).'" target="_blank">Easy Language Pro (opens new window)</a>').'</p>';
+function easy_language_admin_show_pro_hint( string $hint ): void {
+	echo '<p class="easy-language-pro-hint">' . sprintf( wp_kses_post( $hint ), '<a href="' . esc_url( Helper::get_pro_url() ) . '" target="_blank">Easy Language Pro (opens new window)</a>' ) . '</p>';
 }
 add_action( 'easy_language_admin_show_pro_hint', 'easy_language_admin_show_pro_hint' );
 
@@ -533,14 +532,14 @@ function easy_language_admin_multiple_text_field( array $attr ): void {
 		foreach ( $attr['options'] as $key => $settings ) {
 			// get checked-marker.
 			$actual_values = get_option( $attr['fieldId'], array() );
-			$value       = ! empty( $actual_values[ $key ] ) ? $actual_values[ $key ] : '';
+			$value         = ! empty( $actual_values[ $key ] ) ? $actual_values[ $key ] : '';
 
 			// readonly.
 			$readonly = '';
 			if ( isset( $attr['readonly'] ) && false !== $attr['readonly'] ) {
 				$readonly = ' disabled="disabled"';
 				?>
-				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr($value) ?>">
+				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr( $value ); ?>">
 				<?php
 			}
 			if ( isset( $settings['enabled'] ) && false === $settings['enabled'] ) {
@@ -551,7 +550,7 @@ function easy_language_admin_multiple_text_field( array $attr ): void {
 			?>
 			<div class="easy-language-input-text">
 				<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>"><?php echo esc_html( $settings['label'] ); ?></label>
-				<input type="text" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>[<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr($value); ?>"<?php echo esc_attr( $readonly ); ?>>
+				<input type="text" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>[<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr( $value ); ?>"<?php echo esc_attr( $readonly ); ?>>
 			</div>
 			<?php
 		}

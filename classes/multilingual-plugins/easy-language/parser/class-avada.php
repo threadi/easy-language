@@ -67,7 +67,7 @@ class Avada extends Parser_Base implements Parser {
 			'easy_language_avada_text_widgets',
 			array(
 				'fusion_title' => array(),
-				'fusion_text' => array()
+				'fusion_text'  => array(),
 			)
 		);
 	}
@@ -91,17 +91,16 @@ class Avada extends Parser_Base implements Parser {
 		// get content of supported flow-text-shortcodes.
 		foreach ( $this->get_flow_text_shortcodes() as $shortcode => $attributes ) {
 			preg_match_all( '/' . get_shortcode_regex( array( $shortcode ) ) . '/s', $this->get_text(), $matches );
-			if ( empty($attributes) && ! empty( $matches[5] ) ) {
-				foreach( $matches[5] as $texts ) {
-					if (!empty($texts)) {
+			if ( empty( $attributes ) && ! empty( $matches[5] ) ) {
+				foreach ( $matches[5] as $texts ) {
+					if ( ! empty( $texts ) ) {
 						$resulting_texts[] = $texts;
 					}
 				}
-			}
-			elseif( !empty($attributes) && !empty($matches[2]) && !empty($matches[3]) ) {
-				foreach( $matches[2] as $key => $value ) {
-					foreach( shortcode_parse_atts($matches[3][$key]) as $attribute => $attribute_value ) {
-						if( in_array( $attribute, $attributes, true ) && !empty($attribute_value) ) {
+			} elseif ( ! empty( $attributes ) && ! empty( $matches[2] ) && ! empty( $matches[3] ) ) {
+				foreach ( $matches[2] as $key => $value ) {
+					foreach ( shortcode_parse_atts( $matches[3][ $key ] ) as $attribute => $attribute_value ) {
+						if ( in_array( $attribute, $attributes, true ) && ! empty( $attribute_value ) ) {
 							$resulting_texts[] = $attribute_value;
 						}
 					}
@@ -138,7 +137,7 @@ class Avada extends Parser_Base implements Parser {
 	 */
 	private function is_avada_active(): bool {
 		$is_avada = false;
-		$theme   = wp_get_theme();
+		$theme    = wp_get_theme();
 		if ( 'Avada' === $theme->get( 'Name' ) ) {
 			$is_avada = true;
 		}

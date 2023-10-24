@@ -195,7 +195,10 @@ body .text-translations-table #source_language, body .text-translations-table #t
 
 .easy-language-choose-api .form-table div td { text-align: right; }
 
-.easy-language-choose-api .form-table td { padding-left: 0 }
+.easy-language-choose-api .form-table td {
+	padding-left: 0;
+	padding-top: 0;
+}
 
 .easy-language-choose-api .form-table td a.button {
 	line-height: 2;
@@ -260,4 +263,19 @@ body .text-translations-table #source_language, body .text-translations-table #t
 
 .easy-language-transient h3 {
 	margin: 15px 0;
+}
+
+.settings_page_easy_language_settings .attachment-thumbnail { width: 18px;height: auto }
+
+.easy-language-icons .tablenav { display: none }
+
+@media only screen and (max-width: 990px) {
+	.easy-api-radios { display: block }
+}
+
+@media only screen and (min-width: 991px) and (max-width: 1800px) {
+	.easy-api-radios .easy-language-api-pro-hint input[type="radio"] + label > span.pro-hint {
+		bottom: -55px;
+		white-space: normal;
+	}
 }

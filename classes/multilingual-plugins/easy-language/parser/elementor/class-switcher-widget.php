@@ -7,7 +7,6 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor;
 
-use Elementor\Group_Control_Typography;
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
 use Exception;
@@ -23,7 +22,7 @@ class Switcher_Widget extends Widget_Base {
 	 *
 	 * @param array $data Widget data.
 	 * @param array $args Widget arguments.
-	 * @throws Exception
+	 * @throws Exception possible throw exception
 	 */
 	public function __construct( $data = array(), $args = null ) {
 		parent::__construct( $data, $args );
@@ -34,8 +33,7 @@ class Switcher_Widget extends Widget_Base {
 	 *
 	 * @return string Widget name.
 	 */
-	public function get_name(): string
-	{
+	public function get_name(): string {
 		return 'easy-language-switcher';
 	}
 
@@ -44,8 +42,7 @@ class Switcher_Widget extends Widget_Base {
 	 *
 	 * @return string Widget title.
 	 */
-	public function get_title(): string
-	{
+	public function get_title(): string {
 		return __( 'Language Switcher', 'easy-language' );
 	}
 
@@ -54,8 +51,7 @@ class Switcher_Widget extends Widget_Base {
 	 *
 	 * @return string Widget icon.
 	 */
-	public function get_icon(): string
-	{
+	public function get_icon(): string {
 		return 'easy-language-icon';
 	}
 
@@ -64,9 +60,8 @@ class Switcher_Widget extends Widget_Base {
 	 *
 	 * @return string[]
 	 */
-	public function get_keywords(): array
-	{
-		return array( __('Easy Language', 'easy-language' ), __( 'Menu', 'easy-language' ) );
+	public function get_keywords(): array {
+		return array( __( 'Easy Language', 'easy-language' ), __( 'Menu', 'easy-language' ) );
 	}
 
 	/**
@@ -79,19 +74,17 @@ class Switcher_Widget extends Widget_Base {
 	 *
 	 * @return array Widget categories.
 	 */
-	public function get_categories(): array
-	{
+	public function get_categories(): array {
 		return array( 'languages', 'menu' );
 	}
 
 	/**
 	 * Enqueue styles.
 	 */
-	public function get_style_depends(): array
-	{
-		return [
-			'easy-language-elementor-widgets'
-		];
+	public function get_style_depends(): array {
+		return array(
+			'easy-language-elementor-widgets',
+		);
 	}
 
 	/**
@@ -110,24 +103,24 @@ class Switcher_Widget extends Widget_Base {
 		$this->add_control(
 			'show_icons',
 			array(
-				'label' => esc_html__( 'Show icons', 'easy-language' ),
-				'type' => Controls_Manager::SWITCHER,
-				'label_on' => esc_html__( 'Show', 'easy-language' ),
-				'label_off' => esc_html__( 'Hide', 'easy-language' ),
+				'label'        => esc_html__( 'Show icons', 'easy-language' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => esc_html__( 'Show', 'easy-language' ),
+				'label_off'    => esc_html__( 'Hide', 'easy-language' ),
 				'return_value' => 'yes',
-				'default' => 'no',
+				'default'      => 'no',
 			)
 		);
 
 		$this->add_control(
 			'hide_actual_language',
 			array(
-				'label' => esc_html__( 'Hide actual language', 'easy-language' ),
-				'type' => Controls_Manager::SWITCHER,
-				'label_on' => esc_html__( 'Show', 'easy-language' ),
-				'label_off' => esc_html__( 'Hide', 'easy-language' ),
+				'label'        => esc_html__( 'Hide actual language', 'easy-language' ),
+				'type'         => Controls_Manager::SWITCHER,
+				'label_on'     => esc_html__( 'Show', 'easy-language' ),
+				'label_off'    => esc_html__( 'Hide', 'easy-language' ),
 				'return_value' => 'yes',
-				'default' => 'no',
+				'default'      => 'no',
 			)
 		);
 
@@ -137,16 +130,16 @@ class Switcher_Widget extends Widget_Base {
 			'spacing_section',
 			array(
 				'label' => esc_html__( 'Spacing', 'easy-language' ),
-				'tab' => Controls_Manager::TAB_STYLE,
+				'tab'   => Controls_Manager::TAB_STYLE,
 			)
 		);
 
 		$this->add_control(
 			'margin',
 			array(
-				'label' => esc_html__( 'Margin', 'easy-language' ),
-				'type' => Controls_Manager::DIMENSIONS,
-				'default' => array( 0,0,0,0,'px',true ),
+				'label'     => esc_html__( 'Margin', 'easy-language' ),
+				'type'      => Controls_Manager::DIMENSIONS,
+				'default'   => array( 0, 0, 0, 0, 'px', true ),
 				'selectors' => array(
 					'{{WRAPPER}} > div > a' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
 				),
@@ -162,11 +155,13 @@ class Switcher_Widget extends Widget_Base {
 	protected function render(): void {
 		$attributes = $this->get_settings_for_display();
 
-		echo wp_kses_post(\EasyLanguage\Multilingual_plugins\Easy_Language\Switcher::get_instance()->get(
-			array(
-				'hide_actual_language' => 'yes' === $attributes['hide_actual_language'],
-				'show_icons'           => 'yes' === $attributes['show_icons'],
+		echo wp_kses_post(
+			\EasyLanguage\Multilingual_plugins\Easy_Language\Switcher::get_instance()->get(
+				array(
+					'hide_actual_language' => 'yes' === $attributes['hide_actual_language'],
+					'show_icons'           => 'yes' === $attributes['show_icons'],
+				)
 			)
-		));
+		);
 	}
 }
