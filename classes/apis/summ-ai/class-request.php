@@ -217,7 +217,7 @@ class Request {
 			'method'      => $this->get_method(),
 			'headers'     => $headers,
 			'httpversion' => '1.1',
-			'timeout'     => get_option( 'easy_language_api_timeout', 30 ),
+			'timeout'     => get_option( 'easy_language_api_timeout', 60 ),
 			'redirection' => 10,
 		);
 

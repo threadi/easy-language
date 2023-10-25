@@ -205,8 +205,25 @@ class Parser_Base {
 						?>
 					</p>
 					<?php
+				} elseif ( 'above_entry_limit' === $quota_state['status'] && $api_obj->is_configured() ) {
+					?>
+					<p>
+						<?php
+						/* translators: %1$s will be replaced by the API-title */
+						echo sprintf( __( 'This %1$s contains more texts than %2$s would simplify in one loop. Simplify via API will not be possible.', 'easy-language' ), esc_html($object_type_name), esc_html($api_obj->get_title()) );
+						?>
+					</p>
+					<?php
+				} elseif ( 'above_text_limit' === $quota_state['status'] && $api_obj->is_configured() ) {
+					?>
+					<p>
+						<?php
+							/* translators: %1$s will be replaced by the API-title */
+							echo sprintf( __( 'One or more texts are to long to simplify them with %1$s.', 'easy-language' ), esc_html($api_obj->get_title()) );
+						?>
+					</p>
+					<?php
 				} elseif ( 'exceeded' !== $quota_state['status'] && $api_obj->is_configured() ) {
-					// output.
 					?>
 					<p>
 						<?php

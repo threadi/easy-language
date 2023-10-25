@@ -26,14 +26,14 @@ const EASY_LANGUAGE_CAPITO_API_URL = 'https://api.capito.ai/simplification';
 const EASY_LANGUAGE_CAPITO_API_URL_QUOTA = 'https://api.capito.ai/shop/me/quotas';
 
 /**
+ * Capito API URL to get info about subscription.
+ */
+const EASY_LANGUAGE_CAPITO_SUBSCRIPTION_URL = 'https://api.capito.ai/shop/me/subscription';
+
+/**
  * CHATGPT API URL for simplifications.
  */
 const EASY_LANGUAGE_CHATGPT_API_URL = 'https://api.openai.com/v1/chat/completions';
-
-/**
- * ChatGpt URL for quotas.
- */
-const EASY_LANGUAGE_CHATGPT_API_URL_QUOTA = 'https://api.openai.com/v1/chat/completions';
 
 /**
  * Set transient-based hints for the backend.

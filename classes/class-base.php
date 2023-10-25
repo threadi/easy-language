@@ -54,6 +54,20 @@ class Base {
 	protected string $title = '';
 
 	/**
+	 * Set max text length for single entry for this API.
+	 *
+	 * @var int
+	 */
+	protected int $max_single_text_length = PHP_INT_MAX;
+
+	/**
+	 * Set max requests per minute for this API.
+	 *
+	 * @var int
+	 */
+	protected int $max_requests_per_minute = PHP_INT_MAX;
+
+	/**
 	 * Language-specific support-URL.
 	 *
 	 * @var array
@@ -366,5 +380,32 @@ class Base {
 	 */
 	public function is_extended_in_pro(): bool {
 		return false;
+	}
+
+	/**
+	 * Return max text length for this API.
+	 *
+	 * @return int
+	 */
+	public function get_max_text_length(): int {
+		return $this->max_single_text_length;
+	}
+
+	/**
+	 * Return max requests per minute for this API.
+	 *
+	 * @return int
+	 */
+	public function get_max_requests_per_minute(): int {
+		return $this->max_requests_per_minute;
+	}
+
+	/**
+	 * Return supported languages.
+	 *
+	 * @return array
+	 */
+	public function get_supported_languages(): array {
+		return array();
 	}
 }

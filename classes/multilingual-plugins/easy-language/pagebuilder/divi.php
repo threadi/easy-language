@@ -80,43 +80,13 @@ function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): vo
 				'parent' => null,
 				'group'  => null,
 				/* translators: %1$s will be replaced by the object-name (e.g. page oder post) */
-				'title'  => sprintf( __( 'Simplify this %1$s ', 'easy-language' ), esc_html( $object_type_name ) ),
+				'title'  => sprintf( __( 'Simplify this %1$s', 'easy-language' ), esc_html( $object_type_name ) ),
 				'href'   => '',
 			)
 		);
 
 		// add sub-entry for each possible target language.
-		foreach ( array_merge( $original_post_object->get_language(), $target_languages ) as $language_code => $target_language ) {
-			/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
-			$title = sprintf( __( 'Show this %1$s in %2$s ', 'easy-language' ), esc_html( $object_type_name ), esc_html( $target_language['label'] ) );
-
-			// check if this object is already translated in this language.
-			if ( false !== $original_post_object->is_translated_in_language( $language_code ) ) {
-				// generate link-target to default editor with language-marker.
-				$simplified_post_object = new Post_Object( $original_post_object->get_translated_in_language( $language_code ) );
-				$url                    = $simplified_post_object->get_page_builder()->get_edit_link();
-			} else {
-				// create link to generate a new simplification for this object.
-				$url = $original_post_object->get_simplification_link( $language_code );
-				/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
-				$title = sprintf( __( 'Create a simplification of this %1$s in %2$s ', 'easy-language' ), esc_html( $object_type_name ), esc_html( $target_language['label'] ) );
-			}
-
-			// add language as possible translation-target.
-			if ( ! empty( $url ) ) {
-				$admin_bar->add_menu(
-					array(
-						'id'     => $id . '-' . $language_code,
-						'parent' => $id,
-						'title'  => $target_language['label'],
-						'href'   => $url,
-						'meta'   => array(
-							'title' => $title,
-						),
-					)
-				);
-			}
-		}
+		Helper::generate_admin_bar_language_menu( $id, $admin_bar, $target_languages, $post_object, $object_type_name );
 
 		// add option to translate this page via api.
 		// show translate-button if this is not the original post.

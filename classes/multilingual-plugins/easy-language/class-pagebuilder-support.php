@@ -7,7 +7,6 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
-use easyLanguage\Apis;
 use easyLanguage\Base;
 use easyLanguage\Helper;
 use easyLanguage\Multilingual_Plugins;

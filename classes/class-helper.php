@@ -9,6 +9,7 @@ namespace easyLanguage;
 
 // prevent direct access.
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
+use WP_Admin_Bar;
 use WP_Post;
 use WP_Query;
 
@@ -39,20 +40,6 @@ class Helper {
 	 */
 	public static function get_plugin_url(): string {
 		return plugin_dir_url( EASY_LANGUAGE );
-	}
-
-	/**
-	 * Return whether the actual request is a REST-API-request.
-	 *
-	 * @return bool
-	 */
-	public static function is_rest_api(): bool {
-		if ( empty( $_SERVER['REQUEST_URI'] ) ) {
-			return false;
-		}
-
-		$rest_prefix = trailingslashit( rest_get_url_prefix() );
-		return str_contains( trailingslashit( $_SERVER['REQUEST_URI'] ), $rest_prefix );
 	}
 
 	/**
@@ -239,7 +226,9 @@ class Helper {
 	 * Validate multiple text fields.
 	 *
 	 * @param $values
+	 *
 	 * @return array|null
+	 * @noinspection PhpUnused
 	 */
 	public static function settings_validate_multiple_text_field( $values ): ?array {
 		$filter = current_filter();
@@ -249,6 +238,8 @@ class Helper {
 				$values = (array) $_REQUEST[ $filter . '_ro' ];
 			}
 		}
+
+		// return resulting values as array.
 		return $values;
 	}
 
@@ -403,4 +394,63 @@ class Helper {
 		$transient_obj->save();
 	}
 
+	/**
+	 * Generate the admin menu bar for supported languages.
+	 *
+	 * @param string $id The ID of the object.
+	 * @param WP_Admin_Bar $admin_bar The admin-bar-object.
+	 * @param array $target_languages The array of languages.
+	 * @param Post_Object $object The object itself.
+	 * @param string $object_type_name The type name of the object.
+	 *
+	 * @return void
+	 */
+	public static function generate_admin_bar_language_menu( string $id, WP_Admin_Bar $admin_bar, array $target_languages, Post_Object $object, string $object_type_name ): void {
+		foreach ( $target_languages as $language_code => $target_language ) {
+			/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
+			$title = sprintf(__( 'Show this %1$s in %2$s ', 'easy-language' ), esc_html($object_type_name), esc_html($target_language['label']) );
+
+			// check if this object is already translated in this language.
+			if ( false !== $object->is_translated_in_language( $language_code ) ) {
+				// generate link-target to default editor with language-marker.
+				$simplified_post_object = new Post_Object( $object->get_translated_in_language( $language_code ) );
+				$url                    = $simplified_post_object->get_page_builder()->get_edit_link();
+			} else {
+				// create link to generate a new simplification for this object.
+				$url = $object->get_simplification_link( $language_code );
+				/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
+				$title = sprintf(__( 'Create a simplification of this %1$s in %2$s ', 'easy-language' ), esc_html($object_type_name), esc_html($target_language['label']) );
+			}
+
+			// add language as possible translation-target.
+			if ( ! empty( $url ) ) {
+				$admin_bar->add_menu(
+					array(
+						'id'     => $id . '-' . $language_code,
+						'parent' => $id,
+						'title'  => $target_language['label'],
+						'href'   => $url,
+						'meta'   => array(
+							'title' => esc_html($title),
+						),
+					)
+				);
+			}
+		}
+	}
+
+	/**
+	 * Return URL path to icon by given language_code.
+	 *
+	 * @param string $language_code The language code we search the icon for.
+	 *
+	 * @return string
+	 */
+	public static function get_icon_path_for_language_code( string $language_code ): string {
+		$attachment = self::get_attachment_by_language_code( $language_code );
+		if( false !== $attachment ) {
+			return wp_get_attachment_image_url( $attachment->ID );
+		}
+		return '';
+	}
 }

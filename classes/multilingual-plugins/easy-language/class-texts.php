@@ -343,17 +343,6 @@ class Texts {
 				return;
 			}
 
-			/**
-			 * Ermittle alle aktuellen Texte im Objekt.
-			 * Prüfe pro Text, ob dieser bereits vorhanden und mit dem Objekt verbunden ist.
-			 * Wenn nein, ergänze ihn als neuen zu vereinfachenden Text und verbinde ihn mit dem Objekt.
-			 * Wenn ja, mache nichts.
-			 *
-			 * TODO
-			 * Ermittle alle Original-Texte des Objektes in der DB, die von diesem - auch in ihrer Vereinfachung - nicht mehr genutzt werden.
-			 * Nur wenn deren Vereinfachung (wenn vorhanden) von keinem anderen Objekt genutzt wird.
-			 */
-
 			// parse text depending on used pagebuilder for this object.
 			$pagebuilder_obj = $post_obj->get_page_builder();
 

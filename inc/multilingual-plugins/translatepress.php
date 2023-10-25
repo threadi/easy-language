@@ -188,8 +188,6 @@ add_filter( 'trp_ls_floating_current_language', 'easy_language_trp_set_current_l
 /**
  * Change path for our own language-flag.
  *
- * TODO individuelle Grafik vom Admin hinterlegbar machen
- *
  * @param string $flags_path Path to the flags.
  * @param string $searched_language_code Checked language-code.
  * @return string
@@ -201,7 +199,7 @@ function easy_language_set_flag( string $flags_path, string $searched_language_c
 	// add them to the list.
 	foreach ( $languages as $language_code => $language ) {
 		if ( $language_code === $searched_language_code ) {
-			$flags_path = helper::get_plugin_url() . 'gfx/';
+			$flags_path = trailingslashit(dirname(Helper::get_icon_path_for_language_code( $language_code )));
 		}
 	}
 

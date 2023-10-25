@@ -225,7 +225,11 @@ body .text-translations-table #source_language, body .text-translations-table #t
 
 #easylanguage-simplification-dialog-step-description { line-height: 1.4; }
 
-#easylanguage-simplification-dialog-step-description li { font-size: 13px; }
+#easylanguage-simplification-dialog-step-description li {
+	font-size: 13px;
+	list-style: disclosure-closed;
+	margin-left: 14px;
+}
 
 .pro-marker {
 	background-color: var(--lwel-pro-bg);

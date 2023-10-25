@@ -345,7 +345,7 @@ class Switcher {
 					// create own object for this menu item.
 					$new_item = clone $items[ $index ];
 					// set title for menu item.
-					$new_item->title      = $show_icons ? Helper::get_icon_img_for_language_code( $language_code ) : $settings['label']; // TODO icon-support for classic menus.
+					$new_item->title      = $show_icons ? Helper::get_icon_img_for_language_code( $language_code ) : $settings['label'];
 					$new_item->menu_order = $items[ $index ]->menu_order + $language_counter;
 					// set URL for menu item.
 					$new_item->url = $object->get_language_specific_url( empty( $settings['url'] ) ? get_permalink( $object->get_id() ) : $settings['url'], $language_code );

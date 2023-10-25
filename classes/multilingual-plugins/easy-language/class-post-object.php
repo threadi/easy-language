@@ -406,6 +406,7 @@ class Post_Object implements Easy_Language_Object {
 	 * Possible states:
 	 * - ok => could be translated
 	 * - above_limit => if characters of this object are more than the quota-limit
+	 * - above_text_limit => if one text is above the text-limit from used API
 	 * - exceeded => if quota is exceeded
 	 *
 	 * @param Api_Base $api_obj The Api-object.
@@ -421,13 +422,24 @@ class Post_Object implements Easy_Language_Object {
 			'quota_rest'    => 0,
 		);
 
+		// get text-limit from API.
+		$max_text_length = $api_obj->get_max_text_length();
+		$max_text_length_exceeded = false;
+
+		// get entry-limit from API.
+		$entry_limit_per_minute = $api_obj->get_max_requests_per_minute();
+
 		// get chars to translate.
 		$filter  = array(
 			'object_id' => $this->get_id(),
 		);
 		$entries = Db::get_instance()->get_entries( $filter );
 		foreach ( $entries as $entry ) {
-			$return_array['chars_count'] += absint( strlen( $entry->get_original() ) );
+			$text_length =  absint( strlen( $entry->get_original() ) );
+			$return_array['chars_count'] += $text_length;
+			if( $text_length > $max_text_length ) {
+				$max_text_length_exceeded = true;
+			}
 		}
 
 		// get quota value.
@@ -450,6 +462,16 @@ class Post_Object implements Easy_Language_Object {
 		// if unlimited-marker is set, set status to ok.
 		if ( ! empty( $quota_array['unlimited'] ) ) {
 			$return_array['status'] = 'ok';
+		}
+
+		// if max text limit is exceeded, show hint.
+		if( $max_text_length_exceeded ) {
+			$return_array['status'] = 'above_text_limit';
+		}
+
+		// if more entries used as API would perform per minute.
+		if( count($entries) > $entry_limit_per_minute ) {
+			$return_array['status'] = 'above_entry_limit';
 		}
 
 		// return ok.
@@ -494,10 +516,10 @@ class Post_Object implements Easy_Language_Object {
 			}
 
 			/**
-			 * Ermittle alle zu dem Projekt hinterlegten Texte die noch auf "in_process" stehen.
-			 * Wenn es sie gibt, dann brich den Vorgang ab und stell den Nutzer vor die Wahl:
-			 * - Fehlgeschlagene Vereinfachungen nochmal angehen
-			 * - Ignorieren und nicht vereinfachen
+			 * Determine all texts stored for the project that are still on "in_process".
+			 * If there are, cancel the process and give the user a choice:
+			 * - Go back to the failed simplifications.
+			 * - Ignore and do not simplify
 			 */
 			// define filter for entry-loading to check max count of entries for this object.
 			$filter = array(
@@ -510,7 +532,7 @@ class Post_Object implements Easy_Language_Object {
 			if ( ! empty( $entries_in_process ) ) {
 				// set result.
 				/* translators: %1$s will be replaced by the object-title */
-				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, sprintf( __( 'A previously running simplification of texts of this %1$s failed. How do you want to deal with it?<br><br><a href="#" class="button button-primary" data-run-again="1">Run simplifications again</a> <a href="#" class="button button-primary" data-ignore-texts="1">Ignore the failed simplifications</a>', 'easy-language' ), esc_html( $object_type_name ) ) );
+				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, sprintf( __( 'A previously running simplification of texts of this %1$s failed. How do you want to deal with it?<br><br><a href="#" class="button button-primary elementor-button" data-run-again="1">Run simplifications again</a> <a href="#" class="button button-primary elementor-button" data-ignore-texts="1">Ignore the failed simplifications</a>', 'easy-language' ), esc_html( $object_type_name ) ) );
 
 				// return 0 as we have not simplified anything.
 				return 0;

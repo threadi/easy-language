@@ -266,7 +266,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					// do not show anything if the used page builder plugin is not available.
 					if ( false === $page_builder->is_active() ) {
 						/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-						echo '<span class="dashicons dashicons-lightbulb" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), $page_builder->get_name() ) ) . '"></span>';
+						echo '<span class="dashicons dashicons-warning" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), $page_builder->get_name() ) ) . '"></span>';
 
 						// get link to delete this simplification.
 						$delete_translation = get_delete_post_link( $translated_post_id );
@@ -355,6 +355,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 						// if the detected pagebuilder is "undetected" show warning.
 						if( false !== $show_page_builder_warning ) {
+							/* translators: %1$s is the name object (e.g. page or post) */
 							echo '<span class="dashicons dashicons-warning" title="' . esc_attr( sprintf( __( 'This %1$s has been edited with an unknown page builder or the classic editor', 'easy-language' ), esc_html($object_type_name) ) ) . '"></span>';
 						}
 					}
@@ -513,13 +514,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			return;
 		}
 
-		// bail if a multilingual-plugin is used which already translates this page.
-		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if ( $plugin_obj->is_foreign_plugin() ) {
-				return;
-			}
-		}
-
 		// check if this object is a translated object.
 		if ( $object->is_translated() ) {
 			$object_id = $object->get_original_object_as_int();
@@ -541,7 +535,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$id = 'easy-language-translate-button';
 
 		// get object type name.
-		$object_type_name = Helper::get_objekt_type_name( $object );
+		$object_type_name = '';
+		if( $object instanceof Post_Object ) {
+			$object_type_name = Helper::get_objekt_type_name( $object );
+		}
 
 		// add not clickable main menu where all languages will be added as dropdown-items.
 		$admin_bar->add_menu(
@@ -549,42 +546,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'id'     => $id,
 				'parent' => null,
 				'group'  => null,
-				/* translators: %1$s will be replaced by the object-name (like page or post) */
-				'title'  => sprintf( __( 'Simplify this %1$s ', 'easy-language' ), esc_html( $object_type_name ) ),
+				/* translators: %1$s will be replaced by the object-name (e.g. page oder post) */
+				'title'  => sprintf( __( 'Simplify this %1$s', 'easy-language' ), esc_html( $object_type_name ) ),
 				'href'   => '',
 			)
 		);
 
 		// add sub-entry for each possible target language.
-		foreach ( $target_languages as $language_code => $target_language ) {
-			/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
-			$title = sprintf(__( 'Show this %1$s in %2$s ', 'easy-language' ), esc_html($object_type_name), esc_html($target_language['label']) );
-
-			// check if this object is already translated in this language.
-			if ( false !== $object->is_translated_in_language( $language_code ) ) {
-				// generate link-target to default editor with language-marker.
-				$simplified_post_object = new Post_Object( $object->get_translated_in_language( $language_code ) );
-				$url                    = $simplified_post_object->get_page_builder()->get_edit_link();
-			} else {
-				// create link to generate a new simplification for this object.
-				$url = $object->get_simplification_link( $language_code );
-				/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
-				$title = sprintf(__( 'Create a simplification of this %1$s in %2$s ', 'easy-language' ), esc_html($object_type_name), esc_html($target_language['label']) );
-			}
-
-			// add language as possible simplification-target.
-			$admin_bar->add_menu(
-				array(
-					'id'     => $id . '-' . $language_code,
-					'parent' => $id,
-					'title'  => $target_language['label'],
-					'href'   => $url,
-					'meta' => array(
-						'title' => esc_html($title)
-					)
-				)
-			);
-		}
+		Helper::generate_admin_bar_language_menu( $id, $admin_bar, $target_languages, $object, $object_type_name );
 	}
 
 	/**
@@ -1115,7 +1084,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				// do not show anything if the used page builder plugin is not available.
 				if ( false === $page_builder->is_active() ) {
 					/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-					echo '<span class="dashicons dashicons-lightbulb" title="' . sprintf( esc_html__( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) . '"></span>';
+					echo '<span class="dashicons dashicons-warning" title="' . sprintf( esc_html__( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) . '"></span>';
 				} else {
 					// create link to edit the simplification post.
 					$edit_translation = $page_builder->get_edit_link();
@@ -1322,12 +1291,27 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// check nonce.
 		check_ajax_referer( 'easy-language-run-simplification-nonce', 'nonce' );
 
-		// get api.
-		$api_obj = Apis::get_instance()->get_active_api();
-		// TODO check for API
-
 		// get the post-id from request.
 		$post_id = isset( $_POST['post'] ) ? absint( $_POST['post'] ) : 0;
+
+		// get api.
+		$api_obj = Apis::get_instance()->get_active_api();
+
+		// bail if no API is activated.
+		if( false === $api_obj ) {
+			// collect return array.
+			$return = array(
+				1,
+				1,
+				0,
+				__( 'No API activated!', 'easy-language' ),
+				get_permalink($post_id)
+			);
+			wp_send_json( $return );
+
+			// do nothing more.
+			wp_die();
+		}
 
 		// get info if this is a simplification-initialization.
 		$initialization = isset( $_POST['initialization'] ) ? filter_var($_POST['initialization'], FILTER_VALIDATE_BOOLEAN) : false;
@@ -1360,7 +1344,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				get_permalink($post_id)
 			);
 			wp_send_json( $return );
-			//echo absint( $count_simplifications[ $post_obj->get_md5() ] ) . ';' . absint( $max_simplifications[ $post_obj->get_md5() ] ) . ';' . absint( $running_simplifications[ $post_obj->get_md5() ] ) . ';' . wp_kses_post( $results[ $post_obj->get_md5() ] ) . ';'  . get_permalink($post_id);
 		}
 
 		// return nothing.
@@ -1471,7 +1454,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'delete_confirmation_question'    => __( 'Do you really want to delete this translated object?', 'easy-language' ),
 				'dismiss_intro_nonce'             => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),
 				/* translators: %1$s will be replaced by the path to the easy language icon */
-				'intro_step_2'                    => sprintf( __( '<p><img src="%1$s" alt=""><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
+				'intro_step_2'                    => sprintf( __( '<p><img src="%1$s" alt="Easy Language Logo"><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
 				'txt_pagebuilder_unknown_warnung' => __( 'This page has been created with an unknown pagebuilder or the classic editor. Are you sure you want to create a simplified text from this object?', 'easy-language' )
 			)
 		);

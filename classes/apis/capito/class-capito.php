@@ -49,6 +49,13 @@ class Capito extends Base implements Api_Base {
 	private static ?Capito $instance = null;
 
 	/**
+	 * Set max text length for single entry for this API.
+	 *
+	 * @var int
+	 */
+	protected int $max_single_text_length = 9000;
+
+	/**
 	 * Name for database-table with request-response.
 	 *
 	 * @var string
@@ -97,8 +104,9 @@ class Capito extends Base implements Api_Base {
 		// add hook für schedules.
 		add_action( 'easy_language_capito_request_quota', array( $this, 'get_quota_from_api' ) );
 
-		// add hook to remove token.
+		// add admin actions.
 		add_action( 'admin_action_easy_language_capito_remove_token', array( $this, 'remove_token' ) );
+		add_action( 'admin_action_easy_language_capito_test_token', array( $this, 'run_token_test' ) );
 
 		// add hook to get actual quota via link.
 		add_action( 'admin_action_easy_language_capito_get_quota', array( $this, 'get_quota_from_api_via_link' ) );
@@ -431,7 +439,9 @@ class Capito extends Base implements Api_Base {
 	 * @return array
 	 */
 	private function get_transients(): array {
-		return array();
+		return array(
+			'easy_language_capito_test_token'
+		);
 	}
 
 	/**
@@ -621,6 +631,15 @@ class Capito extends Base implements Api_Base {
 		/* translators: %1$s will be replaced by the Capito URL */
 		$description = sprintf( __( 'Get your Capito API Token <a href="%1$s" target="_blank">here (opens new window)</a>.<br>If you have any questions about the token provided by Capito, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_capito_token_set() ) {
+			// Set link to test the entered token.
+			$url = add_query_arg(
+				array(
+					'action' => 'easy_language_capito_test_token',
+					'nonce' => wp_create_nonce( 'easy-language-capito-test-token' )
+				),
+				get_admin_url() . 'admin.php'
+			);
+
 			// set link to remove the token.
 			$remove_token_url = add_query_arg(
 				array(
@@ -633,7 +652,7 @@ class Capito extends Base implements Api_Base {
 			// Show other description if token is set.
 			/* translators: %1$s will be replaced by the Capito URL */
 			$description  = sprintf( __( 'If you have any questions about the token provided by Capito, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
-			$description .= '<br><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
+			$description .= '<br><a href="'.esc_url($url).'" class="button button-secondary easy-language-settings-button">'.__( 'Test token', 'easy-language').'</a><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
 		}
 
 		// if foreign simplification-plugin with API-support is used, hide the language-settings.
@@ -851,10 +870,17 @@ class Capito extends Base implements Api_Base {
 		if ( empty( $value ) ) {
 			add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __( 'You did not enter an API token. All simplification options via the Capito API have been disabled.', 'easy-language' ) );
 		}
-		// TODO validate key against the API.
 		// if token has been changed, get the quota and delete settings hint.
 		elseif ( 0 !== strcmp( $value, get_option( 'easy_language_capito_api_key', '' ) ) ) {
-			$this->get_quota_from_api( $value );
+			$request = $this->get_test_request_response( $value );
+			if( 404 === $request->get_http_status() ) {
+				// show hint if token is not valid for API.
+				add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __('The API key does not seem to be valid.', 'easy-language') );
+			}
+			else {
+				// get initial quota.
+				$this->get_quota_from_api( $value );
+			}
 
 			// delete api-settings hint.
 			Transients::get_instance()->get_transient_by_name( 'easy_language_api_changed' )->delete();
@@ -1118,4 +1144,66 @@ class Capito extends Base implements Api_Base {
 			$icon_obj->save( $language_code );
 		}
 	}
+
+	/**
+	 * Run a token test.
+	 *
+	 * @return void
+	 */
+	public function run_token_test(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-capito-test-token', 'nonce' );
+
+		// get global transients-object.
+		$transients_obj = Transients::get_instance();
+
+		// run test only is necessary values are set.
+		if( $this->is_capito_token_set() ) {
+			// send request.
+			$request = $this->get_test_request_response();
+
+			// add new transient for response to user.
+			$transient_obj = $transients_obj->add();
+			$transient_obj->set_name( 'easy_language_capito_test_token' );
+			if( 200 === $request->get_http_status() ) {
+				// show ok-message.
+				$transient_obj->set_message( __( 'Token could be successfully verified.', 'easy-language' ) );
+				$transient_obj->set_type( 'success' );
+			}
+			else {
+				// show error.
+				$transient_obj->set_message( __( 'Token could not be verified. Please take a look in the log to check the reason.', 'easy-language' ) );
+				$transient_obj->set_type( 'error' );
+			}
+		}
+		else {
+			// show error via new transients object.
+			$transient_obj = $transients_obj->add();
+			$transient_obj->set_message( __( 'Token missing.', 'easy-language' ) );
+			$transient_obj->set_type( 'error' );
+		}
+		$transient_obj->save();
+
+		// redirect user.
+		wp_redirect($_SERVER['HTTP_REFERER']);
+	}
+
+	/**
+	 * Send test request to API.
+	 *
+	 * @param string $token The token for this API.
+	 *
+	 * @return Request
+	 */
+	private function get_test_request_response( string $token = '' ): Request {
+		$request = new Request();
+		$request->set_token( empty($token) ? $this->get_token() : $token );
+		$request->set_url( EASY_LANGUAGE_CAPITO_SUBSCRIPTION_URL );
+		$request->set_method( 'GET' );
+		$request->send();
+
+		// return object.
+		return $request;
+	}
+
 }

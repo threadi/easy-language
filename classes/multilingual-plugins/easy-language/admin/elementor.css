@@ -1,4 +1,7 @@
-.easy-language-table p { margin: 0 0 8px }
+.easy-language-table p {
+	line-height: 1.4;
+	margin: 0 0 8px
+}
 
 .easy-language-table table { margin-bottom: 1em }
 
@@ -18,3 +21,5 @@
 #easylanguage-simplification-dialog-step-description {
 	line-height: 1.4;
 }
+
+#easylanguage-simplification-dialog-step-description .elementor-button { color: #fff }

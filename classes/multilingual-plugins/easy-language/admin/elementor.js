@@ -9,7 +9,7 @@ window.addEventListener(
 					function (e) {
 						e.preventDefault();
 
-						easy_language_get_simplification( jQuery( this ).data( 'id' ), jQuery( this ).data( 'link' ) );
+						easy_language_simplification_init( jQuery( this ).data( 'id' ), jQuery( this ).data( 'link' ), false );
 					}
 					);
 				}

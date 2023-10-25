@@ -3,6 +3,8 @@ ToDo
 
 Funktionales
 ------------
+* Export von Request und Response, gefiltert nach API, ergänzen
+* danach Export von Token-Test an Capito schicken => kommt bisher immer 404 zurück
 * Optionen für Handling in Tabellen ergänzen ("+" => sofort übersetzen / nur erstellen, "translate" => sichtbar/nicht sichtbar
 * Option an Post-Types ergänzen mit denen ein Redakteur weitere/erneute Übersetzungen verhindern kann
 -> kann nur vom Redakteur, der das Schloss setzte gelöst werden
@@ -22,6 +24,9 @@ Funktionales
 * Export von Log-Daten von Requests & Responses als MO/PO-Dateien
 
 Später:
+* größere Seiten oder per Option eine Seite automatisch im Hintergrund übersetzbar machen
+-> Queue-Liste abarbeiten
+-> Hintergrundprozess nimmt dann nur x Texte pro Durchlauf (max. 5) um keine servereigenen Timeouts zu erreichen
 * Vereinfachung per REST API statt AJAX-Request durchführen
 * confirm-Dialoge durch schönere Dialoge ersetzen
 * sprachspezifische Suche im Frontend

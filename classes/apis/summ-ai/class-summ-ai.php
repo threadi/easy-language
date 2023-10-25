@@ -54,6 +54,20 @@ class Summ_AI extends Base implements Api_Base {
 	private string $table_requests;
 
 	/**
+	 * Set max text length for single entry for this API.
+	 *
+	 * @var int
+	 */
+	protected int $max_single_text_length = 10000;
+
+	/**
+	 * Set max requests per minute.
+	 *
+	 * @var int
+	 */
+	protected int $max_requests_per_minute = 15;
+
+	/**
 	 * Database-object.
 	 *
 	 * @var wpdb
