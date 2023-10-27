@@ -335,14 +335,6 @@ class Capito extends Base implements Api_Base {
 			update_option( 'easy_language_capito_target_languages', $languages );
 		}
 
-		// set simplification mode to manuell.
-		if ( ! get_option( 'easy_language_capito_automatic_mode' ) ) {
-			update_option( 'easy_language_capito_automatic_mode', 'manuell' );
-		}
-
-		// set schedule for automatic simplification.
-		$this->set_automatic_mode( get_option( 'easy_language_capito_automatic_mode', 'disabled' ) );
-
 		// set interval for automatic simplification to daily.
 		if ( ! get_option( 'easy_language_capito_quota_interval' ) ) {
 			update_option( 'easy_language_capito_quota_interval', 'daily' );
@@ -426,7 +418,6 @@ class Capito extends Base implements Api_Base {
 			'easy_language_capito_api_key',
 			'easy_language_capito_source_languages',
 			'easy_language_capito_target_languages',
-			'easy_language_capito_automatic_mode',
 			'easy_language_capito_interval',
 			'easy_language_capito_quota',
 			'easy_language_capito_quota_interval',
@@ -717,39 +708,6 @@ class Capito extends Base implements Api_Base {
 		);
 		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_target_languages', array( 'sanitize_callback' => array( $this, 'validate_language_settings' ) ) );
 
-		// Set simplification mode.
-		add_settings_field(
-			'easy_language_capito_automatic_mode',
-			__( 'Choose simplification-mode', 'easy-language' ),
-			'easy_language_admin_multiple_radio_field',
-			'easyLanguageCapitoPage',
-			'settings_section_capito',
-			array(
-				'label_for' => 'easy_language_capito_automatic_mode',
-				'fieldId'   => 'easy_language_capito_automatic_mode',
-				'options'   => apply_filters( 'easy_language_capito_automatic_mode', array(
-					'disabled'  => array(
-						'label'       => __( 'Disabled', 'easy-language' ),
-						'enabled'     => true,
-						'description' => __( 'You have to write all simplifications manually. The API will not be used.', 'easy-language' ),
-					),
-					'manuell'   => array(
-						'label'       => __( 'Simplify texts manually, use API as helper.', 'easy-language' ),
-						'enabled'     => true,
-						'description' => __( 'The system will not check automatically for simplifications. Its your decision.', 'easy-language' ),
-					),
-					'automatic' => array(
-						'label'       => __( 'Automatic simplification of each text.', 'easy-language' ),
-						'enabled'     => false,
-						/* translators: %1$s will be replaced by the Pro-plugin-name */
-						'pro_hint' => __( 'Use this mode and many other options with %1$s.', 'easy-language' )
-					)),
-				),
-				'readonly'  => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
-			)
-		);
-		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_automatic_mode', array( 'sanitize_callback' => array( $this, 'set_automatic_mode' ) ) );
-
 		// get possible intervals.
 		$intervals = array();
 		foreach ( wp_get_schedules() as $name => $schedule ) {
@@ -912,39 +870,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Set the automatic mode for the simplifications.
-	 *
-	 * @param $value
-	 * @return string|null
-	 */
-	public function set_automatic_mode( $value ): ?string {
-		$value = Helper::settings_validate_multiple_radios( $value );
-
-		do_action( 'easy_language_capito_automatic_sanitize', $value );
-
-		return $value;
-	}
-
-	/**
-	 * Set the interval for the automatic-schedule, if it is enabled.
-	 *
-	 * @param $value
-	 *
-	 * @return ?string
-	 */
-	public function set_interval( $value ): ?string {
-		// validate value.
-		$value = Helper::settings_validate_select_field( $value );
-
-		// run additional tasks.
-		do_action( 'easy_language_capito_automatic_sanitize', $value );
-
-		// return setting.
-		return $value;
-	}
-
-	/**
-	 * Set the interval for the automatic-schedule, if it is enabled.
+	 * Set the interval for the quota-schedule, if it is enabled.
 	 *
 	 * @param $value
 	 *

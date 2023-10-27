@@ -5,13 +5,15 @@
   "author": "laOlaWeb GmbH",
   "license": "GPL-2.0-or-later",
   "scripts": {
-    "build": "concurrently --kill-others \"npm run build:switcher\" \"npm run build:navigation-switcher\"",
+    "build": "concurrently --kill-others \"npm run build:switcher\" \"npm run build:navigation-switcher\" \"npm run build:dialog\"",
     "format": "wp-scripts format",
     "lint:css": "wp-scripts lint-style",
     "lint:js": "wp-scripts lint-js",
-    "start": "concurrently --kill-others \"npm run start:switcher\" \"npm run start:navigation-switcher\"",
+    "start": "concurrently --kill-others \"npm run start:switcher\" \"npm run start:navigation-switcher\" \"npm run start:dialog\"",
     "packages-update": "wp-scripts packages-update",
     "start:switcher": "wp-scripts start classes/multilingual-plugins/easy-language/blocks/switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/switcher/build/",
+    "start:dialog": "wp-scripts start classes/multilingual-plugins/easy-language/blocks/dialog/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/dialog/build/",
+    "build:dialog": "wp-scripts build classes/multilingual-plugins/easy-language/blocks/dialog/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/dialog/build/",
     "build:switcher": "wp-scripts build classes/multilingual-plugins/easy-language/blocks/switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/switcher/build/",
     "start:navigation-switcher": "wp-scripts start classes/multilingual-plugins/easy-language/blocks/navigation-switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/",
     "build:navigation-switcher": "wp-scripts build classes/multilingual-plugins/easy-language/blocks/navigation-switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/",
@@ -19,11 +21,11 @@
     "make-json": "wp i18n make-json languages"
   },
   "devDependencies": {
-    "@wordpress/scripts": "^24.2.0",
+    "@wordpress/scripts": "^26.15.0",
     "npm-pack-zip": "^1.3.0"
   },
   "dependencies": {
-    "@wordpress/i18n": "^4.18.0",
+    "@wordpress/i18n": "^4.44.0",
     "concurrently": "^7.3.0"
   }
 }

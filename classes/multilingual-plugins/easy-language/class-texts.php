@@ -73,7 +73,7 @@ class Texts {
 		add_action( 'admin_action_easy_language_add_simplification', array( $this, 'add_object_to_simplification' ) );
 
 		// get automatic simplification of given object.
-		add_action( 'admin_action_easy_language_get_automatic_simplification', array( $this, 'get_automatic_simplification' ) );
+		add_action( 'admin_action_easy_language_get_simplification', array( $this, 'get_simplification' ) );
 
 		// check texts in updated post-types-objects.
 		foreach ( $init->get_supported_post_types() as $post_type => $enabled ) {
@@ -113,91 +113,8 @@ class Texts {
 		if ( $original_post_id > 0 && ! empty( $target_language ) && $api_object ) {
 			// get post-object.
 			$post_obj = new Post_Object( $original_post_id );
-
-			// check if this object is already translated in this language.
-			if ( false === $post_obj->is_translated_in_language( $target_language ) ) {
-				// get the source-language.
-				$source_language = helper::get_wp_lang();
-				if ( empty( $source_language ) ) {
-					$source_language = Helper::get_wp_lang();
-				}
-
-				// get array with post-data of the original.
-				$post_array = $post_obj->get_object_as_array();
-
-				// remove some settings.
-				unset( $post_array['ID'] );
-				unset( $post_array['page_template'] );
-				unset( $post_array['guid'] );
-
-				// set author to actual user.
-				$post_array['post_author'] = get_current_user_id();
-
-				// add the copy.
-				$copied_post_id = wp_insert_post( $post_array );
-
-				// copy taxonomies and post-meta.
-				helper::copy_cpt( $original_post_id, $copied_post_id );
-
-				// mark the copied post as translation-object of the original.
-				update_post_meta( $copied_post_id, 'easy_language_simplification_original_id', $original_post_id );
-
-				// save the source-language of the copied object.
-				update_post_meta( $copied_post_id, 'easy_language_source_language', $source_language );
-
-				// save the target-language of the copied object.
-				update_post_meta( $copied_post_id, 'easy_language_simplification_language', $target_language );
-
-				// save the API used for this simplification.
-				update_post_meta( $copied_post_id, 'easy_language_api', $api_object->get_name() );
-
-				// ste the language for the original object.
-				update_post_meta( $original_post_id, 'easy_language_text_language', $source_language );
-
-				// parse text depending on used pagebuilder for this object.
-				$pagebuilder_obj = $post_obj->get_page_builder();
-				$pagebuilder_obj->set_object_id( $copied_post_id );
-				$pagebuilder_obj->set_title( $post_obj->get_title() );
-				$pagebuilder_obj->set_text( $post_obj->get_content() );
-
-				// loop through the resulting texts and add each one for simplification.
-				foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
-					// bail if text is empty.
-					if( empty($text) ) {
-						continue;
-					}
-
-					// check if the text is already saved as original text for simplification.
-					$original_text_obj = $this->db->get_entry_by_text( $text, $source_language );
-					if ( false === $original_text_obj ) {
-						// save the text for simplification.
-						$original_text_obj = $this->db->add( $text, $source_language, 'post_content' );
-					}
-					$original_text_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $pagebuilder_obj->get_name() );
-					$original_text_obj->set_state( 'to_simplify' );
-				}
-
-				// check if the title has already saved as original text for simplification.
-				$original_title_obj = $this->db->get_entry_by_text( $pagebuilder_obj->get_title(), $source_language );
-				if ( false === $original_title_obj ) {
-					// save the text for simplification.
-					$original_title_obj = $this->db->add( $pagebuilder_obj->get_title(), $source_language, 'title' );
-				}
-				$original_title_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $pagebuilder_obj->get_name() );
-				$original_title_obj->set_state( 'to_simplify' );
-
-				// add this language as translated language to original post.
-				$post_obj->add_translated_language( $target_language );
-
-				// set marker to reset permalinks.
-				Rewrite::get_instance()->set_refresh();
-
-				// get object of copy.
-				$copy_post_obj = new Post_Object( $copied_post_id );
-
-				// run pagebuilder-specific tasks.
-				$pagebuilder_obj->update_object( $copy_post_obj );
-
+			$copy_post_obj = $post_obj->add_simplification_object( $target_language, $api_object );
+			if( $copy_post_obj ) {
 				// forward user to the edit-page of the newly created object.
 				wp_safe_redirect( $copy_post_obj->get_page_builder()->get_edit_link() );
 				exit;
@@ -252,9 +169,9 @@ class Texts {
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
-	public function get_automatic_simplification(): void {
+	public function get_simplification(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-get-automatic-simplification', 'nonce' );
+		check_ajax_referer( 'easy-language-get-simplification', 'nonce' );
 
 		// get api.
 		$api_obj = Apis::get_instance()->get_active_api();

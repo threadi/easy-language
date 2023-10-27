@@ -3,8 +3,31 @@ jQuery( document ).ready(
 		// confirm deletion of translated object.
 		$( '.easy-language-trash' ).on(
 			'click',
-			function () {
-				return confirm( easyLanguagePluginJsVars.delete_confirmation_question );
+			function (e) {
+				e.preventDefault();
+
+				// create dialog.
+				let dialog_config = {
+					detail: {
+						hide_title: true,
+						texts: [
+							'<p><strong>' + easyLanguagePluginJsVars.delete_confirmation_question + '</strong></p>'
+						],
+						buttons: [
+							{
+								'action': 'location.href="' + $(this).attr('href') + '";',
+								'variant': 'primary',
+								'text': 'Yes'
+							},
+							{
+								'action': 'closeDialog();',
+								'variant': 'secondary',
+								'text': 'No'
+							}
+						]
+					}
+				}
+				document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
 			}
 		);
 
@@ -30,8 +53,30 @@ jQuery( document ).ready(
 			}
 		).pointer( 'open' );
 
+		// show warning if the page builder, used for an object, is not available.
 		$( 'a.easy-language-missing-pagebuilder-warning' ).on( 'click', function() {
-			return confirm(easyLanguagePluginJsVars.txt_pagebuilder_unknown_warnung);
+			// create dialog.
+			let dialog_config = {
+				detail: {
+					hide_title: true,
+					texts: [
+						'<p><strong>' + easyLanguagePluginJsVars.txt_pagebuilder_unknown_warnung + '</strong></p>'
+					],
+					buttons: [
+						{
+							'action': 'location.href="' + $(this).attr('href') + '";',
+							'variant': 'primary',
+							'text': 'Yes'
+						},
+						{
+							'action': 'closeDialog();',
+							'variant': 'secondary',
+							'text': 'No'
+						}
+					]
+				}
+			}
+			document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
 		});
 	}
 );

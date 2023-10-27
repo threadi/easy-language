@@ -264,6 +264,10 @@ class Db {
 				$sql_where .= ' AND s.hash = %s';
 				$vars[]     = $filter['simplification_hash'];
 			}
+			if( ! empty( $filter['not_locked']) ) {
+				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
+				$sql_select                                        .= ', oo.object_id, oo.object_type';
+			}
 		}
 
 		// limit the list of entries.
@@ -287,13 +291,23 @@ class Db {
 		// get entries.
 		$results = $wpdb->get_results( $prepared_sql, ARRAY_A );
 		foreach ( $results as $result ) {
-			// create Text-object for this text.
-			$obj = new Text( $result['id'] );
-			$obj->set_original( $result['original'] );
-			$obj->set_source_language( $result['lang'] );
+			// only add post-type-objects if not_locked is set and if they are not locked.
+			$add = true;
+			if( !empty( $filter['not_locked'] ) ) {
+				$object = Init::get_instance()->get_object_by_string( $result['object_type'], $result['object_id'] );
+				$add = !$object->is_locked();
+			}
 
-			// add the Text-object to the list.
-			$return[] = $obj;
+			// add entry to list.
+			if( $add ) {
+				// create Text-object for this text.
+				$obj = new Text( $result['id'] );
+				$obj->set_original( $result['original'] );
+				$obj->set_source_language( $result['lang'] );
+
+				// add the Text-object to the list.
+				$return[] = $obj;
+			}
 		}
 
 		// return the list.

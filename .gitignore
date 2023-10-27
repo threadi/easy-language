@@ -8,3 +8,4 @@ languages/*.json
 /vendor/
 /classes/multilingual-plugins/easy-language/blocks/switcher/build/
 /classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/
+/classes/multilingual-plugins/easy-language/blocks/dialog/build/

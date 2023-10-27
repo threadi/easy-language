@@ -462,39 +462,6 @@ class ChatGpt extends Base implements Api_Base {
 		);
 		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_target_languages_prompts', array( 'sanitize_callback' => 'easyLanguage\Helper::settings_validate_multiple_text_field' ) );
 
-		// Set translation mode.
-		add_settings_field(
-			'easy_language_chatgpt_automatic_mode',
-			__( 'Choose simplification-mode', 'easy-language' ),
-			'easy_language_admin_multiple_radio_field',
-			'easyLanguageChatGptPage',
-			'settings_section_chatgpt',
-			array(
-				'label_for' => 'easy_language_chatgpt_automatic_mode',
-				'fieldId'   => 'easy_language_chatgpt_automatic_mode',
-				'options'   => apply_filters( 'easy_language_chatgpt_automatic_mode', array(
-					'disabled'  => array(
-						'label'       => __( 'Disabled', 'easy-language' ),
-						'enabled'     => true,
-						'description' => __( 'You have to write all simplifications manually. The API will not be used.', 'easy-language' ),
-					),
-					'manuell'   => array(
-						'label'       => __( 'Simplify texts manually, use API as helper.', 'easy-language' ),
-						'enabled'     => true,
-						'description' => __( 'The system will not check automatically for simplifications. Its your decision.', 'easy-language' ),
-					),
-					'automatic' => array(
-						'label'       => __( 'Automatic simplification of each text.', 'easy-language' ),
-						'enabled'     => false,
-						/* translators: %1$s will be replaced by the Pro-plugin-name */
-						'pro_hint' => __( 'Use this mode and many other options with %1$s.', 'easy-language' )
-					)),
-				),
-				'readonly'  => false === $this->is_chatgpt_token_set() || $foreign_translation_plugin_with_api_support,
-			)
-		);
-		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_automatic_mode', array( 'sanitize_callback' => array( $this, 'set_automatic_mode' ) ) );
-
 		// get possible intervals.
 		$intervals = array();
 		foreach ( wp_get_schedules() as $name => $schedule ) {
@@ -544,14 +511,6 @@ class ChatGpt extends Base implements Api_Base {
 			);
 			update_option( 'easy_language_chatgpt_target_languages_prompts', $languages );
 		}
-
-		// set translation mode to manuell.
-		if ( ! get_option( 'easy_language_chatgpt_automatic_mode' ) ) {
-			update_option( 'easy_language_chatgpt_automatic_mode', 'manuell' );
-		}
-
-		// set schedule for automatic simplification.
-		$this->set_automatic_mode( get_option( 'easy_language_chatgpt_automatic_mode', 'disabled' ) );
 
 		// set language model.
 		if ( ! get_option( 'easy_language_chatgpt_model' ) ) {
@@ -621,7 +580,6 @@ class ChatGpt extends Base implements Api_Base {
 			'easy_language_chatgpt_api_key',
 			'easy_language_chatgpt_source_languages',
 			'easy_language_chatgpt_target_languages',
-			'easy_language_chatgpt_automatic_mode',
 			'easy_language_chatgpt_interval',
 			'easy_language_chatgpt_model',
 			'easy_language_chatgpt_target_languages_prompts'
@@ -698,23 +656,6 @@ class ChatGpt extends Base implements Api_Base {
 	 */
 	public function get_token(): string {
 		return (string) get_option( 'easy_language_chatgpt_api_key', '' );
-	}
-
-	/**
-	 * Set the automatic mode for the simplifications.
-	 *
-	 * @param $value
-	 * @return string|null
-	 */
-	public function set_automatic_mode( $value ): ?string {
-		// validate value.
-		$value = Helper::settings_validate_multiple_radios( $value );
-
-		// run additional tasks.
-		do_action( 'easy_language_chatgpt_automatic_sanitize', $value );
-
-		// return value.
-		return $value;
 	}
 
 	/**

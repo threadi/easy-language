@@ -78,4 +78,11 @@ interface Easy_Language_Object {
 	 * @noinspection PhpUnused
 	 */
 	public function process_simplifications( object $simplification_obj, array $language_mappings ): int;
+
+	/**
+	 * Return whether this object is locked or not.
+	 *
+	 * @return bool
+	 */
+	public function is_locked(): bool;
 }

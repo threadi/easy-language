@@ -1,0 +1,27 @@
+body.easy-language-dialog-on-body.wp-core-ui {
+	overflow-y: scroll;
+
+	.easy-language-dialog {
+		button {
+			margin-right: 12px
+		}
+
+		p {
+			line-height: 2
+		}
+
+		.easy-language-progressbar {
+			progress {
+				width: 100%;
+			}
+
+			progress::-moz-progress-bar {
+				background: green;
+			}
+
+			progress::-webkit-progress-value {
+				background: green;
+			}
+		}
+	}
+}

@@ -283,3 +283,20 @@ body .text-translations-table #source_language, body .text-translations-table #t
 		white-space: normal;
 	}
 }
+
+body.easy-language-dialog-on-body.wp-core-ui .components-modal__frame.easy-language-dialog:after {
+	background-image: url(/wp-content/plugins/easy-language/gfx/easy-language-icon.png);
+	width: 60px;
+	height: 60px;
+	float: right;
+	content: "";
+	background-size: cover;
+	position: absolute;
+	right: 12px;
+	top: 12px;
+	z-index: 100;
+}
+
+body.easy-language-dialog-on-body.wp-core-ui .hide-header .easy-language-dialog-text {
+	padding-right: 64px;
+}

@@ -293,9 +293,6 @@ class Text {
 			}
 		}
 
-		// set state to "in_use" to mark text as simplified and inserted.
-		$this->set_state( 'in_use' );
-
 		// return true as we have replaced contents.
 		return true;
 	}
@@ -364,7 +361,7 @@ class Text {
 	}
 
 	/**
-	 * Return list of objects which are using this text.
+	 * Return list of simplification-objects which are using this text.
 	 *
 	 * @return array
 	 */

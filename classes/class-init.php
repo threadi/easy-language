@@ -8,8 +8,6 @@
 namespace easyLanguage;
 
 // prevent direct access.
-use WP_Query;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -327,5 +325,4 @@ class Init {
 		// return nothing.
 		wp_die();
 	}
-
 }

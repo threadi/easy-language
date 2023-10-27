@@ -61,7 +61,7 @@ class Post_Object implements Easy_Language_Object {
 	public function get_language(): array {
 		$languages = Languages::get_instance()->get_active_languages();
 
-		// if this is an translatable object, get only source languages.
+		// if this is a translatable object, get only source languages.
 		if ( 'translatable' === $this->translate_type ) {
 			$languages     = Languages::get_instance()->get_possible_source_languages();
 			$language_code = get_post_meta( $this->get_id(), 'easy_language_text_language', true );
@@ -364,9 +364,9 @@ class Post_Object implements Easy_Language_Object {
 	public function get_simplification_via_api_link(): string {
 		return add_query_arg(
 			array(
-				'action' => 'easy_language_get_automatic_simplification',
+				'action' => 'easy_language_get_simplification',
 				'id'     => $this->get_id(),
-				'nonce'  => wp_create_nonce( 'easy-language-get-automatic-simplification' ),
+				'nonce'  => wp_create_nonce( 'easy-language-get-simplification' ),
 			),
 			get_admin_url() . 'admin.php'
 		);
@@ -640,7 +640,7 @@ class Post_Object implements Easy_Language_Object {
 	}
 
 	/**
-	 * Process simplification of single text initialized with API-support.
+	 * Process simplification of single text.
 	 *
 	 * @param Object $simplification_obj The simplification-object.
 	 * @param array  $language_mappings The language-mappings.
@@ -649,22 +649,22 @@ class Post_Object implements Easy_Language_Object {
 	 * @return int
 	 * @noinspection PhpUnused
 	 */
-	private function process_simplification( object $simplification_obj, array $language_mappings, Text $entry ): int {
+	public function process_simplification( object $simplification_obj, array $language_mappings, Text $entry ): int {
 		// counter for simplifications.
 		$c = 0;
 
 		// set state for the entry to "processing".
 		$entry->set_state( 'processing' );
 
-		// get object the text belongs to, to get the target language.
+		// get object the text belongs to, to get its target language.
 		$object_language = $this->get_language();
 
 		// send request for each active mapping between source-language and target-languages.
 		foreach ( $language_mappings as $source_language => $target_languages ) {
 			foreach ( $target_languages as $target_language ) {
-				// only if this text is not already translated in target-language matching the source-language.
+				// only if this text is not already simplified in source-language matching the target-language.
 				if ( ! empty( $object_language[ $target_language ] ) && false === $entry->has_translation_in_language( $target_language ) && $source_language === $entry->get_source_language() ) {
-					// call API to get translation as result-array.
+					// call API to get simplification of the given entry.
 					$results = $simplification_obj->call_api( $entry->get_original(), $source_language, $target_language );
 
 					// save simplification if results are available.
@@ -696,6 +696,11 @@ class Post_Object implements Easy_Language_Object {
 					}
 				}
 			}
+		}
+
+		// set state to "in_use" to mark text as simplified and inserted.
+		if( $replaced_count > 0 ) {
+			$entry->set_state( 'in_use' );
 		}
 
 		// Set result if we got simplified texts from API but does not replace them.
@@ -778,5 +783,118 @@ class Post_Object implements Easy_Language_Object {
 			unset( $values[ $this->get_md5() ] );
 		}
 		update_option( $marker, $values );
+	}
+
+	/**
+	 * Return whether this object is locked or not.
+	 *
+	 * @return bool
+	 */
+	public function is_locked(): bool {
+		return wp_check_post_lock( $this->get_id() );
+	}
+
+	/**
+	 * Add simplification object to this object if it is an not translatable object.
+	 *
+	 * @param string $target_language The target-language.
+	 * @param Api_Base $api_object The API to use.
+	 *
+	 * @return bool|Post_Object
+	 */
+	public function add_simplification_object( string $target_language, Api_Base $api_object ): bool|Post_Object {
+		// get DB-object.
+		$db = DB::get_instance();
+
+		// check if this object is already translated in this language.
+		if ( false === $this->is_translated_in_language( $target_language ) ) {
+			// get the source-language.
+			$source_language = helper::get_wp_lang();
+			if ( empty( $source_language ) ) {
+				$source_language = Helper::get_wp_lang();
+			}
+
+			// get array with post-data of the original.
+			$post_array = $this->get_object_as_array();
+
+			// remove some settings.
+			unset( $post_array['ID'] );
+			unset( $post_array['page_template'] );
+			unset( $post_array['guid'] );
+
+			// set author to actual user.
+			$post_array['post_author'] = get_current_user_id();
+
+			// add the copy.
+			$copied_post_id = wp_insert_post( $post_array );
+
+			// copy taxonomies and post-meta.
+			helper::copy_cpt( $this->get_id(), $copied_post_id );
+
+			// mark the copied post as translation-object of the original.
+			update_post_meta( $copied_post_id, 'easy_language_simplification_original_id', $this->get_id() );
+
+			// save the source-language of the copied object.
+			update_post_meta( $copied_post_id, 'easy_language_source_language', $source_language );
+
+			// save the target-language of the copied object.
+			update_post_meta( $copied_post_id, 'easy_language_simplification_language', $target_language );
+
+			// save the API used for this simplification.
+			update_post_meta( $copied_post_id, 'easy_language_api', $api_object->get_name() );
+
+			// ste the language for the original object.
+			update_post_meta( $this->get_id(), 'easy_language_text_language', $source_language );
+
+			// parse text depending on used pagebuilder for this object.
+			$pagebuilder_obj = $this->get_page_builder();
+			$pagebuilder_obj->set_object_id( $copied_post_id );
+			$pagebuilder_obj->set_title( $this->get_title() );
+			$pagebuilder_obj->set_text( $this->get_content() );
+
+			// loop through the resulting texts and add each one for simplification.
+			foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
+				// bail if text is empty.
+				if( empty($text) ) {
+					continue;
+				}
+
+				// check if the text is already saved as original text for simplification.
+				$original_text_obj = $db->get_entry_by_text( $text, $source_language );
+				if ( false === $original_text_obj ) {
+					// save the text for simplification.
+					$original_text_obj = $db->add( $text, $source_language, 'post_content' );
+				}
+				$original_text_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $pagebuilder_obj->get_name() );
+				$original_text_obj->set_state( 'to_simplify' );
+			}
+
+			// check if the title has already saved as original text for simplification.
+			$original_title_obj = $db->get_entry_by_text( $pagebuilder_obj->get_title(), $source_language );
+			if ( false === $original_title_obj ) {
+				// save the text for simplification.
+				$original_title_obj = $db->add( $pagebuilder_obj->get_title(), $source_language, 'title' );
+			}
+			$original_title_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $pagebuilder_obj->get_name() );
+			$original_title_obj->set_state( 'to_simplify' );
+
+			// add this language as translated language to original post.
+			$this->add_translated_language( $target_language );
+
+			// set marker to reset permalinks.
+			Rewrite::get_instance()->set_refresh();
+
+			// get object of copy.
+			$copy_post_obj = new Post_Object( $copied_post_id );
+
+			// run pagebuilder-specific tasks.
+			$pagebuilder_obj->update_object( $copy_post_obj );
+
+			// return the new object.
+			return $copy_post_obj;
+		}
+
+		// return false if no simplified object has been created.
+		return false;
 	}
 }
