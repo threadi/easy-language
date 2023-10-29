@@ -43,12 +43,16 @@
     <target name="npm-build" depends="npm-install">
         <delete file="${log.dir}/npm-build1.txt"/>
         <delete file="${log.dir}/npm-build2.txt"/>
+		<delete file="${log.dir}/npm-build3.txt"/>
         <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build1.txt">
             <arg line="run build:switcher"/>
         </exec>
         <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build2.txt">
             <arg line="run build:navigation-switcher"/>
         </exec>
+		<exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build3.txt">
+			<arg line="run build:dialog"/>
+		</exec>
     </target>
 
     <!-- generate json-translations -->

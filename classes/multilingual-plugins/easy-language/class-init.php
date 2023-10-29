@@ -277,7 +277,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 						// show link to delete the translated post.
 						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+						echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '" data-object-type-name="'.esc_attr($object_type_name).'" data-title="'.esc_attr($post_object->get_title()).'">&nbsp;</a>';
 						continue;
 					}
 
@@ -329,7 +329,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 						// show link to delete the translated post.
 						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $delete_simplification ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s.', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
+						echo '<a href="' . esc_url( $delete_simplification ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s.', 'easy-language' ), $settings['label'] ) ) . '" data-object-type-name="'.esc_attr($object_type_name).'" data-title="'.esc_attr($post_object->get_title()).'">&nbsp;</a>';
 					}
 
 					// show mark if content of original page has been changed.
@@ -357,7 +357,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						$dialog = array(
 							'title' => sprintf(__( 'Add simplification for %1$s', 'easy-language' ), esc_html($post_object->get_title())),
 							'texts' => array(
-								'<p>'.sprintf(__( 'With click on "simplify now" the %1$s <i>%2$s</i> will be automatically simplified in %3$s.<br>The simplification will use the API %4$s.<br>Note that this is at the expense of your quota.', 'easy-language' ), esc_html($object_type_name), esc_html($post_object->get_title()), esc_html($settings['label']), esc_html($api_obj->get_title()) ).'</p>'
+								'<p>'.sprintf(__( 'Click on "Simplify now" to automatically simplify the %1$s <i>%2$s</i> in %3$s.<br>The automatic simplification will use the API of %4$s.<br>Note that this is at the expense of your quota with this API.', 'easy-language' ), esc_html($object_type_name), esc_html($post_object->get_title()), esc_html($settings['label']), esc_html($api_obj->get_title()) ).'</p>'
 							),
 							'buttons' => array(
 								array(
@@ -368,7 +368,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 								array(
 									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", false );',
 									'variant' => 'secondary',
-									'text' => __( 'Just add object', 'easy-language' )
+									'text' => sprintf( __( 'Just add %1$s', 'easy-language' ), esc_html($object_type_name) )
 								),
 								array(
 									'action' => 'closeDialog();',
@@ -1453,17 +1453,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			)
 		);
 
-		// embed necessary scripts for progressbar.
-		wp_enqueue_script( 'jquery-ui-progressbar' );
-		wp_enqueue_script( 'jquery-ui-dialog' );
-		wp_enqueue_style(
-			'easy-language-jquery-ui-styles',
-			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'libs/jquery-ui.smoothness.css',
-			false,
-			filemtime( trailingslashit( plugin_dir_path( EASY_LANGUAGE ) ) . 'libs/jquery-ui.smoothness.css' ),
-			false
-		);
-
 		// add jquery-dirty script.
 		wp_enqueue_script(
 			'easy-language-admin-dirty-js',
@@ -1500,7 +1489,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			array(
 				'ajax_url'                        => admin_url( 'admin-ajax.php' ),
 				'simplification_confirmation_question'    => __( 'Do you want to simplify this object?', 'easy-language' ),
-				'delete_confirmation_question'    => __( 'Do you really want to delete this translated object?', 'easy-language' ),
+				'delete_confirmation_question'    => __( 'Do you really want to delete the simplified %1$s <i>%2$s</i>?', 'easy-language' ),
 				'dismiss_intro_nonce'             => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),
 				/* translators: %1$s will be replaced by the path to the easy language icon */
 				'intro_step_2'                    => sprintf( __( '<p><img src="%1$s" alt="Easy Language Logo"><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
@@ -1510,9 +1499,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// embed the dialog-component.
 		$script_asset_path = Helper::get_plugin_path()."classes/multilingual-plugins/easy-language/blocks/dialog/build/index.asset.php";
-		if ( ! file_exists( $script_asset_path ) ) {
-			echo "error1";exit;
-		}
 		$script_asset = require( $script_asset_path );
 		wp_enqueue_script(
 			'easy-language-dialog',
@@ -1871,6 +1857,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				$return['link'] = get_permalink($copy_post_obj->get_id());
 				$return['language'] = $target_language;
 				$return['edit_link'] = $copy_post_obj->get_page_builder()->get_edit_link();
+				$return['object_type_name'] = Helper::get_objekt_type_name( $copy_post_obj );
+				$return['title'] = $copy_post_obj->get_title();
+				$return['api_title'] = $api_object->get_title();
 			}
 		}
 

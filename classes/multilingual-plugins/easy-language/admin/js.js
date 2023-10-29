@@ -11,7 +11,7 @@ jQuery( document ).ready(
 					detail: {
 						hide_title: true,
 						texts: [
-							'<p><strong>' + easyLanguagePluginJsVars.delete_confirmation_question + '</strong></p>'
+							'<p><strong>' + easyLanguagePluginJsVars.delete_confirmation_question.replace('%1$s', $(this).data('object-type-name')).replace('%2$s', $(this).data('title')) + '</strong></p>'
 						],
 						buttons: [
 							{

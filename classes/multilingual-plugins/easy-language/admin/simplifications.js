@@ -37,9 +37,9 @@ function easy_language_add_simplification_object( object_id, language, automatic
 					// create dialog.
 					let dialog_config = {
 						detail: {
-							title: '%1$s has been created',
+							title: '%1$s has been created'.replace('%1$s', data.object_type_name ),
 							texts: [
-								'<p>The %1$s %2$2 has been created.<br>The texts are not yet simplified.<br>You can now edit the texts manually or choose to use the API %3$s.<br>Note that simplification via %4$s is at the expense of your quota.</p>'
+								'<p>The %1$s <i>%2$s</i> has been created.<br>Its texts are not yet simplified.<br>You can now edit the texts manually or choose to use the API %3$s.<br>Note that the automatic simplification is at the expense of your quota with this API.</p>'.replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.api_title)
 							],
 							buttons: [
 								{

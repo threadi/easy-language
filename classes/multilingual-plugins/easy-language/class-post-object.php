@@ -196,7 +196,7 @@ class Post_Object implements Easy_Language_Object {
 	 * @return string
 	 */
 	public function get_title(): string {
-		return get_post_field( 'post_title', $this->get_id() );
+		return get_the_title($this->get_id());
 	}
 
 	/**
