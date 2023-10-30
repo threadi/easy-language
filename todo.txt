@@ -3,13 +3,15 @@ ToDo
 
 Funktionales
 ------------
+* restliche JS-Texte übersetzbar machen & Übersetzungen optimieren
+* Dokumentation für Dialog-Komponente ergänzen
 * Export von Request und Response, gefiltert nach API, ergänzen
 * danach Export von Token-Test an Capito schicken => kommt bisher immer 404 zurück
 * Optionen für Handling in Tabellen ergänzen ("+" => sofort übersetzen / nur erstellen, "translate" => sichtbar/nicht sichtbar
 * Option an Post-Types ergänzen mit denen ein Redakteur weitere/erneute Übersetzungen verhindern kann
--> kann nur vom Redakteur, der das Schloss setzte gelöst werden
+-> kann nur vom Redakteur, der das Schloss setzte, gelöst werden
 * Test-Matrix dokumentieren (aka: welche Kombinationen von Plugins sollten getestet werden)
-* Test-Übersetzung ermöglichen mit einfachem Eingabefeld, welches die Eingabe an die aktive API schickt und die Übersetzung danach anzeigt.
+* Test-Vereinfachung ermöglichen mit einfachem Eingabefeld, welches die Eingabe an die aktive API schickt und die Übersetzung danach anzeigt.
 * Keys nur demjenigen anzeigen der sie eingegeben hat. wenn ein anderer nutzer das formular aufruft, den Key nicht anzeigen.
 * Kompatibilität mit Plugins testen
 -> Caching-Plugins

@@ -69,11 +69,14 @@ class Texts {
 	 */
 	public function init( Init $init ): void {
 
-		// add object for simplification.
+		// add single object for simplification.
 		add_action( 'admin_action_easy_language_add_simplification', array( $this, 'add_object_to_simplification' ) );
 
-		// get automatic simplification of given object.
+		// get simplification of given object.
 		add_action( 'admin_action_easy_language_get_simplification', array( $this, 'get_simplification' ) );
+
+		// get simplification of given text.
+		add_action( 'admin_action_easy_language_get_simplification_of_entry', array( $this, 'get_simplification_of_entry' ) );
 
 		// check texts in updated post-types-objects.
 		foreach ( $init->get_supported_post_types() as $post_type => $enabled ) {
@@ -188,6 +191,67 @@ class Texts {
 			// run simplification of this object.
 			$post_obj = new Post_Object( $object_id );
 			$post_obj->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping() );
+		}
+
+		// redirect user back to editor.
+		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		exit;
+	}
+
+	/**
+	 * Run simplification of single text via link-request.
+	 *
+	 * @return void
+	 */
+	public function get_simplification_of_entry(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-get-simplification-of-entry', 'nonce' );
+
+		// get api.
+		$api_obj = Apis::get_instance()->get_active_api();
+		if ( false === $api_obj ) {
+			// no api active => do nothing and forward user.
+			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+			exit;
+		}
+
+		// get text id.
+		$entry_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
+
+		if ( $entry_id > 0 ) {
+			// get entry.
+			// get one text of a not locked object which should be simplified.
+			$query = array(
+				'id' => $entry_id
+			);
+			$entries = DB::get_instance()->get_entries( $query, 1 );
+
+			// bail if we have no results.
+			if( empty($entries) ) {
+				return;
+			}
+
+			// get entry.
+			$entry = $entries[0];
+
+			// get the objects where this text is been used.
+			$post_objects = $entry->get_objects();
+
+			// bail if no objects could be found.
+			if ( empty( $post_objects ) ) {
+				return;
+			}
+
+			// get object of the first one.
+			$object = Init::get_instance()->get_object_by_string( $post_objects[0]['object_type'], absint( $post_objects[0]['object_id'] ) );
+
+			// bail if none could be found.
+			if ( false === $object ) {
+				return;
+			}
+
+			// call translation for the text on the object.
+			$object->process_simplification( $api_obj->get_simplifications_obj(), $api_obj->get_mapping_languages(), $entry );
 		}
 
 		// redirect user back to editor.

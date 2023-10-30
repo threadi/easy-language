@@ -27,7 +27,7 @@ jQuery( document ).ready(
 						]
 					}
 				}
-				document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
+				easy_language_create_dialog( dialog_config );
 			}
 		);
 
@@ -76,7 +76,16 @@ jQuery( document ).ready(
 					]
 				}
 			}
-			document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
+			easy_language_create_dialog( dialog_config );
 		});
 	}
 );
+
+/**
+ * Helper to create a new dialog with given config.
+ *
+ * @param config
+ */
+function easy_language_create_dialog( config ) {
+	document.body.dispatchEvent(new CustomEvent("easy-language-dialog", config));
+}

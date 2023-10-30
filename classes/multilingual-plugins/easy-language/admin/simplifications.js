@@ -16,9 +16,9 @@ jQuery( document ).ready(
  *
  * @param object_id
  * @param language
- * @param automatic_simplification
+ * @param simplification_mode
  */
-function easy_language_add_simplification_object( object_id, language, automatic_simplification ) {
+function easy_language_add_simplification_object( object_id, language, simplification_mode ) {
 	jQuery.ajax(
 		{
 			type: "POST",
@@ -30,22 +30,22 @@ function easy_language_add_simplification_object( object_id, language, automatic
 				'nonce': easyLanguageSimplificationJsVars.add_simplification_nonce
 			},
 			success: function(data) {
-				if( 'ok' === data.status && automatic_simplification ) {
+				if( 'ok' === data.status && "auto" === simplification_mode ) {
 					easy_language_get_simplification( data.object_id, data.language, false );
 				}
-				else if( 'ok' === data.status && !automatic_simplification ) {
+				else if( 'ok' === data.status && "manually" === simplification_mode ) {
 					// create dialog.
 					let dialog_config = {
 						detail: {
-							title: '%1$s has been created'.replace('%1$s', data.object_type_name ),
+							title: '%1$s ready for simplification'.replace('%1$s', data.object_type_name ),
 							texts: [
-								'<p>The %1$s <i>%2$s</i> has been created.<br>Its texts are not yet simplified.<br>You can now edit the texts manually or choose to use the API %3$s.<br>Note that the automatic simplification is at the expense of your quota with this API.</p>'.replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.api_title)
+								'<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.</p>'.replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language)
 							],
 							buttons: [
 								{
 									'action': 'easy_language_get_simplification(' + data.object_id + ', "' + data.language + '", false );',
 									'variant': 'primary',
-									'text': 'Simplify now'
+									'text': 'Simplify now via API %1$s'.replace('%1$s', data.api_title)
 								},
 								{
 									'action': 'location.href="' + data.edit_link + '";',
@@ -59,7 +59,26 @@ function easy_language_add_simplification_object( object_id, language, automatic
 							]
 						}
 					}
-					document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
+					easy_language_create_dialog( dialog_config );
+				}
+				else if( 'ok' === data.status && "background" === simplification_mode ) {
+					// create dialog.
+					let dialog_config = {
+						detail: {
+							title: '%1$s will be simplified'.replace('%1$s', data.title ),
+							texts: [
+								'<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts will be simplified in background.</p>'.replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language)
+							],
+							buttons: [
+								{
+									'action': 'location.reload();',
+									'variant': 'primary',
+									'text': 'OK'
+								}
+							]
+						}
+					}
+					easy_language_create_dialog( dialog_config );
 				}
 			}
 		}

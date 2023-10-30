@@ -401,4 +401,27 @@ class Text {
 		);
 		$wpdb->insert( $wpdb->easy_language_originals_objects, $query );
 	}
+
+	/**
+	 * Get date of this object (when it was saved).
+	 *
+	 * @return string
+	 */
+	public function get_date(): string {
+		global $wpdb;
+
+		// get from DB.
+		$prepared_sql = $wpdb->prepare(
+			'SELECT o.`time`
+				FROM ' . $wpdb->easy_language_originals . ' o
+				WHERE o.`id` = %d',
+			array( $this->get_id() )
+		);
+
+		// get result
+		$result = (array) $wpdb->get_results( $prepared_sql, ARRAY_A );
+
+		// return the time.
+		return $result[0]['time'];
+	}
 }

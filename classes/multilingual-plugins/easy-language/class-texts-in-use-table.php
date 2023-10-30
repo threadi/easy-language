@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Handler for log-output in backend.
  */
-class Texts_Table extends WP_List_Table {
+class Texts_In_Use_Table extends WP_List_Table {
 
 	/**
 	 * Database-object.
@@ -162,7 +162,7 @@ class Texts_Table extends WP_List_Table {
 				if ( ! empty( $languages[ $language ] ) ) {
 					return $languages[ $language ]['label'];
 				}
-				return '';
+				return __( 'Unknown', 'easy-language' );
 
 			// show target language.
 			case 'target_language':
@@ -173,7 +173,7 @@ class Texts_Table extends WP_List_Table {
 						return $languages[ $language ]['label'];
 					}
 				}
-				return '';
+				return __( 'Unknown', 'easy-language' );
 
 			// show options.
 			case 'options':

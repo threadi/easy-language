@@ -219,6 +219,10 @@ class Db {
 		$sql_where  = ' WHERE 1 = %d';
 		$vars       = array( '1' );
 		if ( ! empty( $filter ) ) {
+			if ( ! empty( $filter['id'] ) ) {
+				$sql_where .= ' AND o.id = %d';
+				$vars[]     = $filter['id'];
+			}
 			if ( ! empty( $filter['original'] ) ) {
 				$sql_where .= ' AND o.original = %s';
 				$vars[]     = $filter['original'];

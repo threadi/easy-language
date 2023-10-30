@@ -15,7 +15,6 @@ use easyLanguage\Languages;
 use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_Plugins_Base;
 use easyLanguage\Transients;
-use Exception;
 use WP_Admin_Bar;
 use WP_Post;
 use WP_Post_Type;
@@ -154,7 +153,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		add_action( 'wp_ajax_easy_language_dismiss_intro_step_2', array( $this, 'dismiss_intro_step_2' ) );
 		add_action( 'current_screen', array( $this, 'screen_actions' ) );
 		add_action( 'update_option_WPLANG', array( $this, 'option_locale_changed' ), 10, 2 );
-		add_action( 'admin_bar_menu', array( $this, 'admin_bar_menu' ), 500 );
+		add_action( 'admin_bar_menu', array( $this, 'add_simplification_button_in_admin_bar' ), 500 );
+		add_action( 'admin_bar_menu', array( $this, 'show_simplification_process' ), 400 );
 	}
 
 	/**
@@ -343,7 +343,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					// create link to simplify this post if used pagebuilder is active.
 					$page_builder = $post_object->get_page_builder();
 					if( $page_builder->is_active() ) {
-						$create_simplification = $post_object->get_simplification_link( $language_code );
+						// get simplification-URL.
+						$create_simplification_link = $post_object->get_simplification_link( $language_code );
 
 						// add warning before adding simplified object if used pagebuilder is unknown.
 						$add_class = '';
@@ -354,19 +355,25 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						}
 
 						// define dialog for click on simplify-link.
+						// TODO checkbox ergänzen über die die Entscheidung am Nutzerprofil gemerkt wird
 						$dialog = array(
 							'title' => sprintf(__( 'Add simplification for %1$s', 'easy-language' ), esc_html($post_object->get_title())),
 							'texts' => array(
-								'<p>'.sprintf(__( 'Click on "Simplify now" to automatically simplify the %1$s <i>%2$s</i> in %3$s.<br>The automatic simplification will use the API of %4$s.<br>Note that this is at the expense of your quota with this API.', 'easy-language' ), esc_html($object_type_name), esc_html($post_object->get_title()), esc_html($settings['label']), esc_html($api_obj->get_title()) ).'</p>'
+								'<p>'.sprintf(__( 'Please decide how you want to proceed to simplify this %1$s.', 'easy-language' ), esc_html($object_type_name) ).'</p>'
 							),
 							'buttons' => array(
 								array(
-									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", true );',
+									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", "auto" );',
 									'variant' => 'primary',
-									'text' => __( 'Simplify now', 'easy-language' )
+									'text' => sprintf(__( 'Simplify now via %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ))
 								),
 								array(
-									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", false );',
+									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", "background" );',
+									'variant' => 'primary',
+									'text' => __( 'Simplify in background', 'easy-language' )
+								),
+								array(
+									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", "manually" );',
 									'variant' => 'secondary',
 									'text' => sprintf( __( 'Just add %1$s', 'easy-language' ), esc_html($object_type_name) )
 								),
@@ -379,7 +386,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 						// show link to add simplification for this language.
 						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $create_simplification ) . '" class="dashicons dashicons-plus easy-language-dialog'. esc_attr($add_class). '" data-dialog="'.esc_attr(wp_json_encode($dialog)).'" title="' . esc_attr( sprintf( esc_html__( 'Simplify this %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+						echo '<a href="' . esc_url( $create_simplification_link ) . '" class="dashicons dashicons-plus easy-language-dialog'. esc_attr($add_class). '" data-dialog="'.esc_attr(wp_json_encode($dialog)).'" title="' . esc_attr( sprintf( esc_html__( 'Simplify this %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
 
 						// if the detected pagebuilder is "undetected" show warning.
 						if( false !== $show_page_builder_warning ) {
@@ -504,7 +511,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 *
 	 * @return void
 	 */
-	public function admin_bar_menu( WP_Admin_Bar $admin_bar ): void {
+	public function add_simplification_button_in_admin_bar( WP_Admin_Bar $admin_bar ): void {
 		// do not show anything in wp-admin.
 		if ( is_admin() ) {
 			return;
@@ -512,11 +519,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// do not show if user has no capabilities for this.
 		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		// bail if support for our own languages is handled by other multilingual plugin.
-		if ( Multilingual_Plugins::get_instance()->is_plugin_with_support_for_given_languages_enabled( $this->get_supported_languages() ) ) {
 			return;
 		}
 
@@ -1090,7 +1092,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * Add row actions to show translate-options and -state per object for nested pages.
+	 * Add row actions to show translate-options and -state per object for plugin nested pages.
+	 *
+	 * TODO check if it matches actual processes in our plugin
 	 *
 	 * @param array   $actions The possible actions for posts.
 	 * @param WP_Post $post The post-object.
@@ -1827,9 +1831,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 *
+	 * Add simplification of object via AJAX.
 	 *
 	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function ajax_add_simplification(): void {
 		check_ajax_referer( 'easy-language-add-simplification-nonce', 'nonce' );
@@ -1868,6 +1873,56 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// return nothing more.
 		wp_die();
+	}
+
+	/**
+	 * Show process of background-simplifications in admin-bar.
+	 *
+	 * @param WP_Admin_Bar $admin_bar
+	 *
+	 * @return void
+	 */
+	public function show_simplification_process( WP_Admin_Bar $admin_bar ): void {
+		// do not show if user has no capabilities for this.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// get all items.
+		$all_entries = DB::get_instance()->get_entries();
+		$all_entries_count = count($all_entries);
+
+		// bail if we have no entries.
+		if( 0 === $all_entries_count ) {
+			return;
+		}
+
+		// get actual items to process the simplification in background.
+		$query = array(
+			'state' => 'to_simplify',
+		);
+		$entries_to_simplify = DB::get_instance()->get_entries( $query );
+		$processed = (($all_entries_count - count($entries_to_simplify))  / $all_entries_count) * 100;
+
+		// get link to list of texts to simplify.
+		$url = add_query_arg( array(
+				'page' => 'easy_language_settings',
+				'tab' => 'simplifications',
+				'subtab' => 'to_simplify'
+			),
+			admin_url().'options-general.php'
+		);
+
+		// add not clickable main menu where all languages will be added as dropdown-items.
+		$admin_bar->add_menu(
+			array(
+				'id'     => 'easy-language-simplification-process',
+				'parent' => null,
+				'group'  => null,
+				'title'  => __( 'Simplifications:', 'easy-language' ).' <progress value="'.absint($processed).'" max="100"></progress>',
+				'href'   => esc_url($url),
+			)
+		);
 	}
 
 }
