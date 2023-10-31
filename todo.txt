@@ -7,6 +7,7 @@ Funktionales
 * Einstellungen zum Automatismus ergänzen:
 -> Intervall
 -> Abschaltbar
+* Umgang mit Erreichen von Limits beim Vereinfachen um Userspace testen
 * Export von Request und Response, gefiltert nach API, ergänzen
 * danach Export von Token-Test an Capito schicken => kommt bisher immer 404 zurück
 * Optionen für Handling in Tabellen ergänzen ("+" => sofort übersetzen / nur erstellen, "translate" => sichtbar/nicht sichtbar
