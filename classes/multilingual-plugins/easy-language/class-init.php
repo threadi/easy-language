@@ -137,9 +137,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		add_action( 'wp_ajax_easy_language_run_simplification', array( $this, 'ajax_run_simplification' ) );
 		add_action( 'wp_ajax_easy_language_run_data_deletion', array( $this, 'deletion_simplified_data' ) );
 		add_action( 'wp_ajax_easy_language_get_info_delete_data', array( $this, 'get_info_about_deletion_of_simplified_data' ) );
-
 		add_action( 'wp_ajax_easy_language_reset_processing_simplification', array( $this, 'ajax_reset_processing_simplification' ) );
 		add_action( 'wp_ajax_easy_language_ignore_processing_simplification', array( $this, 'ajax_ignore_processing_simplification' ) );
+		add_action( 'wp_ajax_easy_language_set_simplification_prevention_on_object', array( $this, 'ajax_set_simplification_prevention' ) );
 
 		// embed files.
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), PHP_INT_MAX );
@@ -1445,6 +1445,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'txt_please_wait'                 => __( 'Please wait', 'easy-language' ),
 				'add_simplification_nonce'		  => wp_create_nonce( 'easy-language-add-simplification-nonce' ),
 				'run_simplification_nonce'        => wp_create_nonce( 'easy-language-run-simplification-nonce' ),
+				'set_simplification_prevention_nonce' => wp_create_nonce( 'easy-language-set-simplification-prevention-nonce' ),
 				'txt_simplification_has_been_run' => __( 'Simplification has been run.', 'easy-language' ),
 				'translate_confirmation_question' => __( '<strong>Are you sure you want to simplify these texts via API?</strong><br>Hint: this could cause costs with the API.', 'easy-language' ),
 				'label_simplification_error' => __( 'Error', 'easy-language' ),
@@ -1961,6 +1962,39 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				)
 			)
 		);
+	}
+
+	/**
+	 * Save the simplification prevention setting for an object.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function ajax_set_simplification_prevention(): void {
+		check_ajax_referer( 'easy-language-set-simplification-prevention-nonce', 'nonce' );
+
+		// define return value.
+		$return = array(
+			'success' => 'ok'
+		);
+
+		// get object id.
+		$post_id = isset($_POST['post']) ? absint($_POST['post']) : 0;
+
+		// is automatic mode prevented?
+		/** @noinspection PhpTernaryExpressionCanBeReplacedWithConditionInspection */
+		$prevent_automatic_mode = isset($_POST['prevent_automatic_simplification']) ? "true" === $_POST['prevent_automatic_simplification'] : false;
+
+		if( $post_id > 0 ) {
+			$post_obj = new Post_Object( $post_id );
+			$post_obj->set_automatic_mode_prevented( $prevent_automatic_mode );
+		}
+
+		// return result.
+		wp_send_json( $return );
+
+		// return nothing more.
+		wp_die();
 	}
 
 }

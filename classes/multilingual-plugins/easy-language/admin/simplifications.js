@@ -9,6 +9,22 @@ jQuery( document ).ready(
 			}
 		);
 
+		// save automatic prevention setting.
+		$('input.easy-language-automatic-simplification-prevention').on( 'change', function() {
+			jQuery.ajax(
+				{
+					type: "POST",
+					url: easyLanguageSimplificationJsVars.ajax_url,
+					data: {
+						'action': 'easy_language_set_simplification_prevention_on_object',
+						'post': $(this).data('id'),
+						'prevent_automatic_simplification': $(this).is(':checked'),
+						'nonce': easyLanguageSimplificationJsVars.set_simplification_prevention_nonce
+					},
+				}
+			);
+		});
+
 		// start to simplify a single text via AJAX.
 		$('.easy-language-simplify-text').on(
 			'click',
@@ -70,7 +86,7 @@ function easy_language_add_simplification_object( object_id, language, simplific
 						detail: {
 							title: '%1$s ready for simplification'.replace('%1$s', data.object_type_name ),
 							texts: [
-								'<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.</p>'.replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language)
+								'<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.<br>If you decide to just edit this %4$s its texts will not automatically be simplified in background.</p>'.replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language).replace('%4$s', data.object_type_name)
 							],
 							buttons: [
 								{

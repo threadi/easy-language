@@ -231,7 +231,9 @@ class Parser_Base {
 						echo wp_kses_post( sprintf( __( 'There would be %1$d characters translated in this %2$s.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $object_type_name ) ) );
 						?>
 					</p>
-					<?php /* translators: %1$s will be replaced by tne object-type-name (e.g. post oder page), %2$s will be replaced by the API-name */ ?>
+					<?php
+					/* translators: %1$s will be replaced by tne object-type-name (e.g. post oder page), %2$s will be replaced by the API-name */
+					?>
 					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary easy-language-translate-object elementor-button" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( sprintf( __( 'Simplify this %1$s with %2$s.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $api_obj->get_title() ) ) ); ?>">
 						<?php
 							/* translators: %1$s will be replaced by the API-title */
@@ -241,7 +243,9 @@ class Parser_Base {
 							echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';
 						}
 						?>
-						</a></p>
+						</a>
+					</p>
+					<label><input type="checkbox" name="automatic_mode_prevented" data-id="<?php echo absint($post_object->get_id()) ?>" class="easy-language-automatic-simplification-prevention" value="1"<?php if( $post_object->is_automatic_mode_prevented() ) { ?> checked="checked"<?php } ?>><?php echo esc_html__( 'Not automatic simplified', 'easy-language' ); ?></label>
 					<?php
 				} elseif ( $api_obj->is_configured() ) {
 					?>

@@ -32,6 +32,11 @@
 
 .form-table p.easy-language-checkbox { margin-bottom: 8px }
 
+#easy-language label {
+	display: block;
+	margin-bottom: 1em;
+}
+
 #easy-language table {
     border-collapse: collapse;
     margin-bottom: 1em;

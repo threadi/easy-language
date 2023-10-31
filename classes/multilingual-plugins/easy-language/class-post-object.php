@@ -921,4 +921,14 @@ class Post_Object implements Easy_Language_Object {
 		// return false if no simplified object has been created.
 		return false;
 	}
+
+	/**
+	 * Set automatic mode prevention on object.
+	 *
+	 * @param bool $prevent_automatic_mode
+	 * @return void
+	 */
+    public function set_automatic_mode_prevented(bool $prevent_automatic_mode): void {
+		update_post_meta( $this->get_id(), 'easy_language_prevent_automatic_mode', $prevent_automatic_mode );
+    }
 }
