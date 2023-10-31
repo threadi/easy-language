@@ -83,6 +83,11 @@ function add_dialog( dialog ) {
 			confirm_dialog.unmount();
 			confirm_dialog = null;
 		}
+		if( ! document.getElementById('easy-language-dialog-root') ) {
+			let root = document.createElement('div');
+			root.id = 'easy-language-dialog-root';
+			document.getElementById('wpfooter').append(root);
+		}
 		confirm_dialog = ReactDOM.createRoot(document.getElementById('easy-language-dialog-root'));
 		confirm_dialog.render(
 			<Confirm_Dialog dialog={dialog}/>

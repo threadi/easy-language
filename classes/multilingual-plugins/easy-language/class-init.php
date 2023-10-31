@@ -130,7 +130,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'pre_get_posts', array( $this, 'hide_simplified_posts' ) );
 		add_filter( 'get_pages', array( $this, 'remove_simplified_pages' ) );
-		add_action( 'admin_footer', function() { echo '<div id="easy-language-dialog-root"></div>'; }); // TODO
 
 		// add ajax-actions hooks.
 		add_action( 'wp_ajax_easy_language_add_simplification_object', array( $this, 'ajax_add_simplification' ) );

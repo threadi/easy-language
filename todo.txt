@@ -3,7 +3,6 @@ ToDo
 
 Funktionales
 ------------
-* <div id="easy-language-dialog-root"></div> für Dialog anders lösen
 * Dokumentation für Dialog-Komponente ergänzen
 * Einstellungen zum Automatismus ergänzen:
 -> Intervall
