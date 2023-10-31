@@ -111,7 +111,7 @@ class Post_Object implements Easy_Language_Object {
 	 *
 	 * @return bool
 	 */
-	public function is_translated(): bool {
+	public function is_simplified(): bool {
 		return 'translated' === $this->translate_type;
 	}
 
@@ -744,8 +744,8 @@ class Post_Object implements Easy_Language_Object {
 	 * @return bool
 	 */
 	public function has_translations(): bool {
-		// bail for translated objects.
-		if ( $this->is_translated() ) {
+		// bail for simplified objects.
+		if ( $this->is_simplified() ) {
 			return false;
 		}
 
@@ -788,21 +788,42 @@ class Post_Object implements Easy_Language_Object {
 	/**
 	 * Return whether this object is locked or not.
 	 *
-	 * @return bool
+	 * @return bool true if object is locked.
 	 */
 	public function is_locked(): bool {
 		return wp_check_post_lock( $this->get_id() );
 	}
 
 	/**
-	 * Add simplification object to this object if it is an not translatable object.
+	 * Return whether this object should not be used during automatic simplification.
+	 *
+	 * @return bool true if it should not be used
+	 * @noinspection PhpUnused
+	 */
+	public function is_automatic_mode_prevented(): bool {
+		return absint(get_post_meta( $this->get_id(), 'easy_language_prevent_automatic_mode', true )) === 1;
+	}
+
+	/**
+	 * Return whether this object has a specific state.
+	 *
+	 * @param string $state
+	 * @return bool
+	 * @noinspection PhpUnused
+	 */
+	public function has_state( string $state ): bool {
+		return $state === $this->get_status();
+	}
+
+	/**
+	 * Add simplification object to this object if it is a not translatable object.
 	 *
 	 * @param string $target_language The target-language.
 	 * @param Api_Base $api_object The API to use.
-	 *
+	 * @param bool $prevent_automatic_mode True if automatic mode is prevented.
 	 * @return bool|Post_Object
 	 */
-	public function add_simplification_object( string $target_language, Api_Base $api_object ): bool|Post_Object {
+	public function add_simplification_object( string $target_language, Api_Base $api_object, bool $prevent_automatic_mode ): bool|Post_Object {
 		// get DB-object.
 		$db = DB::get_instance();
 
@@ -843,7 +864,10 @@ class Post_Object implements Easy_Language_Object {
 			// save the API used for this simplification.
 			update_post_meta( $copied_post_id, 'easy_language_api', $api_object->get_name() );
 
-			// ste the language for the original object.
+			// set if automatic mode is prevented.
+			update_post_meta( $copied_post_id, 'easy_language_prevent_automatic_mode', $prevent_automatic_mode);
+
+			// set the language for the original object.
 			update_post_meta( $this->get_id(), 'easy_language_text_language', $source_language );
 
 			// parse text depending on used pagebuilder for this object.

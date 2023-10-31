@@ -50,7 +50,7 @@ interface Easy_Language_Object {
 	 *
 	 * @return bool
 	 */
-	public function is_translated(): bool;
+	public function is_simplified(): bool;
 
 	/**
 	 * Return whether a given post type is translated in given language.

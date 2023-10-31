@@ -128,7 +128,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// backend simplification-hooks to show or hide translated pages.
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
-		add_action( 'pre_get_posts', array( $this, 'hide_translated_posts' ) );
+		add_action( 'pre_get_posts', array( $this, 'hide_simplified_posts' ) );
 		add_filter( 'get_pages', array( $this, 'remove_simplified_pages' ) );
 		add_action( 'admin_footer', function() { echo '<div id="easy-language-dialog-root"></div>'; }); // TODO
 
@@ -347,30 +347,26 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						$create_simplification_link = $post_object->get_simplification_link( $language_code );
 
 						// add warning before adding simplified object if used pagebuilder is unknown.
-						$add_class = '';
+						$add_class = 'easy-language-dialog';
 						$show_page_builder_warning = false;
 						if( 'Undetected' === $page_builder->get_name() ) {
 							$show_page_builder_warning = true;
-							$add_class .= ' easy-language-missing-pagebuilder-warning';
+							$add_class = 'easy-language-missing-pagebuilder-warning';
 						}
 
 						// define dialog for click on simplify-link.
+						// TODO nur zur Auswahl stellen wenn API auch extern läuft (z.B. nicht bei no-api)
 						// TODO checkbox ergänzen über die die Entscheidung am Nutzerprofil gemerkt wird
 						$dialog = array(
 							'title' => sprintf(__( 'Add simplification for %1$s', 'easy-language' ), esc_html($post_object->get_title())),
 							'texts' => array(
-								'<p>'.sprintf(__( 'Please decide how you want to proceed to simplify this %1$s.', 'easy-language' ), esc_html($object_type_name) ).'</p>'
+								'<p>'.sprintf(__( 'Please decide how you want to proceed to simplify this %1$s.<br>Note that the use of the API %2$s may incur costs.', 'easy-language' ), esc_html($object_type_name), esc_html($api_obj->get_title()) ).'</p>'
 							),
 							'buttons' => array(
 								array(
 									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", "auto" );',
 									'variant' => 'primary',
 									'text' => sprintf(__( 'Simplify now via %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ))
-								),
-								array(
-									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", "background" );',
-									'variant' => 'primary',
-									'text' => __( 'Simplify in background', 'easy-language' )
 								),
 								array(
 									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", "manually" );',
@@ -386,7 +382,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 						// show link to add simplification for this language.
 						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $create_simplification_link ) . '" class="dashicons dashicons-plus easy-language-dialog'. esc_attr($add_class). '" data-dialog="'.esc_attr(wp_json_encode($dialog)).'" title="' . esc_attr( sprintf( esc_html__( 'Simplify this %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+						echo '<a href="' . esc_url( $create_simplification_link ) . '" class="dashicons dashicons-plus '. esc_attr($add_class). '" data-dialog="'.esc_attr(wp_json_encode($dialog)).'" data-title="'.esc_attr($post_object->get_title()).'" data-object-type-name="'.esc_attr($object_type_name).'" title="' . esc_attr( sprintf( esc_html__( 'Simplify this %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
 
 						// if the detected pagebuilder is "undetected" show warning.
 						if( false !== $show_page_builder_warning ) {
@@ -404,29 +400,29 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * Hide our translated objects in queries for actively supported post types in backend.
+	 * Hide our simplified objects in queries for actively supported post types in backend.
 	 *
 	 * @param WP_Query $query The query-object.
 	 *
 	 * @return void
 	 */
-	public function hide_translated_posts( WP_Query $query ): void {
+	public function hide_simplified_posts( WP_Query $query ): void {
 		if ( is_admin() && '' === $query->get( 'do_not_use_easy_language_filter' ) && $query->get( 'post_status' ) !== 'trash' ) {
 			// get our supported post-types.
 			$post_types = $this->get_supported_post_types();
 
 			// get requested post-types, if they are a post-type.
-			$hide_translated_posts = false;
+			$hide_simplified_posts = false;
 			if ( is_array( $query->get( 'post_type' ) ) ) {
 				foreach ( $query->get( 'post_type' ) as $post_type ) {
 					if ( ! empty( $post_types[ $post_type ] ) ) {
-						$hide_translated_posts = true;
+						$hide_simplified_posts = true;
 					}
 				}
 			} elseif ( ! empty( $post_types[ $query->get( 'post_type' ) ] ) ) {
-					$hide_translated_posts = true;
+				$hide_simplified_posts = true;
 			}
-			if ( $hide_translated_posts ) {
+			if ( $hide_simplified_posts ) {
 				$query->set(
 					'meta_query',
 					array(
@@ -544,8 +540,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			return;
 		}
 
-		// check if this object is a translated object.
-		if ( $object->is_translated() ) {
+		// check if this object is a simplified object.
+		if ( $object->is_simplified() ) {
 			$object_id = $object->get_original_object_as_int();
 			// get new object as base for the listing.
 			$object = $this->get_object_by_wp_object( get_queried_object(), $object_id );
@@ -676,10 +672,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// get post-type-names.
 		$post_type_names = \easyLanguage\Init::get_instance()->get_post_type_names();
 
-		// get our own translator-role.
+		// get our own simplifier-role.
 		$translator_role = get_role( 'el_simplifier' );
 
-		// get all translated, draft and marked objects in any supported language to set them to publish.
+		// get all simplified, draft and marked objects in any supported language to set them to publish.
 		foreach ( $this->get_supported_post_types() as $post_type => $enabled ) {
 			$query   = array(
 				'post_type'                       => $post_type,
@@ -1345,31 +1341,32 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// get the post-id from request.
 		$post_id = isset( $_POST['post'] ) ? absint( $_POST['post'] ) : 0;
 
-		// get api.
-		$api_obj = Apis::get_instance()->get_active_api();
-
-		// bail if no API is activated.
-		if( false === $api_obj ) {
-			// collect return array.
-			$return = array(
-				1,
-				1,
-				0,
-				__( 'No API activated!', 'easy-language' ),
-				get_permalink($post_id)
-			);
-			wp_send_json( $return );
-
-			// do nothing more.
-			wp_die();
-		}
-
-		// get info if this is a simplification-initialization.
-		$initialization = isset( $_POST['initialization'] ) ? filter_var($_POST['initialization'], FILTER_VALIDATE_BOOLEAN) : false;
-
 		if ( absint( $post_id ) > 0 ) {
 			// get object.
 			$post_obj = new Post_Object( $post_id );
+
+			// get api.
+			$api_obj = Apis::get_instance()->get_active_api();
+
+			// bail if no API is activated.
+			if( false === $api_obj ) {
+				// collect return array.
+				$return = array(
+					1,
+					1,
+					0,
+					__( 'No API activated!', 'easy-language' ),
+					get_permalink($post_id),
+					$post_obj->get_page_builder()->get_edit_link()
+				);
+				wp_send_json( $return );
+
+				// do nothing more.
+				wp_die();
+			}
+
+			// get info if this is a simplification-initialization.
+			$initialization = isset( $_POST['initialization'] ) ? filter_var($_POST['initialization'], FILTER_VALIDATE_BOOLEAN) : false;
 
 			// run simplification of one text-entry in given object.
 			$post_obj->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping(), absint(get_option( 'easy_language_api_text_limit_per_process', 1 ) ), $initialization );
@@ -1392,7 +1389,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				absint( $max_simplifications[ $post_obj->get_md5() ] ),
 				absint( $running_simplifications[ $post_obj->get_md5() ] ),
 				wp_kses_post( $results[ $post_obj->get_md5() ] ),
-				get_permalink($post_id)
+				get_permalink($post_id),
+				$post_obj->get_page_builder()->get_edit_link()
 			);
 			wp_send_json( $return );
 		}
@@ -1411,7 +1409,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	public function remove_simplified_pages( array $pages ): array {
 		foreach ( $pages as $index => $page ) {
 			$post_obj = new Post_Object( $page->ID );
-			if ( $post_obj->is_translated() ) {
+			if ( $post_obj->is_simplified() ) {
 				unset( $pages[ $index ] );
 			}
 		}
@@ -1448,12 +1446,15 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'add_simplification_nonce'		  => wp_create_nonce( 'easy-language-add-simplification-nonce' ),
 				'run_simplification_nonce'        => wp_create_nonce( 'easy-language-run-simplification-nonce' ),
 				'txt_simplification_has_been_run' => __( 'Simplification has been run.', 'easy-language' ),
-				'translate_confirmation_question' => __( 'Simplify the texts in this object?', 'easy-language' ),
+				'translate_confirmation_question' => __( '<strong>Are you sure you want to simplify these texts via API?</strong><br>Hint: this could cause costs with the API.', 'easy-language' ),
 				'label_simplification_error' => __( 'Error', 'easy-language' ),
 				/* translators: [error] will be replaced by the http-error-message (e.g. "Gateway timed our") */
 				'txt_simplification_error' => sprintf( __( '<p><strong>The following error occurred during: [error]</strong> - at least one simplification could not be processed.<br><br><strong>Possible causes:</strong></p><ul><li>The server settings for WordPress hosting prevent longer lasting requests. Contact your hosters support for a solution.</li><li>The API used took too long to simplify the text. Shorten particularly long texts or contact API support for further assistance.</li><li>Use <a href="%1$s" target="_blank">Easy Language Pro</a> for automatic translations in the background without the risk of hitting timeouts on your own hosting.</li></ul>', 'easy-language' ), esc_url( Helper::get_pro_url() ) ),
 				'ignore_processing_simplification_nonce' => wp_create_nonce( 'easy-language-ignore-processing-simplification-nonce' ),
 				'reset_processing_simplification_nonce' => wp_create_nonce( 'easy-language-reset-processing-simplification-nonce' ),
+				'label_yes' => __( 'Yes', 'easy-language' ),
+				'label_no' => __( 'No', 'easy-language' ),
+				'title_simplify_texts' => __( 'Simplify texts', 'easy-language' )
 			)
 		);
 
@@ -1493,11 +1494,15 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			array(
 				'ajax_url'                        => admin_url( 'admin-ajax.php' ),
 				'simplification_confirmation_question'    => __( 'Do you want to simplify this object?', 'easy-language' ),
+				'title_delete_confirmation' => __( 'Delete simplified %1$s', 'easy-language' ),
 				'delete_confirmation_question'    => __( 'Do you really want to delete the simplified %1$s <i>%2$s</i>?', 'easy-language' ),
 				'dismiss_intro_nonce'             => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),
 				/* translators: %1$s will be replaced by the path to the easy language icon */
 				'intro_step_2'                    => sprintf( __( '<p><img src="%1$s" alt="Easy Language Logo"><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
-				'txt_pagebuilder_unknown_warnung' => __( 'This page has been created with an unknown pagebuilder or the classic editor. Are you sure you want to create a simplified text from this object?', 'easy-language' )
+				'txt_pagebuilder_unknown_warnung' => __( 'The %1$s <i>%2$s</i>has been created with an unknown pagebuilder or the classic editor.<br><strong>Are you sure you want to create simplified text for this %3$s?</strong>', 'easy-language' ),
+				'label_yes' => __( 'Yes', 'easy-language' ),
+				'label_no' => __( 'No', 'easy-language' ),
+				'title_unknown_pagebuilder' => __( 'Unknown pagebuilder', 'easy-language' )
 			)
 		);
 
@@ -1795,10 +1800,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			return;
 		}
 
-		// get one text of a not locked object which should be simplified.
+		// get one text of a not locked, not prevented and actual not trashed object which should be simplified.
 		$query = array(
 			'state' => 'to_simplify',
-			'not_locked' => true
+			'not_locked' => true,
+			'not_prevented' => true,
+			'object_not_state' => 'trash'
 		);
 		$entries = DB::get_instance()->get_entries( $query, 1 ); // TODO Zahl einstellbar machen
 
@@ -1831,7 +1838,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * Add simplification of object via AJAX.
+	 * Add simplification of given object via AJAX.
 	 *
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
@@ -1853,14 +1860,22 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// get language.
 		$target_language = isset($_POST['language']) ? sanitize_text_field( wp_unslash( $_POST['language']) ) : '';
 
+		// is automatic mode prevented?
+		/** @noinspection PhpTernaryExpressionCanBeReplacedWithConditionInspection */
+		$prevent_automatic_mode = isset($_POST['prevent_automatic_simplification']) ? boolval($_POST['prevent_automatic_simplification']) : false;
+
 		if( $original_post_id > 0 && !empty($target_language) && $api_object ) {
 			$post_object = new Post_Object( $original_post_id );
-			$copy_post_obj = $post_object->add_simplification_object( $target_language, $api_object );
+			$copy_post_obj = $post_object->add_simplification_object( $target_language, $api_object, $prevent_automatic_mode );
 			if( $copy_post_obj ) {
+				// get language title.
+				$languages = Languages::get_instance()->get_active_languages();
+
+				// collect return values.
 				$return['status'] = 'ok';
 				$return['object_id'] = $copy_post_obj->get_id();
 				$return['link'] = get_permalink($copy_post_obj->get_id());
-				$return['language'] = $target_language;
+				$return['language'] = $languages[$target_language]['label'];
 				$return['edit_link'] = $copy_post_obj->get_page_builder()->get_edit_link();
 				$return['object_type_name'] = Helper::get_objekt_type_name( $copy_post_obj );
 				$return['title'] = $copy_post_obj->get_title();
@@ -1878,6 +1893,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Show process of background-simplifications in admin-bar.
 	 *
+	 * TODO einstellbar machen wer diesen Balken sieht
+	 *
 	 * @param WP_Admin_Bar $admin_bar
 	 *
 	 * @return void
@@ -1885,6 +1902,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	public function show_simplification_process( WP_Admin_Bar $admin_bar ): void {
 		// do not show if user has no capabilities for this.
 		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// get active API.
+		$api_obj = Apis::get_instance()->get_active_api();
+
+		// bail if no API is active.
+		if( false === $api_obj ) {
 			return;
 		}
 
@@ -1900,9 +1925,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// get actual items to process the simplification in background.
 		$query = array(
 			'state' => 'to_simplify',
+			'object_not_state' => 'trash'
 		);
 		$entries_to_simplify = DB::get_instance()->get_entries( $query );
-		$processed = (($all_entries_count - count($entries_to_simplify))  / $all_entries_count) * 100;
+		$entries_to_simplify_count = count($entries_to_simplify);
+		$processed = (($all_entries_count - $entries_to_simplify_count)  / $all_entries_count) * 100;
 
 		// get link to list of texts to simplify.
 		$url = add_query_arg( array(
@@ -1913,14 +1940,25 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			admin_url().'options-general.php'
 		);
 
+		// generate text depending on items to process.
+		$admin_bar_text =  __( 'Simplifications:', 'easy-language' ).' <progress value="'.absint($processed).'" max="100"></progress>';
+		$admin_bar_title = sprintf( __( '%1$d of %2$d texts simplified via %3$s', 'easy-language' ), absint($all_entries_count - $entries_to_simplify_count), absint($all_entries_count), esc_html($api_obj->get_title()) );
+		if( 0 === $entries_to_simplify_count ) {
+			$admin_bar_text = __( 'No open simplifications', 'easy-language' );
+			$admin_bar_title = '';
+		}
+
 		// add not clickable main menu where all languages will be added as dropdown-items.
 		$admin_bar->add_menu(
 			array(
 				'id'     => 'easy-language-simplification-process',
 				'parent' => null,
 				'group'  => null,
-				'title'  => __( 'Simplifications:', 'easy-language' ).' <progress value="'.absint($processed).'" max="100"></progress>',
+				'title'  => $admin_bar_text,
 				'href'   => esc_url($url),
+				'meta' => array(
+					'title' => $admin_bar_title
+				)
 			)
 		);
 	}

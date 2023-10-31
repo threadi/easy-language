@@ -202,8 +202,8 @@ class Switcher {
 			return '';
 		}
 
-		// check if this object is a translated object.
-		if ( $object->is_translated() ) {
+		// check if this object is a simplified object.
+		if ( $object->is_simplified() ) {
 			$object_id = $object->get_original_object_as_int();
 			// get original object as base for the listing.
 			$object = $this->init->get_object_by_wp_object( get_post( $object_id ), $object_id );
@@ -287,8 +287,8 @@ class Switcher {
 			return $items;
 		}
 
-		// check if this object is a translated object.
-		if ( $object->is_translated() ) {
+		// check if this object is a simplified object.
+		if ( $object->is_simplified() ) {
 			$object_id = $object->get_original_object_as_int();
 			// get new object as base for the listing.
 			$object = $this->init->get_object_by_wp_object( get_post( $object_id ), $object_id );

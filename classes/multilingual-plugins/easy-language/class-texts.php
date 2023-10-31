@@ -86,6 +86,12 @@ class Texts {
 		// if object is trashed.
 		add_action( 'wp_trash_post', array( $this, 'trash_object' ) );
 
+		// if object is untrashed, set its state to publish.
+		add_filter( 'wp_untrash_post_status', array( $this, 'untrash_object_post_status' ), 10, 2 );
+
+		// if object is untrashed.
+		add_filter( 'untrashed_post', array( $this, 'untrash_object' ), 10, 2 );
+
 		// delete simplifications if object is really deleted.
 		add_action( 'before_delete_post', array( $this, 'delete_object' ) );
 	}
@@ -116,7 +122,7 @@ class Texts {
 		if ( $original_post_id > 0 && ! empty( $target_language ) && $api_object ) {
 			// get post-object.
 			$post_obj = new Post_Object( $original_post_id );
-			$copy_post_obj = $post_obj->add_simplification_object( $target_language, $api_object );
+			$copy_post_obj = $post_obj->add_simplification_object( $target_language, $api_object, false );
 			if( $copy_post_obj ) {
 				// forward user to the edit-page of the newly created object.
 				wp_safe_redirect( $copy_post_obj->get_page_builder()->get_edit_link() );
@@ -141,8 +147,8 @@ class Texts {
 		// get the object.
 		$post_obj = new Post_Object( $post_id );
 
-		// if this is a translated object, clean it up.
-		if ( $post_obj->is_translated() ) {
+		// if this is a simplified object, clean it up.
+		if ( $post_obj->is_simplified() ) {
 			/**
 			 * Remove the object from the simplification-marker arrays.
 			 */
@@ -202,6 +208,7 @@ class Texts {
 	 * Run simplification of single text via link-request.
 	 *
 	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function get_simplification_of_entry(): void {
 		// check nonce.
@@ -219,16 +226,17 @@ class Texts {
 		$entry_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 
 		if ( $entry_id > 0 ) {
-			// get entry.
-			// get one text of a not locked object which should be simplified.
+			// get the requested text.
 			$query = array(
-				'id' => $entry_id
+				'id' => $entry_id,
+				'not_locked' => true,
 			);
 			$entries = DB::get_instance()->get_entries( $query, 1 );
 
 			// bail if we have no results.
 			if( empty($entries) ) {
-				return;
+				wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+				exit;
 			}
 
 			// get entry.
@@ -239,7 +247,8 @@ class Texts {
 
 			// bail if no objects could be found.
 			if ( empty( $post_objects ) ) {
-				return;
+				wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+				exit;
 			}
 
 			// get object of the first one.
@@ -247,7 +256,8 @@ class Texts {
 
 			// bail if none could be found.
 			if ( false === $object ) {
-				return;
+				wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+				exit;
 			}
 
 			// call translation for the text on the object.
@@ -316,8 +326,8 @@ class Texts {
 			}
 		}
 
-		// if this is a translated object, update the translatable contents and reset the changed-marker on its original.
-		if ( $post_obj->is_translated() ) {
+		// if this is a simplified object, update the simplified contents and reset the changed-marker on its original.
+		if ( $post_obj->is_simplified() ) {
 			// bail if a simplification of this object is actual running.
 			$running_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, array() );
 			if( !empty($running_simplifications[$post_obj->get_md5()]) && absint($running_simplifications[$post_obj->get_md5()]) > 0 ) {
@@ -341,19 +351,38 @@ class Texts {
 			$source_languages = $parent_post_obj->get_language();
 			$source_language  = array_key_first( $source_languages );
 
-			// get target language from object.
+			// get target language from simplified object.
 			$target_languages = $post_obj->get_language();
 			$target_language  = array_key_first( $target_languages );
+
+			// get the actual title from object.
+			$title = $pagebuilder_obj->get_title();
 
 			// get parsed texts from object.
 			$parsed_texts = $pagebuilder_obj->get_parsed_texts();
 
-			// delete in DB existing texts of this object which are not part of the actual content.
+			// delete in DB existing texts of its object is not part of the actual content.
 			// also check for their simplifications.
-			$entries = $this->db->get_entries( array( 'object_id' => $post_id, 'lang' => $source_language ) );
+			$query = array(
+				'object_id' => $post_id,
+				'lang' => $source_language
+			);
+			$entries = $this->db->get_entries( $query );
 			if( !empty($target_language) && !empty($entries) ) {
 				foreach ( $entries as $entry ) {
-					if ( false === in_array( trim( $entry->get_translation( $target_language ) ), $parsed_texts, true ) && false === in_array( $entry->get_original(), $parsed_texts, true ) ) {
+					// do nothing if this is a simplified text.
+					if( $entry->has_translation_in_language( $target_language ) ) {
+						continue;
+					}
+					if ( false === $entry->is_field( 'title') &&
+						false === in_array( trim( $entry->get_translation( $target_language ) ), $parsed_texts, true )
+						&& false === in_array( $entry->get_original(), $parsed_texts, true )
+					) {
+						$entry->delete();
+					}
+					elseif( false !== $entry->is_field( 'title')
+						&& $title !== trim( $entry->get_translation( $target_language ) )
+					) {
 						$entry->delete();
 					}
 				}
@@ -380,7 +409,6 @@ class Texts {
 			}
 
 			// check if the title has already saved as original text for simplification.
-			$title = $pagebuilder_obj->get_title();
 			$original_title_obj = $this->db->get_entry_by_text( $title, $source_language );
 			if ( false === $original_title_obj ) {
 				// also check if this is a simplified text of the given language.
@@ -392,9 +420,8 @@ class Texts {
 				}
 			}
 
-			// remove changed-marker on original object.
+			// remove changed-marker on original object for each language.
 			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
-			// get all simplifications for this object in all active languages.
 			foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
 				$original_post->remove_changed_marker( $language_code );
 			}
@@ -402,7 +429,7 @@ class Texts {
 	}
 
 	/**
-	 * If translated object is moved to trash, update the settings on its original object.
+	 * If simplified object is moved to trash, update the settings on its original object.
 	 *
 	 * @param int $post_id The post-ID.
 	 *
@@ -412,9 +439,8 @@ class Texts {
 		// get the object.
 		$post_obj = new Post_Object( $post_id );
 
-		// if this is a translated object, reset the changed-marker on its original
-		// and cleanup db.
-		if ( $post_obj->is_translated() ) {
+		// if this is a simplified object, reset the changed-marker on its original and cleanup db.
+		if ( $post_obj->is_simplified() ) {
 			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
 			$languages     = $post_obj->get_language();
 			$language_code = array_key_first( $languages );
@@ -429,7 +455,50 @@ class Texts {
 	}
 
 	/**
-	 * Return all texts.
+	 * If simplified object is removed from trash, set its state to "publish" and update its parent.
+	 *
+	 * @param string $new_state The new state (we override it here).
+	 * @param int $post_id The post-ID.
+	 *
+	 * @return string
+	 */
+	public function untrash_object_post_status( string $new_state, int $post_id ): string {
+		// get the object.
+		$post_obj = new Post_Object( $post_id );
+
+		// if this is a simplified object, return "publish" as new state.
+		if ( $post_obj->is_simplified() ) {
+			return 'publish';
+		}
+
+		return $new_state;
+	}
+
+	/**
+	 * If simplified object is removed from trash, update the settings on its original object.
+	 *
+	 * @param int $post_id The post-ID.
+	 *
+	 * @return void
+	 */
+	public function untrash_object( int $post_id ): void {
+		// get the object.
+		$post_obj = new Post_Object( $post_id );
+
+		// if this is a simplified object, reset the changed-marker on its original and cleanup db.
+		if ( $post_obj->is_simplified() ) {
+			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
+			$languages     = $post_obj->get_language();
+			$language_code = array_key_first( $languages );
+			if ( ! empty( $language_code ) ) {
+				// add language from list of translated languages on original post.
+				$original_post->add_translated_language( $language_code );
+			}
+		}
+	}
+
+	/**
+	 * Return all texts in DB without any filter.
 	 *
 	 * @return array
 	 */

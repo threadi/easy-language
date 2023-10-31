@@ -8,6 +8,36 @@ jQuery( document ).ready(
 				easy_language_simplification_init($(this).data('id'), $(this).data('link'));
 			}
 		);
+
+		// start to simplify a single text via AJAX.
+		$('.easy-language-simplify-text').on(
+			'click',
+			function (e) {
+				e.preventDefault();
+				// create dialog.
+				let dialog_config = {
+					detail: {
+						title: 'Simplify this text?',
+						texts: [
+							'<p>Simplifying texts via API could cause costs.<br><strong>Are you sure your want to simplify this single text?</strong></p>'
+						],
+						buttons: [
+							{
+								'action': 'location.href="' + $(this).attr('href') + '";',
+								'variant': 'primary',
+								'text': easyLanguageSimplificationJsVars.label_yes
+							},
+							{
+								'action': 'closeDialog();',
+								'variant': 'secondary',
+								'text': easyLanguageSimplificationJsVars.label_no
+							}
+						]
+					}
+				}
+				easy_language_create_dialog( dialog_config );
+			}
+		);
 	}
 );
 
@@ -27,6 +57,7 @@ function easy_language_add_simplification_object( object_id, language, simplific
 				'action': 'easy_language_add_simplification_object',
 				'post': object_id,
 				'language': language,
+				'prevent_automatic_simplification': "manually" === simplification_mode,
 				'nonce': easyLanguageSimplificationJsVars.add_simplification_nonce
 			},
 			success: function(data) {
@@ -50,30 +81,11 @@ function easy_language_add_simplification_object( object_id, language, simplific
 								{
 									'action': 'location.href="' + data.edit_link + '";',
 									'variant': 'secondary',
-									'text': 'Edit'
+									'text': 'Edit %1$s'.replace('%1$s', data.object_type_name)
 								},
 								{
 									'action': 'location.reload();',
 									'text': 'Cancel'
-								}
-							]
-						}
-					}
-					easy_language_create_dialog( dialog_config );
-				}
-				else if( 'ok' === data.status && "background" === simplification_mode ) {
-					// create dialog.
-					let dialog_config = {
-						detail: {
-							title: '%1$s will be simplified'.replace('%1$s', data.title ),
-							texts: [
-								'<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts will be simplified in background.</p>'.replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language)
-							],
-							buttons: [
-								{
-									'action': 'location.reload();',
-									'variant': 'primary',
-									'text': 'OK'
 								}
 							]
 						}
@@ -95,25 +107,25 @@ function easy_language_add_simplification_object( object_id, language, simplific
 function easy_language_simplification_init( id, link, frontend_edit ) {
 	let dialog_config = {
 		detail: {
-			hide_title: true,
+			title: easyLanguageSimplificationJsVars.title_simplify_texts,
 			texts: [
-				'<p><strong>' + easyLanguageSimplificationJsVars.translate_confirmation_question + '</strong></p>'
+				'<p>' + easyLanguageSimplificationJsVars.translate_confirmation_question + '</p>'
 			],
 			buttons: [
 				{
 					'action': 'easy_language_get_simplification( ' + id + ', "' + link + '", ' + frontend_edit + ');',
 					'variant': 'primary',
-					'text': 'Yes'
+					'text': easyLanguageSimplificationJsVars.label_yes
 				},
 				{
 					'action': 'closeDialog();',
 					'variant': 'secondary',
-					'text': 'No'
+					'text': easyLanguageSimplificationJsVars.label_no
 				}
 			]
 		}
 	}
-	document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
+	easy_language_create_dialog( dialog_config );
 }
 
 /**
@@ -135,7 +147,7 @@ function easy_language_get_simplification( object_id, link, frontend_edit ) {
 			},
 		}
 	}
-	document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
+	easy_language_create_dialog( dialog_config );
 
 	// start simplification.
 	easy_language_get_simplification_info( object_id, true );
@@ -176,7 +188,7 @@ function easy_language_get_simplification_info( obj_id, initialization ) {
 							]
 						}
 					}
-					document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
+					easy_language_create_dialog( dialog_config );
 				}
 			},
 			success: function (data) {
@@ -185,6 +197,7 @@ function easy_language_get_simplification_info( obj_id, initialization ) {
 				let running  = parseInt( data[2] );
 				let result   = data[3];
 				let link = data[4];
+				let edit_link = data[5];
 
 				// update progressbar.
 				jQuery("#progress" + obj_id).attr('value', (count / max) * 100);
@@ -208,7 +221,12 @@ function easy_language_get_simplification_info( obj_id, initialization ) {
 								{
 									'action': 'location.href="' + link + '";',
 									'variant': 'primary',
-									'text': 'Show site'
+									'text': 'Show in frontend'
+								},
+								{
+									'action': 'location.href="' + edit_link + '";',
+									'variant': 'primary',
+									'text': 'Edit'
 								},
 								{
 									'action': 'closeDialog();',
@@ -218,81 +236,7 @@ function easy_language_get_simplification_info( obj_id, initialization ) {
 							]
 						}
 					}
-					document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
-
-					// set events on buttons in texts.
-					/*stepDescription.find('a.button').each(function() {
-						if( jQuery(this).data('run-again') ) {
-							jQuery(this).on('click', function (e) {
-								e.preventDefault();
-
-								// first reset the processing texts to state "to_simplify".
-								jQuery.ajax(
-									{
-										type: "POST",
-										url: easyLanguageSimplificationJsVars.ajax_url,
-										data: {
-											'action': 'easy_language_reset_processing_simplification',
-											'post': obj_id,
-											'nonce': easyLanguageSimplificationJsVars.reset_processing_simplification_nonce
-										},
-										error: function (e) {
-											// hide progressbar.
-											progressbar.addClass("hidden");
-
-											// update dialog-title.
-											jQuery('#easylanguage-simplification-dialog').dialog({title: easyLanguageSimplificationJsVars.label_simplification_error});
-
-											// show error.
-											stepDescription.html(easyLanguageSimplificationJsVars.txt_simplification_error.replace('[error]', e.statusText));
-
-											// get buttons.
-											jQuery('.easylanguage-simplification-dialog-no-close .ui-button').prop('disabled', false);
-										},
-										success: function (data) {
-											// then run normal simplification again.
-											easy_language_get_simplification_info( obj_id, progressbar, stepDescription, true, frontend_edit );
-										}
-									}
-								);
-							});
-						}
-						if( jQuery(this).data('ignore-texts') ) {
-							jQuery(this).on('click', function (e) {
-								e.preventDefault();
-
-								// first set the processing texts to state "ignore".
-								jQuery.ajax(
-									{
-										type: "POST",
-										url: easyLanguageSimplificationJsVars.ajax_url,
-										data: {
-											'action': 'easy_language_ignore_processing_simplification',
-											'post': obj_id,
-											'nonce': easyLanguageSimplificationJsVars.ignore_processing_simplification_nonce
-										},
-										error: function (e) {
-											// hide progressbar.
-											progressbar.addClass("hidden");
-
-											// update dialog-title.
-											jQuery('#easylanguage-simplification-dialog').dialog({title: easyLanguageSimplificationJsVars.label_simplification_error});
-
-											// show error.
-											stepDescription.html(easyLanguageSimplificationJsVars.txt_simplification_error.replace('[error]', e.statusText));
-
-											// get buttons.
-											jQuery('.easylanguage-simplification-dialog-no-close .ui-button').prop('disabled', false);
-										},
-										success: function (data) {
-											// then run normal simplification again.
-											easy_language_get_simplification_info( obj_id, progressbar, stepDescription, true, frontend_edit );
-										}
-									}
-								);
-							});
-						}
-					});*/
+					easy_language_create_dialog( dialog_config );
 				}
 			}
 		}

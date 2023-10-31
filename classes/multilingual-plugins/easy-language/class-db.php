@@ -205,7 +205,7 @@ class Db {
 	 * @param array $filter Optional filter.
 	 * @param int $limit Limit the list.
 	 *
-	 * @return array
+	 * @return array Array of Text-objects
 	 */
 	public function get_entries( array $filter = array(), int $limit = 0 ): array {
 		global $wpdb;
@@ -272,6 +272,18 @@ class Db {
 				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
 				$sql_select                                        .= ', oo.object_id, oo.object_type';
 			}
+			if( ! empty( $filter['not_prevented']) ) {
+				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
+				$sql_select                                        .= ', oo.object_id, oo.object_type';
+			}
+			if( ! empty( $filter['object_state']) ) {
+				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
+				$sql_select                                        .= ', oo.object_id, oo.object_type';
+			}
+			if( ! empty( $filter['object_not_state']) ) {
+				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
+				$sql_select                                        .= ', oo.object_id, oo.object_type';
+			}
 		}
 
 		// limit the list of entries.
@@ -292,14 +304,29 @@ class Db {
 		// prepare SQL-statement.
 		$prepared_sql = $wpdb->prepare( $sql, $vars );
 
+		// get init instance.
+		$init = Init::get_instance();
+
 		// get entries.
 		$results = $wpdb->get_results( $prepared_sql, ARRAY_A );
 		foreach ( $results as $result ) {
 			// only add post-type-objects if not_locked is set and if they are not locked.
 			$add = true;
 			if( !empty( $filter['not_locked'] ) ) {
-				$object = Init::get_instance()->get_object_by_string( $result['object_type'], $result['object_id'] );
+				$object = $init->get_object_by_string( $result['object_type'], $result['object_id'] );
 				$add = !$object->is_locked();
+			}
+			if( !empty( $filter['not_prevented'] ) && false !== $add ) {
+				$object = $init->get_object_by_string( $result['object_type'], $result['object_id'] );
+				$add = !$object->is_automatic_mode_prevented();
+			}
+			if( !empty( $filter['object_state'] ) && false !== $add ) {
+				$object = $init->get_object_by_string( $result['object_type'], $result['object_id'] );
+				$add = $object->has_state($filter['object_state']);
+			}
+			if( !empty( $filter['object_not_state'] ) && false !== $add ) {
+				$object = $init->get_object_by_string( $result['object_type'], $result['object_id'] );
+				$add = !$object->has_state($filter['object_not_state']);
 			}
 
 			// add entry to list.

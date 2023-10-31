@@ -60,6 +60,8 @@ function easy_language_add_styles_and_js_admin(): void {
 			'label_icon_chooser'          => __( 'Choose new icon', 'easy-language' ),
 			'button_icon_chooser'         => __( 'Use this icon', 'easy-language' ),
 			'txt_icon_changed'            => __( 'Icon successfully replaced.', 'easy-language' ),
+			'label_yes' => __( 'Yes', 'easy-language' ),
+			'label_no' => __( 'No', 'easy-language' ),
 		)
 	);
 

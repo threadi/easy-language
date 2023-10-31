@@ -300,3 +300,7 @@ body.easy-language-dialog-on-body.wp-core-ui .components-modal__frame.easy-langu
 body.easy-language-dialog-on-body.wp-core-ui .hide-header .easy-language-dialog-text {
 	padding-right: 64px;
 }
+
+body.easy-language-dialog-on-body.wp-core-ui .components-modal__header .components-modal__header-heading {
+	padding-right: 64px;
+}

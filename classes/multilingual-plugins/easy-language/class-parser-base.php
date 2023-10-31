@@ -121,7 +121,7 @@ class Parser_Base {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		if ( $post_object->is_translatable() || $post_object->is_translated() ) {
+		if ( $post_object->is_translatable() || $post_object->is_simplified() ) {
 			return true;
 		}
 		return false;

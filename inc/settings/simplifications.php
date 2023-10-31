@@ -5,6 +5,7 @@
  * @package easy-language
  */
 
+use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Multilingual_plugins\Easy_Language\Texts_In_Use_Table;
 use easyLanguage\Multilingual_plugins\Easy_Language\Texts_To_Simplify_Table;
@@ -77,11 +78,22 @@ add_action( 'easy_language_settings_simplifications__page', 'easy_language_setti
  * @return void
  */
 function easy_language_settings_simplifications_to_simplify(): void {
+	// get API-object.
+	$api_obj = Apis::get_instance()->get_active_api();
+
+	// show hint if not API is active.
+	if( false === $api_obj ) {
+		?><h2><?php echo esc_html__( 'Texts to simplify', 'easy-language' ); ?></h2><?php
+		?><p><?php echo esc_html__( 'No API active which could simplify texts.', 'easy-language' ); ?></p><?php
+		return;
+	}
+
+	// get table object to show text to simplify.
 	$translations = new Texts_To_Simplify_Table();
 	$translations->prepare_items();
 	?>
 	<h2><?php echo esc_html__( 'Texts to simplify', 'easy-language' ); ?></h2>
-	<p><?php echo esc_html__( 'This table contains texts which will be simplified. They are processed by a background-process.', 'easy-language' ); ?></p>
+	<p><?php echo esc_html(sprintf(__( 'This table contains texts which will be simplified via %1$s. They are processed by a background-process.', 'easy-language' ), esc_html($api_obj->get_title()) ) ); ?></p>
 	<?php $translations->display();
 }
 add_action( 'easy_language_settings_simplifications_to_simplify_page', 'easy_language_settings_simplifications_to_simplify' );

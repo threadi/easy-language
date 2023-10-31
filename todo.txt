@@ -31,3 +31,12 @@ Später:
 -> Hintergrundprozess nimmt dann nur x Texte pro Durchlauf (max. 5) um keine servereigenen Timeouts zu erreichen
 * Vereinfachung per REST API statt AJAX-Request durchführen
 * sprachspezifische Suche im Frontend
+
+Automatismus:
+* vereinfacht alle Texte von Objekten, bei denen der Nutzer nicht verhindert hat, dass automatismus greifen soll
+
+Initialisierung von Vereinfachung:
+* Nutzer fragen, ob er sofort vereinfachen möchte oder nur die seite anlegen möchte
+* bei sofortiger vereinfachung nutzer informieren, wenn grenzwerte der verwendeten api erreicht wurden
+=> in dem fall auf den automatismus hinweisen der im hintergrund läuft
+* wenn man seite nur anlegt verhindern, dass seite von automatismus geändert wird

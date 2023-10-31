@@ -334,7 +334,7 @@ class Text {
 		$object_count = count($this->get_objects());
 
 		// delete connection between text and given object_id.
-		if ( $object_count > 0 ) {
+		if ( $object_id > 0 ) {
 			$wpdb->delete(
 				$wpdb->easy_language_originals_objects,
 				array(
@@ -353,7 +353,7 @@ class Text {
 			);
 		}
 
-		// if this text is used only from 1 object, delete it completely with its simplifications.
+		// if this text is used only from 1 object, delete it completely including its simplifications.
 		if ( 1 === absint(get_option( 'easy_language_delete_unused_simplifications', 0 ) ) && 1 === $object_count ) {
 			$wpdb->delete( $wpdb->easy_language_originals, array( 'id' => $this->get_id() ) );
 			$wpdb->delete( $wpdb->easy_language_simplifications, array( 'oid' => $this->get_id() ) );
@@ -423,5 +423,22 @@ class Text {
 
 		// return the time.
 		return $result[0]['time'];
+	}
+
+	/**
+	 * Return whether this text is used for given field.
+	 *
+	 * @param string $field
+	 * @return bool
+	 */
+	public function is_field( string $field ): bool {
+		foreach( $this->get_objects() as $object_array ) {
+			if( $field === $object_array['field'] ) {
+				return true;
+			}
+		}
+
+		// return false in other cases.
+		return false;
 	}
 }

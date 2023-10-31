@@ -54,7 +54,7 @@ jQuery(document).ready(function($) {
 								]
 							}
 						}
-						document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
+						easy_language_create_dialog( dialog_config );
 					}
 				}
 			}
@@ -68,22 +68,25 @@ jQuery(document).ready(function($) {
 		// create dialog.
 		let dialog_config = {
 			detail: {
-				title: easyLanguageJsVars.txt_delete_question,
+				hide_title: true,
+				texts: [
+					'<p><strong>' + easyLanguageJsVars.txt_delete_question + '</strong></p>',
+				],
 				buttons: [
 					{
 						'action': 'easy_language_start_data_deletion();',
 						'variant': 'primary',
-						'text': 'Yes',
+						'text': easyLanguageJsVars.label_yes,
 					},
 					{
 						'action': 'closeDialog();',
 						'variant': 'primary',
-						'text': 'No',
+						'text': easyLanguageJsVars.label_no,
 					}
 				]
 			}
 		}
-		document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
+		easy_language_create_dialog( dialog_config );
 	});
 
 	// prevent leaving of posts-form if it has changes.
@@ -146,7 +149,7 @@ function easy_language_start_data_deletion() {
 			}
 		}
 	}
-	document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
+	easy_language_create_dialog( dialog_config );
 
 	// start deletion.
 	jQuery.ajax(
@@ -210,7 +213,7 @@ function easy_language_get_data_deletion_info() {
 							]
 						}
 					}
-					document.body.dispatchEvent(new CustomEvent("easy-language-dialog", dialog_config));
+					easy_language_create_dialog( dialog_config );
 				}
 			}
 		}

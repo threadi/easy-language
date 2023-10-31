@@ -76,6 +76,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	private function table_data(): array {
 		$query = array(
 			'state' => 'to_simplify',
+			'object_not_state' => 'trash'
 		);
 		return DB::get_instance()->get_entries( $query );
 	}
@@ -127,15 +128,19 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 		// show content depending on column.
 		switch ( $column_name ) {
 			case 'options':
+				$link = '';
+				foreach( $item->get_objects() as $object_array ) {
+					$link = get_permalink( $object_array['object_id'] );
+				}
 				$do_simplification = add_query_arg(
 					array(
 						'action' => 'easy_language_get_simplification_of_entry',
-						'id'     => $item->get_id(),
-						'nonce'  => wp_create_nonce( 'easy-language-get-simplification-of-entry' ),
+						'id' => $item->get_id(),
+						'nonce' => wp_create_nonce('easy-language-get-simplification-of-entry'),
 					),
 					get_admin_url() . 'admin.php'
 				);
-				return '<a href="' . esc_url( $do_simplification ) . '" class="dashicons dashicons-translation">&nbsp;</a>';;
+				return '<a href="' . esc_url($do_simplification) . '" class="dashicons dashicons-translation easy-language-simplify-text" data-id="'.absint($item->get_id()).'">&nbsp;</a>';
 
 			// get date of this entry.
 			case 'date':
@@ -154,8 +159,8 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 			case 'target_language':
 				$item_languages = array();
 				$languages = $languages_obj->get_possible_target_languages();
-				foreach( $item->get_objects() as $object ) {
-					$post_object = new Post_Object( $object['object_id'] );
+				foreach( $item->get_objects() as $object_array ) {
+					$post_object = new Post_Object( $object_array['object_id'] );
 					$language = array_key_first($post_object->get_language());
 					if ( ! empty( $languages[ $language ] ) ) {
 						$item_languages[$language] = $languages[ $language ]['label'];

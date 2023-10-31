@@ -9,7 +9,7 @@ jQuery( document ).ready(
 				// create dialog.
 				let dialog_config = {
 					detail: {
-						hide_title: true,
+						title: easyLanguagePluginJsVars.title_delete_confirmation.replace('%1$s', $(this).data('object-type-name')),
 						texts: [
 							'<p><strong>' + easyLanguagePluginJsVars.delete_confirmation_question.replace('%1$s', $(this).data('object-type-name')).replace('%2$s', $(this).data('title')) + '</strong></p>'
 						],
@@ -17,12 +17,12 @@ jQuery( document ).ready(
 							{
 								'action': 'location.href="' + $(this).attr('href') + '";',
 								'variant': 'primary',
-								'text': 'Yes'
+								'text': easyLanguagePluginJsVars.label_yes
 							},
 							{
 								'action': 'closeDialog();',
 								'variant': 'secondary',
-								'text': 'No'
+								'text': easyLanguagePluginJsVars.label_no
 							}
 						]
 					}
@@ -54,24 +54,26 @@ jQuery( document ).ready(
 		).pointer( 'open' );
 
 		// show warning if the page builder, used for an object, is not available.
-		$( 'a.easy-language-missing-pagebuilder-warning' ).on( 'click', function() {
+		$( 'a.easy-language-missing-pagebuilder-warning' ).off('click').on( 'click', function(e) {
+			e.preventDefault();
+
 			// create dialog.
 			let dialog_config = {
 				detail: {
-					hide_title: true,
+					title: easyLanguagePluginJsVars.title_unknown_pagebuilder,
 					texts: [
-						'<p><strong>' + easyLanguagePluginJsVars.txt_pagebuilder_unknown_warnung + '</strong></p>'
+						'<p>' + easyLanguagePluginJsVars.txt_pagebuilder_unknown_warnung.replace('%1$s', $(this).data('object-type-name')).replace('%2$s', $(this).data('title')).replace('%3$s', $(this).data('object-type-name')) + '</p>'
 					],
 					buttons: [
 						{
-							'action': 'location.href="' + $(this).attr('href') + '";',
+							'action': 'easy_language_create_dialog({ "detail": ' + JSON.stringify($(this).data('dialog')) + ' });',
 							'variant': 'primary',
-							'text': 'Yes'
+							'text': easyLanguagePluginJsVars.label_yes
 						},
 						{
 							'action': 'closeDialog();',
 							'variant': 'secondary',
-							'text': 'No'
+							'text': easyLanguagePluginJsVars.label_no
 						}
 					]
 				}
