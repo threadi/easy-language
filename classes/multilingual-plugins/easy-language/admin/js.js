@@ -1,6 +1,10 @@
 jQuery( document ).ready(
 	function ($) {
-		// confirm deletion of translated object.
+
+		// get internationalization tools of WordPress.
+		let { __ } = wp.i18n;
+
+		// confirm deletion of simplified object.
 		$( '.easy-language-trash' ).on(
 			'click',
 			function (e) {
@@ -9,20 +13,22 @@ jQuery( document ).ready(
 				// create dialog.
 				let dialog_config = {
 					detail: {
-						title: easyLanguagePluginJsVars.title_delete_confirmation.replace('%1$s', $(this).data('object-type-name')),
+						/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
+						title: __( 'Delete simplified %1$s', 'easy-language' ).replace('%1$s', $(this).data('object-type-name')),
 						texts: [
-							'<p><strong>' + easyLanguagePluginJsVars.delete_confirmation_question.replace('%1$s', $(this).data('object-type-name')).replace('%2$s', $(this).data('title')) + '</strong></p>'
+							/* translators: %1$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title */
+							'<p><strong>' + __( 'Do you really want to delete the simplified %1$s <i>%2$s</i>?', 'easy-language' ).replace('%1$s', $(this).data('object-type-name')).replace('%2$s', $(this).data('title')) + '</strong></p>'
 						],
 						buttons: [
 							{
 								'action': 'location.href="' + $(this).attr('href') + '";',
 								'variant': 'primary',
-								'text': easyLanguagePluginJsVars.label_yes
+								'text': __( 'Yes', 'easy-language' )
 							},
 							{
 								'action': 'closeDialog();',
 								'variant': 'secondary',
-								'text': easyLanguagePluginJsVars.label_no
+								'text': __( 'No', 'easy-language' )
 							}
 						]
 					}
@@ -41,7 +47,7 @@ jQuery( document ).ready(
 				},
 				pointerClass: 'easy-language-pointer',
 				close: function () {
-					// save via ajax the dismission of this hint.
+					// save via ajax the hiding of this hint.
 					let data = {
 						'action': 'easy_language_dismiss_intro_step_2',
 						'nonce': easyLanguagePluginJsVars.dismiss_intro_nonce
@@ -60,20 +66,21 @@ jQuery( document ).ready(
 			// create dialog.
 			let dialog_config = {
 				detail: {
-					title: easyLanguagePluginJsVars.title_unknown_pagebuilder,
+					title: __( 'Unknown pagebuilder', 'easy-language' ),
 					texts: [
-						'<p>' + easyLanguagePluginJsVars.txt_pagebuilder_unknown_warnung.replace('%1$s', $(this).data('object-type-name')).replace('%2$s', $(this).data('title')).replace('%3$s', $(this).data('object-type-name')) + '</p>'
+						/* translators: %1$s and %3$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title */
+						'<p>' + __( 'The %1$s <i>%2$s</i> has been created with an unknown pagebuilder or the classic editor.<br><strong>Are you sure you want to create simplified text for this %3$s?</strong>', 'easy-language' ).replace('%1$s', $(this).data('object-type-name')).replace('%2$s', $(this).data('title')).replace('%3$s', $(this).data('object-type-name')) + '</p>'
 					],
 					buttons: [
 						{
 							'action': 'easy_language_create_dialog({ "detail": ' + JSON.stringify($(this).data('dialog')) + ' });',
 							'variant': 'primary',
-							'text': easyLanguagePluginJsVars.label_yes
+							'text': __( 'Yes', 'easy-language' )
 						},
 						{
 							'action': 'closeDialog();',
 							'variant': 'secondary',
-							'text': easyLanguagePluginJsVars.label_no
+							'text': __( 'No', 'easy-language' )
 						}
 					]
 				}

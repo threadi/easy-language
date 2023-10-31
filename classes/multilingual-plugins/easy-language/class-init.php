@@ -358,19 +358,23 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						// TODO nur zur Auswahl stellen wenn API auch extern läuft (z.B. nicht bei no-api)
 						// TODO checkbox ergänzen über die die Entscheidung am Nutzerprofil gemerkt wird
 						$dialog = array(
+							/* translators: %1$s will be replaced by the object-title */
 							'title' => sprintf(__( 'Add simplification for %1$s', 'easy-language' ), esc_html($post_object->get_title())),
 							'texts' => array(
+								/* translators: %1$s will be replaced by the object-type-name (e.g. post or page), %2$s will be replaced by the API-title */
 								'<p>'.sprintf(__( 'Please decide how you want to proceed to simplify this %1$s.<br>Note that the use of the API %2$s may incur costs.', 'easy-language' ), esc_html($object_type_name), esc_html($api_obj->get_title()) ).'</p>'
 							),
 							'buttons' => array(
 								array(
 									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", "auto" );',
 									'variant' => 'primary',
+									/* translators: %1$s will be replaced by the API-title */
 									'text' => sprintf(__( 'Simplify now via %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ))
 								),
 								array(
 									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", "manually" );',
 									'variant' => 'secondary',
+									/* translators: %1$s will be replaced by the object-type-name (e.g. post or page) */
 									'text' => sprintf( __( 'Just add %1$s', 'easy-language' ), esc_html($object_type_name) )
 								),
 								array(
@@ -1427,7 +1431,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		wp_enqueue_script(
 			'easy-language-simplifications',
 			plugins_url( '/classes/multilingual-plugins/easy-language/admin/simplifications.js', EASY_LANGUAGE ),
-			array( 'jquery' ),
+			array( 'jquery', 'easy-language-dialog', 'wp-i18n' ),
 			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/simplifications.js' ),
 			true
 		);
@@ -1438,26 +1442,16 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easyLanguageSimplificationJsVars',
 			array(
 				'ajax_url'                        => admin_url( 'admin-ajax.php' ),
-				'label_simplification_is_running' => __( 'Simplification in progress', 'easy-language' ),
-				'label_simplification_done'       => __( 'Simplification completed', 'easy-language' ),
-				'label_open_link'                 => __( 'Open frontend', 'easy-language' ),
-				'label_ok'                        => __( 'OK', 'easy-language' ),
-				'txt_please_wait'                 => __( 'Please wait', 'easy-language' ),
 				'add_simplification_nonce'		  => wp_create_nonce( 'easy-language-add-simplification-nonce' ),
 				'run_simplification_nonce'        => wp_create_nonce( 'easy-language-run-simplification-nonce' ),
 				'set_simplification_prevention_nonce' => wp_create_nonce( 'easy-language-set-simplification-prevention-nonce' ),
-				'txt_simplification_has_been_run' => __( 'Simplification has been run.', 'easy-language' ),
-				'translate_confirmation_question' => __( '<strong>Are you sure you want to simplify these texts via API?</strong><br>Hint: this could cause costs with the API.', 'easy-language' ),
-				'label_simplification_error' => __( 'Error', 'easy-language' ),
-				/* translators: [error] will be replaced by the http-error-message (e.g. "Gateway timed our") */
-				'txt_simplification_error' => sprintf( __( '<p><strong>The following error occurred during: [error]</strong> - at least one simplification could not be processed.<br><br><strong>Possible causes:</strong></p><ul><li>The server settings for WordPress hosting prevent longer lasting requests. Contact your hosters support for a solution.</li><li>The API used took too long to simplify the text. Shorten particularly long texts or contact API support for further assistance.</li><li>Use <a href="%1$s" target="_blank">Easy Language Pro</a> for automatic translations in the background without the risk of hitting timeouts on your own hosting.</li></ul>', 'easy-language' ), esc_url( Helper::get_pro_url() ) ),
 				'ignore_processing_simplification_nonce' => wp_create_nonce( 'easy-language-ignore-processing-simplification-nonce' ),
 				'reset_processing_simplification_nonce' => wp_create_nonce( 'easy-language-reset-processing-simplification-nonce' ),
-				'label_yes' => __( 'Yes', 'easy-language' ),
-				'label_no' => __( 'No', 'easy-language' ),
-				'title_simplify_texts' => __( 'Simplify texts', 'easy-language' )
 			)
 		);
+
+		// enable internationalization of our script.
+		wp_set_script_translations('easy-language-simplifications', 'easy-language', trailingslashit(plugin_dir_path(EASY_LANGUAGE)) . 'languages/');
 
 		// add jquery-dirty script.
 		wp_enqueue_script(
@@ -1483,7 +1477,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		wp_enqueue_script(
 			'easy-language-plugin-admin',
 			plugins_url( '/classes/multilingual-plugins/easy-language/admin/js.js', EASY_LANGUAGE ),
-			array( 'jquery', 'easy-language-dialog' ),
+			array( 'jquery', 'easy-language-dialog', 'wp-i18n' ),
 			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/js.js' ),
 			true
 		);
@@ -1494,18 +1488,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easyLanguagePluginJsVars',
 			array(
 				'ajax_url'                        => admin_url( 'admin-ajax.php' ),
-				'simplification_confirmation_question'    => __( 'Do you want to simplify this object?', 'easy-language' ),
-				'title_delete_confirmation' => __( 'Delete simplified %1$s', 'easy-language' ),
-				'delete_confirmation_question'    => __( 'Do you really want to delete the simplified %1$s <i>%2$s</i>?', 'easy-language' ),
 				'dismiss_intro_nonce'             => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),
 				/* translators: %1$s will be replaced by the path to the easy language icon */
 				'intro_step_2'                    => sprintf( __( '<p><img src="%1$s" alt="Easy Language Logo"><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
-				'txt_pagebuilder_unknown_warnung' => __( 'The %1$s <i>%2$s</i>has been created with an unknown pagebuilder or the classic editor.<br><strong>Are you sure you want to create simplified text for this %3$s?</strong>', 'easy-language' ),
-				'label_yes' => __( 'Yes', 'easy-language' ),
-				'label_no' => __( 'No', 'easy-language' ),
-				'title_unknown_pagebuilder' => __( 'Unknown pagebuilder', 'easy-language' )
 			)
 		);
+
+		// enable internationalization of our script.
+		wp_set_script_translations('easy-language-plugin-admin', 'easy-language', trailingslashit(plugin_dir_path(EASY_LANGUAGE)) . 'languages/');
 
 		// embed the dialog-component.
 		$script_asset_path = Helper::get_plugin_path()."classes/multilingual-plugins/easy-language/blocks/dialog/build/index.asset.php";
@@ -1943,6 +1933,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// generate text depending on items to process.
 		$admin_bar_text =  __( 'Simplifications:', 'easy-language' ).' <progress value="'.absint($processed).'" max="100"></progress>';
+		/* translators: %1$d and %2$d will be replaced by digits, %3$s will be replaced by the API-title */
 		$admin_bar_title = sprintf( __( '%1$d of %2$d texts simplified via %3$s', 'easy-language' ), absint($all_entries_count - $entries_to_simplify_count), absint($all_entries_count), esc_html($api_obj->get_title()) );
 		if( 0 === $entries_to_simplify_count ) {
 			$admin_bar_text = __( 'No open simplifications', 'easy-language' );

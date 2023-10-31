@@ -93,7 +93,12 @@ function easy_language_settings_simplifications_to_simplify(): void {
 	$translations->prepare_items();
 	?>
 	<h2><?php echo esc_html__( 'Texts to simplify', 'easy-language' ); ?></h2>
-	<p><?php echo esc_html(sprintf(__( 'This table contains texts which will be simplified via %1$s. They are processed by a background-process.', 'easy-language' ), esc_html($api_obj->get_title()) ) ); ?></p>
+	<p>
+		<?php
+			/* translators: %1$s will be replaced by the API-title */
+			echo esc_html(sprintf(__( 'This table contains texts which will be simplified via %1$s. They are processed by a background-process.', 'easy-language' ), esc_html($api_obj->get_title()) ) );
+		?>
+	</p>
 	<?php $translations->display();
 }
 add_action( 'easy_language_settings_simplifications_to_simplify_page', 'easy_language_settings_simplifications_to_simplify' );

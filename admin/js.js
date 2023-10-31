@@ -1,4 +1,7 @@
 jQuery(document).ready(function($) {
+	// get internationalization tools of WordPress.
+	let { __ } = wp.i18n;
+
     // save to hide transient-messages via ajax-request.
     $('div[data-dismissible] button.notice-dismiss').on('click',
         function (event) {
@@ -41,15 +44,15 @@ jQuery(document).ready(function($) {
 						// create dialog.
 						let dialog_config = {
 							detail: {
-								title: easyLanguageJsVars.label_reset_intro,
+								title: __( 'Intro reset', 'easy-language' ),
 								texts: [
-									'<p>' + easyLanguageJsVars.txt_intro_reset + '</p>'
+									'<p>' + __( '<p><strong>Intro has been reset.</strong> You can now start again to configure the plugin.<br><strong>Hint:</strong> No configuration and data has been changed.</p>', 'easy-language' ) + '</p>'
 								],
 								buttons: [
 									{
 										'action': 'location.href = "' + easyLanguageJsVars.admin_start + '";',
 										'variant': 'primary',
-										'text': easyLanguageJsVars.label_ok
+										'text': __( 'OK', 'easy-language' )
 									}
 								]
 							}
@@ -70,18 +73,18 @@ jQuery(document).ready(function($) {
 			detail: {
 				hide_title: true,
 				texts: [
-					'<p><strong>' + easyLanguageJsVars.txt_delete_question + '</strong></p>',
+					'<p><strong>' + __( 'Do you really want to delete all simplifications?', 'easy-language' ) + '</strong></p>',
 				],
 				buttons: [
 					{
 						'action': 'easy_language_start_data_deletion();',
 						'variant': 'primary',
-						'text': easyLanguageJsVars.label_yes,
+						'text': __( 'Yes', 'easy-language' )
 					},
 					{
 						'action': 'closeDialog();',
 						'variant': 'primary',
-						'text': easyLanguageJsVars.label_no,
+						'text': __( 'No', 'easy-language' )
 					}
 				]
 			}
@@ -99,12 +102,12 @@ jQuery(document).ready(function($) {
 		e.preventDefault();
 		let obj = $(this);
 		let custom_uploader = wp.media({
-			title: easyLanguageJsVars.label_icon_chooser,
+			title: __( 'Choose new icon', 'easy-language' ),
 			library : {
 				type : 'image'
 			},
 			button: {
-				text: easyLanguageJsVars.button_icon_chooser
+				text: __( 'Use this icon', 'easy-language' )
 			},
 			multiple: false
 		}).on('select', function() { // it also has "open" and "close" events
@@ -128,7 +131,7 @@ jQuery(document).ready(function($) {
 						obj.parent().find('img').attr( 'src', attachment.url );
 
 						// show success message.
-						alert(easyLanguageJsVars.txt_icon_changed);
+						alert(__( 'Icon successfully replaced.', 'easy-language' ));
 					}
 				}
 			);
@@ -141,7 +144,7 @@ function easy_language_start_data_deletion() {
 	// create dialog.
 	let dialog_config = {
 		detail: {
-			title: easyLanguageJsVars.label_delete_data,
+			title: __( 'Deletion of simplified texts', 'easy-language' ),
 			progressbar: {
 				active: true,
 				progress: 0,
@@ -200,9 +203,9 @@ function easy_language_get_data_deletion_info() {
 					// create dialog.
 					let dialog_config = {
 						detail: {
-							title: easyLanguageJsVars.label_delete_data,
+							title: __( 'Deletion of simplified texts', 'easy-language' ),
 							texts: [
-								easyLanguageJsVars.txt_deletion_done
+								__( '<p><strong>Deletion of simplified texts done.</strong><br>You can now start with simplifications.</p>', 'easy-language' )
 							],
 							buttons: [
 								{
