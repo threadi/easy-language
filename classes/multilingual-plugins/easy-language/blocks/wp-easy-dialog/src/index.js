@@ -20,6 +20,11 @@ function Confirm_Dialog( args ) {
 		setOpen( false )
 	};
 
+	let classNames = "wp-easy-dialog";
+	if( args.dialog.className ) {
+		classNames = "wp-easy-dialog " + args.dialog.className;
+	}
+
 	/**
 	 * Output rendered dialog, with title, texts and buttons configured by JSON.
 	 *
@@ -30,8 +35,8 @@ function Confirm_Dialog( args ) {
 		<div>
 		{open &&
 			<Modal
-				bodyOpenClassName="easy-language-dialog-on-body"
-				className="easy-language-dialog"
+				bodyOpenClassName="wp-easy-dialog-on-body"
+				className={classNames}
 				isDismissible={false}
 				onRequestClose={ closeDialog }
 				title={args.dialog.title}
@@ -41,14 +46,14 @@ function Confirm_Dialog( args ) {
 			>
 				{args.dialog.texts && args.dialog.texts.map(function(text) {
 							return (
-								<div key={text} dangerouslySetInnerHTML={{__html: text}} className="easy-language-dialog-text" />
+								<div key={text} dangerouslySetInnerHTML={{__html: text}} className="wp-easy-dialog-text" />
 							)
 						}
 					)
 				}
 				{args.dialog.progressbar && args.dialog.progressbar.active && (
 					<div
-						className="easy-language-progressbar"
+						className="wp-progressbar"
 					>
 						<progress max="100" id={args.dialog.progressbar.id} value={args.dialog.progressbar.progress}>&nbsp;</progress>
 					</div>
@@ -83,12 +88,14 @@ function add_dialog( dialog ) {
 			confirm_dialog.unmount();
 			confirm_dialog = null;
 		}
-		if( ! document.getElementById('easy-language-dialog-root') ) {
-			let root = document.createElement('div');
-			root.id = 'easy-language-dialog-root';
-			document.getElementById('wpfooter').append(root);
+		if( ! document.getElementById('wp-easy-dialog-root') ) {
+			if( document.getElementById('wpadminbar') ) {
+				let root = document.createElement('div');
+				root.id = 'wp-easy-dialog-root';
+				document.getElementById('wpadminbar').append(root);
+			}
 		}
-		confirm_dialog = ReactDOM.createRoot(document.getElementById('easy-language-dialog-root'));
+		confirm_dialog = ReactDOM.createRoot(document.getElementById('wp-easy-dialog-root'));
 		confirm_dialog.render(
 			<Confirm_Dialog dialog={dialog}/>
 		);
@@ -100,18 +107,18 @@ function add_dialog( dialog ) {
  */
 document.addEventListener( 'DOMContentLoaded', () => {
 	// add listener which could be used to trigger the dialog with given configuration.
-	document.body.addEventListener('easy-language-dialog', function(attr) {
+	document.body.addEventListener('wp-easy-dialog', function(attr) {
 		if( attr.detail ) {
 			add_dialog(attr.detail);
 		}
 	});
 
-	// on each element with the class "easy-language-dialog".
-	let simplify_links = document.getElementsByClassName('easy-language-dialog');
+	// on each element with the class "wp-easy-dialog".
+	let simplify_links = document.getElementsByClassName('wp-easy-dialog');
 	for( let i=0;i<simplify_links.length;i++ ) {
 		simplify_links[i].onclick = function(e) {
 			e.preventDefault();
-			document.body.dispatchEvent(new CustomEvent("easy-language-dialog", { detail: JSON.parse(this.dataset.dialog) }));
+			document.body.dispatchEvent(new CustomEvent("wp-easy-dialog", { detail: JSON.parse(this.dataset.dialog) }));
 		};
 	}
 })

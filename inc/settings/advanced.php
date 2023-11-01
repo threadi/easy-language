@@ -24,7 +24,7 @@ function easy_language_settings_add_advanced_tab( string $tab ): void {
 	// output tab.
 	echo '<a href="' . esc_url( Helper::get_settings_page_url() ) . '&tab=advanced" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'Advanced', 'easy-language' ) . '</a>';
 }
-add_action( 'easy_language_settings_add_tab', 'easy_language_settings_add_advanced_tab', 60, 1 );
+add_action( 'easy_language_settings_add_tab', 'easy_language_settings_add_advanced_tab', 60 );
 
 /**
  * Page for advanced settings.

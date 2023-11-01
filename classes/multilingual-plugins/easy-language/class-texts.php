@@ -86,9 +86,6 @@ class Texts {
 		// if object is trashed.
 		add_action( 'wp_trash_post', array( $this, 'trash_object' ) );
 
-		// if object is untrashed, set its state to publish.
-		add_filter( 'wp_untrash_post_status', array( $this, 'untrash_object_post_status' ), 10, 2 );
-
 		// if object is untrashed.
 		add_filter( 'untrashed_post', array( $this, 'untrash_object' ), 10, 2 );
 
@@ -452,26 +449,6 @@ class Texts {
 				$original_post->remove_changed_marker( $language_code );
 			}
 		}
-	}
-
-	/**
-	 * If simplified object is removed from trash, set its state to "publish" and update its parent.
-	 *
-	 * @param string $new_state The new state (we override it here).
-	 * @param int $post_id The post-ID.
-	 *
-	 * @return string
-	 */
-	public function untrash_object_post_status( string $new_state, int $post_id ): string {
-		// get the object.
-		$post_obj = new Post_Object( $post_id );
-
-		// if this is a simplified object, return "publish" as new state.
-		if ( $post_obj->is_simplified() ) {
-			return 'publish';
-		}
-
-		return $new_state;
 	}
 
 	/**

@@ -8,7 +8,7 @@ jQuery( document ).ready(
 			'click',
 			function (e) {
 				e.preventDefault();
-				easy_language_simplification_init($(this).data('id'), $(this).data('link'));
+				easy_language_simplification_init( $(this).data('id'), $(this).data('link'), false );
 			}
 		);
 
@@ -61,13 +61,60 @@ jQuery( document ).ready(
 );
 
 /**
+ * Send request to reset the simplification process of given object.
+ *
+ * @param object_id
+ * @param link
+ */
+function easy_language_reset_processing_simplification( object_id, link ) {
+	jQuery.ajax(
+		{
+			type: "POST",
+			url: easyLanguageSimplificationJsVars.ajax_url,
+			data: {
+				'action': 'easy_language_reset_processing_simplification',
+				'post': object_id,
+				'nonce': easyLanguageSimplificationJsVars.reset_processing_simplification_nonce
+			},
+			success: function() {
+				easy_language_simplification_init( object_id, link, false );
+			}
+		}
+	);
+}
+
+/**
+ * Send request to ignore the failed simplification of a given object.
+ *
+ * @param object_id
+ * @param link
+ */
+function easy_language_ignore_processing_simplification( object_id, link ) {
+	jQuery.ajax(
+		{
+			type: "POST",
+			url: easyLanguageSimplificationJsVars.ajax_url,
+			data: {
+				'action': 'easy_language_ignore_processing_simplification',
+				'post': object_id,
+				'nonce': easyLanguageSimplificationJsVars.ignore_processing_simplification_nonce
+			},
+			success: function() {
+				easy_language_simplification_init( object_id, link, false );
+			}
+		}
+	);
+}
+
+/**
  * Create simplified object via AJAX with or without automatic simplification.
  *
  * @param object_id
  * @param language
  * @param simplification_mode
+ * @param api_configured
  */
-function easy_language_add_simplification_object( object_id, language, simplification_mode ) {
+function easy_language_add_simplification_object( object_id, language, simplification_mode, api_configured ) {
 	// get internationalization tools of WordPress.
 	let { __ } = wp.i18n;
 
@@ -88,32 +135,59 @@ function easy_language_add_simplification_object( object_id, language, simplific
 				}
 				else if( 'ok' === data.status && "manually" === simplification_mode ) {
 					// create dialog.
-					let dialog_config = {
-						detail: {
-							/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
-							title: __('%1$s ready for simplification', 'easy-language').replace('%1$s', data.object_type_name ),
-							texts: [
-								/* translators: %1$s and %4$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title, %3$s will be replaced by the language-name */
-								__( '<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.<br>If you decide to just edit this %4$s its texts will not automatically be simplified in background.</p>', 'easy-language').replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language).replace('%4$s', data.object_type_name)
-							],
-							buttons: [
-								{
-									'action': 'easy_language_get_simplification(' + data.object_id + ', "' + data.language + '", false );',
-									'variant': 'primary',
-									/* translators: %1$s will be replaced by the API-title */
-									'text': __( 'Simplify now via API %1$s', 'easy-language').replace('%1$s', data.api_title)
-								},
-								{
-									'action': 'location.href="' + data.edit_link + '";',
-									'variant': 'secondary',
-									/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
-									'text': __( 'Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
-								},
-								{
-									'action': 'location.reload();',
-									'text': __( 'Cancel', 'easy-language' )
-								}
-							]
+					let dialog_config = {};
+					if( api_configured ) {
+						dialog_config = {
+							detail: {
+								/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
+								title: __('%1$s ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
+								texts: [
+									/* translators: %1$s and %4$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title, %3$s will be replaced by the language-name */
+									__('<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.<br>If you decide to just edit this %4$s its texts will not automatically be simplified in background.</p>', 'easy-language').replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language).replace('%4$s', data.object_type_name)
+								],
+								buttons: [
+									{
+										'action': 'easy_language_get_simplification(' + data.object_id + ', "' + data.language + '", false );',
+										'variant': 'primary',
+										/* translators: %1$s will be replaced by the API-title */
+										'text': __('Simplify now via API %1$s', 'easy-language').replace('%1$s', data.api_title)
+									},
+									{
+										'action': 'location.href="' + data.edit_link + '";',
+										'variant': 'secondary',
+										/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
+										'text': __('Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
+									},
+									{
+										'action': 'location.reload();',
+										'text': __('Cancel', 'easy-language')
+									}
+								]
+							}
+						}
+					}
+					else {
+						dialog_config = {
+							detail: {
+								/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
+								title: __('%1$s ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
+								texts: [
+									/* translators: %1$s and %4$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title, %3$s will be replaced by the language-name */
+									__('<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.</p>', 'easy-language').replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language).replace('%4$s', data.object_type_name)
+								],
+								buttons: [
+									{
+										'action': 'location.href="' + data.edit_link + '";',
+										'variant': 'primary',
+										/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
+										'text': __('Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
+									},
+									{
+										'action': 'location.reload();',
+										'text': __('Cancel', 'easy-language')
+									}
+								]
+							}
 						}
 					}
 					easy_language_create_dialog( dialog_config );
@@ -229,9 +303,7 @@ function easy_language_get_simplification_info( obj_id, initialization ) {
 				let count    = parseInt( data[0] );
 				let max      = parseInt( data[1] );
 				let running  = parseInt( data[2] );
-				let result   = data[3];
-				let link = data[4];
-				let edit_link = data[5];
+				let dialog_config   = data[3];
 
 				// update progressbar.
 				jQuery("#progress" + obj_id).attr('value', (count / max) * 100);
@@ -244,33 +316,8 @@ function easy_language_get_simplification_info( obj_id, initialization ) {
 						200
 					);
 				} else {
-					// create dialog.
-					let dialog_config = {
-						detail: {
-							title: __('Simplification processed', 'easy-language' ),
-							texts: [
-								'<p>' + result + '</p>'
-							],
-							buttons: [
-								{
-									'action': 'location.href="' + link + '";',
-									'variant': 'primary',
-									'text': __( 'Show in frontend', 'easy-language' )
-								},
-								{
-									'action': 'location.href="' + edit_link + '";',
-									'variant': 'primary',
-									'text': __( 'Edit', 'easy-language' )
-								},
-								{
-									'action': 'closeDialog();',
-									'variant': 'secondary',
-									'text': __(  'Cancel', 'easy-language' )
-								}
-							]
-						}
-					}
-					easy_language_create_dialog( dialog_config );
+					// create dialog based on return.
+					easy_language_create_dialog( { detail: dialog_config } );
 				}
 			}
 		}

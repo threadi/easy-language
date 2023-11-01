@@ -156,12 +156,6 @@ class Install {
 			update_option( EASY_LANGUAGE_HASH, hash( 'sha256', rand() . get_option( 'home' ) ) );
 		}
 
-		// check if automatic interval exist, if not create it.
-		if (!wp_next_scheduled('easy_language_automatic_simplification')) {
-			// add it.
-			wp_schedule_event(time(), get_option('easy_language_automatic_simplification', 'hourly' ), 'easy_language_automatic_simplification');
-		}
-
 		// add user role for easy-language-translator if it does not exist.
 		$translator_role = get_role( 'el_simplifier' );
 		if ( null === $translator_role ) {

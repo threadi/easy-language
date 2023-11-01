@@ -5,15 +5,17 @@
   "author": "laOlaWeb GmbH",
   "license": "GPL-2.0-or-later",
   "scripts": {
-    "build": "concurrently --kill-others \"npm run build:switcher\" \"npm run build:navigation-switcher\" \"npm run build:dialog\"",
+    "build": "concurrently --kill-others \"npm run build:switcher\" \"npm run build:navigation-switcher\" \"npm run build:wp-easy-dialog\" \"npm run build:divi-language-field\"",
     "format": "wp-scripts format",
     "lint:css": "wp-scripts lint-style",
     "lint:js": "wp-scripts lint-js",
-    "start": "concurrently --kill-others \"npm run start:switcher\" \"npm run start:navigation-switcher\" \"npm run start:dialog\"",
+    "start": "concurrently --kill-others \"npm run start:switcher\" \"npm run start:navigation-switcher\" \"npm run start:wp-easy-dialog\" \"npm run start:divi-language-field\"",
     "packages-update": "wp-scripts packages-update",
     "start:switcher": "wp-scripts start classes/multilingual-plugins/easy-language/blocks/switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/switcher/build/",
-    "start:dialog": "wp-scripts start classes/multilingual-plugins/easy-language/blocks/dialog/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/dialog/build/",
-    "build:dialog": "wp-scripts build classes/multilingual-plugins/easy-language/blocks/dialog/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/dialog/build/",
+    "start:wp-easy-dialog": "wp-scripts start classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/",
+    "build:wp-easy-dialog": "wp-scripts build classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/",
+    "start:divi-language-field": "wp-scripts start classes/multilingual-plugins/easy-language/parser/divi/src/language_field.js --output-path=classes/multilingual-plugins/easy-language/parser/divi/build/",
+    "build:divi-language-field": "wp-scripts build classes/multilingual-plugins/easy-language/parser/divi/src/language_field.js --output-path=classes/multilingual-plugins/easy-language/parser/divi/build/",
     "build:switcher": "wp-scripts build classes/multilingual-plugins/easy-language/blocks/switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/switcher/build/",
     "start:navigation-switcher": "wp-scripts start classes/multilingual-plugins/easy-language/blocks/navigation-switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/",
     "build:navigation-switcher": "wp-scripts build classes/multilingual-plugins/easy-language/blocks/navigation-switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/",
@@ -26,6 +28,7 @@
   },
   "dependencies": {
     "@wordpress/i18n": "^4.44.0",
-    "concurrently": "^7.3.0"
+    "concurrently": "^7.3.0",
+    "react-dom": "^18.2.0"
   }
 }

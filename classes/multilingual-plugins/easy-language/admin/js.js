@@ -96,5 +96,5 @@ jQuery( document ).ready(
  * @param config
  */
 function easy_language_create_dialog( config ) {
-	document.body.dispatchEvent(new CustomEvent("easy-language-dialog", config));
+	document.body.dispatchEvent(new CustomEvent("wp-easy-dialog", config));
 }

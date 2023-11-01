@@ -1,7 +1,7 @@
-body.easy-language-dialog-on-body.wp-core-ui {
+body.wp-easy-dialog-on-body.wp-core-ui {
 	overflow-y: scroll;
 
-	.easy-language-dialog {
+	.wp-easy-dialog {
 		button {
 			margin-right: 12px
 		}
@@ -10,7 +10,7 @@ body.easy-language-dialog-on-body.wp-core-ui {
 			line-height: 2
 		}
 
-		.easy-language-progressbar {
+		.wp-progressbar {
 			progress {
 				width: 100%;
 			}
@@ -22,6 +22,18 @@ body.easy-language-dialog-on-body.wp-core-ui {
 			progress::-webkit-progress-value {
 				background: green;
 			}
+		}
+
+		&.wp-dialog-error {
+			border-left: 3px solid red;
+		}
+
+		&.wp-dialog-hint {
+			border-left: 3px solid yellow;
+		}
+
+		&.wp-dialog-success {
+			border-left: 3px solid green;
 		}
 	}
 }

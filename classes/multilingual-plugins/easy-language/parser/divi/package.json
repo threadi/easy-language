@@ -1,0 +1,14 @@
+{
+	"name": "@easy-language/divi-language_field",
+	"version": "1.0.0",
+	"description": "Provides a custom divi field for easy-language-settings.",
+	"author": "laOlaWeb GmbH",
+	"license": "GPL-2.0-or-later",
+	"scripts": {
+		"start": "wp-scripts start src/language_field.js --output-path=build/",
+		"build": "wp-scripts build src/language_field.js --output-path=build/"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "^26.15.0"
+	}
+}

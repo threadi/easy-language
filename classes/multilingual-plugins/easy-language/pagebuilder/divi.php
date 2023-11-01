@@ -8,6 +8,7 @@
 use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
+use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_plugins\Easy_Language\Init;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Divi;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
@@ -102,7 +103,7 @@ function easy_language_pagebuilder_divi_admin_bar( WP_Admin_Bar $admin_bar ): vo
 						'title'  => sprintf( __( 'Simplify with %1$s.', 'easy-language' ), $api_obj->get_title() ),
 						'href'   => $post_object->get_simplification_via_api_link(),
 						'meta'   => array(
-							'onclick' => 'easy_language_simplification_init("' . absint( $post_object->get_id() ) . '", "' . esc_url( get_permalink( $post_object->get_id() ) ) . '", true);return false;',
+							'class' => 'easy-language-translate-object'
 						),
 					)
 				);
@@ -129,6 +130,88 @@ add_action( 'admin_bar_menu', 'easy_language_pagebuilder_divi_admin_bar', 500 );
 function easy_language_pagebuilder_divi_scripts(): void {
 	if ( function_exists( 'et_core_is_fb_enabled' ) && Divi::get_instance()->is_active() && et_core_is_fb_enabled() ) {
 		Init::get_instance()->get_simplifications_scripts();
+
+		// divi-specific editor-JS.
+		wp_register_script(
+			'easy-language-divi-admin',
+			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'classes/multilingual-plugins/easy-language/admin/divi.js',
+			array( 'jquery', 'et-dynamic-asset-helpers' ),
+			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/divi.js' ),
+			true
+		);
+		wp_enqueue_script( 'easy-language-divi-admin' );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'easy_language_pagebuilder_divi_scripts' );
+
+/**
+ * Add our custom toggle.
+ *
+ * @param array $toggles
+ *
+ * @return array
+ */
+function easy_language_divi_add_toggle( array $toggles ): array {
+	$toggles['easy-language-simplifications'] = __( 'Simplify texts', 'easy-language' );
+	return $toggles;
+}
+add_filter( 'et_builder_page_settings_modal_toggles', 'easy_language_divi_add_toggle' );
+
+/**
+ * Add fields to our custom toggle.
+ *
+ * @param array $fields
+ *
+ * @return array
+ */
+function easy_language_divi_add_fields( array $fields ): array {
+	$post_types = array();
+	foreach( Init::get_instance()->get_supported_post_types() as $post_type => $enabled ) {
+		$post_types[] = $post_type;
+	}
+
+	$fields['easy-language-simplify-texts'] = array(
+		'meta_key' => 'easy_language_divi_languages',
+		'type' => 'easy-language-language-options',
+		'options' => array(
+			'off' => esc_html__('Off', 'et_builder'),
+			'on' => esc_html__('On', 'et_builder'),
+		),
+		'show_in_bb' => true,
+		'option_category' => 'basic_option',
+		'tab_slug' => 'content',
+		'toggle_slug' => 'easy-language-simplifications',
+		'depends_on_post_type' => $post_types
+	);
+	return $fields;
+}
+add_filter( 'et_builder_page_settings_definitions', 'easy_language_divi_add_fields' );
+
+/**
+ * Save values from fields added via @easy_language_divi_add_fields.
+ *
+ * @param array $values
+ *
+ * @return array
+ */
+function easy_language_divi_save_values( array $values ): array {
+	return $values;
+}
+add_filter( 'et_builder_page_settings_values', 'easy_language_divi_save_values' );
+
+/**
+ * Add custom JS-file for divi.
+ *
+ * @return void
+ */
+function easy_language_divi_add_scripts(): void {
+	wp_register_script(
+		'easy-language-divi',
+		trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'classes/multilingual-plugins/easy-language/parser/divi/build/language_field.js',
+		array( 'jquery', 'et-dynamic-asset-helpers' ),
+		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/parser/divi/build/language_field.js' ),
+		true
+	);
+	wp_enqueue_script( 'easy-language-divi' );
+}
+add_action( 'et_fb_enqueue_assets', 'easy_language_divi_add_scripts' );

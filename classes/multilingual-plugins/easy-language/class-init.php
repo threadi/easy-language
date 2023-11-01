@@ -154,6 +154,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		add_action( 'update_option_WPLANG', array( $this, 'option_locale_changed' ), 10, 2 );
 		add_action( 'admin_bar_menu', array( $this, 'add_simplification_button_in_admin_bar' ), 500 );
 		add_action( 'admin_bar_menu', array( $this, 'show_simplification_process' ), 400 );
+		add_filter( 'cron_schedules', array( $this, 'add_cron_intervals' ) );
 	}
 
 	/**
@@ -294,7 +295,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						// get quota-state of this object.
 						$quota_status = $simplified_post_obj->get_quota_state( $api_obj );
 
-						// only if it is ok show translate-icon and API is configured.
+						// only if it is ok and API is configured show simplify-icon.
 						if ( 'ok' === $quota_status['status'] && $api_obj->is_configured() ) {
 							// get link to add simplification.
 							$do_simplification = $simplified_post_obj->get_simplification_via_api_link();
@@ -302,6 +303,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 							// show link to simplify this page via api.
 							/* translators: %1$s is the name of the language, %2$s is the name of the used API, %3$s will be the API-title */
 							echo '<a href="' . esc_url( $do_simplification ) . '" class="dashicons dashicons-translation easy-language-translate-object" data-id="' . absint( $simplified_post_obj->get_id() ) . '" data-link="' . esc_url( get_permalink( $translated_post_id ) ) . '" title="' . esc_attr( sprintf( __( 'Simplify this %1$s in %2$s with %3$s.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</a>';
+						} elseif ( 'above_entry_limit' === $quota_status['status'] && $api_obj->is_configured() ) {
+							// show simple not clickable icon if API is configured but limit for texts is exceeded
+							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
+							echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'To many text-widgets in this %1$s for simplification with %2$s.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</span>';
 						} elseif ( $api_obj->is_configured() ) {
 							// show simple not clickable icon if API is configured but no quota available.
 							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
@@ -346,7 +351,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						$create_simplification_link = $post_object->get_simplification_link( $language_code );
 
 						// add warning before adding simplified object if used pagebuilder is unknown.
-						$add_class = 'easy-language-dialog';
+						$add_class = 'wp-easy-dialog';
 						$show_page_builder_warning = false;
 						if( 'Undetected' === $page_builder->get_name() ) {
 							$show_page_builder_warning = true;
@@ -365,13 +370,13 @@ class Init extends Base implements Multilingual_Plugins_Base {
 							),
 							'buttons' => array(
 								array(
-									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", "auto" );',
+									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", "auto", true );',
 									'variant' => 'primary',
 									/* translators: %1$s will be replaced by the API-title */
 									'text' => sprintf(__( 'Simplify now via %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ))
 								),
 								array(
-									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", "manually" );',
+									'action' => 'easy_language_add_simplification_object('.absint($post_id).', "'.esc_attr($language_code).'", "manually", '.$api_obj->is_configured().' );',
 									'variant' => 'secondary',
 									/* translators: %1$s will be replaced by the object-type-name (e.g. post or page) */
 									'text' => sprintf( __( 'Just add %1$s', 'easy-language' ), esc_html($object_type_name) )
@@ -382,6 +387,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 								)
 							)
 						);
+						if( false === $api_obj->is_configured() ) {
+							/* translators: %1$s will be replaced by the object-type-name (e.g. post or page), %2$s will be replaced by the object-title */
+							$dialog['texts'][0] = '<p>'.sprintf(__( 'Create a simplified %1$s for <i>%2$s</i> to edit is manually.', 'easy-language' ), esc_html($object_type_name), esc_html($post_object->get_title()) ).'</p>';
+							$dialog['buttons'][0] = $dialog['buttons'][1];
+							$dialog['buttons'][0]['variant'] = 'primary';
+							$dialog['buttons'][1] = $dialog['buttons'][2];
+							unset($dialog['buttons'][2]);
+						}
 
 						// show link to add simplification for this language.
 						/* translators: %1$s is the name of the language */
@@ -728,7 +741,24 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			}
 		}
 
+		// enable automatic simplifications.
+		if ( ! get_option( 'easy_language_automatic_simplification_enabled' ) ) {
+			update_option( 'easy_language_automatic_simplification_enabled', 1 );
+		}
+
+		// set intervall for automatic simplifications.
+		if ( ! get_option( 'easy_language_automatic_simplification' ) ) {
+			update_option( 'easy_language_automatic_simplification', '5minutely' );
+		}
+
+		// check if automatic interval exist, if not create it.
+		if (!wp_next_scheduled('easy_language_automatic_simplification')) {
+			// add it.
+			wp_schedule_event(time(), get_option('easy_language_automatic_simplification', '5minutely' ), 'easy_language_automatic_simplification');
+		}
+
 		// load language file.
+		// TODO entfernen sobald sprachen im repo sind
 		load_plugin_textdomain( 'easy-language', false, dirname( plugin_basename( EASY_LANGUAGE ) ) . '/languages' );
 
 		// set transient for intro step 1 with hint where to start.
@@ -848,6 +878,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy_language_state_on_api_change',
 			'easy_language_generate_permalink',
 			'easy_language_intro_step_2',
+			'easy_language_automatic_simplification',
+			'easy_language_automatic_simplification_enabled'
 		);
 		foreach ( $options as $option ) {
 			delete_option( $option );
@@ -993,6 +1025,54 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			)
 		);
 		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_generate_permalink' );
+
+		/**
+		 * Automatic Section
+		 */
+		add_settings_section(
+			'settings_section_automatic',
+			__( 'Automatic Settings', 'easy-language' ),
+			'__return_true',
+			'easyLanguageEasyLanguagePage'
+		);
+
+		// Set if translated pages should have a generated permalink.
+		add_settings_field(
+			'easy_language_automatic_simplification_enabled',
+			__( 'Enable automatic simplifications', 'easy-language' ),
+			'easy_language_admin_checkbox_field',
+			'easyLanguageEasyLanguagePage',
+			'settings_section_automatic',
+			array(
+				'label_for'   => 'easy_language_automatic_simplification_enabled',
+				'fieldId'     => 'easy_language_automatic_simplification_enabled',
+				'description' => __( 'If enabled open simplifications will be run automatically in the intervall set below.', 'easy-language' ),
+			)
+		);
+		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_automatic_simplification_enabled' );
+
+		// get possible intervals.
+		$intervals = array();
+		foreach ( wp_get_schedules() as $name => $schedule ) {
+			$intervals[ $name ] = $schedule['display'];
+		}
+
+		// Interval for automatic simplifications.
+		add_settings_field(
+			'easy_language_automatic_simplification',
+			__( 'Interval for automatic simplification', 'easy-language' ),
+			'easy_language_admin_select_field',
+			'easyLanguageEasyLanguagePage',
+			'settings_section_automatic',
+			array(
+				'label_for'   => 'easy_language_automatic_simplification',
+				'fieldId'     => 'easy_language_automatic_simplification',
+				'values'      => $intervals,
+				'disable_empty' => true,
+				'description' => __( 'Simplification are run automatically in this intervall.', 'easy-language' ),
+			)
+		);
+		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_automatic_simplification', array( 'sanitize_callback' => array( $this, 'set_automatic_interval' ) ) );
 
 		/**
 		 * Frontend Section
@@ -1358,9 +1438,20 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					1,
 					1,
 					0,
-					__( 'No API activated!', 'easy-language' ),
-					get_permalink($post_id),
-					$post_obj->get_page_builder()->get_edit_link()
+					array(
+						'className' => 'wp-dialog-error',
+						'title' => __( 'Error', 'easy-language' ),
+						'texts' => array(
+							'<p>'.__( 'No API activated!', 'easy-language' ).'</p>'
+						),
+						'buttons' => array(
+							array(
+								'action' => 'closeDialog();',
+								'variant' => 'primary',
+								'text' => __( 'OK', 'easy-language' )
+							)
+						)
+					)
 				);
 				wp_send_json( $return );
 
@@ -1391,9 +1482,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				absint( $count_simplifications[ $post_obj->get_md5() ] ),
 				absint( $max_simplifications[ $post_obj->get_md5() ] ),
 				absint( $running_simplifications[ $post_obj->get_md5() ] ),
-				wp_kses_post( $results[ $post_obj->get_md5() ] ),
-				get_permalink($post_id),
-				$post_obj->get_page_builder()->get_edit_link()
+				$results[ $post_obj->get_md5() ]
 			);
 			wp_send_json( $return );
 		}
@@ -1430,7 +1519,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		wp_enqueue_script(
 			'easy-language-simplifications',
 			plugins_url( '/classes/multilingual-plugins/easy-language/admin/simplifications.js', EASY_LANGUAGE ),
-			array( 'jquery', 'easy-language-dialog', 'wp-i18n' ),
+			array( 'jquery', 'wp-easy-dialog', 'wp-i18n' ),
 			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/simplifications.js' ),
 			true
 		);
@@ -1476,7 +1565,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		wp_enqueue_script(
 			'easy-language-plugin-admin',
 			plugins_url( '/classes/multilingual-plugins/easy-language/admin/js.js', EASY_LANGUAGE ),
-			array( 'jquery', 'easy-language-dialog', 'wp-i18n' ),
+			array( 'jquery', 'wp-easy-dialog', 'wp-i18n' ),
 			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/js.js' ),
 			true
 		);
@@ -1497,19 +1586,19 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		wp_set_script_translations('easy-language-plugin-admin', 'easy-language', trailingslashit(plugin_dir_path(EASY_LANGUAGE)) . 'languages/');
 
 		// embed the dialog-component.
-		$script_asset_path = Helper::get_plugin_path()."classes/multilingual-plugins/easy-language/blocks/dialog/build/index.asset.php";
+		$script_asset_path = Helper::get_plugin_path()."classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/index.asset.php";
 		$script_asset = require( $script_asset_path );
 		wp_enqueue_script(
-			'easy-language-dialog',
-			Helper::get_plugin_url().'classes/multilingual-plugins/easy-language/blocks/dialog/build/index.js',
+			'wp-easy-dialog',
+			Helper::get_plugin_url().'classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/index.js',
 			$script_asset['dependencies'],
 			$script_asset['version'],
 			true
 		);
-		$admin_css = Helper::get_plugin_url().'classes/multilingual-plugins/easy-language/blocks/dialog/build/style-index.css';
-		$admin_css_path = Helper::get_plugin_path().'classes/multilingual-plugins/easy-language/blocks/dialog/build/style-index.css';
+		$admin_css = Helper::get_plugin_url().'classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/style-index.css';
+		$admin_css_path = Helper::get_plugin_path().'classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/style-index.css';
 		wp_enqueue_style(
-			'easy-language-dialog',
+			'wp-easy-dialog',
 			$admin_css,
 			array( 'wp-components' ),
 			filemtime( $admin_css_path )
@@ -1784,6 +1873,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return void
 	 */
 	public function run_automatic_simplification(): void {
+		// bail if automatic simplification is disabled.
+		if( 1 !== absint(get_option( 'easy_language_automatic_simplification_enabled', 0 ) ) ) {
+			return;
+		}
+
 		// bail if no API is active.
 		$api_obj = Apis::get_instance()->get_active_api();
 		if( false === $api_obj ) {
@@ -1903,6 +1997,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			return;
 		}
 
+		// bail if used API has no configuration set.
+		if( false === $api_obj->is_configured() ) {
+			return;
+		}
+
 		// get all items.
 		$all_entries = DB::get_instance()->get_entries();
 		$all_entries_count = count($all_entries);
@@ -1987,4 +2086,39 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		wp_die();
 	}
 
+	/**
+	 * Set automatic simplification intervall.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public function set_automatic_interval( string $value ): string {
+		$value = Helper::settings_validate_select_field( $value );
+		if ( ! empty( $value ) ) {
+			wp_clear_scheduled_hook( 'easy_language_automatic_simplification' );
+			wp_schedule_event( time(), $value, 'easy_language_automatic_simplification' );
+		}
+
+		// return setting.
+		return $value;
+	}
+
+	/**
+	 * Add some cron-intervals.
+	 *
+	 * @param $schedules
+	 * @return array
+	 */
+	public function add_cron_intervals( $schedules ): array {
+		$schedules['5minutely'] = array(
+			'interval'  => 5*60,
+			'display'   => __('every 5th minute', 'easy-language')
+		);
+		$schedules['minutely'] = array(
+			'interval'  => 60,
+			'display'   => __('every minute', 'easy-language')
+		);
+		return $schedules;
+	}
 }

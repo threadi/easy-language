@@ -3,7 +3,6 @@ ToDo
 
 Funktionales
 ------------
-* Dokumentation für Dialog-Komponente ergänzen
 * Einstellungen zum Automatismus ergänzen:
 -> Intervall
 -> Abschaltbar

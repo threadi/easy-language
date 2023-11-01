@@ -29,7 +29,7 @@ function easy_language_settings_add_api_logs_tab( string $tab ): void {
 	// output tab.
 	echo '<a href="' . esc_url( Helper::get_settings_page_url() ) . '&tab=api_logs" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'API Logs', 'easy-language' ) . '</a>';
 }
-add_action( 'easy_language_settings_add_tab', 'easy_language_settings_add_api_logs_tab', 100, 1 );
+add_action( 'easy_language_settings_add_tab', 'easy_language_settings_add_api_logs_tab', 100 );
 
 /**
  * Show log as list.

@@ -197,7 +197,7 @@ function easy_language_pagebuilder_elementor_styles(): void {
 		);
 		wp_enqueue_script( 'easy-language-elementor-admin' );
 
-		// embed translation scripts.
+		// embed simplification scripts.
 		$multilingual_plugin->get_simplifications_scripts();
 	}
 }

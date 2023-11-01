@@ -289,7 +289,7 @@ body .text-translations-table #source_language, body .text-translations-table #t
 	}
 }
 
-body.easy-language-dialog-on-body.wp-core-ui .components-modal__frame.easy-language-dialog:after {
+body.wp-easy-dialog-on-body.wp-core-ui .components-modal__frame.wp-easy-dialog:after {
 	background-image: url(/wp-content/plugins/easy-language/gfx/easy-language-icon.png);
 	width: 60px;
 	height: 60px;
@@ -302,10 +302,10 @@ body.easy-language-dialog-on-body.wp-core-ui .components-modal__frame.easy-langu
 	z-index: 100;
 }
 
-body.easy-language-dialog-on-body.wp-core-ui .hide-header .easy-language-dialog-text {
+body.wp-easy-dialog-on-body.wp-core-ui .hide-header .wp-easy-dialog-text {
 	padding-right: 64px;
 }
 
-body.easy-language-dialog-on-body.wp-core-ui .components-modal__header .components-modal__header-heading {
+body.wp-easy-dialog-on-body.wp-core-ui .components-modal__header .components-modal__header-heading {
 	padding-right: 64px;
 }

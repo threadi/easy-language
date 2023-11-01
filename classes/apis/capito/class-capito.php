@@ -833,7 +833,11 @@ class Capito extends Base implements Api_Base {
 			$request = $this->get_test_request_response( $value );
 			if( 404 === $request->get_http_status() ) {
 				// show hint if token is not valid for API.
-				add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __('The API key does not seem to be valid.', 'easy-language') );
+				/* translators: %1$s is replaced by the URL for the API-log */
+				add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', sprintf( __( '<strong>Token could not be verified.</strong> Please take a look <a href="%1$s">in the log</a> to check the reason.', 'easy-language' ), esc_url(Helper::get_api_logs_page_url()) ) );
+
+				// remove token.
+				$value = '';
 			}
 			else {
 				// get initial quota.
@@ -1098,7 +1102,8 @@ class Capito extends Base implements Api_Base {
 			}
 			else {
 				// show error.
-				$transient_obj->set_message( __( 'Token could not be verified. Please take a look in the log to check the reason.', 'easy-language' ) );
+				/* translators: %1$s is replaced by the URL for the API-log */
+				$transient_obj->set_message( sprintf( __( '<strong>Token could not be verified.</strong> Please take a look <a href="%1$s">in the log</a> to check the reason.', 'easy-language' ), esc_url(Helper::get_api_logs_page_url()) ) );
 				$transient_obj->set_type( 'error' );
 			}
 		}

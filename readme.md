@@ -27,7 +27,7 @@ I recommend to use [PoEdit](https://poedit.net/) to translate texts for this plu
 
 Run in main directory:
 
-`wp i18n make-pot . languages/easy-language.pot --exclude=classes/multilingual-plugins/easy-language/blocks/navigation-switcher/src/,classes/multilingual-plugins/easy-language/blocks/switcher/src/,classes/multilingual-plugins/easy-language/blocks/dialog/src/,svn/`
+`wp i18n make-pot . languages/easy-language.pot --exclude=classes/multilingual-plugins/easy-language/blocks/navigation-switcher/src/,classes/multilingual-plugins/easy-language/blocks/switcher/src/,classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/src/,svn/`
 
 ### update translation-file
 
