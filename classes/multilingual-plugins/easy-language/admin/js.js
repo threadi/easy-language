@@ -38,26 +38,28 @@ jQuery( document ).ready(
 		);
 
 		// show pointer where user could edit its contents.
-		$( 'body.easy-language-intro-step-2 .menu-icon-page .wp-menu-name' ).pointer(
-			{
-				content: easyLanguagePluginJsVars.intro_step_2,
-				position: {
-					edge:  'left',
-					align: 'left'
-				},
-				pointerClass: 'easy-language-pointer',
-				close: function () {
-					// save via ajax the hiding of this hint.
-					let data = {
-						'action': 'easy_language_dismiss_intro_step_2',
-						'nonce': easyLanguagePluginJsVars.dismiss_intro_nonce
-					};
+		if (jQuery.fn.pointer) {
+			$('body.easy-language-intro-step-2 .menu-icon-page .wp-menu-name').pointer(
+				{
+					content: easyLanguagePluginJsVars.intro_step_2,
+					position: {
+						edge: 'left',
+						align: 'left'
+					},
+					pointerClass: 'easy-language-pointer',
+					close: function () {
+						// save via ajax the hiding of this hint.
+						let data = {
+							'action': 'easy_language_dismiss_intro_step_2',
+							'nonce': easyLanguagePluginJsVars.dismiss_intro_nonce
+						};
 
-					// run ajax request to save this setting
-					$.post( easyLanguagePluginJsVars.ajax_url, data );
+						// run ajax request to save this setting
+						$.post(easyLanguagePluginJsVars.ajax_url, data);
+					}
 				}
-			}
-		).pointer( 'open' );
+			).pointer('open');
+		}
 
 		// show warning if the page builder, used for an object, is not available.
 		$( 'a.easy-language-missing-pagebuilder-warning' ).off('click').on( 'click', function(e) {

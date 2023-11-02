@@ -1,0 +1,74 @@
+#react-dialog-root {
+	.modal_bg {
+		background-color: rgba(0, 0, 0, 0.2);
+		width: 100vw;
+		height: 100vh;
+		z-index: 8000;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		position: absolute;
+	}
+
+	.modal {
+		padding: 24px 32px;
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: auto;
+		max-width: 80%;
+		height: auto;
+		background-color: var(--wp--preset--color--white);
+		color: var(--wp--preset--color--black);
+		z-index: 9000;
+		border-radius: 16px;
+		box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.04);
+	}
+
+	.modalContent {
+		padding: 10px;
+		font-size: 14px;
+		color: #2c3e50;
+		text-align: center;
+	}
+
+	.wp-easy-dialog-title, .wp-easy-dialog-text p { margin-bottom: 1em }
+
+	button {
+		align-items: center;
+		-webkit-appearance: none;
+		background: none;
+		border: 0;
+		border-radius: 2px;
+		box-sizing: border-box;
+		color: var(--wp-components-color-foreground, #1e1e1e);
+		cursor: pointer;
+		display: inline-flex;
+		font-family: inherit;
+		font-size: 13px;
+		font-weight: 400;
+		height: 36px;
+		margin: 0 1em 0 0;
+		padding: 6px 12px;
+		text-decoration: none;
+		transition: box-shadow .1s linear;
+
+		&.primary {
+			background: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+			color: var(--wp-components-color-accent-inverted, #fff);
+			outline: 1px solid transparent;
+			text-decoration: none;
+			text-shadow: none;
+			white-space: nowrap;
+		}
+
+		&.secondary {
+			background: transparent;
+			box-shadow: inset 0 0 0 1px var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+			color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+			outline: 1px solid transparent;
+			white-space: nowrap;
+		}
+	}
+}

@@ -4,18 +4,60 @@
  * @source: https://divibooster.com/divi-custom-field-type-multi-checkboxes-with-ids/
  */
 
-// embed react and jQuery
-import React, { Component, useEffect } from 'react';
-import $ from 'jquery';
-import { hydrateRoot } from 'react-dom/client';
+// embed style.
+import './style.scss';
 
-function Get_Language_Options() {
+// embed react and jQuery.
+import React, { Component, useEffect, useState } from 'react';
+import $ from 'jquery';
+
+/**
+ * Request the language options for this object and show them.
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
+function Get_Language_Options( args ) {
+	const [options, setOptions] = useState(null);
+
+	// Function to get the possible language options via AJAX.
+	const get_options = (e) => {
+		fetch(args.env.rest.endpoints.language_options + '/' + args.object_id, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				"X-WP-Nonce": args.env.rest.nonce
+			},
+			body: JSON.stringify({post: args.object_id}),
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				setOptions(data);
+			})
+	};
+
+	// run request.
 	useEffect(() => {
-		post('/analytics/event');
+		get_options();
+
+		/**
+		 * Set onclick event for button to show dialog before simplifying this object.
+		 */
+		setTimeout(function() {
+			top.document.querySelector('.easy-language-language-options-wrap .easy-language-translate-object').addEventListener('click', function(e) {
+				e.preventDefault();
+				console.log();
+				document.body.dispatchEvent(new CustomEvent("react-dialog", { detail: JSON.parse(this.dataset.dialog) }));
+			});
+		}, 200)
 	}, []);
 
 	return (
-		<div>Hallo</div>
+		<div>
+			{options &&
+				<div dangerouslySetInnerHTML={{__html: options.html}} />
+			}
+		</div>
 	);
 }
 
@@ -26,24 +68,21 @@ class Easy_Language_Language_Options extends Component {
 	static slug = 'easy-language-language-options';
 	constructor(props) {
 		super(props);
-
-		let container = document.getElementById('easy-language-language-options');
-		let root = hydrateRoot(container, <Get_Language_Options />);
 	}
 
 	render() {
 		return (
-			<div id="easy-language-language-options" className={`${this.constructor.slug}-wrap et-fb-multiple-checkboxes-wrap`}>
-				{ root }
+			<div className={`${this.constructor.slug}-wrap`}>
+				<Get_Language_Options object_id={ETBuilderBackendDynamic.postId} env={easyLanguageDiviData} />
 			</div>
 		);
 	}
 }
 
 /**
- * Export field directly.
+ * Add field via Divi-hook.
  */
-export default Easy_Language_Language_Options;
 $(window).on('et_builder_api_ready', (event, API) => {
 	API.registerModalFields([Easy_Language_Language_Options]);
 });
+

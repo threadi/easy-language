@@ -112,6 +112,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$pagebuilder = Pagebuilder_Support::get_instance();
 		$pagebuilder->init( $this );
 
+		// get our own REST API-support-handler.
+		$rest_api = REST_API::get_instance();
+		$rest_api->init( $this );
+
 		// include pagebuilder support.
 		foreach ( glob( plugin_dir_path( EASY_LANGUAGE ) . 'classes/multilingual-plugins/easy-language/pagebuilder/*.php' ) as $filename ) {
 			include $filename;
@@ -1509,7 +1513,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * Embed translation-related scripts, which are also used by some pageBuilders.
+	 * Embed translation-related scripts, which are also used by some PageBuilders.
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
@@ -1585,7 +1589,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// enable internationalization of our script.
 		wp_set_script_translations('easy-language-plugin-admin', 'easy-language', trailingslashit(plugin_dir_path(EASY_LANGUAGE)) . 'languages/');
 
-		// embed the dialog-component.
+		// embed the wp-easy-dialog-component.
 		$script_asset_path = Helper::get_plugin_path()."classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/index.asset.php";
 		$script_asset = require( $script_asset_path );
 		wp_enqueue_script(

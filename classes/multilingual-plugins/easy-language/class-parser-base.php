@@ -201,7 +201,7 @@ class Parser_Base {
 					<p class="alert">
 						<?php
 							/* translators: %1$s will be replaced by the API-title */
-							printf( esc_html__( 'There would be %1$d characters to simplify in this %2$s. That is more than the %3$d available in quota.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $object_type ), absint( $quota_state['quota_rest'] ) );
+							printf( esc_html__( 'There would be %1$d characters to simplify in this %2$s. That is more than the %3$d available in quota.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $object_type_name ), absint( $quota_state['quota_rest'] ) );
 						?>
 					</p>
 					<?php
@@ -234,8 +234,28 @@ class Parser_Base {
 					<?php
 					/* translators: %1$s will be replaced by tne object-type-name (e.g. post oder page), %2$s will be replaced by the API-name */
 					$title = sprintf( __( 'Simplify this %1$s with %2$s.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $api_obj->get_title() ) );
+
+					// set config for dialog.
+					$dialog_config = array(
+						'title' => __( 'Simplify texts', 'easy-language' ),
+						'texts' => array(
+							'<p>'.__( '<strong>Are you sure you want to simplify these texts via API?</strong><br>Hint: this could cause costs with the API.', 'easy-language' ).'</p>'
+						),
+						'buttons' => array(
+							array(
+								'action' => 'easy_language_get_simplification( '.$post_id.', "'.get_permalink($post_id).'", false);',
+								'variant' => 'primary',
+								'text' => __( 'Yes', 'easy-language' )
+							),
+							array(
+								'action' => 'closeDialog();',
+								'variant' => 'secondary',
+								'text' => __( 'No', 'easy-language' )
+							)
+						)
+					);
 					?>
-					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary easy-language-translate-object elementor-button" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( $title ); ?>">
+					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary easy-language-translate-object elementor-button" data-dialog="<?php echo esc_attr(wp_json_encode($dialog_config)); ?>" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( $title ); ?>">
 						<?php
 							/* translators: %1$s will be replaced by the API-title */
 							echo sprintf( esc_html__( 'Simplify with %1$s.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
@@ -336,7 +356,7 @@ class Parser_Base {
 
 				// output.
 				?>
-				<tr><th><?php echo esc_html( $settings['label'] ); ?></th><td><a href="<?php echo esc_url( $link ); ?>" title="<?php echo esc_attr( sprintf( $link_title, $settings['label'] ) ); ?>"><?php echo wp_kses_post( $link_content ); ?></a></td></tr>
+				<tr><th><?php echo esc_html( $settings['label'] ); ?></th><td><a href="<?php echo esc_url( $link ); ?>" title="<?php echo esc_attr( sprintf( $link_title, esc_html($settings['label']) ) ); ?>"><?php echo wp_kses_post( $link_content ); ?></a></td></tr>
 				<?php
 			}
 			?>

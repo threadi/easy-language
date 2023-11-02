@@ -3,8 +3,8 @@
 /**
  * Embed wp-easy-dialog.
  */
-add_action( 'admin_enqueue_scripts', 'wp_dialog_embed', PHP_INT_MAX );
-function wp_dialog_embed(): void {
+add_action( 'admin_enqueue_scripts', 'custom_dialog_embed', PHP_INT_MAX );
+function custom_dialog_embed(): void {
 	$path = __FILE__;
 
 	// embed the dialog-component.

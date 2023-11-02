@@ -79,7 +79,7 @@ class Languages extends Base_Data_Control {
 			}
 
 			// get the original-object.
-			$post_object = new Post_Object( $original_post_id );
+			$original_post_object = new Post_Object( $original_post_id );
 
 			?>
 			<# if ( data.description ) { #>
@@ -89,7 +89,7 @@ class Languages extends Base_Data_Control {
 			<div class="elementor-control-field easy-language-table">
 				<div class="elementor-control-input-wrapper">
 					<?php
-						$post_object->get_page_builder()->get_language_switch( $post_id );
+						$original_post_object->get_page_builder()->get_language_switch( $post_id );
 					?>
 				</div>
 			</div>
