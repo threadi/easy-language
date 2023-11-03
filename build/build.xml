@@ -44,6 +44,7 @@
         <delete file="${log.dir}/npm-build1.txt"/>
         <delete file="${log.dir}/npm-build2.txt"/>
 		<delete file="${log.dir}/npm-build3.txt"/>
+		<delete file="${log.dir}/npm-build4.txt"/>
         <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build1.txt">
             <arg line="run build:switcher"/>
         </exec>
@@ -52,6 +53,9 @@
         </exec>
 		<exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build3.txt">
 			<arg line="run build:wp-easy-dialog"/>
+		</exec>
+		<exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build4.txt">
+			<arg line="run build:react-dialog"/>
 		</exec>
     </target>
 
@@ -106,6 +110,8 @@
 			</zipfileset>
             <zipfileset dir="${src.dir}/languages" prefix="${plugin.slug}/languages" />
 			<zipfileset dir="${src.dir}/libs" prefix="${plugin.slug}/libs" />
+			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
+			<zipfileset dir="${src.dir}/vendor/gettext" prefix="${plugin.slug}/vendor/gettext" />
             <zipfileset dir="${src.dir}" includes="uninstall.php,readme.txt" prefix="${plugin.slug}" />
             <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
         </zip>

@@ -831,7 +831,7 @@ class Capito extends Base implements Api_Base {
 		// if token has been changed, get the quota and delete settings hint.
 		elseif ( 0 !== strcmp( $value, get_option( 'easy_language_capito_api_key', '' ) ) ) {
 			$request = $this->get_test_request_response( $value );
-			if( 404 === $request->get_http_status() ) {
+			if( in_array( $request->get_http_status(), array( 401, 404 ), true ) ) {
 				// show hint if token is not valid for API.
 				/* translators: %1$s is replaced by the URL for the API-log */
 				add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', sprintf( __( '<strong>Token could not be verified.</strong> Please take a look <a href="%1$s">in the log</a> to check the reason.', 'easy-language' ), esc_url(Helper::get_api_logs_page_url()) ) );
@@ -1137,4 +1137,16 @@ class Capito extends Base implements Api_Base {
 		return $request;
 	}
 
+	/**
+	 * Return all log entries of this API.
+	 *
+	 * @return array
+	 */
+	public function get_log_entries(): array {
+		$results = $this->wpdb->get_results( $this->wpdb->prepare( 'SELECT `time`, `request`, `response` FROM '.$this->table_requests.' WHERE 1 = %d', array( 1 ) ) );
+		if( is_null($results) ) {
+			return array();
+		}
+		return $results;
+	}
 }

@@ -72,13 +72,29 @@ class Log_Api_Table extends WP_List_Table {
 	 * @return array
 	 */
 	private function table_data(): array {
+		// order table.
 		$orderby = ( isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], array_keys( $this->get_sortable_columns() ) ) ) ? $_REQUEST['orderby'] : 'date';
 		$order   = ( isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], array( 'asc', 'desc' ) ) ) ? $_REQUEST['order'] : 'desc';
-		$sql     = '
-            SELECT `state`, `time` AS `date`, `request`, `response`, `api`
-            FROM `' . $this->table_name . '`
-            ORDER BY %1$s %2$s';
-		return $this->wpdb->get_results( $this->wpdb->prepare( $sql, array( $orderby, $order ) ), ARRAY_A );
+
+		// define vars for prepared statement.
+		$vars = array(
+			$orderby,
+			$order
+		);
+
+		// get filter.
+		$api = $this->get_api_filter();
+		$where = '';
+		if( !empty($api) ) {
+			$where .= ' WHERE `api` = "%3$s"';
+			$vars[] = $api;
+		}
+
+		// get statement.
+		$sql     = $this->get_base_sql().$where.' ORDER BY %1$s %2$s';
+
+		// get results and return them.
+		return $this->wpdb->get_results( $this->wpdb->prepare( $sql, $vars ), ARRAY_A );
 	}
 
 	/**
@@ -143,5 +159,88 @@ class Log_Api_Table extends WP_List_Table {
 			default:
 				return wp_kses_post( print_r( $item, true ) );
 		}
+	}
+
+	/**
+	 * Define filter for languages.
+	 *
+	 * @return array
+	 */
+	protected function get_views(): array {
+		// get main url.
+		$url = remove_query_arg( 'api' );
+
+		// define initial list.
+		$list = array(
+			"all"       => '<a href="'.esc_url($url).'">'.__( 'All', 'easy-language').'</a>',
+		);
+
+		// get all apis from entries and add them to the list.
+		$entries = $this->wpdb->get_results( $this->get_base_sql(), ARRAY_A );
+		$apis_array = array();
+		foreach( $entries as $item ) {
+			if( empty($apis_array[$item['api']]) ) {
+				$api_object = Apis::get_instance()->get_api_by_name( $item['api'] );
+				if( false !== $api_object ) {
+					$apis_array[$item['api']] = $api_object;
+				}
+			}
+
+		}
+
+		// convert APIs to list-entries.
+		foreach( $apis_array as $api => $api_object ) {
+			$url = add_query_arg( array('api' => $api) );
+			$list[$api] = '<a href="'.esc_url($url).'">'.esc_html($api_object->get_title()).'</a>';
+		}
+
+		// return resulting list.
+		return $list;
+	}
+
+	/**
+	 * Add export-buttons on top of table.
+	 *
+	 * @param $which
+	 * @return void
+	 */
+	public function extra_tablenav( $which ): void {
+		if( 'top' === $which ) {
+			$api = $this->get_api_filter();
+
+			if( !empty($api) ) {
+				// define export-URL.
+				$url = add_query_arg(
+					array(
+						'action' => 'easy_language_export_api_log',
+						'nonce'  => wp_create_nonce( 'easy-language-export-api-log' ),
+						'api' => $api
+					),
+					get_admin_url() . 'admin.php'
+				);
+				?><a href="<?php echo esc_url($url); ?>" class="button"><?php echo esc_html__( 'Export', 'easy-language' ); ?></a><?php
+			}
+			else {
+				?><span class="button disabled" title="<?php echo esc_html__('Choose a API to export above', 'easy-language' ); ?>"><?php echo esc_html__( 'Export', 'easy-language' ); ?></span><?php
+			}
+		}
+	}
+
+	/**
+	 * Get actual API-filter-value.
+	 *
+	 * @return string
+	 */
+	private function get_api_filter(): string {
+		return isset($_GET['api']) ? sanitize_text_field( $_GET['api'] ) : '';
+	}
+
+	/**
+	 * Return base-SQL-statement to get api logs.
+	 *
+	 * @return string
+	 */
+	private function get_base_sql(): string {
+		return 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM `' . $this->table_name . '`';
 	}
 }

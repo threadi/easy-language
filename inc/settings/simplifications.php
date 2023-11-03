@@ -63,12 +63,14 @@ add_action( 'easy_language_settings_simplifications_page', 'easy_language_pro_ad
  * @return void
  */
 function easy_language_settings_simplifications_in_use(): void {
-	$translations = new Texts_In_Use_Table();
-	$translations->prepare_items();
 	?>
 	<h2><?php echo esc_html__( 'Simplified texts in use', 'easy-language' ); ?></h2>
 	<p><?php echo esc_html__( 'This table contains all simplified texts. The original texts will not be simplified a second time.', 'easy-language' ); ?></p>
-	<?php $translations->display();
+	<?php
+	$simplifications_table = new Texts_In_Use_Table();
+	$simplifications_table->prepare_items();
+	$simplifications_table->views();
+	$simplifications_table->display();
 }
 add_action( 'easy_language_settings_simplifications__page', 'easy_language_settings_simplifications_in_use' );
 
@@ -89,8 +91,6 @@ function easy_language_settings_simplifications_to_simplify(): void {
 	}
 
 	// get table object to show text to simplify.
-	$translations = new Texts_To_Simplify_Table();
-	$translations->prepare_items();
 	?>
 	<h2><?php echo esc_html__( 'Texts to simplify', 'easy-language' ); ?></h2>
 	<p>
@@ -99,6 +99,9 @@ function easy_language_settings_simplifications_to_simplify(): void {
 			echo esc_html(sprintf(__( 'This table contains texts which will be simplified via %1$s. They are processed by a background-process.', 'easy-language' ), esc_html($api_obj->get_title()) ) );
 		?>
 	</p>
-	<?php $translations->display();
+	<?php
+	$simplifications_table = new Texts_To_Simplify_Table();
+	$simplifications_table->prepare_items();
+	$simplifications_table->display();
 }
 add_action( 'easy_language_settings_simplifications_to_simplify_page', 'easy_language_settings_simplifications_to_simplify' );

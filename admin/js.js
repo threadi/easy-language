@@ -141,6 +141,9 @@ jQuery(document).ready(function($) {
 });
 
 function easy_language_start_data_deletion() {
+	// get internationalization tools of WordPress.
+	let { __ } = wp.i18n;
+
 	// create dialog.
 	let dialog_config = {
 		detail: {
@@ -174,6 +177,9 @@ function easy_language_start_data_deletion() {
  * Get import info until deletion is done.
  */
 function easy_language_get_data_deletion_info() {
+	// get internationalization tools of WordPress.
+	let { __ } = wp.i18n;
+
 	// run info check.
 	jQuery.ajax(
 		{

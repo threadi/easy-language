@@ -7,6 +7,8 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
+use easyLanguage\Api_Base;
+use easyLanguage\Apis;
 use easyLanguage\Languages;
 
 /**
@@ -430,6 +432,7 @@ class Text {
 	 *
 	 * @param string $field
 	 * @return bool
+	 * @noinspection PhpUnused
 	 */
 	public function is_field( string $field ): bool {
 		foreach( $this->get_objects() as $object_array ) {
@@ -441,4 +444,83 @@ class Text {
 		// return false in other cases.
 		return false;
 	}
+
+	/**
+	 * Get target languages which depends on settings of the objects where the text is used.
+	 *
+	 * @return array
+	 * @noinspection PhpUnused
+	 */
+	public function get_target_languages(): array {
+		// get languages-object.
+		$languages_obj = Languages::get_instance();
+
+		// get possible target languages.
+		$languages = $languages_obj->get_possible_target_languages();
+
+		// define resulting array.
+		$item_languages = array();
+
+		// loop through the objects of this text.
+		foreach( $this->get_objects() as $object_array ) {
+			$post_object = new Post_Object( $object_array['object_id'] );
+			$language = array_key_first($post_object->get_language());
+			if ( ! empty( $languages[ $language ] ) ) {
+				$item_languages[$language] = $languages[ $language ]['label'];
+			}
+		}
+
+		// return resulting list.
+		return $item_languages;
+	}
+
+	/**
+	 * Get for simplification used API.
+	 *
+	 * @return Api_Base|false
+	 * @noinspection PhpUnused
+	 */
+	public function get_api(): Api_Base|false {
+		global $wpdb;
+
+		// get from DB.
+		$prepared_sql = $wpdb->prepare(
+			'SELECT s.`used_api`
+				FROM ' . $wpdb->easy_language_simplifications . ' s
+				WHERE s.`oid` = %d',
+			array( $this->get_id() )
+		);
+
+		// get result
+		$result = (array) $wpdb->get_results( $prepared_sql, ARRAY_A );
+
+		// get API-object if its name could be read.
+		if( !empty($result) ) {
+			return Apis::get_instance()->get_api_by_name( $result[0]['used_api'] );
+		}
+
+		// get the API-name.
+		return false;
+	}
+
+	/**
+	 * Get user who requested a specific simplification.
+	 *
+	 * @param string $language
+	 * @return int
+	 */
+	public function get_user_for_simplification( string $language ): int {
+		global $wpdb;
+
+		// get from DB.
+		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `user_id` FROM ' . $wpdb->easy_language_simplifications . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
+		if ( ! empty( $result ) ) {
+			// return result.
+			return $result['user_id'];
+		}
+
+		// return empty string if no translation exist.
+		return '';
+	}
+
 }

@@ -46,13 +46,16 @@ function easy_language_admin_add_menu_content_api_logs(): void {
 	if ( ! class_exists( 'WP_List_Table' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 	}
-	$log = new Log_Api_Table();
-	$log->prepare_items();
 	?>
 	<div class="wrap">
 		<div id="icon-users" class="icon32"></div>
 		<h2><?php echo esc_html__( 'API Logs', 'easy-language' ); ?></h2>
-		<?php $log->display(); ?>
+		<?php
+		$log_table = new Log_Api_Table();
+		$log_table->prepare_items();
+		$log_table->views();
+		$log_table->display();
+		?>
 	</div>
 	<?php
 }

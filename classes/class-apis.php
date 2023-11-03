@@ -27,7 +27,10 @@ class Apis {
 	/**
 	 * Constructor for Init-Handler.
 	 */
-	private function __construct() {}
+	private function __construct() {
+		// hooks.
+		add_action( 'admin_action_easy_language_export_api_log', array( $this, 'export_api_log' ) );
+	}
 
 	/**
 	 * Prevent cloning of this object.
@@ -83,5 +86,56 @@ class Apis {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Export API log for specific API.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function export_api_log(): void {
+		global $wpdb;
+
+		// check nonce.
+		check_ajax_referer( 'easy-language-export-api-log', 'nonce' );
+
+		// get name of the api to export.
+		$export_api = isset($_GET['api']) ? sanitize_text_field( $_GET['api']) : '';
+
+		if( !empty($export_api) ) {
+			// get api object.
+			$api_object = $this->get_api_by_name( $export_api );
+			if( false !== $api_object ) {
+				// get the entries.
+				$entries = array(
+					array(
+						__( 'Date', 'easy-language' ),
+						__( 'Request', 'easy-language' ),
+						__( 'Response', 'easy-language' )
+					)
+				);
+				foreach( $api_object->get_log_entries() as $entry ) {
+					$entries[] = array(
+						$entry->time,
+						$entry->request,
+						$entry->response
+					);
+				}
+
+				// set header for response as download.
+				header("Content-type: application/csv");
+				header("Content-Disposition: attachment; filename=".date('YmdHi')."_".get_option('blogname').".csv"); // TODO
+				$fp = fopen('php://output', 'w'); // or use php://stdout
+				foreach ($entries as $row) {
+					fputcsv($fp, $row);
+				}
+				exit;
+			}
+		}
+
+		// redirect user back.
+		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		exit;
 	}
 }

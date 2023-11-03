@@ -10,7 +10,10 @@ namespace easyLanguage\Multilingual_plugins\Easy_Language;
 use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
+use Gettext\Translation;
+use Gettext\Translations;
 use WP_Post;
+use Gettext\Generator\PoGenerator;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -77,6 +80,9 @@ class Texts {
 
 		// get simplification of given text.
 		add_action( 'admin_action_easy_language_get_simplification_of_entry', array( $this, 'get_simplification_of_entry' ) );
+
+		// export simplified texts.
+		add_action( 'admin_action_easy_language_export_simplifications', array( $this, 'export_simplifications' ) );
 
 		// check texts in updated post-types-objects.
 		foreach ( $init->get_supported_post_types() as $post_type => $enabled ) {
@@ -481,5 +487,67 @@ class Texts {
 	 */
 	public function get_texts(): array {
 		return $this->db->get_entries();
+	}
+
+	/**
+	 * Export simplified texts as po file.
+	 *
+	 * @return void
+	 */
+	public function export_simplifications(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-export-simplifications', 'nonce' );
+
+		// get language to export.
+		$export_language_code = isset($_GET['lang']) ? sanitize_text_field( $_GET['lang']) : '';
+
+		if( !empty($export_language_code) ) {
+
+			// define query for entries.
+			$query = array(
+				'state' => 'in_use',
+				'object_not_state' => 'trash',
+				'lang' => $export_language_code,
+				'target_lang' => $export_language_code
+			);
+
+			// return resulting entry-objects.
+			$entries = DB::get_instance()->get_entries($query);
+
+			// define translations-object which will be exported as po-file.
+			$translations = Translations::create( get_option( 'blogname' ) ); // TODO zulässigen Namen aus blogname generieren
+			$translations->setDescription( __( 'List of with Easy Language simplified texts.', 'easy-language' ) );
+			$translations->getHeaders()->set('Last-Translator', get_option('admin_email') );
+			$translations->getHeaders()->set('X-Generator', Helper::get_plugin_name() );
+
+			// add each entry to the translation object.
+			foreach ($entries as $entry) {
+				$translation = Translation::create('', $entry->get_original() );
+				foreach( $entry->get_target_languages() as $language_code => $language ) {
+					if( !$translation->isTranslated() ) {
+						$translation->translate(trim($entry->get_translation($language_code)));
+					}
+				}
+				$translations->add($translation);
+			}
+
+			// get the resulting po-file as string.
+			$po_generator = new PoGenerator();
+			$po = $po_generator->generateString( $translations );
+
+			$replace_from = '"Last-Translator';
+			$po = str_replace( $replace_from, '"Language: '.$export_language_code.'\n"'.PHP_EOL.$replace_from, $po );
+
+			// return header.
+			header( 'Content-Type: application/octet-stream' );
+			header( 'Content-Disposition: inline; filename="' . date('YmdHi') . '_'.get_option('blogname').'.po"' ); // TODO
+			header( 'Content-Length: ' . strlen($po) );
+			echo $po;
+			exit;
+		}
+
+		// redirect user back.
+		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		exit;
 	}
 }

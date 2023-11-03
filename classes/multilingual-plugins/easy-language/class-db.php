@@ -236,7 +236,14 @@ class Db {
 				$vars[]    = $filter['state'];
 			}
 			if ( ! empty( $filter['lang'] ) ) {
-				$sql_where .= ' AND o.lang = %s';
+				if ( ! empty( $filter['target_lang'] ) ) {
+					$sql_join[ $wpdb->easy_language_simplifications ] = ' LEFT JOIN ' . $wpdb->easy_language_simplifications . ' s ON s.oid = o.id';
+					$sql_where .= ' AND (s.language = %s OR o.lang = %s)';
+					$vars[]     = $filter['target_lang'];
+				}
+				else {
+					$sql_where .= ' AND o.lang = %s';
+				}
 				$vars[]     = $filter['lang'];
 			}
 			if ( ! empty( $filter['field'] ) ) {
@@ -359,30 +366,31 @@ class Db {
 	 * Return the text-object for the given text in the given language.
 	 *
 	 * @param string $text The original text we search.
-	 * @param string $language The language we search.
+	 * @param string $source_language The source language we search.
 	 * @return bool|Text
 	 */
-	public function get_entry_by_text( string $text, string $language ): bool|Text {
-		// check if object has already been loaded.
-		if ( empty( $this->texts[ $this->get_string_hash( $text . $language ) ] ) ) {
-			// get object via DB-request.
-			$query     = array(
-				'hash' => $this->get_string_hash( $text ),
-				'lang' => $language,
-			);
-			$text_objs = $this->get_entries( $query );
-			if ( ! empty( $text_objs ) ) {
-				// secure text-object.
-				$this->texts[ $this->get_string_hash( $text . $language ) ] = $text_objs[0];
-
-				// return text-object.
-				return $text_objs[0];
-			}
-
-			// return false if no entry could be found for this text.
-			return false;
+	public function get_entry_by_text( string $text, string $source_language ): bool|Text {
+		// return already loaded object.
+		if ( !empty( $this->texts[ $this->get_string_hash( $text . $source_language ) ] ) ) {
+			return $this->texts[ $this->get_string_hash( $text . $source_language ) ];
 		}
-		return $this->texts[ $this->get_string_hash( $text . $language ) ];
+
+		// get object via DB-request.
+		$query     = array(
+			'hash' => $this->get_string_hash( $text ),
+			'lang' => $source_language,
+		);
+		$text_objs = $this->get_entries( $query );
+		if ( ! empty( $text_objs ) ) {
+			// secure text-object.
+			$this->texts[ $this->get_string_hash( $text . $source_language ) ] = $text_objs[0];
+
+			// return text-object.
+			return $text_objs[0];
+		}
+
+		// return false if no entry could be found for this text.
+		return false;
 	}
 
 	/**

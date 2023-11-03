@@ -12,6 +12,23 @@ import React, { Component, useEffect, useState } from 'react';
 import $ from 'jquery';
 
 /**
+ * Init scripts for easy-language-handling.
+ */
+function init_scripts() {
+	if( top.document.querySelector('.easy-language-language-options-wrap .easy-language-translate-object') ) {
+		top.document.querySelector('.easy-language-language-options-wrap .easy-language-translate-object').addEventListener('click', function(e) {
+			e.preventDefault();
+			document.body.dispatchEvent(new CustomEvent("react-dialog", { detail: JSON.parse(this.dataset.dialog) }));
+		});
+	}
+	else {
+		setTimeout(function() {
+			init_scripts();
+		}, 200)
+	}
+}
+
+/**
  * Request the language options for this object and show them.
  *
  * @returns {JSX.Element}
@@ -43,13 +60,7 @@ function Get_Language_Options( args ) {
 		/**
 		 * Set onclick event for button to show dialog before simplifying this object.
 		 */
-		setTimeout(function() {
-			top.document.querySelector('.easy-language-language-options-wrap .easy-language-translate-object').addEventListener('click', function(e) {
-				e.preventDefault();
-				console.log();
-				document.body.dispatchEvent(new CustomEvent("react-dialog", { detail: JSON.parse(this.dataset.dialog) }));
-			});
-		}, 200)
+		init_scripts();
 	}, []);
 
 	return (

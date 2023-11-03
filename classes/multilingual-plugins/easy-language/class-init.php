@@ -750,6 +750,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			update_option( 'easy_language_automatic_simplification_enabled', 1 );
 		}
 
+		// set amount of simplification items per automatic run.
+		if ( ! get_option( 'easy_language_automatic_item_count' ) ) {
+			update_option( 'easy_language_automatic_item_count', 1 );
+		}
+
 		// set intervall for automatic simplifications.
 		if ( ! get_option( 'easy_language_automatic_simplification' ) ) {
 			update_option( 'easy_language_automatic_simplification', '5minutely' );
@@ -883,6 +888,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy_language_generate_permalink',
 			'easy_language_intro_step_2',
 			'easy_language_automatic_simplification',
+			'easy_language_automatic_item_count',
 			'easy_language_automatic_simplification_enabled'
 		);
 		foreach ( $options as $option ) {
@@ -1054,6 +1060,21 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			)
 		);
 		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_automatic_simplification_enabled' );
+
+		// Set items to simplify per run.
+		add_settings_field(
+			'easy_language_automatic_item_count',
+			__( 'Number of items per run', 'easy-language' ),
+			'easy_language_admin_number_field',
+			'easyLanguageEasyLanguagePage',
+			'settings_section_automatic',
+			array(
+				'label_for'   => 'easy_language_automatic_item_count',
+				'fieldId'     => 'easy_language_automatic_item_count',
+				'description' => __( 'The amount of items per automatic simplification run.', 'easy-language' ),
+			)
+		);
+		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_automatic_item_count' );
 
 		// get possible intervals.
 		$intervals = array();
@@ -1895,7 +1916,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'not_prevented' => true,
 			'object_not_state' => 'trash'
 		);
-		$entries = DB::get_instance()->get_entries( $query, 1 ); // TODO Zahl einstellbar machen
+		$entries = DB::get_instance()->get_entries( $query, get_option( 'easy_language_automatic_item_count', 1 ) );
 
 		// bail if no text could be found.
 		if( empty($entries) ) {

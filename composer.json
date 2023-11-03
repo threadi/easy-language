@@ -15,5 +15,8 @@
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true
     }
+  },
+  "require": {
+    "gettext/gettext": "^5.7"
   }
 }

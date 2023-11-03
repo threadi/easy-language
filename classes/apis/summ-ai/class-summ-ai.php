@@ -536,4 +536,17 @@ class Summ_AI extends Base implements Api_Base {
 			$icon_obj->save( $language_code );
 		}
 	}
+
+	/**
+	 * Return the log entries of this API.
+	 *
+	 * @return array
+	 */
+	public function get_log_entries(): array {
+		$results = $this->wpdb->get_results( $this->wpdb->prepare( 'SELECT `time`, `request`, `response` FROM '.$this->table_requests.' WHERE 1 = %d', array( 1 ) ) );
+		if( is_null($results) ) {
+			return array();
+		}
+		return $results;
+	}
 }

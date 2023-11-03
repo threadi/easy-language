@@ -196,4 +196,11 @@ interface Api_Base {
 	 * @return bool
 	 */
 	public function is_extended_in_pro(): bool;
+
+	/**
+	 * Return the log entries of this API.
+	 *
+	 * @return array
+	 */
+	public function get_log_entries(): array;
 }

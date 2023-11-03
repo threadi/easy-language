@@ -408,4 +408,13 @@ class Base {
 	public function get_supported_languages(): array {
 		return array();
 	}
+
+	/**
+	 * Return the log entries of this API.
+	 *
+	 * @return array
+	 */
+	public function get_log_entries(): array {
+		return array();
+	}
 }

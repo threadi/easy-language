@@ -924,6 +924,9 @@ class Post_Object implements Easy_Language_Object {
 			return 0;
 		}
 
+		// set state to in_use.
+		$entry->set_state( 'in_use' );
+
 		// return simplification-count.
 		return $c;
 	}
