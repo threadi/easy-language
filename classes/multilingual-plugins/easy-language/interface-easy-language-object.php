@@ -46,11 +46,18 @@ interface Easy_Language_Object {
 	public function get_original_object_as_int(): int;
 
 	/**
-	 * Return whether this object is a translated object.
+	 * Return whether this object is a simplified object.
 	 *
 	 * @return bool
 	 */
 	public function is_simplified(): bool;
+
+	/**
+	 * Return whether this object is a simplifiable object.
+	 *
+	 * @return bool
+	 */
+	public function is_simplifiable(): bool;
 
 	/**
 	 * Return whether a given post type is translated in given language.

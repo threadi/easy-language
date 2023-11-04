@@ -64,34 +64,6 @@ jQuery(document).ready(function($) {
 		);
 	});
 
-	// delete all simplified texts.
-	$('body.settings_page_easy_language_settings a.easy-language-delete-data').on('click', function(e) {
-		e.preventDefault();
-
-		// create dialog.
-		let dialog_config = {
-			detail: {
-				hide_title: true,
-				texts: [
-					'<p><strong>' + __( 'Do you really want to delete all simplifications?', 'easy-language' ) + '</strong></p>',
-				],
-				buttons: [
-					{
-						'action': 'easy_language_start_data_deletion();',
-						'variant': 'primary',
-						'text': __( 'Yes', 'easy-language' )
-					},
-					{
-						'action': 'closeDialog();',
-						'variant': 'primary',
-						'text': __( 'No', 'easy-language' )
-					}
-				]
-			}
-		}
-		easy_language_create_dialog( dialog_config );
-	});
-
 	// prevent leaving of posts-form if it has changes.
 	$("body.settings_page_easy_language_settings form").dirty({preventLeaving: true});
 
@@ -140,6 +112,9 @@ jQuery(document).ready(function($) {
 	});
 });
 
+/**
+ * Delete all simplified texts via AJAX incl. progressbar.
+ */
 function easy_language_start_data_deletion() {
 	// get internationalization tools of WordPress.
 	let { __ } = wp.i18n;

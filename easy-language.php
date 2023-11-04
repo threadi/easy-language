@@ -16,13 +16,13 @@
 
 use easyLanguage\Init;
 
-// save plugin-path.
-const EASY_LANGUAGE = __FILE__;
-
 // do nothing if PHP-version is not 8.0 or newer.
 if ( version_compare( PHP_VERSION, '8.0', '<' ) ) {
 	return;
 }
+
+// save plugin-path.
+const EASY_LANGUAGE = __FILE__;
 
 // embed necessary files.
 require_once 'inc/autoload.php';

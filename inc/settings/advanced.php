@@ -180,8 +180,28 @@ function easy_language_admin_reset_intro_now(): void {
  * @return void
  */
 function easy_language_admin_delete_data_now(): void {
+	// create dialog to start deletion.
+	$dialog_config = array(
+		'hide_title' => true,
+		'texts' => array(
+			'<p><strong>'.__( 'Do you really want to delete all simplifications?', 'easy-language' ).'</strong></p>',
+		),
+		'buttons' => array(
+			array(
+				'action' => 'easy_language_start_data_deletion();',
+				'variant' => 'primary',
+				'text' => __( 'Yes', 'easy-language' )
+			),
+			array(
+				'action' => 'closeDialog();',
+				'variant' => 'primary',
+				'text' => __( 'No', 'easy-language' )
+			)
+		)
+	);
+
 	?>
-	<p><a href="#" class="button button-primary easy-language-delete-data"><?php echo esc_html__( 'Delete ALL simplification texts', 'easy-language' ); ?></a></p>
+	<p><a href="#" class="button button-primary wp-easy-dialog" data-dialog="<?php echo esc_attr(wp_json_encode($dialog_config)); ?>"><?php echo esc_html__( 'Delete ALL simplification texts', 'easy-language' ); ?></a></p>
 	<p><i><?php echo esc_html__( 'Hint', 'easy-language' ); ?>:</i> <?php echo esc_html__( 'After click on this button the intro for this plugin will be re-initialized.', 'easy-language' ); ?></p>
 	<?php
 }

@@ -348,6 +348,7 @@ class Request {
 	 * @param $lang
 	 *
 	 * @return void
+	 * @noinspection PhpUnused
 	 */
 	public function set_target_language( $lang ): void {
 		$this->target_language = $lang;
@@ -356,11 +357,12 @@ class Request {
 	/**
 	 * Set source-language for this request.
 	 *
-	 * @param $lang
+	 * @param string $lang The source language as string (e.g. "de_EL").
 	 *
 	 * @return void
+	 * @noinspection PhpUnused
 	 */
-	public function set_source_language( $lang ): void {
+	public function set_source_language( string $lang ): void {
 		$this->source_language = $lang;
 	}
 
@@ -397,6 +399,7 @@ class Request {
 	 *
 	 * @param bool $is_test true if this request is a test.
 	 * @return void
+	 * @noinspection PhpUnused
 	 */
 	public function set_is_test( bool $is_test ): void {
 		$this->is_test = $is_test;

@@ -13,14 +13,11 @@ Funktionales
 * Kompatibilität mit Plugins testen
 -> Caching-Plugins
 -> Order-Plugins
--> WooCommerce
--> TablePress
 -> ..
 * PageBuilder-Support:
 -> Beaver
 -> SiteOrigin
 -> Themify
-* Export von Log-Daten von Requests & Responses als MO/PO-Dateien
 
 Später:
 * Vereinfachungen über eigenes Object erfassen und ausgeben

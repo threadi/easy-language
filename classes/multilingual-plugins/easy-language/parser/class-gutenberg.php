@@ -70,6 +70,7 @@ class Gutenberg extends Parser_Base implements Parser {
 		foreach ( $blocks as $block ) {
 			$resulting_texts = $this->get_block_text( $block, $resulting_texts );
 		}
+
 		return $resulting_texts;
 	}
 
@@ -81,9 +82,17 @@ class Gutenberg extends Parser_Base implements Parser {
 	 * @return array
 	 */
 	private function get_block_text( array $block, array $resulting_texts ): array {
+		// get possible flow blocks.
+		$flow_blocks = $this->get_flow_text_blocks();
+
 		// get content if it is a valid flow-text-block.
-		if ( in_array( $block['blockName'], $this->get_flow_text_blocks(), true ) ) {
-			$resulting_texts[] = trim( $block['innerHTML'] );
+		if ( isset($flow_blocks[$block['blockName']]) ) {
+			if( strlen($flow_blocks[$block['blockName']]) > 0 && is_callable($flow_blocks[$block['blockName']]) ) {
+				$resulting_texts[] = call_user_func($flow_blocks[$block['blockName']], $block['blockName']);
+			}
+			else {
+				$resulting_texts[] = trim($block['innerHTML']);
+			}
 		}
 
 		// loop through inner-blocks.
@@ -104,9 +113,9 @@ class Gutenberg extends Parser_Base implements Parser {
 		return apply_filters(
 			'easy_language_gutenberg_blocks',
 			array(
-				'core/paragraph',
-				'core/heading',
-				'core/list-item',
+				'core/paragraph' => '',
+				'core/heading' => '',
+				'core/list-item' => '',
 			)
 		);
 	}

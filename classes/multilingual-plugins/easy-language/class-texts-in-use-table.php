@@ -243,7 +243,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 		foreach( $entries as $item ) {
 			// get object of the used api.
 			$api_obj = $item->get_api();
-			if( empty($languages_array[$item->get_source_language()]) ) {
+			if( false !== $api_obj && empty($languages_array[$item->get_source_language()]) ) {
 				// get source languages of this api.
 				$source_languages = $api_obj->get_active_source_languages();
 

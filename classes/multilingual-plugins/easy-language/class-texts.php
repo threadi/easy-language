@@ -292,7 +292,7 @@ class Texts {
 		$post_obj = new Post_Object( $post_id );
 
 		// if this is an original object, check its contents.
-		if ( $post_obj->is_translatable() ) {
+		if ( $post_obj->is_simplifiable() ) {
 			// parse text depending on used pagebuilder.
 			$pagebuilder_obj = $post_obj->get_page_builder();
 

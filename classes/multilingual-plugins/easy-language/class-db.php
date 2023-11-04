@@ -299,6 +299,9 @@ class Db {
 			$sql_limit = ' LIMIT '.absint($limit);
 		}
 
+		// set ordering: title first, then other fields (to show fast proceed as titles are smaller than other texts).
+		$sql_order = " ORDER BY IF( o.field = 'title', 0, 1 ) ASC";
+
 		// define base-statement.
 		$sql = 'SELECT `id`, `original`, `lang`%1$s FROM ' . $wpdb->easy_language_originals . ' AS o';
 
@@ -306,7 +309,7 @@ class Db {
 		$sql = sprintf( $sql, $sql_select );
 
 		// concat sql-statement.
-		$sql = $sql . implode( ' ', $sql_join ) . $sql_where . $sql_limit;
+		$sql = $sql . implode( ' ', $sql_join ) . $sql_where . $sql_order . $sql_limit;
 
 		// prepare SQL-statement.
 		$prepared_sql = $wpdb->prepare( $sql, $vars );

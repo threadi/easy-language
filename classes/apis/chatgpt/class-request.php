@@ -315,11 +315,11 @@ class Request {
 	/**
 	 * Set source-language for this request.
 	 *
-	 * @param $lang
+	 * @param string $lang The source language as string (e.g. "de_EL")
 	 *
 	 * @return void
 	 */
-	public function set_source_language( $lang ): void {
+	public function set_source_language( string $lang ): void {
 		$this->source_language = $lang;
 	}
 

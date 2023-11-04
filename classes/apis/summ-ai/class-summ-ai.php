@@ -217,6 +217,7 @@ class Summ_AI extends Base implements Api_Base {
 				'api_value'   => 'plain',
 				'icon' => 'icon-de-el',
 				'img' => 'de_EL.png',
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : ''
 			),
 			'de_LS' => array(
 				'label'       => __( 'Leichte Sprache', 'easy-language' ),
@@ -226,6 +227,7 @@ class Summ_AI extends Base implements Api_Base {
 				'api_value'   => 'easy',
 				'icon' => 'icon-de-ls',
 				'img' => 'de_LS.png',
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : ''
 			),
 		);
 	}

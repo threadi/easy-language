@@ -1469,7 +1469,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Run simplification via AJAX.
 	 *
-	 * Output-Format: count-of-simplifications;count-of-total-simplifications;running-marker;result-as-text;link
+	 * Output-Format: count-of-simplifications;count-of-total-simplifications;running-marker;result-as-wp-easy-dialog-array
 	 *
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
@@ -1484,6 +1484,34 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		if ( absint( $post_id ) > 0 ) {
 			// get object.
 			$post_obj = new Post_Object( $post_id );
+
+			// bail if object is not a simplifiable object.
+			if( ! $post_obj->is_simplified() ) {
+				// collect return array.
+				$return = array(
+					1,
+					1,
+					0,
+					array(
+						'className' => 'wp-dialog-error',
+						'title' => __( 'Error', 'easy-language' ),
+						'texts' => array(
+							'<p>'.__( 'Requested object is not intended to be simplified!', 'easy-language' ).'</p>'
+						),
+						'buttons' => array(
+							array(
+								'action' => 'closeDialog();',
+								'variant' => 'primary',
+								'text' => __( 'OK', 'easy-language' )
+							)
+						)
+					)
+				);
+				wp_send_json( $return );
+
+				// do nothing more.
+				wp_die();
+			}
 
 			// get api.
 			$api_obj = Apis::get_instance()->get_active_api();
@@ -1533,6 +1561,47 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 			// get result (if set).
 			$results = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, array() );
+
+			// check if all values are available and return general error if not.
+			if( !isset($count_simplifications[ $post_obj->get_md5() ]) || !isset($max_simplifications[ $post_obj->get_md5() ]) || !isset($running_simplifications[ $post_obj->get_md5() ]) || !isset($results[ $post_obj->get_md5() ]) ) {
+				$error_message = sprintf( '<p>Error: Simplification failed with %1$s:<br>', esc_html( $api_obj->get_title() ) );
+				if( !isset($count_simplifications[ $post_obj->get_md5() ]) ) {
+					$error_message .= '* counting failed<br>';
+				}
+				if( !isset($max_simplifications[ $post_obj->get_md5() ]) ) {
+					$error_message .= '* max value failed<br>';
+				}
+				if( !isset($running_simplifications[ $post_obj->get_md5() ]) ) {
+					$error_message .= '* running marker failed<br>';
+				}
+				if( !isset($results[ $post_obj->get_md5() ]) ) {
+					$error_message .= '* no result returned<br>';
+				}
+
+				// collect return array for this error.
+				$return = array(
+					1,
+					1,
+					0,
+					array(
+						'className' => 'wp-dialog-error',
+						'title' => __( 'Error', 'easy-language' ),
+						'texts' => array(
+							'<p>'.sprintf(__( '<strong>This error should never happen!</strong> Please contact the <a href="%1$s" target="_blank">Plugin-support (opens new window)</a> about the following erro.', 'easy-language' ), esc_url(Helper::get_support_url())).'</p>',
+							$error_message
+						),
+						'buttons' => array(
+							array(
+								'action' => 'location.reload();',
+								'variant' => 'primary',
+								'text' => __( 'OK', 'easy-language' )
+							)
+						)
+					)
+				);
+				wp_send_json( $return );
+				wp_die();
+			}
 
 			// collect return array.
 			$return = array(

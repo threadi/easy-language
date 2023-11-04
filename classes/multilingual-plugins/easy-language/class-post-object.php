@@ -32,20 +32,20 @@ class Post_Object implements Easy_Language_Object {
 
 	/**
 	 * The simplification-type of the object:
-	 * - translated => the original objects in WP.
-	 * - translatable => the simplified objects of our own plugin.
+	 * - simplifiable => the original objects in WP.
+	 * - simplified => the simplified objects of our own plugin.
 	 *
 	 * @var string
 	 */
-	private string $translate_type = 'translatable';
+	private string $simplify_type = '';
 
 	/**
 	 * Initialize the object.
 	 *
-	 * @param int $post_id The Post-ID.
+	 * @param int $post_id The post-ID.
 	 */
 	public function __construct( int $post_id ) {
-		// secure the given ID.
+		// secure the given post-object-ID.
 		$this->id = $post_id;
 	}
 
@@ -55,10 +55,13 @@ class Post_Object implements Easy_Language_Object {
 	 * @return string
 	 */
 	private function get_simplification_type(): string {
-		if ( get_post_meta( $this->get_id(), 'easy_language_simplification_original_id', true ) ) {
-			$this->translate_type = 'translated';
+		if( empty($this->simplify_type) ) {
+			$this->simplify_type = 'simplifiable';
+			if( get_post_meta($this->get_id(), 'easy_language_simplification_original_id', true) ) {
+				$this->simplify_type = 'simplified';
+			}
 		}
-		return $this->translate_type;
+		return $this->simplify_type;
 	}
 
 	/**
@@ -70,7 +73,7 @@ class Post_Object implements Easy_Language_Object {
 		$languages = Languages::get_instance()->get_active_languages();
 
 		// if this is a simplifiable object, get only source languages.
-		if ( 'translatable' === $this->translate_type ) {
+		if ( $this->is_simplifiable() ) {
 			$languages     = Languages::get_instance()->get_possible_source_languages();
 			$language_code = get_post_meta( $this->get_id(), 'easy_language_text_language', true );
 			if ( empty( $language_code ) ) {
@@ -120,7 +123,7 @@ class Post_Object implements Easy_Language_Object {
 	 * @return bool
 	 */
 	public function is_simplified(): bool {
-		return 'translated' === $this->get_simplification_type();
+		return 'simplified' === $this->get_simplification_type();
 	}
 
 	/**
@@ -128,8 +131,8 @@ class Post_Object implements Easy_Language_Object {
 	 *
 	 * @return bool
 	 */
-	public function is_translatable(): bool {
-		return 'translatable' === $this->get_simplification_type();
+	public function is_simplifiable(): bool {
+		return 'simplifiable' === $this->get_simplification_type();
 	}
 
 	/**
@@ -260,7 +263,7 @@ class Post_Object implements Easy_Language_Object {
 	 * @return void
 	 */
 	public function mark_as_changed_in_language( string $language_code ): void {
-		if ( false === $this->is_translatable() ) {
+		if ( false === $this->is_simplifiable() ) {
 			return;
 		}
 
@@ -277,7 +280,7 @@ class Post_Object implements Easy_Language_Object {
 	 */
 	public function has_changed( string $language_code ): bool {
 		$changed_marker = absint( get_post_meta( $this->get_id(), 'easy_language_' . $language_code . '_changed', true ) );
-		return $this->is_translatable() && 1 === $changed_marker;
+		return $this->is_simplifiable() && 1 === $changed_marker;
 	}
 
 	/**
@@ -288,7 +291,7 @@ class Post_Object implements Easy_Language_Object {
 	 * @return void
 	 */
 	public function remove_changed_marker( string $language_code ): void {
-		if ( false === $this->is_translatable() ) {
+		if ( false === $this->is_simplifiable() ) {
 			return;
 		}
 
@@ -305,7 +308,7 @@ class Post_Object implements Easy_Language_Object {
 	 */
 	public function add_translated_language( string $target_language ): void {
 		// only for translatable object.
-		if ( false === $this->is_translatable() ) {
+		if ( false === $this->is_simplifiable() ) {
 			delete_post_meta( $this->get_id(), 'easy_language_simplified_in' );
 			return;
 		}
@@ -329,7 +332,7 @@ class Post_Object implements Easy_Language_Object {
 	 */
 	public function remove_translated_language( string $target_language ): void {
 		// only for translatable object.
-		if ( false === $this->is_translatable() ) {
+		if ( false === $this->is_simplifiable() ) {
 			return;
 		}
 
@@ -489,7 +492,7 @@ class Post_Object implements Easy_Language_Object {
 	/**
 	 * Process multiple simplification of a single post-object.
 	 *
-	 * @param Object $simplification_obj The simplification-object.
+	 * @param Object $simplification_obj The simplification-object of the used API.
 	 * @param array  $language_mappings The language-mappings.
 	 * @param int    $limit Limit the entries processed during this request.
 	 * @param bool   $initialization Mark if this is the initialization of a simplification.
@@ -550,7 +553,7 @@ class Post_Object implements Easy_Language_Object {
 				'state'     => 'processing',
 			);
 
-			// get entries which are in process.
+			// get entries which are in process and show error if there are any.
 			$entries_in_process = Db::get_instance()->get_entries( $filter );
 			if ( ! empty( $entries_in_process ) ) {
 				// set result.

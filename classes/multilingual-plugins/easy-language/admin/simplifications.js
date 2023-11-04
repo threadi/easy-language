@@ -266,27 +266,46 @@ function easy_language_get_simplification_info( obj_id, initialization ) {
 				'nonce': easyLanguageSimplificationJsVars.run_simplification_nonce
 			},
 			error: function(e) {
-				if( e.textStatus !== undefined ) {
+				console.log(e);
+				let dialog_config = {};
+				if( 200 !== e.status ) {
 					// create dialog with error-message.
-					let dialog_config = {
+					dialog_config = {
 						detail: {
-							title: __( 'Error', 'easy-language' ),
+							title: __('Error', 'easy-language'),
 							texts: [
-								// TODO Pro-URL ermitteln
 								/* translators: [error] will be replaced by the http-error-message (e.g. "Gateway timed our"), %1$s will be replaced with the Pro-URL */
-								__( '<p><strong>The following error occurred during: [error]</strong> - at least one simplification could not be processed.<br><br><strong>Possible causes:</strong></p><ul><li>The server settings for WordPress hosting prevent longer lasting requests. Contact your hosters support for a solution.</li><li>The API used took too long to simplify the text. Shorten particularly long texts or contact API support for further assistance.</li><li>Use <a href="%1$s" target="_blank">Easy Language Pro</a> for automatic translations in the background without the risk of hitting timeouts on your own hosting.</li></ul>', 'easy-language' ).replace('[error]', e.statusText)
+								__('<p><strong>The following error occurred during: [error]</strong> - at least one simplification could not be processed.<br><br><strong>Possible causes:</strong></p><ul><li>The server settings for WordPress hosting prevent longer lasting requests. Contact your hosters support for a solution.</li><li>The API used took too long to simplify the text. Shorten particularly long texts or contact API support for further assistance.</li><li>Use automatic simplifications in the background without the risk of hitting timeouts on your own hosting.</li></ul>', 'easy-language').replace('[error]', e.statusText)
 							],
 							buttons: [
 								{
-									'action': 'closeDialog();',
-									'variant': 'secondary',
+									'action': 'location.reload();',
+									'variant': 'primary',
 									'text': 'OK'
 								}
 							]
 						}
 					}
-					easy_language_create_dialog( dialog_config );
 				}
+				else {
+					// create dialog with error-message.
+					dialog_config = {
+						detail: {
+							title: __('Error', 'easy-language'),
+							texts: [
+								__('<p><strong>Any error occurred during simplification.</strong><br>Please check your error-log for the reason.', 'easy-language')
+							],
+							buttons: [
+								{
+									'action': 'location.reload();',
+									'variant': 'primary',
+									'text': 'OK'
+								}
+							]
+						}
+					}
+				}
+				easy_language_create_dialog( dialog_config );
 			},
 			success: function (data) {
 				let count    = parseInt( data[0] );
@@ -319,6 +338,7 @@ function easy_language_get_simplification_info( obj_id, initialization ) {
  * @param object_id
  * @param prevent_automatic_simplification
  * @param link
+ * @param command
  */
 function easy_language_prevent_automatic_simplification( object_id, prevent_automatic_simplification, link, command ) {
 	jQuery.ajax(
