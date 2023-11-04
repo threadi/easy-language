@@ -218,10 +218,10 @@ class Log_Api_Table extends WP_List_Table {
 					),
 					get_admin_url() . 'admin.php'
 				);
-				?><a href="<?php echo esc_url($url); ?>" class="button"><?php echo esc_html__( 'Export', 'easy-language' ); ?></a><?php
+				?><a href="<?php echo esc_url($url); ?>" class="button"><?php echo esc_html__( 'Export as CSV', 'easy-language' ); ?></a><?php
 			}
 			else {
-				?><span class="button disabled" title="<?php echo esc_html__('Choose a API to export above', 'easy-language' ); ?>"><?php echo esc_html__( 'Export', 'easy-language' ); ?></span><?php
+				?><span class="button disabled" title="<?php echo esc_html__('Choose an API to export above', 'easy-language' ); ?>"><?php echo esc_html__( 'Export as CSV', 'easy-language' ); ?></span><?php
 			}
 		}
 	}

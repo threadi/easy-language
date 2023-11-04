@@ -19,6 +19,7 @@
     <fail unless="plugin.slug" />
     <fail unless="plugin.version" />
     <fail unless="npm.path" />
+	<fail unless="composer.path" />
 	<fail unless="apis" />
 	<fail unless="pagebuilders" />
     <fail message="Do not run as root!">
@@ -38,6 +39,14 @@
             <arg line="i concurrently"/>
         </exec>
     </target>
+
+	<!-- install composer -->
+	<target name="composer-install">
+		<delete file="${log.dir}/composer-install1.txt"/>
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-install1.txt">
+			<arg line="install"/>
+		</exec>
+	</target>
 
     <!-- build the Blocks via npm -->
     <target name="npm-build" depends="npm-install">
@@ -92,7 +101,7 @@
     </target>
 
     <!-- init project -->
-    <target name="init" description="initialize the project" depends="npm-build,json-translations" />
+    <target name="init" description="initialize the project" depends="npm-build,composer-install,json-translations" />
 
     <!-- create release-zip -->
     <target name="build" description="builds a new release" depends="init,setVersionNumber">

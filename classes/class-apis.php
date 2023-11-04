@@ -123,10 +123,10 @@ class Apis {
 					);
 				}
 
-				// set header for response as download.
+				// set header for response as CSV-download.
 				header("Content-type: application/csv");
-				header("Content-Disposition: attachment; filename=".date('YmdHi')."_".get_option('blogname').".csv"); // TODO
-				$fp = fopen('php://output', 'w'); // or use php://stdout
+				header("Content-Disposition: attachment; filename=".sanitize_file_name(date('YmdHi')."_".get_option('blogname').".csv"));
+				$fp = fopen('php://output', 'w');
 				foreach ($entries as $row) {
 					fputcsv($fp, $row);
 				}

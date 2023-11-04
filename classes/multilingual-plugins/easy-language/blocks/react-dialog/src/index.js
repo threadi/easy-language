@@ -1,3 +1,8 @@
+/**
+ * File to handle easy dialog for React.
+ *
+ * @package react-dialog
+ */
 import './style.scss'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -22,11 +27,11 @@ function Modal( args ) {
 			<div className="modal_bg" onClick={closeDialog} />
 			<div className="modal">
 				{args.dialog.title &&
-					<h1 className="wp-easy-dialog-title">{args.dialog.title}</h1>
+					<h1 className="react-dialog-title">{args.dialog.title}</h1>
 				}
 				{args.dialog.texts && args.dialog.texts.map(function(text) {
 						return (
-							<div key={text} dangerouslySetInnerHTML={{__html: text}} className="wp-easy-dialog-text" />
+							<div key={text} dangerouslySetInnerHTML={{__html: text}} className="react-dialog-text" />
 						)
 					}
 				)
@@ -50,7 +55,7 @@ function Modal( args ) {
 			</div>
 		</>
 	);
-};
+}
 export default Modal;
 
 /**
@@ -63,11 +68,9 @@ export default Modal;
 function add_react_dialog( dialog ) {
 	if( dialog ) {
 		if( ! top.document.getElementById('react-dialog-root') ) {
-			if( top.document.getElementById('wpadminbar') ) {
-				let root = top.document.createElement('div');
-				root.id = 'react-dialog-root';
-				top.document.body.append(root);
-			}
+			let root = top.document.createElement('div');
+			root.id = 'react-dialog-root';
+			top.document.body.append(root);
 		}
 		// we use ReactDom.render as Divi comes with React 16 and not React 18.
 		ReactDOM.render(<Modal dialog={dialog}/>, top.document.getElementById('react-dialog-root'));

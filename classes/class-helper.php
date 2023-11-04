@@ -335,7 +335,7 @@ class Helper {
 	}
 
 	/**
-	 * Get attachment by given language-code via postmeta of the attachment.
+	 * Get attachment by given language-code via post-meta of the attachment.
 	 *
 	 * @param string $language_code The search language code.
 	 *
@@ -367,15 +367,33 @@ class Helper {
 	/**
 	 * Get img for given language code.
 	 *
-	 * @param string $language_code
+	 * @param string $language_code The language we search an icon for.
 	 *
 	 * @return string
 	 */
 	public static function get_icon_img_for_language_code( string $language_code ): string {
-		$attachment = self::get_attachment_by_language_code( $language_code );
-		if( false !== $attachment ) {
-			return ' '.wp_get_attachment_image( $attachment->ID );
+		// get list of images from db.
+		$images = (array)get_option( 'easy_language_icons', array() );
+
+		// return image if it is in list.
+		if( !empty($images[$language_code]) ) {
+			return ' '.wp_kses_post($images[$language_code]);
 		}
+
+		// get it from media library if requested language is not in list.
+		$attachment = self::get_attachment_by_language_code($language_code);
+		if( false !== $attachment ) {
+			// get image.
+			$image = wp_get_attachment_image($attachment->ID);
+
+			// add it to list in DB.
+			$images[$language_code] = $image;
+			update_option( 'easy_language_icons', $images );
+
+			// return image.
+			return ' ' . wp_kses_post($image);
+		}
+
 		return '';
 	}
 
@@ -452,5 +470,20 @@ class Helper {
 			return wp_get_attachment_image_url( $attachment->ID );
 		}
 		return '';
+	}
+
+	/**
+	 * Get object by given id and type.
+	 *
+	 * @param int $object_id The object-ID.
+	 * @param string $object_type The object-type.
+	 * @return object|false
+	 */
+	public static function get_object( int $object_id, string $object_type ): object|false {
+		$post_types = \easyLanguage\Multilingual_plugins\Easy_Language\Init::get_instance()->get_supported_post_types();
+		if( !empty($post_types[$object_type]) ) {
+			return new Post_Object($object_id);
+		}
+		return false;
 	}
 }

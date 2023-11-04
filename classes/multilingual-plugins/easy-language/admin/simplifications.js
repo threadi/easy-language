@@ -14,18 +14,7 @@ jQuery( document ).ready(
 
 		// save automatic prevention setting.
 		$('input.easy-language-automatic-simplification-prevention').on( 'change', function() {
-			jQuery.ajax(
-				{
-					type: "POST",
-					url: easyLanguageSimplificationJsVars.ajax_url,
-					data: {
-						'action': 'easy_language_set_simplification_prevention_on_object',
-						'post': $(this).data('id'),
-						'prevent_automatic_simplification': $(this).is(':checked'),
-						'nonce': easyLanguageSimplificationJsVars.set_simplification_prevention_nonce
-					},
-				}
-			);
+			easy_language_prevent_automatic_simplification( $(this).data('id'), $(this).is(':checked'), null );
 		});
 
 		// start to simplify a single text via AJAX.
@@ -126,7 +115,6 @@ function easy_language_add_simplification_object( object_id, language, simplific
 				'action': 'easy_language_add_simplification_object',
 				'post': object_id,
 				'language': language,
-				'prevent_automatic_simplification': "manually" === simplification_mode,
 				'nonce': easyLanguageSimplificationJsVars.add_simplification_nonce
 			},
 			success: function(data) {
@@ -143,17 +131,17 @@ function easy_language_add_simplification_object( object_id, language, simplific
 								title: __('%1$s ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
 								texts: [
 									/* translators: %1$s and %4$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title, %3$s will be replaced by the language-name */
-									__('<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.<br>If you decide to just edit this %4$s its texts will not automatically be simplified in background.</p>', 'easy-language').replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language).replace('%4$s', data.object_type_name)
+									__('<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.<br>If you decide to edit this %4$s by yourself its texts will not automatically be simplified in background.</p>', 'easy-language').replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language).replace('%4$s', data.object_type_name)
 								],
 								buttons: [
 									{
-										'action': 'easy_language_get_simplification(' + data.object_id + ', "' + data.language + '", false );',
+										'action': 'easy_language_get_simplification(' + data.object_id + ' );',
 										'variant': 'primary',
 										/* translators: %1$s will be replaced by the API-title */
 										'text': __('Simplify now via API %1$s', 'easy-language').replace('%1$s', data.api_title)
 									},
 									{
-										'action': 'location.href="' + data.edit_link + '";',
+										'action': 'easy_language_prevent_automatic_simplification(' + data.object_id + ', true, "' + data.edit_link + '" );',
 										'variant': 'secondary',
 										/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
 										'text': __('Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
@@ -216,7 +204,7 @@ function easy_language_simplification_init( id, link, frontend_edit ) {
 			],
 			buttons: [
 				{
-					'action': 'easy_language_get_simplification( ' + id + ', "' + link + '", ' + frontend_edit + ');',
+					'action': 'easy_language_get_simplification( ' + id + ' );',
 					'variant': 'primary',
 					'text': __( 'Yes', 'easy-language' )
 				},
@@ -235,14 +223,15 @@ function easy_language_simplification_init( id, link, frontend_edit ) {
  * Start loading of simplifications of actual object.
  *
  * @param object_id
- * @param link
- * @param frontend_edit
  */
-function easy_language_get_simplification( object_id, link, frontend_edit ) {
+function easy_language_get_simplification( object_id ) {
+	// get internationalization tools of WordPress.
+	let { __ } = wp.i18n;
+
 	// create dialog.
 	let dialog_config = {
 		detail: {
-			title: 'Simplification in progress',
+			title: __('Simplification in progress', 'easy-language' ),
 			progressbar: {
 				active: true,
 				progress: 0,
@@ -318,6 +307,36 @@ function easy_language_get_simplification_info( obj_id, initialization ) {
 				} else {
 					// create dialog based on return.
 					easy_language_create_dialog( { detail: dialog_config } );
+				}
+			}
+		}
+	);
+}
+
+/**
+ * Prevent simplification of object and optionally forward user to given link or run command after it.
+ *
+ * @param object_id
+ * @param prevent_automatic_simplification
+ * @param link
+ */
+function easy_language_prevent_automatic_simplification( object_id, prevent_automatic_simplification, link, command ) {
+	jQuery.ajax(
+		{
+			type: "POST",
+			url: easyLanguageSimplificationJsVars.ajax_url,
+			data: {
+				'action': 'easy_language_set_simplification_prevention_on_object',
+				'post': object_id,
+				'prevent_automatic_simplification': prevent_automatic_simplification,
+				'nonce': easyLanguageSimplificationJsVars.set_simplification_prevention_nonce
+			},
+			success: function() {
+				if( link ) {
+					location.href = link;
+				}
+				else if( command ) {
+					eval(command);
 				}
 			}
 		}

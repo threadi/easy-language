@@ -1,3 +1,8 @@
+/**
+ * File to handle easy dialog for WordPress.
+ *
+ * @package wp-easy-dialog
+ */
 import './style.scss';
 import { Button, Modal } from '@wordpress/components';
 import React, {useState} from 'react'

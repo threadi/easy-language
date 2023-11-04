@@ -17,7 +17,7 @@
     color: var(--lwel-hint-font);
 }
 
-.settings_page_easy_language_settings .highlight a:after, .post-type-personioposition .personio-pro-hint a:after {
+.settings_page_easy_language_settings .highlight a:after {
     content: "\f504";
     display: inline-block;
     font-family: "dashicons", sans-serif;
@@ -270,13 +270,15 @@ body .text-translations-table #source_language, body .text-translations-table #t
 	width: 80px;
 }
 
+.settings_page_easy_language_settings .attachment-thumbnail { width: 18px;height: auto }
+
+.settings_page_easy_language_settings #options { width: 42px; }
+
+.easy-language-icons .tablenav { display: none }
+
 .easy-language-transient h3 {
 	margin: 15px 0;
 }
-
-.settings_page_easy_language_settings .attachment-thumbnail { width: 18px;height: auto }
-
-.easy-language-icons .tablenav { display: none }
 
 @media only screen and (max-width: 990px) {
 	.easy-api-radios { display: block }
@@ -308,4 +310,26 @@ body.wp-easy-dialog-on-body.wp-core-ui .hide-header .wp-easy-dialog-text {
 
 body.wp-easy-dialog-on-body.wp-core-ui .components-modal__header .components-modal__header-heading {
 	padding-right: 64px;
+}
+
+.text-translations-table #used_in, .settings_page_easy_language_settings #used_in {
+	width: 120px;
+}
+
+.easy-language-automatic-simplification-prevented {
+	cursor: pointer;
+	position: relative;
+	z-index: 1
+}
+
+.easy-language-automatic-simplification-prevented:after {
+	border-bottom: 2px solid red;
+	content: "";
+	position: absolute;
+	top: 9px;
+	right: -6px;
+	left: 0;
+	bottom: 0;
+	z-index: 2;
+	transform: rotate(145deg);
 }

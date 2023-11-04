@@ -41,6 +41,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 			'date'            => __( 'date', 'easy-language' ),
 			'used_api'        => __( 'used API', 'easy-language' ),
 			'user'            => __( 'requesting user', 'easy-language' ),
+			'used_in'		  => __( 'used in', 'easy-language' ),
 			'source_language' => __( 'source language', 'easy-language' ),
 			'target_language' => __( 'target language', 'easy-language' ),
 			'original'        => __( 'original', 'easy-language' ),
@@ -126,6 +127,14 @@ class Texts_In_Use_Table extends WP_List_Table {
 		// get object of the used api.
 		$api_obj = $item->get_api();
 
+		// filter column name.
+		$column_name = apply_filters( 'easy_language_simplification_table_used_in', $column_name, $item );
+
+		// bail if column-name is not set.
+		if( false === $column_name ) {
+			return '';
+		}
+
 		// show content depending on column.
 		switch ( $column_name ) {
 			// show date.
@@ -199,6 +208,10 @@ class Texts_In_Use_Table extends WP_List_Table {
 
 				// return hint that this translation was run without login.
 				return '<i>' . __( 'without login', 'easy-language' ) . '</i>';
+
+			// show hint for pro in used in column.
+			case 'used_in':
+				return '<span class="pro-marker">'.__( 'Only in Pro', 'easy-language' ).'</span>';
 
 			// fallback if no column has been matched.
 			default:
@@ -274,10 +287,10 @@ class Texts_In_Use_Table extends WP_List_Table {
 					),
 					get_admin_url() . 'admin.php'
 				);
-				?><a href="<?php echo esc_url($url); ?>" class="button"><?php echo esc_html__( 'Export as mo/po', 'easy-language' ); ?></a><?php
+				?><a href="<?php echo esc_url($url); ?>" class="button"><?php echo esc_html__( 'Export as Portable Object (po)', 'easy-language' ); ?></a><?php
 			}
 			else {
-				?><span class="button disabled" title="<?php echo esc_html__('Choose a language to export above', 'easy-language' ); ?>"><?php echo esc_html__( 'Export as mo/po', 'easy-language' ); ?></span><?php
+				?><span class="button disabled" title="<?php echo esc_html__('Choose a language above to export', 'easy-language' ); ?>"><?php echo esc_html__( 'Export as Portable Object (po)', 'easy-language' ); ?></span><?php
 			}
 		}
 	}
@@ -289,5 +302,14 @@ class Texts_In_Use_Table extends WP_List_Table {
 	 */
 	private function get_lang_filter(): string {
 		return isset($_GET['lang']) ? sanitize_text_field( $_GET['lang'] ) : '';
+	}
+
+	/**
+	 * Message to be displayed when there are no items
+	 *
+	 * @since 3.1.0
+	 */
+	public function no_items(): void {
+		echo esc_html__( 'No simplified texts found.', 'easy-language' );
 	}
 }

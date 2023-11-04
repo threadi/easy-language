@@ -10,7 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require dirname(EASY_LANGUAGE) . '/vendor/autoload.php';
+if( defined('EASY_LANGUAGE') ) {
+	require dirname(EASY_LANGUAGE) . '/vendor/autoload.php';
+}
 
 // set autoloader.
 spl_autoload_register( 'easy_language_autoloader' );

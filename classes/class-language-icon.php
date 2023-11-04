@@ -92,6 +92,9 @@ class Language_Icon {
 						$language_list[ $language_code ] = 1;
 						update_post_meta( $attachment->ID, 'easy_language_code', $language_list );
 					}
+
+					// delete icon cache in DB.
+					delete_option( 'easy_language_icons' );
 				}
 			}
 		}

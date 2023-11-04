@@ -168,13 +168,16 @@ class Divi extends Parser_Base implements Parser {
 	 * @return string
 	 */
 	public function get_edit_link(): string {
-		return add_query_arg(
-			array(
-				'et_fb'     => '1',
-				'PageSpeed' => 'Off',
-			),
-			et_fb_prepare_ssl_link( get_permalink( $this->get_object_id() ) )
-		);
+		if( $this->is_divi_active() ) {
+			return add_query_arg(
+				array(
+					'et_fb' => '1',
+					'PageSpeed' => 'Off',
+				),
+				et_fb_prepare_ssl_link(get_permalink($this->get_object_id()))
+			);
+		}
+		return parent::get_edit_link();
 	}
 
 	/**

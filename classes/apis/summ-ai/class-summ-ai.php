@@ -164,7 +164,7 @@ class Summ_AI extends Base implements Api_Base {
 				'description' => __( 'Informal german spoken in Germany.', 'easy-language'),
 				'icon' => 'icon-de-de',
 				'img' => 'de_de.png',
-				'img_icon' => Helper::get_icon_img_for_language_code( 'de_de' )
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : ''
 			),
 			'de_DE_formal' => array(
 				'label' => __( 'German (Formal)', 'easy-language'),
@@ -172,7 +172,7 @@ class Summ_AI extends Base implements Api_Base {
 				'description' => __( 'Formal german spoken in Germany.', 'easy-language'),
 				'icon' => 'icon-de-de',
 				'img' => 'de_de.png',
-				'img_icon' => Helper::get_icon_img_for_language_code( 'de_DE_formal' )
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_DE_formal' ) : ''
 			),
 			'de_CH' => array(
 				'label' => __( 'Suisse german', 'easy-language'),
@@ -180,7 +180,7 @@ class Summ_AI extends Base implements Api_Base {
 				'description' => __( 'Formal german spoken in Suisse.', 'easy-language'),
 				'icon' => 'icon-de-ch',
 				'img' => 'de_ch.png',
-				'img_icon' => Helper::get_icon_img_for_language_code( 'de_CH' )
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_CH' ) : ''
 			),
 			'de_CH_informal' => array(
 				'label' => __( 'Suisse german (Informal)', 'easy-language'),
@@ -188,7 +188,7 @@ class Summ_AI extends Base implements Api_Base {
 				'description' => __( 'Informal german spoken in Suisse.', 'easy-language'),
 				'icon' => 'icon-de-ch',
 				'img' => 'de_ch.png',
-				'img_icon' => Helper::get_icon_img_for_language_code( 'de_CH_informal' )
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_CH_informal' ) : ''
 			),
 			'de_AT' => array(
 				'label' => __( 'Austria German', 'easy-language'),
@@ -196,7 +196,7 @@ class Summ_AI extends Base implements Api_Base {
 				'description' => __( 'German spoken in Austria.', 'easy-language'),
 				'icon' => 'icon-de-at',
 				'img' => 'de_at.png',
-				'img_icon' => Helper::get_icon_img_for_language_code( 'de_AT' )
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_AT' ) : ''
 			),
 		);
 	}

@@ -31,7 +31,9 @@ class Post_Object implements Easy_Language_Object {
 	private int $id;
 
 	/**
-	 * The translate-type of the object.
+	 * The simplification-type of the object:
+	 * - translated => the original objects in WP.
+	 * - translatable => the simplified objects of our own plugin.
 	 *
 	 * @var string
 	 */
@@ -45,13 +47,18 @@ class Post_Object implements Easy_Language_Object {
 	public function __construct( int $post_id ) {
 		// secure the given ID.
 		$this->id = $post_id;
+	}
 
-		/**
-		 * Check translate-typ of object: translatable or translated.
-		 */
+	/**
+	 * Get simplification type.
+	 *
+	 * @return string
+	 */
+	private function get_simplification_type(): string {
 		if ( get_post_meta( $this->get_id(), 'easy_language_simplification_original_id', true ) ) {
 			$this->translate_type = 'translated';
 		}
+		return $this->translate_type;
 	}
 
 	/**
@@ -62,7 +69,7 @@ class Post_Object implements Easy_Language_Object {
 	public function get_language(): array {
 		$languages = Languages::get_instance()->get_active_languages();
 
-		// if this is a translatable object, get only source languages.
+		// if this is a simplifiable object, get only source languages.
 		if ( 'translatable' === $this->translate_type ) {
 			$languages     = Languages::get_instance()->get_possible_source_languages();
 			$language_code = get_post_meta( $this->get_id(), 'easy_language_text_language', true );
@@ -113,7 +120,7 @@ class Post_Object implements Easy_Language_Object {
 	 * @return bool
 	 */
 	public function is_simplified(): bool {
-		return 'translated' === $this->translate_type;
+		return 'translated' === $this->get_simplification_type();
 	}
 
 	/**
@@ -122,7 +129,7 @@ class Post_Object implements Easy_Language_Object {
 	 * @return bool
 	 */
 	public function is_translatable(): bool {
-		return 'translatable' === $this->translate_type;
+		return 'translatable' === $this->get_simplification_type();
 	}
 
 	/**
@@ -488,6 +495,7 @@ class Post_Object implements Easy_Language_Object {
 	 * @param bool   $initialization Mark if this is the initialization of a simplification.
 	 *
 	 * @return int
+	 * @noinspection PhpUndefinedFunctionInspection
 	 */
 	public function process_simplifications( object $simplification_obj, array $language_mappings, int $limit = 0, bool $initialization = true ): int {
 		// get object-hash.
@@ -681,7 +689,6 @@ class Post_Object implements Easy_Language_Object {
 						)
 					)
 				);
-				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 			} else {
 				// otherwise show hint that some texts are already optimized.
 				$dialog = array(
@@ -708,8 +715,8 @@ class Post_Object implements Easy_Language_Object {
 						)
 					)
 				);
-				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 			}
+			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
 			// set max value as count.
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, absint( $simplification_max[ $hash ] ) );
@@ -1007,6 +1014,9 @@ class Post_Object implements Easy_Language_Object {
 	 * @return bool true if object is locked.
 	 */
 	public function is_locked(): bool {
+		if( !function_exists('wp_check_post_lock') ) {
+			require_once ABSPATH . 'wp-admin/includes/post.php';
+		}
 		return wp_check_post_lock( $this->get_id() );
 	}
 
@@ -1123,6 +1133,9 @@ class Post_Object implements Easy_Language_Object {
 
 			// set marker to reset permalinks.
 			Rewrite::get_instance()->set_refresh();
+
+			// set lock on post to prevent automatic simplification.
+			wp_set_post_lock( $copied_post_id );
 
 			// get object of copy.
 			$copy_post_obj = new Post_Object( $copied_post_id );

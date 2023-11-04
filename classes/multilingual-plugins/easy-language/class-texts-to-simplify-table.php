@@ -7,12 +7,9 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
-use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
 use WP_List_Table;
-use WP_User;
-use wpdb;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,28 +20,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handler for log-output in backend.
  */
 class Texts_To_Simplify_Table extends WP_List_Table {
-
-	/**
-	 * Database-object.
-	 *
-	 * @var wpdb
-	 */
-	private wpdb $wpdb;
-
-	/**
-	 * Name for own database-table with simplifications.
-	 *
-	 * @var string
-	 */
-	private string $table_translations;
-
-	/**
-	 * Name for own database-table with simplifications.
-	 *
-	 * @var string
-	 */
-	private string $table_originals;
-
 	/**
 	 * Constructor for Logging-Handler.
 	 */
@@ -62,6 +37,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 		return array(
 			'options'         => '',
 			'date'            => __( 'date', 'easy-language' ),
+			'used_in' 		  => __( 'used in', 'easy-language' ),
 			'source_language' => __( 'source language', 'easy-language' ),
 			'target_language' => __( 'target language', 'easy-language' ),
 			'original'        => __( 'original', 'easy-language' ),
@@ -74,11 +50,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	 * @return array
 	 */
 	private function table_data(): array {
-		$query = array(
-			'state' => 'to_simplify',
-			'object_not_state' => 'trash'
-		);
-		return DB::get_instance()->get_entries( $query );
+		return DB::get_instance()->get_entries( Init::get_instance()->get_filter_for_entries_to_simplify() );
 	}
 
 	/**
@@ -116,14 +88,27 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	/**
 	 * Define what data to show on each column of the table.
 	 *
-	 * @param  array  $item        Data.
+	 * @param  array|object  $item        Data.
 	 * @param  String $column_name - Current column name.
 	 *
 	 * @return string
 	 */
 	public function column_default( $item, $column_name ): string {
+		// bail if item is not an entry-text.
+		if( !( $item instanceof Text ) ) {
+			return '';
+		}
+
 		// get languages-object.
 		$languages_obj = Languages::get_instance();
+
+		// filter column name.
+		$column_name = apply_filters( 'easy_language_simplification_table_to_simplify', $column_name, $item );
+
+		// bail if column-name is not set.
+		if( false === $column_name ) {
+			return '';
+		}
 
 		// show content depending on column.
 		switch ( $column_name ) {
@@ -154,12 +139,26 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 			case 'target_language':
 				return implode(',', $item->get_target_languages());
 
+			// show original text.
 			case 'original':
 				return wp_strip_all_tags( $item->get_original() );
+
+			// show hint for pro in used in column.
+			case 'used_in':
+				return '<span class="pro-marker">'.__( 'Only in Pro', 'easy-language' ).'</span>';
 
 			// fallback if no column has been matched.
 			default:
 				return print_r( $item, true );
 		}
+	}
+
+	/**
+	 * Message to be displayed when there are no items
+	 *
+	 * @since 3.1.0
+	 */
+	public function no_items(): void {
+		echo esc_html__( 'No texts found which should be simplified.', 'easy-language' );
 	}
 }

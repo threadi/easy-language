@@ -331,7 +331,7 @@ class Transient {
 	}
 
 	/**
-	 * Return whether this transient has a action set.
+	 * Return whether this transient has an action set.
 	 *
 	 * @return bool
 	 */

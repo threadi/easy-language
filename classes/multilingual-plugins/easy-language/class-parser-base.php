@@ -243,7 +243,7 @@ class Parser_Base {
 						),
 						'buttons' => array(
 							array(
-								'action' => 'easy_language_get_simplification( '.$post_id.', "'.get_permalink($post_id).'", false);',
+								'action' => 'easy_language_get_simplification( '.$post_id.' );',
 								'variant' => 'primary',
 								'text' => __( 'Yes', 'easy-language' )
 							),

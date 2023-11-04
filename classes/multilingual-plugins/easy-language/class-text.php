@@ -519,8 +519,8 @@ class Text {
 			return $result['user_id'];
 		}
 
-		// return empty string if no translation exist.
-		return '';
+		// return zero if no simplification exist.
+		return 0;
 	}
 
 }

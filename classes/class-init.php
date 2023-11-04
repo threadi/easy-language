@@ -320,6 +320,9 @@ class Init {
 			}
 			$assigned_languages[$language_code] = 1;
 			update_post_meta( $icon, 'easy_language_code', $assigned_languages );
+
+			// reset image list in db.
+			delete_option( 'easy_language_icons' );
 		}
 
 		// return nothing.

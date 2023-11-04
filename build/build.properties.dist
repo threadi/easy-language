@@ -7,6 +7,9 @@ plugin.version=
 # set path to npm-binary
 npm.path=
 
+# set path to composer-binary
+composer.path=
+
 # set list of APIs to embed in release
 apis=
 

@@ -232,7 +232,7 @@ class Capito extends Base implements Api_Base {
 				'api_value'   => 'a1',
 				'icon' => 'icon-de-ls',
 				'img' => 'de_LS.png',
-				'img_icon' => Helper::get_icon_img_for_language_code( 'de_a1' )
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a1' ) : ''
 			),
 			'de_a2' => array(
 				'label'       => __( 'German A2', 'easy-language' ),
@@ -242,7 +242,7 @@ class Capito extends Base implements Api_Base {
 				'api_value'   => 'a2',
 				'icon' => 'icon-de-ls',
 				'img' => 'de_LS.png',
-				'img_icon' => Helper::get_icon_img_for_language_code( 'de_a2' )
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a2' ) : ''
 			),
 			'de_b1' => array(
 				'label'       => __( 'German B1', 'easy-language' ),
@@ -252,7 +252,7 @@ class Capito extends Base implements Api_Base {
 				'api_value'   => 'b1',
 				'icon' => 'icon-de-el',
 				'img' => 'de_EL.png',
-				'img_icon' => Helper::get_icon_img_for_language_code( 'de_b1' )
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_b1' ) : ''
 			),
 			'en_a1' => array(
 				'label'       => __( 'English A1', 'easy-language' ),
@@ -262,7 +262,7 @@ class Capito extends Base implements Api_Base {
 				'api_value'   => 'a1',
 				'icon' => 'icon-de-ls',
 				'img' => 'en_LS.png',
-				'img_icon' => Helper::get_icon_img_for_language_code( 'en_a1' )
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'en_a1' ) : ''
 			),
 			'en_a2' => array(
 				'label'       => __( 'English A2', 'easy-language' ),
@@ -272,7 +272,7 @@ class Capito extends Base implements Api_Base {
 				'api_value'   => 'a2',
 				'icon' => 'icon-de-ls',
 				'img' => 'en_LS.png',
-				'img_icon' => Helper::get_icon_img_for_language_code( 'en_a2' )
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'en_a2' ) : ''
 			),
 			'en_b1' => array(
 				'label'       => __( 'English B1', 'easy-language' ),
@@ -282,7 +282,7 @@ class Capito extends Base implements Api_Base {
 				'api_value'   => 'b1',
 				'icon' => 'icon-de-ls',
 				'img' => 'en_EL.png',
-				'img_icon' => Helper::get_icon_img_for_language_code( 'en_b1' )
+				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'en_b1' ) : ''
 			),
 		);
 	}

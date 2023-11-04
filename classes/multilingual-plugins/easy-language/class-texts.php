@@ -406,7 +406,7 @@ class Texts {
 						// if not save the text for simplification.
 						$original_text_obj = $this->db->add( $text, $source_language, 'post_content' );
 						$original_text_obj->set_object( get_post_type( $post_obj->get_id() ), $post_obj->get_id(), $pagebuilder_obj->get_name() );
-						$original_text_obj->set_state( 'to_simplify' );
+						$original_text_obj->set_state( 'in_use' );
 					}
 				}
 			}
@@ -419,7 +419,7 @@ class Texts {
 					// save the text for simplification.
 					$original_title_obj = $this->db->add( $title, $source_language, 'title' );
 					$original_title_obj->set_object( get_post_type( $post_id ), $post_id, $pagebuilder_obj->get_name() );
-					$original_title_obj->set_state( 'to_simplify' );
+					$original_title_obj->set_state( 'in_use' );
 				}
 			}
 
@@ -501,7 +501,7 @@ class Texts {
 		// get language to export.
 		$export_language_code = isset($_GET['lang']) ? sanitize_text_field( $_GET['lang']) : '';
 
-		if( !empty($export_language_code) ) {
+		if( !empty($export_language_code) && class_exists('Translations') ) {
 
 			// define query for entries.
 			$query = array(
@@ -540,7 +540,7 @@ class Texts {
 
 			// return header.
 			header( 'Content-Type: application/octet-stream' );
-			header( 'Content-Disposition: inline; filename="' . date('YmdHi') . '_'.get_option('blogname').'.po"' ); // TODO
+			header( 'Content-Disposition: inline; filename="' . sanitize_file_name( date('YmdHi') . '_'.get_option('blogname').'.po"' ) );
 			header( 'Content-Length: ' . strlen($po) );
 			echo $po;
 			exit;
