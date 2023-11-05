@@ -55,10 +55,15 @@ class Texts_In_Use_Table extends WP_List_Table {
 	 * @return array
 	 */
 	private function table_data(): array {
+		// order table.
+		$order_by = ( isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], array_keys( $this->get_sortable_columns() ) ) ) ? $_REQUEST['orderby'] : 'date';
+		$order   = ( isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], array( 'asc', 'desc' ) ) ) ? $_REQUEST['order'] : 'desc';
+
 		// define query for entries.
 		$query = array(
 			'state' => 'in_use',
-			'object_not_state' => 'trash'
+			'object_not_state' => 'trash',
+			'has_simplification' => true
 		);
 
 		// get language-filter.
@@ -69,7 +74,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 		}
 
 		// return resulting entry-objects.
-		return DB::get_instance()->get_entries( $query );
+		return DB::get_instance()->get_entries( $query, array( 'order_by' => $order_by, 'order' => $order ) );
 	}
 
 	/**
@@ -145,7 +150,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 			case 'simplification':
 				$texts = '';
 				foreach( $target_languages as $language_code => $target_language ) {
-					$texts .= wp_strip_all_tags($item->get_translation( $language_code ));
+					$texts .= wp_strip_all_tags($item->get_simplification( $language_code ));
 				}
 				return $texts;
 

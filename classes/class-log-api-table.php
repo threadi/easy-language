@@ -73,12 +73,12 @@ class Log_Api_Table extends WP_List_Table {
 	 */
 	private function table_data(): array {
 		// order table.
-		$orderby = ( isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], array_keys( $this->get_sortable_columns() ) ) ) ? $_REQUEST['orderby'] : 'date';
+		$order_by = ( isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], array_keys( $this->get_sortable_columns() ) ) ) ? $_REQUEST['orderby'] : 'date';
 		$order   = ( isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], array( 'asc', 'desc' ) ) ) ? $_REQUEST['order'] : 'desc';
 
 		// define vars for prepared statement.
 		$vars = array(
-			$orderby,
+			$order_by,
 			$order
 		);
 

@@ -7,7 +7,7 @@
 
 namespace easyLanguage\Multilingual_plugins\Wpml;
 
-use easyLanguage\Base;
+use easyLanguage\Base_Abstract;
 use easyLanguage\Languages;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use easyLanguage\Multilingual_Plugins_Base;
@@ -18,7 +18,7 @@ use WPML_Flags_Factory;
 /**
  * Object to handle the WPML-support.
  */
-class Init extends Base implements Multilingual_Plugins_Base {
+class Init extends Base_Abstract implements Multilingual_Plugins_Base {
 
 	/**
 	 * Name of this plugin.

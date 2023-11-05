@@ -23,4 +23,4 @@ function easy_language_pagebuilder_gutenberg( array $pagebuilder_list ): array {
 	$pagebuilder_list[] = Gutenberg::get_instance();
 	return $pagebuilder_list;
 }
-add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_gutenberg' );
+add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_gutenberg', 1000 );

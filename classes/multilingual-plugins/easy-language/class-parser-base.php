@@ -189,19 +189,13 @@ class Parser_Base {
 				// get quota-state for this object.
 				$quota_state = $post_object->get_quota_state( $api_obj );
 
-				// get object type name.
-				$object_type = $post_object->get_type();
-
-				// get object type name.
-				$object_type_name = Helper::get_objekt_type_name( $post_object );
-
 				// do not show simplify-button if characters to simplify are more than quota characters.
 				if ( 'above_limit' === $quota_state['status'] && $api_obj->is_configured() ) {
 					?>
 					<p class="alert">
 						<?php
 							/* translators: %1$s will be replaced by the API-title */
-							printf( esc_html__( 'There would be %1$d characters to simplify in this %2$s. That is more than the %3$d available in quota.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $object_type_name ), absint( $quota_state['quota_rest'] ) );
+							printf( esc_html__( 'There would be %1$d characters to simplify in this %2$s. That is more than the %3$d available in quota.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $post_object->get_type_name() ), absint( $quota_state['quota_rest'] ) );
 						?>
 					</p>
 					<?php
@@ -210,7 +204,7 @@ class Parser_Base {
 					<p>
 						<?php
 						/* translators: %1$s will be replaced by the API-title */
-						echo sprintf( __( 'This %1$s contains more texts than %2$s would simplify in one loop. Simplify via API will not be possible.', 'easy-language' ), esc_html($object_type_name), esc_html($api_obj->get_title()) );
+						echo sprintf( __( 'This %1$s contains more texts than %2$s would simplify in one loop. Simplify via API will not be possible.', 'easy-language' ), esc_html($post_object->get_type_name()), esc_html($api_obj->get_title()) );
 						?>
 					</p>
 					<?php
@@ -228,12 +222,12 @@ class Parser_Base {
 					<p>
 						<?php
 						/* translators: %1$d will be replaced by the amount of characters in this page/post, %2$s will be replaced by the name of this page-type (post or page)  */
-						echo wp_kses_post( sprintf( __( 'There would be %1$d characters translated in this %2$s.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $object_type_name ) ) );
+						echo wp_kses_post( sprintf( __( 'There would be %1$d characters translated in this %2$s.', 'easy-language' ), esc_html( $quota_state['chars_count'] ), esc_html( $post_object->get_type_name() ) ) );
 						?>
 					</p>
 					<?php
 					/* translators: %1$s will be replaced by tne object-type-name (e.g. post oder page), %2$s will be replaced by the API-name */
-					$title = sprintf( __( 'Simplify this %1$s with %2$s.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $api_obj->get_title() ) );
+					$title = sprintf( __( 'Simplify this %1$s with %2$s.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $api_obj->get_title() ) );
 
 					// set config for dialog.
 					$dialog_config = array(
@@ -243,7 +237,7 @@ class Parser_Base {
 						),
 						'buttons' => array(
 							array(
-								'action' => 'easy_language_get_simplification( '.$post_id.' );',
+								'action' => 'easy_language_get_simplification( '.$post_id.', "'.$post_object->get_type().'" );',
 								'variant' => 'primary',
 								'text' => __( 'Yes', 'easy-language' )
 							),
@@ -255,7 +249,7 @@ class Parser_Base {
 						)
 					);
 					?>
-					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary easy-language-translate-object elementor-button" data-dialog="<?php echo esc_attr(wp_json_encode($dialog_config)); ?>" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( $title ); ?>">
+					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary wp-easy-dialog elementor-button" data-dialog="<?php echo esc_attr(wp_json_encode($dialog_config)); ?>" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( $title ); ?>">
 						<?php
 							/* translators: %1$s will be replaced by the API-title */
 							echo sprintf( esc_html__( 'Simplify with %1$s.', 'easy-language' ), esc_html( $api_obj->get_title() ) );

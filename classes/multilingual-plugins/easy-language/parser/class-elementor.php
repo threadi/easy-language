@@ -125,7 +125,7 @@ class Elementor extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Replace original text with translation.
+	 * Replace single original text with translation.
 	 *
 	 * We replace the text complete 1:1.
 	 *

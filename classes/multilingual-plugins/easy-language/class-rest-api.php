@@ -5,6 +5,8 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
+use easyLanguage\Apis;
+use easyLanguage\Helper;
 use WP_REST_Server;
 
 /**
@@ -58,6 +60,7 @@ class REST_Api {
 	 * @return void
 	 */
 	public function add_language_options_for_page_endpoint(): void {
+		// endpoint to get language options on page.
 		register_rest_route( 'easy-language/v1', '/language-options/(?P<id>\d+)', array(
 			'methods' => WP_REST_Server::CREATABLE,
 			'callback' => array( $this, 'get_language_options_for_page' ),
@@ -70,6 +73,24 @@ class REST_Api {
 			),
 			'permission_callback' => function () {
 				return current_user_can( 'edit_el_simplifier' );
+			}
+		) );
+
+		// endpoint to check the automatic cronjob.
+		register_rest_route( 'easy-language/v1', '/automatic_cron_checks/', array(
+			'methods' => WP_REST_SERVER::READABLE,
+			'callback' => array( $this, 'check_automatic_cron' ),
+			'permission_callback' => function () {
+				return current_user_can( 'manage_options' );
+			}
+		) );
+
+		// endpoint to check for API.
+		register_rest_route( 'easy-language/v1', '/api_check/', array(
+			'methods' => WP_REST_SERVER::READABLE,
+			'callback' => array( $this, 'check_api' ),
+			'permission_callback' => function () {
+				return current_user_can( 'manage_options' );
 			}
 		) );
 	}
@@ -103,5 +124,111 @@ class REST_Api {
 		return array(
 			'html' => $contents
 		);
+	}
+
+	/**
+	 * Run check of our own automatic simplification cron for Tools > Site Health.
+	 *
+	 * @return array
+	 */
+	public function check_automatic_cron(): array {
+		// define default results.
+		$result = array(
+			'label' => __( 'Easy Language Automatic Simplification Cron Check', 'easy-language' ),
+			'status' => 'good',
+			'badge'       => array(
+				'label' => __( 'Easy Language', 'easy-language' ),
+				'color' => 'gray',
+			),
+			'description' => __( 'To use automatic simplification for texts in your website the Easy Language plugin adds a WordPress cronjob which is used to perform this tasks.<br><strong>All ok with the cronjob!</strong>', 'easy-language' ),
+			'actions'     => '',
+			'test'        => 'easy_language_check_automatic_cron',
+		);
+
+		// get scheduled event.
+		$scheduled_event = wp_get_scheduled_event( 'easy_language_automatic_simplification' );
+
+		// event does not exist => show error.
+		if( false === $scheduled_event ) {
+			$url = add_query_arg(
+				array(
+					'action' => 'easy_language_create_automatic_cron',
+					'nonce' => wp_create_nonce( 'easy-language-create-schedules' )
+				),
+				get_admin_url() . 'admin.php'
+			);
+			$result['status'] = 'recommended';
+			$result['description'] = __( 'Cronjob to automatic simplify texts in your website does not exist!', 'easy-language' );
+			/* translators: %1$s will be replaced by the URL to recreate the schedule */
+			$result['actions'] = sprintf( __( '<p><a href="%1$s" class="button button-primary">Recreate the schedules</a></p>', 'easy-language' ), esc_url($url) );
+
+			// return this result.
+			return $result;
+		}
+
+		// if scheduled event exist, check if next run is in the past.
+		if( $scheduled_event->timestamp < time() ) {
+			$result['status'] = 'recommended';
+			/* translators: %1$s will be replaced by the date of the planned next schedule run (which is in the past) */
+			$result['description'] = sprintf( __( 'Cronjob to simplify texts should have been run at %1$s, but was not executed!<br><strong>Please check the cron-system of your WordPress-installation.</strong>', 'easy-language' ), Helper::get_format_date_time( date( 'Y-m-d H:i:s', $scheduled_event->timestamp ) ));
+
+			// return this result.
+			return $result;
+		}
+
+		// return result.
+		return $result;
+	}
+
+	/**
+	 * Check the active API.
+	 *
+	 * @return array
+	 */
+	public function check_api(): array {
+		// get actual API.
+		$api_obj = Apis::get_instance()->get_active_api();
+		if( false === $api_obj ) {
+			// define default results.
+			$result = array(
+				'label' => __( 'Easy Language API check', 'easy-language' ),
+				'status' => 'recommended',
+				'badge'       => array(
+					'label' => __( 'Easy Language', 'easy-language' ),
+					'color' => 'gray',
+				),
+				'description' => __( 'To use simplification for texts in your website the Easy Language plugin uses APIs from SUMM AI, Capito and ChatGpt which needs some configuration.<br><strong>No Api active!</strong>', 'easy-language' ),
+				/* translators: %1$s will be replaced by the URL for API-settings */
+				'actions'     => sprintf( __( '<p><a href="%1$s" class="button button-primary">Choose an API</a></p>', 'easy-language' ), esc_url(Helper::get_settings_page_url()) ),
+				'test'        => 'easy_language_check_api',
+			);
+		}
+		else {
+			// define default results.
+			$result = array(
+				'label' => __('Easy Language API check', 'easy-language'),
+				'status' => 'good',
+				'badge' => array(
+					'label' => __('Easy Language', 'easy-language'),
+					'color' => 'gray',
+				),
+				/* translators: %1$s will be replaced by the API-title */
+				'description' => sprintf( __('To use simplification for texts in your website the Easy Language plugin uses APIs from SUMM AI, Capito and ChatGpt which needs some configuration.<br><strong>All ok with the actual active API %1$s!</strong>', 'easy-language'), esc_html( $api_obj->get_title() )),
+				'actions' => '',
+				'test' => 'easy_language_check_api',
+			);
+
+			// switch to recommend if API is not configured.
+			if( false === $api_obj->is_configured() ) {
+				$result['status'] = 'recommended';
+				/* translators: %1$s will be replaced by the API-title */
+				$result['description'] = sprintf( __('<strong>The actual active API %1$s is not configured.</strong> It will not be usable to simplify texts in your website.', 'easy-language'), esc_html( $api_obj->get_title() ));
+				/* translators: %1$s will be replaced with the API-settings-URL */
+				$result['actions'] = sprintf( __( '<p><a href="%1$s" class="button button-primary">Configure API now</a></p>', 'easy-language' ), esc_url($api_obj->get_settings_url()) );
+			}
+		}
+
+		// return result.
+		return $result;
 	}
 }

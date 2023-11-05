@@ -8,44 +8,14 @@ jQuery( document ).ready(
 			'click',
 			function (e) {
 				e.preventDefault();
-				easy_language_simplification_init( $(this).data('id'), $(this).data('link'), false );
+				easy_language_simplification_init( $(this).data('id'), $(this).data('object-type') );
 			}
 		);
 
 		// save automatic prevention setting.
 		$('input.easy-language-automatic-simplification-prevention').on( 'change', function() {
-			easy_language_prevent_automatic_simplification( $(this).data('id'), $(this).is(':checked'), null );
+			easy_language_prevent_automatic_simplification( $(this).data('id'), $(this).data('object-type'), $(this).is(':checked'), null );
 		});
-
-		// start to simplify a single text via AJAX.
-		$('.easy-language-simplify-text').on(
-			'click',
-			function (e) {
-				e.preventDefault();
-				// create dialog.
-				let dialog_config = {
-					detail: {
-						title: __('Simplify this text?', 'easy-language'),
-						texts: [
-							__( '<p>Simplifying texts via API could cause costs.<br><strong>Are you sure your want to simplify this single text?</strong></p>', 'easy-language' )
-						],
-						buttons: [
-							{
-								'action': 'location.href="' + $(this).attr('href') + '";',
-								'variant': 'primary',
-								'text': __( 'Yes', 'easy-language' )
-							},
-							{
-								'action': 'closeDialog();',
-								'variant': 'secondary',
-								'text': __( 'No', 'easy-language' )
-							}
-						]
-					}
-				}
-				easy_language_create_dialog( dialog_config );
-			}
-		);
 	}
 );
 
@@ -53,9 +23,9 @@ jQuery( document ).ready(
  * Send request to reset the simplification process of given object.
  *
  * @param object_id
- * @param link
+ * @param type
  */
-function easy_language_reset_processing_simplification( object_id, link ) {
+function easy_language_reset_processing_simplification( object_id, type ) {
 	jQuery.ajax(
 		{
 			type: "POST",
@@ -66,7 +36,7 @@ function easy_language_reset_processing_simplification( object_id, link ) {
 				'nonce': easyLanguageSimplificationJsVars.reset_processing_simplification_nonce
 			},
 			success: function() {
-				easy_language_simplification_init( object_id, link, false );
+				easy_language_simplification_init( object_id, type );
 			}
 		}
 	);
@@ -76,20 +46,21 @@ function easy_language_reset_processing_simplification( object_id, link ) {
  * Send request to ignore the failed simplification of a given object.
  *
  * @param object_id
- * @param link
+ * @param type
  */
-function easy_language_ignore_processing_simplification( object_id, link ) {
+function easy_language_ignore_processing_simplification( object_id, type ) {
 	jQuery.ajax(
 		{
 			type: "POST",
 			url: easyLanguageSimplificationJsVars.ajax_url,
 			data: {
 				'action': 'easy_language_ignore_processing_simplification',
-				'post': object_id,
+				'id': object_id,
+				'type': type,
 				'nonce': easyLanguageSimplificationJsVars.ignore_processing_simplification_nonce
 			},
 			success: function() {
-				easy_language_simplification_init( object_id, link, false );
+				easy_language_simplification_init( object_id, type );
 			}
 		}
 	);
@@ -99,11 +70,12 @@ function easy_language_ignore_processing_simplification( object_id, link ) {
  * Create simplified object via AJAX with or without automatic simplification.
  *
  * @param object_id
+ * @param type
  * @param language
  * @param simplification_mode
  * @param api_configured
  */
-function easy_language_add_simplification_object( object_id, language, simplification_mode, api_configured ) {
+function easy_language_add_simplification_object( object_id, type, language, simplification_mode, api_configured ) {
 	// get internationalization tools of WordPress.
 	let { __ } = wp.i18n;
 
@@ -113,13 +85,15 @@ function easy_language_add_simplification_object( object_id, language, simplific
 			url: easyLanguageSimplificationJsVars.ajax_url,
 			data: {
 				'action': 'easy_language_add_simplification_object',
-				'post': object_id,
+				'id': object_id,
+				'type': type,
 				'language': language,
 				'nonce': easyLanguageSimplificationJsVars.add_simplification_nonce
 			},
 			success: function(data) {
+				console.log(data);
 				if( 'ok' === data.status && "auto" === simplification_mode ) {
-					easy_language_get_simplification( data.object_id, data.language, false );
+					easy_language_get_simplification( data.object_id, data.object_type, false );
 				}
 				else if( 'ok' === data.status && "manually" === simplification_mode ) {
 					// create dialog.
@@ -135,13 +109,13 @@ function easy_language_add_simplification_object( object_id, language, simplific
 								],
 								buttons: [
 									{
-										'action': 'easy_language_get_simplification(' + data.object_id + ' );',
+										'action': 'easy_language_get_simplification(' + data.object_id + ', "' + data.object_type + '" );',
 										'variant': 'primary',
 										/* translators: %1$s will be replaced by the API-title */
 										'text': __('Simplify now via API %1$s', 'easy-language').replace('%1$s', data.api_title)
 									},
 									{
-										'action': 'easy_language_prevent_automatic_simplification(' + data.object_id + ', true, "' + data.edit_link + '" );',
+										'action': 'easy_language_prevent_automatic_simplification(' + data.object_id + ', "' + data.object_type + '", true, "' + data.edit_link + '" );',
 										'variant': 'secondary',
 										/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
 										'text': __('Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
@@ -189,10 +163,9 @@ function easy_language_add_simplification_object( object_id, language, simplific
  * Initialize the simplification incl. confirmation.
  *
  * @param id ID of the object to simplify.
- * @param link URL for the object which will be simplified.
- * @param frontend_edit Bool if the edit uses the frontend.
+ * @param type The type of the object to simplify.
  */
-function easy_language_simplification_init( id, link, frontend_edit ) {
+function easy_language_simplification_init( id, type ) {
 	// get internationalization tools of WordPress.
 	let { __ } = wp.i18n;
 
@@ -204,7 +177,7 @@ function easy_language_simplification_init( id, link, frontend_edit ) {
 			],
 			buttons: [
 				{
-					'action': 'easy_language_get_simplification( ' + id + ' );',
+					'action': 'easy_language_get_simplification( ' + id + ', "' + type + '" );',
 					'variant': 'primary',
 					'text': __( 'Yes', 'easy-language' )
 				},
@@ -223,8 +196,9 @@ function easy_language_simplification_init( id, link, frontend_edit ) {
  * Start loading of simplifications of actual object.
  *
  * @param object_id
+ * @param type
  */
-function easy_language_get_simplification( object_id ) {
+function easy_language_get_simplification( object_id, type ) {
 	// get internationalization tools of WordPress.
 	let { __ } = wp.i18n;
 
@@ -242,16 +216,17 @@ function easy_language_get_simplification( object_id ) {
 	easy_language_create_dialog( dialog_config );
 
 	// start simplification.
-	easy_language_get_simplification_info( object_id, true );
+	easy_language_get_simplification_info( object_id, type, true );
 }
 
 /**
  * Get import info until import is done.
  *
  * @param obj_id
+ * @param type
  * @param initialization
  */
-function easy_language_get_simplification_info( obj_id, initialization ) {
+function easy_language_get_simplification_info( obj_id, type, initialization ) {
 	// get internationalization tools of WordPress.
 	let { __ } = wp.i18n;
 
@@ -261,12 +236,12 @@ function easy_language_get_simplification_info( obj_id, initialization ) {
 			url: easyLanguageSimplificationJsVars.ajax_url,
 			data: {
 				'action': 'easy_language_run_simplification',
-				'post': obj_id,
+				'id': obj_id,
+				'type': type,
 				'initialization': initialization,
 				'nonce': easyLanguageSimplificationJsVars.run_simplification_nonce
 			},
 			error: function(e) {
-				console.log(e);
 				let dialog_config = {};
 				if( 200 !== e.status ) {
 					// create dialog with error-message.
@@ -320,7 +295,7 @@ function easy_language_get_simplification_info( obj_id, initialization ) {
 				if ( running >= 1 ) {
 					setTimeout(
 						function () {
-							easy_language_get_simplification_info( obj_id, false ) },
+							easy_language_get_simplification_info( obj_id, type, false ) },
 						200
 					);
 				} else {
@@ -336,18 +311,20 @@ function easy_language_get_simplification_info( obj_id, initialization ) {
  * Prevent simplification of object and optionally forward user to given link or run command after it.
  *
  * @param object_id
+ * @param type
  * @param prevent_automatic_simplification
  * @param link
  * @param command
  */
-function easy_language_prevent_automatic_simplification( object_id, prevent_automatic_simplification, link, command ) {
+function easy_language_prevent_automatic_simplification( object_id, type, prevent_automatic_simplification, link, command ) {
 	jQuery.ajax(
 		{
 			type: "POST",
 			url: easyLanguageSimplificationJsVars.ajax_url,
 			data: {
 				'action': 'easy_language_set_simplification_prevention_on_object',
-				'post': object_id,
+				'id': object_id,
+				'type': type,
 				'prevent_automatic_simplification': prevent_automatic_simplification,
 				'nonce': easyLanguageSimplificationJsVars.set_simplification_prevention_nonce
 			},

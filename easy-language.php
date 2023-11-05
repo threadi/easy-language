@@ -25,8 +25,8 @@ if ( version_compare( PHP_VERSION, '8.0', '<' ) ) {
 const EASY_LANGUAGE = __FILE__;
 
 // embed necessary files.
-require_once 'inc/autoload.php';
-require_once 'inc/constants.php';
+require_once __DIR__.'/inc/autoload.php';
+require_once __DIR__.'/inc/constants.php';
 
 // include admin-related files.
 if ( is_admin() ) {
@@ -38,5 +38,5 @@ if ( is_admin() ) {
 }
 
 // initialize the plugin.
-$lel = Init::get_instance();
-$lel->init();
+Init::get_instance()->init();
+

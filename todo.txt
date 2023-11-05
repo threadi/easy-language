@@ -17,7 +17,6 @@ Funktionales
 * PageBuilder-Support:
 -> Beaver
 -> SiteOrigin
--> Themify
 
 Später:
 * Vereinfachungen über eigenes Object erfassen und ausgeben

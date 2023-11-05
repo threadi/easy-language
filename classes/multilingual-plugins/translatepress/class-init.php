@@ -7,7 +7,7 @@
 
 namespace easyLanguage\Multilingual_plugins\TranslatePress;
 
-use easyLanguage\Base;
+use easyLanguage\Base_Abstract;
 use easyLanguage\Multilingual_Plugins_Base;
 use easyLanguage\Transients;
 use TRP_Translate_Press;
@@ -15,7 +15,7 @@ use TRP_Translate_Press;
 /**
  * Rewrite-Handling for this plugin.
  */
-class Init extends Base implements Multilingual_Plugins_Base {
+class Init extends Base_Abstract implements Multilingual_Plugins_Base {
 	/**
 	 * Marker for API-support.
 	 *

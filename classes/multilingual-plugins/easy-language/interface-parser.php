@@ -1,6 +1,6 @@
 <?php
 /**
- * File for our own translation-parser.
+ * File for our own simplification-parser.
  *
  * @package easy-language
  */

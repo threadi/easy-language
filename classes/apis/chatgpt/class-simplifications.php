@@ -98,7 +98,7 @@ class Simplifications {
 
 			// get the text only if it has returned from API.
 			if ( ! empty( $request_array['choices'][0]['message']['content'] ) ) {
-				// get translated text.
+				// get simplified text.
 				$translated_text = apply_filters( 'easy_language_simplified_text', $request_array['choices'][0]['message']['content'], $request_array, $this );
 
 				// return simplification to plugin which will save it.

@@ -1,6 +1,6 @@
 <?php
 /**
- * File for API-handling in this plugin.
+ * File for API- and plugin-handling in this plugin.
  *
  * @package easy-language
  */
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Base-object for API- and plugin-main-classes.
  */
-class Base {
+abstract class Base_Abstract {
 	/**
 	 * Marker for foreign plugin (plugins which are supported by this plugin but not maintained).
 	 *

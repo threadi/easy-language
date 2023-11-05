@@ -287,21 +287,6 @@ class Helper {
 	}
 
 	/**
-	 * Return language-specific title for the type of the given object.
-	 *
-	 * @param Post_Object $post_object
-	 * @return string
-	 */
-	public static function get_objekt_type_name( Post_Object $post_object ): string {
-		$object_type_settings = Init::get_instance()->get_post_type_settings();
-		$object_type_name     = 'page';
-		if ( ! empty( $object_type_settings[ $post_object->get_type() ] ) ) {
-			$object_type_name = $object_type_settings[ $post_object->get_type() ]['label_singular'];
-		}
-		return $object_type_name;
-	}
-
-	/**
 	 * Return the URL for laolaweb.com where we can order the Pro-Version.
 	 *
 	 * @return string
@@ -429,9 +414,9 @@ class Helper {
 			$title = sprintf(__( 'Show this %1$s in %2$s ', 'easy-language' ), esc_html($object_type_name), esc_html($target_language['label']) );
 
 			// check if this object is already translated in this language.
-			if ( false !== $object->is_translated_in_language( $language_code ) ) {
+			if ( false !== $object->is_simplified_in_language( $language_code ) ) {
 				// generate link-target to default editor with language-marker.
-				$simplified_post_object = new Post_Object( $object->get_translated_in_language( $language_code ) );
+				$simplified_post_object = new Post_Object( $object->get_simplification_in_language( $language_code ) );
 				$url                    = $simplified_post_object->get_page_builder()->get_edit_link();
 			} else {
 				// create link to generate a new simplification for this object.
@@ -476,14 +461,10 @@ class Helper {
 	 * Get object by given id and type.
 	 *
 	 * @param int $object_id The object-ID.
-	 * @param string $object_type The object-type.
+	 * @param string $object_type The object-type (optional).
 	 * @return object|false
 	 */
-	public static function get_object( int $object_id, string $object_type ): object|false {
-		$post_types = \easyLanguage\Multilingual_plugins\Easy_Language\Init::get_instance()->get_supported_post_types();
-		if( !empty($post_types[$object_type]) ) {
-			return new Post_Object($object_id);
-		}
-		return false;
+	public static function get_object( int $object_id, string $object_type = '' ): object|false {
+		return apply_filters( 'easy_language_get_object', false, $object_id, $object_type );
 	}
 }

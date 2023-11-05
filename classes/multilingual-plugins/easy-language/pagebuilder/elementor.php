@@ -73,9 +73,6 @@ function easy_language_add_elementor_page_settings_controls( Post $page ): void 
 	$language       = reset( $language_array );
 
 	if ( ! empty( $language ) ) {
-		// get object type name.
-		$object_type_name = Helper::get_objekt_type_name( $post_object );
-
 		/**
 		 * Add section.
 		 */
@@ -96,7 +93,7 @@ function easy_language_add_elementor_page_settings_controls( Post $page ): void 
 				'label'       => '',
 				'label_block' => true,
 				/* translators: %1$s will be replaced by the type of the object, %2$s will be replaced by the name of the language */
-				'description' => sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $language['label'] ) ),
+				'description' => sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $language['label'] ) ),
 				'type'        => 'easy_languages',
 			)
 		);
@@ -121,9 +118,6 @@ function easy_language_add_elementor_page_settings_controls_page( Page $page ): 
 	$language       = reset( $language_array );
 
 	if ( ! empty( $language ) ) {
-		// get object type name.
-		$object_type_name = Helper::get_objekt_type_name( $post_object );
-
 		/**
 		 * Add section.
 		 */
@@ -144,7 +138,7 @@ function easy_language_add_elementor_page_settings_controls_page( Page $page ): 
 				'label'       => '',
 				'label_block' => true,
 				/* translators: %1$s will be replaced by the type of the object, %2$s will be replaced by the name of the language */
-				'description' => sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $language['label'] ) ),
+				'description' => sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $language['label'] ) ),
 				'type'        => 'easy_languages',
 			)
 		);

@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Initialize the object.
  */
-interface Easy_Language_Object {
+interface Easy_Language_Interface {
 
 	/**
 	 * Return the object language depending on object type.
@@ -66,7 +66,7 @@ interface Easy_Language_Object {
 	 *
 	 * @return bool
 	 */
-	public function is_translated_in_language( string $language ): bool;
+	public function is_simplified_in_language( string $language ): bool;
 
 	/**
 	 * Get the pagebuilder used by this object.

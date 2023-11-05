@@ -7,8 +7,7 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
-use easyLanguage\Base;
-use easyLanguage\Helper;
+use easyLanguage\Base_Abstract;
 use easyLanguage\Multilingual_Plugins;
 use WP_Post;
 
@@ -32,9 +31,9 @@ class Pagebuilder_Support {
 	/**
 	 * Instance of initializing object.
 	 *
-	 * @var Base
+	 * @var Base_Abstract
 	 */
-	private Base $init;
+	private Base_Abstract $init;
 
 	/**
 	 * Constructor for this object.
@@ -61,11 +60,11 @@ class Pagebuilder_Support {
 	/**
 	 * Initialize pagebuilder-support for our own plugin.
 	 *
-	 * @param Base $init The Base-object.
+	 * @param Base_Abstract $init The Base-object.
 	 *
 	 * @return void
 	 */
-	public function init( Base $init ): void {
+	public function init( Base_Abstract $init ): void {
 		// secure initializing object.
 		$this->init = $init;
 
@@ -128,16 +127,13 @@ class Pagebuilder_Support {
 		$language_array = $post_object->get_language();
 		$language       = reset( $language_array );
 
-		// get object type name.
-		$object_type_name = Helper::get_objekt_type_name( $post_object );
-
 		// output.
 		if ( ! empty( $language ) ) {
 			?>
 			<p>
 				<?php
 					/* translators: %1$s will be replaced by the type of the object, %2$s will be replaced by the name of the language */
-					echo wp_kses_post( sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $language['label'] ) ) );
+					echo wp_kses_post( sprintf( __( 'You are editing this %1$s in the language <strong>%2$s</strong>.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $language['label'] ) ) );
 				?>
 			</p>
 			<?php

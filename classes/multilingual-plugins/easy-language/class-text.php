@@ -9,6 +9,7 @@ namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
 use easyLanguage\Api_Base;
 use easyLanguage\Apis;
+use easyLanguage\Helper;
 use easyLanguage\Languages;
 
 /**
@@ -120,7 +121,7 @@ class Text {
 	 * @param string $target_language The target language for this simplification.
 	 * @return string
 	 */
-	public function get_translation( string $target_language ): string {
+	public function get_simplification( string $target_language ): string {
 		$supported_target_languages = Languages::get_instance()->get_active_languages();
 		if ( ! empty( $supported_target_languages[ $target_language ] ) ) {
 			$translation = $this->get_translation_from_db( $target_language );
@@ -137,7 +138,7 @@ class Text {
 	 * @param string $language The language we search.
 	 * @return bool
 	 */
-	public function has_translation_in_language( string $language ): bool {
+	public function has_simplification_in_language( string $language ): bool {
 		return ! empty( $this->get_translation_from_db( $language ) );
 	}
 
@@ -178,7 +179,7 @@ class Text {
 	 * @return void
 	 * @noinspection PhpUnused
 	 */
-	public function set_translation( string $translated_text, string $target_language, string $used_api, int $job_id ): void {
+	public function set_simplification( string $translated_text, string $target_language, string $used_api, int $job_id ): void {
 		global $wpdb;
 
 		// get current user.
@@ -216,7 +217,7 @@ class Text {
 	 *
 	 * @return bool
 	 */
-	public function replace_original_with_translation( int $object_id, string $target_language ): bool {
+	public function replace_original_with_simplification( int $object_id, string $target_language ): bool {
 		// get simplification objects.
 		$simplification_objects = $this->get_objects();
 
@@ -226,7 +227,7 @@ class Text {
 		}
 
 		// get object.
-		$object = Init::get_instance()->get_object_by_wp_object( get_post( $object_id ), $object_id );
+		$object = Helper::get_object( $object_id );
 
 		// bail of no object could be loaded.
 		if ( false === $object ) {
@@ -244,7 +245,7 @@ class Text {
 					$obj->set_title( $object->get_title() );
 
 					// get title.
-					$title = $obj->get_title_with_simplifications( $object->get_title(), $this->get_translation( $target_language ) );
+					$title = $obj->get_title_with_simplifications( $object->get_title(), $this->get_simplification( $target_language ) );
 
 					// update post-entry.
 					$array = array(
@@ -280,7 +281,7 @@ class Text {
 					$obj->set_text( $this->get_original() );
 
 					// get the resulting text depending on pagebuilder.
-					$content = $obj->get_text_with_simplifications( $object->get_content(), $this->get_translation( $target_language ) );
+					$content = $obj->get_text_with_simplifications( $object->get_content(), $this->get_simplification( $target_language ) );
 
 					// update post-entry.
 					$array = array(

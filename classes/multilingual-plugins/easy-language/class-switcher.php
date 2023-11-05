@@ -332,7 +332,7 @@ class Switcher {
 				foreach ( $languages as $language_code => $settings ) {
 					// bail if not translated pages should not be linked.
 					if ( 'hide_not_translated' === get_option( 'easy_language_switcher_link', '' )
-						&& ! $object->is_translated_in_language( $language_code )
+						&& ! $object->is_simplified_in_language( $language_code )
 						&& key( $object->get_language() ) !== $language_code ) {
 						continue;
 					}

@@ -7,13 +7,13 @@
 
 namespace easyLanguage\Apis\Your_Api;
 
-use easyLanguage\Base;
 use easyLanguage\Api_Base;
+use easyLanguage\Base_Abstract;
 
 /**
  * Define what SUMM AI supports and what not.
  */
-class Your_Api extends Base implements Api_Base {
+class Your_Api extends Base_Abstract implements Api_Base {
 
 	/**
 	 * Set the internal name for the API.

@@ -8,8 +8,8 @@
 namespace easyLanguage\Apis\Capito;
 
 use easyLanguage\Apis;
-use easyLanguage\Base;
 use easyLanguage\Api_Base;
+use easyLanguage\Base_Abstract;
 use easyLanguage\Helper;
 use easyLanguage\Language_Icon;
 use easyLanguage\Multilingual_Plugins;
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define what Capito supports and what not.
  */
-class Capito extends Base implements Api_Base {
+class Capito extends Base_Abstract implements Api_Base {
 
 	/**
 	 * Set the internal name for the API.

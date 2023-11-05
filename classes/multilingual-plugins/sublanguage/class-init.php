@@ -7,7 +7,7 @@
 
 namespace easyLanguage\Multilingual_plugins\Sublanguage;
 
-use easyLanguage\Base;
+use easyLanguage\Base_Abstract;
 use easyLanguage\Languages;
 use easyLanguage\Multilingual_Plugins_Base;
 use easyLanguage\Transients;
@@ -16,7 +16,7 @@ use WP_Query;
 /**
  * Object to handle the sublanguage-support.
  */
-class Init extends Base implements Multilingual_Plugins_Base {
+class Init extends Base_Abstract implements Multilingual_Plugins_Base {
 
 	/**
 	 * Name of this plugin.

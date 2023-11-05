@@ -10,6 +10,7 @@ namespace easyLanguage\Multilingual_plugins\Easy_Language;
 use easyLanguage\Api_Base;
 use easyLanguage\Apis;
 use easyLanguage\Helper;
+use easyLanguage\Init;
 use easyLanguage\Languages;
 use WP_Post;
 use WP_Query;
@@ -22,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Handles a single post-object.
  */
-class Post_Object implements Easy_Language_Object {
+class Post_Object extends Objects_Abstract implements Easy_Language_Interface {
 	/**
 	 * The ID of the object.
 	 *
@@ -118,7 +119,7 @@ class Post_Object implements Easy_Language_Object {
 	}
 
 	/**
-	 * Return whether this object is a translated object.
+	 * Return whether this object is a simplified object.
 	 *
 	 * @return bool
 	 */
@@ -127,7 +128,7 @@ class Post_Object implements Easy_Language_Object {
 	}
 
 	/**
-	 * Return whether this object is a translatable object.
+	 * Return whether this object is a simplifiable object.
 	 *
 	 * @return bool
 	 */
@@ -136,17 +137,17 @@ class Post_Object implements Easy_Language_Object {
 	}
 
 	/**
-	 * Return whether a given post type is translated in given language.
+	 * Return whether a given post type is simplified in given language.
 	 *
 	 * @param string $language The language to check.
 	 *
 	 * @return bool
 	 */
-	public function is_translated_in_language( string $language ): bool {
-		if ( false === $this->has_translations() ) {
+	public function is_simplified_in_language( string $language ): bool {
+		if ( false === $this->has_simplifications() ) {
 			return false;
 		}
-		return $this->get_translated_in_language( $language ) > 0;
+		return $this->get_simplification_in_language( $language ) > 0;
 	}
 
 	/**
@@ -156,7 +157,7 @@ class Post_Object implements Easy_Language_Object {
 	 *
 	 * @return int
 	 */
-	public function get_translated_in_language( string $language_code ): int {
+	public function get_simplification_in_language( string $language_code ): int {
 		$query  = array(
 			'post_type'                       => $this->get_type(),
 			'post_status'                     => 'any',
@@ -232,22 +233,21 @@ class Post_Object implements Easy_Language_Object {
 		// define target-url.
 		$url = trailingslashit( $slug );
 
-		// if actual object is translated, link to the translated object.
-		if ( $this->is_translated_in_language( $language_code ) ) {
+		// if actual object is simplified, link to the simplified object.
+		if ( $this->is_simplified_in_language( $language_code ) ) {
 			if ( in_array( get_option( 'easy_language_switcher_link', '' ), array( 'hide_not_translated', 'link_translated' ), true ) ) {
-				$url = get_permalink( $this->get_translated_in_language( $language_code ) );
+				$url = get_permalink( $this->get_simplification_in_language( $language_code ) );
 			} elseif ( 'page' === get_option( 'show_on_front' ) ) {
 					$object_id          = absint( get_option( 'page_on_front', 0 ) );
 					$object             = new Post_Object( $object_id );
-					$translated_post_id = $object->get_translated_in_language( $language_code );
-					$url                = get_permalink( $translated_post_id );
+					$url                = get_permalink( $object->get_simplification_in_language( $language_code ) );
 			} elseif ( 'posts' === get_option( 'show_on_front' ) ) {
 				$url = get_home_url();
 			}
 		} elseif ( key( $this->get_language() ) === $language_code ) {
 			$url = get_permalink( $this->get_id() );
 		} elseif ( in_array( get_option( 'easy_language_switcher_link', '' ), array( 'hide_not_translated', 'link_translated' ), true ) ) {
-			// if this page is not translated, link to the homepage.
+			// if this page is not simplified, link to the homepage.
 			$url = get_home_url();
 		}
 
@@ -256,7 +256,7 @@ class Post_Object implements Easy_Language_Object {
 	}
 
 	/**
-	 * Set marker that the translatable content of this object has been changed.
+	 * Set marker that the simplified content of this object has been changed.
 	 *
 	 * @param string $language_code The language we search.
 	 *
@@ -300,14 +300,14 @@ class Post_Object implements Easy_Language_Object {
 	}
 
 	/**
-	 * Add a language as translated language to translatable object.
+	 * Add a language as simplified language to simplifiable object.
 	 *
 	 * @param string $target_language The language we search.
 	 *
 	 * @return void
 	 */
-	public function add_translated_language( string $target_language ): void {
-		// only for translatable object.
+	public function add_language( string $target_language ): void {
+		// only for simplifiable object.
 		if ( false === $this->is_simplifiable() ) {
 			delete_post_meta( $this->get_id(), 'easy_language_simplified_in' );
 			return;
@@ -324,14 +324,14 @@ class Post_Object implements Easy_Language_Object {
 	}
 
 	/**
-	 * Remove a language as translated language from a translatable object.
+	 * Remove a language from a simplified object.
 	 *
 	 * @param string $target_language The language we search.
 	 *
 	 * @return void
 	 */
-	public function remove_translated_language( string $target_language ): void {
-		// only for translatable object.
+	public function remove_language( string $target_language ): void {
+		// only for simplifiable object.
 		if ( false === $this->is_simplifiable() ) {
 			return;
 		}
@@ -377,6 +377,7 @@ class Post_Object implements Easy_Language_Object {
 			array(
 				'action' => 'easy_language_get_simplification',
 				'id'     => $this->get_id(),
+				'type'   => $this->get_type(),
 				'nonce'  => wp_create_nonce( 'easy-language-get-simplification' ),
 			),
 			get_admin_url() . 'admin.php'
@@ -415,7 +416,7 @@ class Post_Object implements Easy_Language_Object {
 	 * Return quota-state of this object regarding a given api.
 	 *
 	 * Possible states:
-	 * - ok => could be translated
+	 * - ok => could be simplified
 	 * - above_limit => if characters of this object are more than the quota-limit
 	 * - above_text_limit => if one text is above the text-limit from used API
 	 * - exceeded => if quota is exceeded
@@ -440,7 +441,7 @@ class Post_Object implements Easy_Language_Object {
 		// get entry-limit from API.
 		$entry_limit_per_minute = $api_obj->get_max_requests_per_minute();
 
-		// get chars to translate.
+		// get chars to simplify.
 		$filter  = array(
 			'object_id' => $this->get_id(),
 		);
@@ -504,9 +505,6 @@ class Post_Object implements Easy_Language_Object {
 		// get object-hash.
 		$hash = $this->get_md5();
 
-		// get object type name.
-		$object_type_name = Helper::get_objekt_type_name( $this );
-
 		// initialize the simplification.
 		if ( false !== $initialization ) {
 			$simplification_results = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, array() );
@@ -562,7 +560,7 @@ class Post_Object implements Easy_Language_Object {
 					'title' => __( 'Simplification canceled', 'easy-language' ),
 					'texts' => array(
 						/* translators: %1$s will be replaced by the object-title */
-						'<p>'.sprintf( __( 'A previously running simplification of texts of this %1$s failed. How do you want to deal with it?', 'easy-language' ), esc_html( $object_type_name ) ).'</p>'
+						'<p>'.sprintf( __( 'A previously running simplification of texts of this %1$s failed. How do you want to deal with it?', 'easy-language' ), esc_html( $this->get_type_name() ) ).'</p>'
 					),
 					'buttons' => array(
 						array(
@@ -571,7 +569,7 @@ class Post_Object implements Easy_Language_Object {
 							'text' => __(  'Run simplification again', 'easy-language' )
 						),
 						array(
-							'action' => 'easy_language_ignore_processing_simplification("' . $this->get_id() . '", "'.get_permalink($this->get_id()).'");',
+							'action' => 'easy_language_ignore_processing_simplification("' . $this->get_id() . '", "'.$this->get_type().'");',
 							'variant' => 'primary',
 							'text' => __(  'Ignore the failed simplifications', 'easy-language' )
 						),
@@ -607,7 +605,7 @@ class Post_Object implements Easy_Language_Object {
 					'title' => __( 'Simplification canceled', 'easy-language' ),
 					'texts' => array(
 						/* translators: %1$s will be replaced by the object-title (like page or post), %2$s will be replaced by the API-title */
-						'<p>'.sprintf(__( 'The %1$s contains more text widgets than the API %2$s could handle in a short time.<br>The texts will be automatically simplified in the background.', 'easy-language' ), esc_html($object_type_name), esc_html($api_obj->get_title())).'</p>'
+						'<p>'.sprintf(__( 'The %1$s contains more text widgets than the API %2$s could handle in a short time.<br>The texts will be automatically simplified in the background.', 'easy-language' ), esc_html($this->get_type_name()), esc_html($api_obj->get_title())).'</p>'
 					),
 					'buttons' => array(
 						array(
@@ -616,7 +614,7 @@ class Post_Object implements Easy_Language_Object {
 							'text' => __( 'Show in frontend', 'easy-language' )
 						),
 						array(
-							'action' => 'location.href="'.$this->get_page_builder()->get_edit_link().'";',
+							'action' => 'location.href="'.$this->get_edit_link().'";',
 							'variant' => 'secondary',
 							'text' => __( 'Edit', 'easy-language' )
 						),
@@ -628,7 +626,7 @@ class Post_Object implements Easy_Language_Object {
 				);
 				if( $this->is_automatic_mode_prevented() ) {
 					/* translators: %1$s will be replaced by the object-title (like page or post), %2$s will be replaced by the API-title */
-					$dialog['texts'][0] = '<p>'.sprintf(__( 'The %1$s contains more text widgets than the API %2$s could handle in a short time.<br>The texts could be automatically simplified in the background if you enable this on the page settings.', 'easy-language' ), esc_html($object_type_name), esc_html($api_obj->get_title())).'</p>';
+					$dialog['texts'][0] = '<p>'.sprintf(__( 'The %1$s contains more text widgets than the API %2$s could handle in a short time.<br>The texts could be automatically simplified in the background if you enable this on the page settings.', 'easy-language' ), esc_html($this->get_type_name()), esc_html($api_obj->get_title())).'</p>';
 				}
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
@@ -639,10 +637,10 @@ class Post_Object implements Easy_Language_Object {
 			// mark simplification for this object as running.
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, time() );
 
-			// set max texts to translate.
+			// set max texts to simplify.
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, $max_entry_count );
 
-			// set counter for translated texts to 0.
+			// set counter for simplified texts to 0.
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, 0 );
 		}
 
@@ -656,7 +654,7 @@ class Post_Object implements Easy_Language_Object {
 		);
 
 		// get limited entries.
-		$entries = Db::get_instance()->get_entries( $filter, $limit );
+		$entries = Db::get_instance()->get_entries( $filter, array(), $limit );
 
 		// if no more texts to simplify found, break the process and show hint depending on progress.
 		if ( empty( $entries ) ) {
@@ -673,7 +671,7 @@ class Post_Object implements Easy_Language_Object {
 					'title' => __( 'Simplification canceled', 'easy-language' ),
 					'texts' => array(
 						/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
-						'<p>'.sprintf( __( '<strong>The texts in this %1$s are already simplified.</strong><br>%2$s was not used. Nothing has been changed.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $simplification_obj->init->get_title() ) ).'</p>'
+						'<p>'.sprintf( __( '<strong>The texts in this %1$s are already simplified.</strong><br>%2$s was not used. Nothing has been changed.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->init->get_title() ) ).'</p>'
 					),
 					'buttons' => array(
 						array(
@@ -682,7 +680,7 @@ class Post_Object implements Easy_Language_Object {
 							'text' => __( 'Show in frontend', 'easy-language' )
 						),
 						array(
-							'action' => 'location.href="'.$this->get_page_builder()->get_edit_link().'";',
+							'action' => 'location.href="'.$this->get_edit_link().'";',
 							'variant' => 'secondary',
 							'text' => __( 'Edit', 'easy-language' )
 						),
@@ -699,7 +697,7 @@ class Post_Object implements Easy_Language_Object {
 					'title' => __( 'Simplification canceled', 'easy-language' ),
 					'texts' => array(
 						/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
-						'<p>'.sprintf( __( '<strong>Some texts in this %1$s are already simplified.</strong><br>Other missing simplifications has been run via %2$s and are insert into the text.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $simplification_obj->init->get_title() ) ).'</p>'
+						'<p>'.sprintf( __( '<strong>Some texts in this %1$s are already simplified.</strong><br>Other missing simplifications has been run via %2$s and are insert into the text.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->init->get_title() ) ).'</p>'
 					),
 					'buttons' => array(
 						array(
@@ -708,7 +706,7 @@ class Post_Object implements Easy_Language_Object {
 							'text' => __( 'Show in frontend', 'easy-language' )
 						),
 						array(
-							'action' => 'location.href="'.$this->get_page_builder()->get_edit_link().'";',
+							'action' => 'location.href="'.$this->get_edit_link().'";',
 							'variant' => 'secondary',
 							'text' => __( 'Edit', 'easy-language' )
 						),
@@ -757,7 +755,7 @@ class Post_Object implements Easy_Language_Object {
 				'title' => __( 'Simplification processed', 'easy-language' ),
 				'texts' => array(
 					/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
-					'<p>'.sprintf( __( '<strong>Simplifications have been returned from %2$s.</strong><br>They were inserted into the %1$s.', 'easy-language' ), esc_html( $object_type_name ), esc_html( $simplification_obj->init->get_title() ) ).'</p>'
+					'<p>'.sprintf( __( '<strong>Simplifications have been returned from %2$s.</strong><br>They were inserted into the %1$s.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->init->get_title() ) ).'</p>'
 				),
 				'buttons' => array(
 					array(
@@ -766,7 +764,7 @@ class Post_Object implements Easy_Language_Object {
 						'text' => __( 'Show in frontend', 'easy-language' )
 					),
 					array(
-						'action' => 'location.href="'.$this->get_page_builder()->get_edit_link().'";',
+						'action' => 'location.href="'.$this->get_edit_link().'";',
 						'variant' => 'primary',
 						'text' => __( 'Edit', 'easy-language' )
 					),
@@ -825,13 +823,13 @@ class Post_Object implements Easy_Language_Object {
 		foreach ( $language_mappings as $source_language => $target_languages ) {
 			foreach ( $target_languages as $target_language ) {
 				// only if this text is not already simplified in source-language matching the target-language.
-				if ( ! empty( $object_language[ $target_language ] ) && false === $entry->has_translation_in_language( $target_language ) && $source_language === $entry->get_source_language() ) {
+				if ( ! empty( $object_language[ $target_language ] ) && false === $entry->has_simplification_in_language( $target_language ) && $source_language === $entry->get_source_language() ) {
 					// call API to get simplification of the given entry.
 					$results = $simplification_obj->call_api( $entry->get_original(), $source_language, $target_language );
 
 					// save simplification if results are available.
 					if ( ! empty( $results ) ) {
-						$entry->set_translation( $results['translated_text'], $target_language, $simplification_obj->init->get_name(), absint( $results['jobid'] ) );
+						$entry->set_simplification( $results['translated_text'], $target_language, $simplification_obj->init->get_name(), absint( $results['jobid'] ) );
 						++$c;
 					}
 					else {
@@ -868,8 +866,8 @@ class Post_Object implements Easy_Language_Object {
 		$replaced_count = 0;
 		foreach ( $language_mappings as $source_language => $target_languages ) {
 			foreach ( $target_languages as $target_language ) {
-				if ( false !== $entry->has_translation_in_language( $target_language ) && $source_language === $entry->get_source_language() ) {
-					if ( $entry->replace_original_with_translation( $this->get_id(), $target_language ) ) {
+				if ( false !== $entry->has_simplification_in_language( $target_language ) && $source_language === $entry->get_source_language() ) {
+					if ( $entry->replace_original_with_simplification( $this->get_id(), $target_language ) ) {
 						++$replaced_count;
 					}
 				}
@@ -880,16 +878,13 @@ class Post_Object implements Easy_Language_Object {
 		if( 0 === $c && $replaced_count > 0 ) {
 			$entry->set_state( 'in_use' );
 
-			// get object type name.
-			$object_type_name = Helper::get_objekt_type_name( $this );
-
 			// create dialog.
 			$dialog = array(
 				'className' => 'wp-dialog-success',
 				'title' => __( 'Simplification processed', 'easy-language' ),
 				'texts' => array(
 					/* translators: %1$s will be replaced by the object-title (like post or page) */
-					'<p>'.sprintf( __( 'The texts are already simplified local.<br><strong>We did not use the API to simplify them again.</strong><br>The texts in this %1$s are replaced with its local available simplification.', 'easy-language' ), esc_html($object_type_name)).'</p>'
+					'<p>'.sprintf( __( 'The texts are already simplified local.<br><strong>We did not use the API to simplify them again.</strong><br>The texts in this %1$s are replaced with its local available simplification.', 'easy-language' ), esc_html($this->get_type_name())).'</p>'
 				),
 				'buttons' => array(
 					array(
@@ -898,7 +893,7 @@ class Post_Object implements Easy_Language_Object {
 						'text' => __( 'Show in frontend', 'easy-language' )
 					),
 					array(
-						'action' => 'location.href="'.$this->get_page_builder()->get_edit_link().'";',
+						'action' => 'location.href="'.$this->get_edit_link().'";',
 						'variant' => 'primary',
 						'text' => __( 'Edit', 'easy-language' )
 					),
@@ -965,17 +960,17 @@ class Post_Object implements Easy_Language_Object {
 	}
 
 	/**
-	 * Return whether this original object has translations.
+	 * Return whether this original object has simplifications.
 	 *
 	 * @return bool
 	 */
-	public function has_translations(): bool {
+	public function has_simplifications(): bool {
 		// bail for simplified objects.
 		if ( $this->is_simplified() ) {
 			return false;
 		}
 
-		// get list of translations in languages.
+		// get list of simplifications in languages.
 		$languages = get_post_meta( $this->get_id(), 'easy_language_simplified_in', true );
 
 		// return true if list is not empty.
@@ -1045,7 +1040,7 @@ class Post_Object implements Easy_Language_Object {
 	}
 
 	/**
-	 * Add simplification object to this object if it is a not translatable object.
+	 * Add simplification object to this object if it is a not simplifiable object.
 	 *
 	 * @param string $target_language The target-language.
 	 * @param Api_Base $api_object The API to use.
@@ -1056,8 +1051,8 @@ class Post_Object implements Easy_Language_Object {
 		// get DB-object.
 		$db = DB::get_instance();
 
-		// check if this object is already translated in this language.
-		if ( false === $this->is_translated_in_language( $target_language ) ) {
+		// check if this object is already simplified in this language.
+		if ( false === $this->is_simplified_in_language( $target_language ) ) {
 			// get the source-language.
 			$source_language = helper::get_wp_lang();
 			if ( empty( $source_language ) ) {
@@ -1081,7 +1076,7 @@ class Post_Object implements Easy_Language_Object {
 			// copy taxonomies and post-meta.
 			helper::copy_cpt( $this->get_id(), $copied_post_id );
 
-			// mark the copied post as translation-object of the original.
+			// mark the copied post as simplified-object of the original.
 			update_post_meta( $copied_post_id, 'easy_language_simplification_original_id', $this->get_id() );
 
 			// save the source-language of the copied object.
@@ -1131,8 +1126,8 @@ class Post_Object implements Easy_Language_Object {
 			$original_title_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $pagebuilder_obj->get_name() );
 			$original_title_obj->set_state( 'to_simplify' );
 
-			// add this language as translated language to original post.
-			$this->add_translated_language( $target_language );
+			// add this language as simplified language to original post.
+			$this->add_language( $target_language );
 
 			// set marker to reset permalinks.
 			Rewrite::get_instance()->set_refresh();
@@ -1163,4 +1158,35 @@ class Post_Object implements Easy_Language_Object {
     public function set_automatic_mode_prevented(bool $prevent_automatic_mode): void {
 		update_post_meta( $this->get_id(), 'easy_language_prevent_automatic_mode', $prevent_automatic_mode );
     }
+
+	/**
+	 * Return language-specific title for the type of the given object.
+	 *
+	 * @return string
+	 */
+	public function get_type_name(): string {
+		$object_type_settings = Init::get_instance()->get_post_type_settings();
+		$object_type_name     = 'page';
+		if ( ! empty( $object_type_settings[ $this->get_type() ] ) ) {
+			$object_type_name = $object_type_settings[ $this->get_type() ]['label_singular'];
+		}
+		return $object_type_name;
+	}
+
+	/**
+	 * Return the edit link.
+	 *
+	 * @return string
+	 */
+	public function get_edit_link(): string {
+		// get the page builder used for this object.
+		$page_builder = $this->get_page_builder();
+		if( $page_builder ) {
+			// return its custom edit link.
+			return $page_builder->get_edit_link();
+		}
+
+		// return the default edit link as fallback.
+		return get_edit_post_link( $this->get_id() );
+	}
 }

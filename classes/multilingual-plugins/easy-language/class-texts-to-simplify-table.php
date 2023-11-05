@@ -50,7 +50,12 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	 * @return array
 	 */
 	private function table_data(): array {
-		return DB::get_instance()->get_entries( Init::get_instance()->get_filter_for_entries_to_simplify() );
+		// order table.
+		$order_by = ( isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], array_keys( $this->get_sortable_columns() ) ) ) ? $_REQUEST['orderby'] : 'date';
+		$order   = ( isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], array( 'asc', 'desc' ) ) ) ? $_REQUEST['order'] : 'desc';
+
+		// get results
+		return DB::get_instance()->get_entries( Init::get_instance()->get_filter_for_entries_to_simplify(), array( 'order_by' => $order_by, 'order' => $order ) );
 	}
 
 	/**

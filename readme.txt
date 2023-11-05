@@ -21,7 +21,7 @@ The [SUMM AI](https://summ-ai.com) API is usable without API Key to simplify 180
 * Supported APIs to simplify texts in your website: [SUMM AI](https://summ-ai.com), [Capito](https://www.capito.eu), [ChatGpt](https://chat.openai.com)
 * The SUMM AI API is also usable with TranslatePress
 * Adds easy language to other multilingual plugins like WPML, Polylang, Sublanguage, TranslatePress
-* PageBuilder: native support for Block Editor (Gutenberg), Avada, Elementor, Divi and WPBakery
+* PageBuilder: native support for Block Editor (Gutenberg), Avada, Elementor, Divi, WPBakery and Themify
 * Multisite: all simplified texts will be available to any other blog in the network to prevent double simplification
 * Own translator role for users to only simplified texts.
 

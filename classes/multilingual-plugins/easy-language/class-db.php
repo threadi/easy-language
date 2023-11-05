@@ -202,12 +202,13 @@ class Db {
 	/**
 	 * Return all actual entries as Easy_Language_Text-object-array.
 	 *
-	 * @param array $filter Optional filter.
-	 * @param int $limit Limit the list.
+	 * @param array $filter Set filter (optional).
+	 * @param array $order Order list (optional).
+	 * @param int $limit Limit the list (optional).
 	 *
 	 * @return array Array of Text-objects
 	 */
-	public function get_entries( array $filter = array(), int $limit = 0 ): array {
+	public function get_entries( array $filter = array(), array $order = array(), int $limit = 0 ): array {
 		global $wpdb;
 
 		// initialize return array.
@@ -217,7 +218,18 @@ class Db {
 		$sql_select = '';
 		$sql_join   = array();
 		$sql_where  = ' WHERE 1 = %d';
+
+		// set ordering: default goes for title first, then other fields (to show fast proceed as titles are smaller than other texts).
+		$sql_order = " ORDER BY IF( o.field = 'title', 0, 1 ) ASC";
+		if( !empty($order) && !empty( $order['order_by']) && !empty( $order['order']) && in_array( $order['order'], array('asc','desc'), true ) ) {
+			if( 'date' === $order['order_by'] ) {
+				$sql_order = " ORDER BY o.time ".sanitize_text_field($order['order']);
+			}
+		}
+
+		// init vars-array for prepared statement.
 		$vars       = array( '1' );
+
 		if ( ! empty( $filter ) ) {
 			if ( ! empty( $filter['id'] ) ) {
 				$sql_where .= ' AND o.id = %d';
@@ -287,9 +299,12 @@ class Db {
 				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
 				$sql_select                                        .= ', oo.object_id, oo.object_type';
 			}
-			if( ! empty( $filter['object_not_state']) ) {
+			if( ! empty( $filter['object_not_state'] ) ) {
 				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
 				$sql_select                                        .= ', oo.object_id, oo.object_type';
+			}
+			if( ! empty( $filter['has_simplification'] ) ) {
+				$sql_join[ $wpdb->easy_language_simplifications ] = ' INNER JOIN ' . $wpdb->easy_language_simplifications . ' s ON s.oid = o.id';
 			}
 		}
 
@@ -298,9 +313,6 @@ class Db {
 		if( absint($limit) > 0 ) {
 			$sql_limit = ' LIMIT '.absint($limit);
 		}
-
-		// set ordering: title first, then other fields (to show fast proceed as titles are smaller than other texts).
-		$sql_order = " ORDER BY IF( o.field = 'title', 0, 1 ) ASC";
 
 		// define base-statement.
 		$sql = 'SELECT `id`, `original`, `lang`%1$s FROM ' . $wpdb->easy_language_originals . ' AS o';
@@ -323,19 +335,19 @@ class Db {
 			// only add post-type-objects if not_locked is set and if they are not locked.
 			$add = true;
 			if( !empty( $filter['not_locked'] ) ) {
-				$object = $init->get_object_by_string( $result['object_type'], $result['object_id'] );
+				$object = Helper::get_object( absint($result['object_id']), $result['object_type'] );
 				$add = !$object->is_locked();
 			}
 			if( !empty( $filter['not_prevented'] ) && false !== $add ) {
-				$object = $init->get_object_by_string( $result['object_type'], $result['object_id'] );
+				$object = Helper::get_object( absint($result['object_id']), $result['object_type'] );
 				$add = !$object->is_automatic_mode_prevented();
 			}
 			if( !empty( $filter['object_state'] ) && false !== $add ) {
-				$object = $init->get_object_by_string( $result['object_type'], $result['object_id'] );
+				$object = Helper::get_object( absint($result['object_id']), $result['object_type'] );
 				$add = $object->has_state($filter['object_state']);
 			}
 			if( !empty( $filter['object_not_state'] ) && false !== $add ) {
-				$object = $init->get_object_by_string( $result['object_type'], $result['object_id'] );
+				$object = Helper::get_object( absint($result['object_id']), $result['object_type'] );
 				$add = !$object->has_state($filter['object_not_state']);
 			}
 
