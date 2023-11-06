@@ -7,8 +7,8 @@
 
 namespace easyLanguage\Apis\Summ_Ai;
 
+use easyLanguage\Base;
 use easyLanguage\Api_Base;
-use easyLanguage\Base_Abstract;
 use easyLanguage\Helper;
 use easyLanguage\Language_Icon;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define what SUMM AI supports and what not.
  */
-class Summ_AI extends Base_Abstract implements Api_Base {
+class Summ_AI extends Base implements Api_Base {
 
 	/**
 	 * Set the internal name for the API.

@@ -7,9 +7,8 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
-use easyLanguage\Api_Base;
 use easyLanguage\Apis;
-use easyLanguage\Base_Abstract;
+use easyLanguage\Base;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
 use easyLanguage\Multilingual_Plugins;
@@ -31,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Initializer for this plugin.
  */
-class Init extends Base_Abstract implements Multilingual_Plugins_Base {
+class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Marker for foreign plugin (plugins which are supported by this plugin but not maintained).
 	 *
@@ -1808,11 +1807,11 @@ class Init extends Base_Abstract implements Multilingual_Plugins_Base {
 	/**
 	 * Show quota hint in backend tables.
 	 *
-	 * @param Api_Base $api_obj The used API.
+	 * @param Base $api_obj The used API.
 	 *
 	 * @return void
 	 */
-	public function show_quota_hint( Api_Base $api_obj ): void {
+	public function show_quota_hint( Base $api_obj ): void {
 		$quota_array   = $api_obj->get_quota();
 		$quota_percent = 0;
 		if ( ! empty( $quota_array['character_limit'] ) && $quota_array['character_limit'] > 0 ) {

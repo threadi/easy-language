@@ -38,7 +38,7 @@ function Modal( args ) {
 				}
 				{args.dialog.progressbar && args.dialog.progressbar.active && (
 					<div
-						className="wp-progressbar"
+						className="react-progressbar"
 					>
 						<progress max="100" id={args.dialog.progressbar.id} value={args.dialog.progressbar.progress}>&nbsp;</progress>
 					</div>

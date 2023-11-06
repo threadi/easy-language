@@ -7,7 +7,7 @@
 
 namespace easyLanguage\Multilingual_plugins\Polylang;
 
-use easyLanguage\Base_Abstract;
+use easyLanguage\Base;
 use easyLanguage\Languages;
 use easyLanguage\Multilingual_Plugins_Base;
 use easyLanguage\Transients;
@@ -15,7 +15,7 @@ use easyLanguage\Transients;
 /**
  * Object to handle polylang support.
  */
-class Init extends Base_Abstract implements Multilingual_Plugins_Base {
+class Init extends Base implements Multilingual_Plugins_Base {
 
 	/**
 	 * Name of this plugin.

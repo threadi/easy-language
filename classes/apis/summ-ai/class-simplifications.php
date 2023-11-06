@@ -7,7 +7,7 @@
 
 namespace easyLanguage\Apis\Summ_Ai;
 
-use easyLanguage\Api_Base;
+use easyLanguage\Base;
 use easyLanguage\Multilingual_plugins\Easy_Language\Init;
 
 // prevent direct access.
@@ -29,9 +29,9 @@ class Simplifications {
 	/**
 	 * Init-Object of this API.
 	 *
-	 * @var Api_Base
+	 * @var Base
 	 */
-	public Api_Base $init;
+	public Base $init;
 
 	/**
 	 * Constructor for Init-Handler.
@@ -59,10 +59,10 @@ class Simplifications {
 	/**
 	 * Initialize this object.
 	 *
-	 * @param Api_Base $init
+	 * @param Base $init
 	 * @return void
 	 */
-	public function init( Api_Base $init ): void {
+	public function init( Base $init ): void {
 		$this->init = $init;
 	}
 

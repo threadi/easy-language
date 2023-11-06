@@ -9,7 +9,7 @@ namespace easyLanguage\Apis\ChatGpt;
 
 use easyLanguage\Apis;
 use easyLanguage\Api_Base;
-use easyLanguage\Base_Abstract;
+use easyLanguage\Base;
 use easyLanguage\Helper;
 use easyLanguage\Language_Icon;
 use easyLanguage\Multilingual_Plugins;
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define what ChatGpt supports and what not.
  */
-class ChatGpt extends Base_Abstract implements Api_Base {
+class ChatGpt extends Base implements Api_Base {
 
 	/**
 	 * Set the internal name for the API.

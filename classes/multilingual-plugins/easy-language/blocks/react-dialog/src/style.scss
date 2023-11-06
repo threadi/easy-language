@@ -35,6 +35,20 @@
 
 	.react-dialog-title, .react-dialog-text p { margin-bottom: 1em }
 
+	.react-progressbar {
+		progress {
+			width: 100%;
+		}
+
+		progress::-moz-progress-bar {
+			background: green;
+		}
+
+		progress::-webkit-progress-value {
+			background: green;
+		}
+	}
+
 	button {
 		align-items: center;
 		-webkit-appearance: none;

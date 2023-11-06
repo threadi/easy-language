@@ -15,8 +15,8 @@ import $ from 'jquery';
  * Init scripts for easy-language-handling.
  */
 function init_scripts() {
-	if( top.document.querySelector('.easy-language-language-options-wrap .easy-language-translate-object') ) {
-		top.document.querySelector('.easy-language-language-options-wrap .easy-language-translate-object').addEventListener('click', function(e) {
+	if( top.document.querySelector('.easy-language-language-options-wrap .wp-easy-dialog') ) {
+		top.document.querySelector('.easy-language-language-options-wrap .wp-easy-dialog').addEventListener('click', function(e) {
 			e.preventDefault();
 			document.body.dispatchEvent(new CustomEvent("react-dialog", { detail: JSON.parse(this.dataset.dialog) }));
 		});

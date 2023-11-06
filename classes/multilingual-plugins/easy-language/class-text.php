@@ -7,7 +7,7 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
-use easyLanguage\Api_Base;
+use easyLanguage\Base;
 use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
@@ -478,10 +478,10 @@ class Text {
 	/**
 	 * Get for simplification used API.
 	 *
-	 * @return Api_Base|false
+	 * @return Base|false
 	 * @noinspection PhpUnused
 	 */
-	public function get_api(): Api_Base|false {
+	public function get_api(): Base|false {
 		global $wpdb;
 
 		// get from DB.

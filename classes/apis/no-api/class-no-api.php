@@ -7,8 +7,8 @@
 
 namespace easyLanguage\Apis\No_Api;
 
+use easyLanguage\Base;
 use easyLanguage\Api_Base;
-use easyLanguage\Base_Abstract;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define what No-API supports and what not.
  */
-class No_Api extends Base_Abstract implements Api_Base {
+class No_Api extends Base implements Api_Base {
 
 	/**
 	 * Set the internal name for the API.

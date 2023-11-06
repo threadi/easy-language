@@ -32,3 +32,8 @@ Filter um die Liste der unterstützten Blöcke in Gutenberg zu beeinflussen.
 ## easy_language_possible_post_types
 
 Filter um Liste der unterstützen Post-types zu beeinflussen.
+
+## easy_language_possible_taxonomies
+
+Filter für Liste der möglichen Taxonomien
+Only Pro

@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Base-object for API- and plugin-main-classes.
  */
-abstract class Base_Abstract {
+abstract class Base {
 	/**
 	 * Marker for foreign plugin (plugins which are supported by this plugin but not maintained).
 	 *

@@ -56,7 +56,7 @@ function easy_language_autoloader( string $class_name ): void {
 		foreach ( $dirs as $dir ) {
 			// Now build a path to the file using mapping to the file location.
 			$filepath_pre = trailingslashit( dirname( $dir, 2 ) . '/classes/' . $namespace );
-			foreach ( array( 'class', 'interface' ) as $type ) {
+			foreach ( array( 'class', 'interface', 'abstract' ) as $type ) {
 				$filepath = $filepath_pre . $type . '-' . strtolower( $file_name );
 
 				// If the file exists in the specified path, then include it.

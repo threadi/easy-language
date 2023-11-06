@@ -91,7 +91,6 @@ function easy_language_add_simplification_object( object_id, type, language, sim
 				'nonce': easyLanguageSimplificationJsVars.add_simplification_nonce
 			},
 			success: function(data) {
-				console.log(data);
 				if( 'ok' === data.status && "auto" === simplification_mode ) {
 					easy_language_get_simplification( data.object_id, data.object_type, false );
 				}

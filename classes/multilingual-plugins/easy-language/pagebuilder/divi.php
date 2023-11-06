@@ -79,26 +79,26 @@ add_filter( 'et_builder_page_settings_definitions', 'easy_language_divi_add_fiel
  * @return void
  */
 function easy_language_divi_add_scripts(): void {
-	// register custom style.
+	// add styles for language field in Divi-settings.
 	wp_register_style(
-		'easy-language-divi-admin',
+		'easy-language-language-field',
 		trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'classes/multilingual-plugins/easy-language/parser/divi/build/style-language_field.css',
 		array(),
 		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/parser/divi/build/style-language_field.css' ),
 	);
-	wp_enqueue_style( 'easy-language-divi-admin' );
+	wp_enqueue_style( 'easy-language-language-field' );
 
-	// add custom script.
+	// add script for language field in Divi-settings.
 	wp_register_script(
-		'easy-language-divi',
+		'easy-language-language-field',
 		trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'classes/multilingual-plugins/easy-language/parser/divi/build/language_field.js',
 		array( 'jquery', 'et-dynamic-asset-helpers' ),
 		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/parser/divi/build/language_field.js' ),
 		true
 	);
 
-	// add individual variables for our divi-JS.
-	wp_localize_script( 'easy-language-divi', 'easyLanguageDiviData', array(
+	// add individual variables for language-field-JS.
+	wp_localize_script( 'easy-language-language-field', 'easyLanguageDiviData', array(
 		'rest' => array(
 			'endpoints' => array(
 				'language_options'       => esc_url_raw( rest_url( 'easy-language/v1/language-options' ) ),
@@ -107,8 +107,27 @@ function easy_language_divi_add_scripts(): void {
 		),
 	) );
 
-	// enable the custom script.
-	wp_enqueue_script( 'easy-language-divi' );
+	// enable the language-field-JS.
+	wp_enqueue_script( 'easy-language-language-field' );
+
+	// add simplification-scripts for Divi.
+	wp_enqueue_script(
+		'easy-language-divi-simplifications',
+		plugins_url( '/classes/multilingual-plugins/easy-language/admin/divi.js', EASY_LANGUAGE ),
+		array( 'jquery', 'react-dialog', 'wp-i18n' ),
+		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/divi.js' ),
+		true
+	);
+
+	// add php-vars to our simplifications-js-script.
+	wp_localize_script(
+		'easy-language-divi-simplifications',
+		'easyLanguageDiviSimplificationJsVars',
+		array(
+			'ajax_url'                        => admin_url( 'admin-ajax.php' ),
+			'run_simplification_nonce'        => wp_create_nonce( 'easy-language-run-simplification-nonce' ),
+		)
+	);
 
 	// embed the react-dialog-component.
 	$script_asset_path = Helper::get_plugin_path()."classes/multilingual-plugins/easy-language/blocks/react-dialog/build/index.asset.php";

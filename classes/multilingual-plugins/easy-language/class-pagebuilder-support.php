@@ -7,7 +7,7 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
-use easyLanguage\Base_Abstract;
+use easyLanguage\Base;
 use easyLanguage\Multilingual_Plugins;
 use WP_Post;
 
@@ -31,9 +31,9 @@ class Pagebuilder_Support {
 	/**
 	 * Instance of initializing object.
 	 *
-	 * @var Base_Abstract
+	 * @var Base
 	 */
-	private Base_Abstract $init;
+	private Base $init;
 
 	/**
 	 * Constructor for this object.
@@ -60,11 +60,11 @@ class Pagebuilder_Support {
 	/**
 	 * Initialize pagebuilder-support for our own plugin.
 	 *
-	 * @param Base_Abstract $init The Base-object.
+	 * @param Base $init The Base-object.
 	 *
 	 * @return void
 	 */
-	public function init( Base_Abstract $init ): void {
+	public function init( Base $init ): void {
 		// secure initializing object.
 		$this->init = $init;
 
