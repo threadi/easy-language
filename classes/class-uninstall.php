@@ -112,37 +112,37 @@ class Uninstall {
 	 */
 	private function tasks(): void {
 		// get all images which have assigned 'easy_language_icon' post meta and delete them.
-		$query           = array(
+		$query                            = array(
 			'posts_per_page' => -1,
 			'post_type'      => 'attachment',
-			'post_status' => 'inherit',
-			'meta_query' => array(
+			'post_status'    => 'inherit',
+			'meta_query'     => array(
 				array(
-					'key' => 'easy_language_icon',
-					'value' => '1',
-					'compare' => '='
-				)
-			)
+					'key'     => 'easy_language_icon',
+					'value'   => '1',
+					'compare' => '=',
+				),
+			),
 		);
 		$attachments_with_language_marker = new WP_Query( $query );
-		foreach( $attachments_with_language_marker->posts as $attachment ) {
+		foreach ( $attachments_with_language_marker->posts as $attachment ) {
 			wp_delete_attachment( $attachment->ID );
 		}
 
 		// delete all post-meta 'easy_language_code' on images.
-		$query           = array(
+		$query                            = array(
 			'posts_per_page' => -1,
 			'post_type'      => 'attachment',
-			'post_status' => 'inherit',
-			'meta_query' => array(
+			'post_status'    => 'inherit',
+			'meta_query'     => array(
 				array(
-					'key' => 'easy_language_code',
-					'compare' => 'EXIST'
-				)
-			)
+					'key'     => 'easy_language_code',
+					'compare' => 'EXIST',
+				),
+			),
 		);
 		$attachments_with_language_marker = new WP_Query( $query );
-		foreach( $attachments_with_language_marker->posts as $attachment ) {
+		foreach ( $attachments_with_language_marker->posts as $attachment ) {
 			delete_post_meta( $attachment->ID, 'easy_language_code' );
 		}
 
@@ -200,7 +200,7 @@ class Uninstall {
 		foreach ( $wp_roles->roles as $role_name => $settings ) {
 			$role = get_role( $role_name );
 			foreach ( Init::get_instance()->get_capabilities( 'el_simplifier', 'el_simplifier' ) as $capability ) {
-				$role->remove_cap($capability);
+				$role->remove_cap( $capability );
 			}
 		}
 	}
@@ -218,7 +218,7 @@ class Uninstall {
 			'easy_language_api_timeout',
 			'easy_language_api_text_limit_per_process',
 			'easy_language_delete_unused_simplifications',
-			EASY_LANGUAGE_TRANSIENT_LIST
+			EASY_LANGUAGE_TRANSIENT_LIST,
 		);
 	}
 }

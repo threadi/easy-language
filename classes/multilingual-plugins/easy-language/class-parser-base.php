@@ -204,7 +204,7 @@ class Parser_Base {
 					<p>
 						<?php
 						/* translators: %1$s will be replaced by the API-title */
-						echo sprintf( __( 'This %1$s contains more texts than %2$s would simplify in one loop. Simplify via API will not be possible.', 'easy-language' ), esc_html($post_object->get_type_name()), esc_html($api_obj->get_title()) );
+						printf( esc_html__( 'This %1$s contains more texts than %2$s would simplify in one loop. Simplify via API will not be possible.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $api_obj->get_title() ) );
 						?>
 					</p>
 					<?php
@@ -213,7 +213,7 @@ class Parser_Base {
 					<p>
 						<?php
 							/* translators: %1$s will be replaced by the API-title */
-							echo sprintf( __( 'One or more texts are to long to simplify them with %1$s.', 'easy-language' ), esc_html($api_obj->get_title()) );
+							printf( esc_html__( 'One or more texts are to long to simplify them with %1$s.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
 						?>
 					</p>
 					<?php
@@ -231,28 +231,28 @@ class Parser_Base {
 
 					// set config for dialog.
 					$dialog_config = array(
-						'title' => __( 'Simplify texts', 'easy-language' ),
-						'texts' => array(
-							'<p>'.__( '<strong>Are you sure you want to simplify these texts via API?</strong><br>Hint: this could cause costs with the API.', 'easy-language' ).'</p>'
+						'title'   => __( 'Simplify texts', 'easy-language' ),
+						'texts'   => array(
+							'<p>' . __( '<strong>Are you sure you want to simplify these texts via API?</strong><br>Hint: this could cause costs with the API.', 'easy-language' ) . '</p>',
 						),
 						'buttons' => array(
 							array(
-								'action' => 'easy_language_get_simplification( '.$post_id.', "'.$post_object->get_type().'" );',
+								'action'  => 'easy_language_get_simplification( ' . $post_id . ', "' . $post_object->get_type() . '" );',
 								'variant' => 'primary',
-								'text' => __( 'Yes', 'easy-language' )
+								'text'    => __( 'Yes', 'easy-language' ),
 							),
 							array(
-								'action' => 'closeDialog();',
+								'action'  => 'closeDialog();',
 								'variant' => 'secondary',
-								'text' => __( 'No', 'easy-language' )
-							)
-						)
+								'text'    => __( 'No', 'easy-language' ),
+							),
+						),
 					);
 					?>
-					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary wp-easy-dialog elementor-button" data-dialog="<?php echo esc_attr(wp_json_encode($dialog_config)); ?>" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( $title ); ?>">
+					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary wp-easy-dialog elementor-button" data-dialog="<?php echo esc_attr( wp_json_encode( $dialog_config ) ); ?>" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( $title ); ?>">
 						<?php
 							/* translators: %1$s will be replaced by the API-title */
-							echo sprintf( esc_html__( 'Simplify with %1$s.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
+							printf( esc_html__( 'Simplify with %1$s.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
 						if ( $quota_state['quota_percent'] > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
 							/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
 							echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';
@@ -260,8 +260,16 @@ class Parser_Base {
 						?>
 						</a>
 					</p>
-					<label><input type="checkbox" name="automatic_mode_prevented" data-id="<?php echo absint($post_object->get_id()) ?>" class="easy-language-automatic-simplification-prevention" value="1"<?php if( $post_object->is_automatic_mode_prevented() ) { ?> checked="checked"<?php } ?>><?php echo esc_html__( 'Not automatic simplified', 'easy-language' ); ?></label>
 					<?php
+					if ( 1 === absint( get_option( 'easy_language_automatic_simplification_enabled', 0 ) ) ) {
+						?>
+							<label><input type="checkbox" name="automatic_mode_prevented" data-id="<?php echo absint( $post_object->get_id() ); ?>" class="easy-language-automatic-simplification-prevention" value="1"
+																												<?php
+																												if ( $post_object->is_automatic_mode_prevented() ) {
+																													?>
+								checked="checked"<?php } ?>><?php echo esc_html__( 'Not automatic simplified', 'easy-language' ); ?></label>
+						<?php
+					}
 				} elseif ( $api_obj->is_configured() ) {
 					?>
 						<p class="alert">
@@ -350,7 +358,7 @@ class Parser_Base {
 
 				// output.
 				?>
-				<tr><th><?php echo esc_html( $settings['label'] ); ?></th><td><a href="<?php echo esc_url( $link ); ?>" title="<?php echo esc_attr( sprintf( $link_title, esc_html($settings['label']) ) ); ?>"><?php echo wp_kses_post( $link_content ); ?></a></td></tr>
+				<tr><th><?php echo esc_html( $settings['label'] ); ?></th><td><a href="<?php echo esc_url( $link ); ?>" title="<?php echo esc_attr( sprintf( $link_title, esc_html( $settings['label'] ) ) ); ?>"><?php echo wp_kses_post( $link_content ); ?></a></td></tr>
 				<?php
 			}
 			?>

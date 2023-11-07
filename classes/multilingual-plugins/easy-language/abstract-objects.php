@@ -2,8 +2,6 @@
 /**
  * File for our own object-handler.
  *
- * TODO Datei füllen und object-klassen entschlacken
- *
  * @package easy-language
  */
 
@@ -182,6 +180,9 @@ abstract class Objects {
 				);
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
+				// set error marker for return value.
+				$this->set_error_marker_for_process();
+
 				// return 0 as we have not simplified anything.
 				return 0;
 			}
@@ -195,6 +196,7 @@ abstract class Objects {
 			// define filter for entry-loading to check max count of entries for this object.
 			$filter = array(
 				'object_id' => $this->get_id(),
+				'object_type' => $this->get_type(),
 				'state'     => 'processing',
 			);
 
@@ -211,7 +213,7 @@ abstract class Objects {
 					),
 					'buttons' => array(
 						array(
-							'action' => 'easy_language_reset_processing_simplification("' . $this->get_id() . '", "'.get_permalink($this->get_id()).'");',
+							'action' => 'easy_language_reset_processing_simplification("' . $this->get_id() . '", "'.$this->get_type().'");',
 							'variant' => 'primary',
 							'text' => __(  'Run simplification again', 'easy-language' )
 						),
@@ -228,6 +230,9 @@ abstract class Objects {
 				);
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
+				// set error marker for return value.
+				$this->set_error_marker_for_process();
+
 				// return 0 as we have not simplified anything.
 				return 0;
 			}
@@ -235,6 +240,7 @@ abstract class Objects {
 			// define filter for entry-loading to check max count of entries for this object.
 			$filter = array(
 				'object_id' => $this->get_id(),
+				'object_type' => $this->get_type(),
 			);
 
 			// get entries.
@@ -256,12 +262,12 @@ abstract class Objects {
 					),
 					'buttons' => array(
 						array(
-							'action' => 'location.href="'.get_permalink($this->get_id()).'";',
+							'action' => 'top.location.href="'.get_permalink($this->get_id()).'";',
 							'variant' => 'primary',
 							'text' => __( 'Show in frontend', 'easy-language' )
 						),
 						array(
-							'action' => 'location.href="'.$this->get_edit_link().'";',
+							'action' => 'top.location.href="'.$this->get_edit_link().'";',
 							'variant' => 'secondary',
 							'text' => __( 'Edit', 'easy-language' )
 						),
@@ -276,6 +282,9 @@ abstract class Objects {
 					$dialog['texts'][0] = '<p>'.sprintf(__( 'The %1$s contains more text widgets than the API %2$s could handle in a short time.<br>The texts could be automatically simplified in the background if you enable this on the page settings.', 'easy-language' ), esc_html($this->get_type_name()), esc_html($api_obj->get_title())).'</p>';
 				}
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
+
+				// set error marker for return value.
+				$this->set_error_marker_for_process();
 
 				// return 0 as we have not simplified anything.
 				return 0;
@@ -297,6 +306,7 @@ abstract class Objects {
 		// define filter to get all entries for this object which should be simplified.
 		$filter = array(
 			'object_id' => $this->get_id(),
+			'object_type' => $this->get_type(),
 			'state'     => 'to_simplify',
 		);
 
@@ -322,17 +332,17 @@ abstract class Objects {
 					),
 					'buttons' => array(
 						array(
-							'action' => 'location.href="'.get_permalink($this->get_id()).'";',
+							'action' => 'top.location.href="'.get_permalink($this->get_id()).'";',
 							'variant' => 'primary',
 							'text' => __( 'Show in frontend', 'easy-language' )
 						),
 						array(
-							'action' => 'location.href="'.$this->get_edit_link().'";',
+							'action' => 'top.location.href="'.$this->get_edit_link().'";',
 							'variant' => 'secondary',
 							'text' => __( 'Edit', 'easy-language' )
 						),
 						array(
-							'action' => 'location.reload();',
+							'action' => 'top.location.reload();',
 							'text' => __(  'Cancel', 'easy-language' )
 						)
 					)
@@ -348,17 +358,17 @@ abstract class Objects {
 					),
 					'buttons' => array(
 						array(
-							'action' => 'location.href="'.get_permalink($this->get_id()).'";',
+							'action' => 'top.location.href="'.get_permalink($this->get_id()).'";',
 							'variant' => 'primary',
 							'text' => __( 'Show in frontend', 'easy-language' )
 						),
 						array(
-							'action' => 'location.href="'.$this->get_edit_link().'";',
+							'action' => 'top.location.href="'.$this->get_edit_link().'";',
 							'variant' => 'secondary',
 							'text' => __( 'Edit', 'easy-language' )
 						),
 						array(
-							'action' => 'location.reload();',
+							'action' => 'top.location.reload();',
 							'text' => __(  'Cancel', 'easy-language' )
 						)
 					)
@@ -406,17 +416,17 @@ abstract class Objects {
 				),
 				'buttons' => array(
 					array(
-						'action' => 'location.href="'.get_permalink($this->get_id()).'";',
+						'action' => 'top.location.href="'.get_permalink($this->get_id()).'";',
 						'variant' => 'primary',
 						'text' => __( 'Show in frontend', 'easy-language' )
 					),
 					array(
-						'action' => 'location.href="'.$this->get_edit_link().'";',
+						'action' => 'top.location.href="'.$this->get_edit_link().'";',
 						'variant' => 'primary',
 						'text' => __( 'Edit', 'easy-language' )
 					),
 					array(
-						'action' => 'location.reload();',
+						'action' => 'top.location.reload();',
 						'variant' => 'secondary',
 						'text' => __(  'Cancel', 'easy-language' )
 					)
@@ -534,17 +544,17 @@ abstract class Objects {
 				),
 				'buttons' => array(
 					array(
-						'action' => 'location.href="'.get_permalink($this->get_id()).'";',
+						'action' => 'top.location.href="'.get_permalink($this->get_id()).'";',
 						'variant' => 'primary',
 						'text' => __( 'Show in frontend', 'easy-language' )
 					),
 					array(
-						'action' => 'location.href="'.$this->get_edit_link().'";',
+						'action' => 'top.location.href="'.$this->get_edit_link().'";',
 						'variant' => 'primary',
 						'text' => __( 'Edit', 'easy-language' )
 					),
 					array(
-						'action' => 'location.reload();',
+						'action' => 'top.location.reload();',
 						'variant' => 'secondary',
 						'text' => __(  'Cancel', 'easy-language' )
 					)
@@ -588,4 +598,20 @@ abstract class Objects {
 	 * @return void
 	 */
 	private function process_simplification_trigger_on_end() {}
+
+	/**
+	 * Set error marker for running simplification.
+	 *
+	 * @return void
+	 */
+	private function set_error_marker_for_process(): void {
+		// mark simplification for this object as if it has been run.
+		$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
+
+		// set max texts to 1.
+		$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, 1 );
+
+		// set counter to 1.
+		$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, 1 );
+	}
 }

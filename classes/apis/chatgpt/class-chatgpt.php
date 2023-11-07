@@ -199,9 +199,9 @@ class ChatGpt extends Base implements Api_Base {
 				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
 				'url'         => 'de_el',
 				'api_value'   => 'plain',
-				'icon' => 'icon-de-el',
-				'img' => 'de_EL.png',
-				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : ''
+				'icon'        => 'icon-de-el',
+				'img'         => 'de_EL.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
 			),
 			'de_LS' => array(
 				'label'       => __( 'Leichte Sprache', 'easy-language' ),
@@ -209,9 +209,9 @@ class ChatGpt extends Base implements Api_Base {
 				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
 				'url'         => 'de_ls',
 				'api_value'   => 'easy',
-				'icon' => 'icon-de-ls',
-				'img' => 'de_LS.png',
-				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : ''
+				'icon'        => 'icon-de-ls',
+				'img'         => 'de_LS.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
 			),
 		);
 	}
@@ -259,12 +259,12 @@ class ChatGpt extends Base implements Api_Base {
 	/**
 	 * Add settings tab.
 	 *
-	 * @param $tab
+	 * @param string $tab The tab internal name.
 	 *
 	 * @return void
 	 * @noinspection DuplicatedCode
 	 */
-	public function add_settings_tab( $tab ): void {
+	public function add_settings_tab( string $tab ): void {
 		// get list of available plugins and check if they support APIs.
 		$supports_api = false;
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
@@ -279,13 +279,13 @@ class ChatGpt extends Base implements Api_Base {
 		}
 
 		// check active tab.
-		$activeClass = '';
+		$active_class = '';
 		if ( $this->get_name() === $tab ) {
-			$activeClass = ' nav-tab-active';
+			$active_class = ' nav-tab-active';
 		}
 
 		// output tab.
-		echo '<a href="' . esc_url( helper::get_settings_page_url() ) . '&tab=' . esc_attr( $this->get_name() ) . '" class="nav-tab' . esc_attr( $activeClass ) . '">' . __( 'ChatGpt', 'easy-language' ) . '</a>';
+		echo '<a href="' . esc_url( helper::get_settings_page_url() ) . '&tab=' . esc_attr( $this->get_name() ) . '" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'ChatGpt', 'easy-language' ) . '</a>';
 	}
 
 	/**
@@ -314,7 +314,7 @@ class ChatGpt extends Base implements Api_Base {
 		}
 
 		?>
-		<form method="POST" action="<?php echo get_admin_url(); ?>options.php">
+		<form method="POST" action="<?php echo esc_url( get_admin_url() ); ?>options.php">
 			<?php
 			settings_fields( 'easyLanguageChatGptFields' );
 			do_settings_sections( 'easyLanguageChatGptPage' );
@@ -411,7 +411,7 @@ class ChatGpt extends Base implements Api_Base {
 		// Enable source-languages
 		// -> defaults to WP-locale
 		// -> if WPML, Polylang or TranslatePress is available, show additional languages
-		// -> but restrict list to languages supported by ChatGpt
+		// -> but restrict list to languages supported by ChatGpt.
 		add_settings_field(
 			'easy_language_chatgpt_source_languages',
 			__( 'Choose source languages', 'easy-language' ),
@@ -582,7 +582,7 @@ class ChatGpt extends Base implements Api_Base {
 			'easy_language_chatgpt_target_languages',
 			'easy_language_chatgpt_interval',
 			'easy_language_chatgpt_model',
-			'easy_language_chatgpt_target_languages_prompts'
+			'easy_language_chatgpt_target_languages_prompts',
 		);
 	}
 
@@ -671,11 +671,11 @@ class ChatGpt extends Base implements Api_Base {
 	/**
 	 * Validate the API token.
 	 *
-	 * @param $value
+	 * @param ?string $value The value to validate.
 	 * @return ?string
 	 * @noinspection PhpUnused
 	 */
-	public function validate_api_key( $value ): ?string {
+	public function validate_api_key( ?string $value ): ?string {
 		$errors = get_settings_errors();
 
 		/**
@@ -690,10 +690,8 @@ class ChatGpt extends Base implements Api_Base {
 		// if no token has been entered, show hint.
 		if ( empty( $value ) ) {
 			add_settings_error( 'easy_language_chatgpt_api_key', 'easy_language_chatgpt_api_key', __( 'You did not enter an API token. All simplification options via the ChatGpt API have been disabled.', 'easy-language' ) );
-		}
-		// if token has been changed, delete settings hint.
-		elseif ( 0 !== strcmp( $value, get_option( 'easy_language_chatgpt_api_key', '' ) ) ) {
-			// delete api-settings hint.
+		} elseif ( 0 !== strcmp( $value, get_option( 'easy_language_chatgpt_api_key', '' ) ) ) {
+			// if token has been changed, delete settings hint.
 			Transients::get_instance()->get_transient_by_name( 'easy_language_api_changed' )->delete();
 		}
 
@@ -711,11 +709,11 @@ class ChatGpt extends Base implements Api_Base {
 	 *
 	 * The source-language must be possible to simplify in the target-language.
 	 *
-	 * @param $values
+	 * @param ?array $values The values to check.
 	 *
 	 * @return array|null
 	 */
-	public function validate_language_settings( $values ): ?array {
+	public function validate_language_settings( ?array $values ): ?array {
 		$values = Helper::settings_validate_multiple_checkboxes( $values );
 		if ( empty( $values ) ) {
 			add_settings_error( 'easy_language_chatgpt_target_languages', 'easy_language_chatgpt_target_languages', __( 'You have to set a target-language for simplifications.', 'easy-language' ) );
@@ -787,7 +785,7 @@ class ChatGpt extends Base implements Api_Base {
 			$source_languages = array();
 		}
 
-		// define resulting list
+		// define resulting list.
 		$list = array();
 
 		foreach ( $this->get_supported_source_languages() as $language_code => $language ) {
@@ -812,7 +810,7 @@ class ChatGpt extends Base implements Api_Base {
 		$request_texts = get_option( 'easy_language_chatgpt_target_languages_prompts', array() );
 
 		// return language-specific text is it exist.
-		if( !empty($request_texts[ $target_language ]) ) {
+		if ( ! empty( $request_texts[ $target_language ] ) ) {
 			return $request_texts[ $target_language ];
 		}
 
@@ -836,7 +834,7 @@ class ChatGpt extends Base implements Api_Base {
 	 */
 	public function enable(): void {
 		// save language-icons in db.
-		foreach( $this->get_supported_target_languages() as $language_code => $settings ) {
+		foreach ( $this->get_supported_target_languages() as $language_code => $settings ) {
 			$icon_obj = new Language_Icon();
 			$icon_obj->set_file( $settings['img'] );
 			$icon_obj->save( $language_code );
@@ -849,8 +847,8 @@ class ChatGpt extends Base implements Api_Base {
 	 * @return array
 	 */
 	public function get_log_entries(): array {
-		$results = $this->wpdb->get_results( $this->wpdb->prepare( 'SELECT `time`, `request`, `response` FROM '.$this->table_requests.' WHERE 1 = %d', array( 1 ) ) );
-		if( is_null($results) ) {
+		$results = $this->wpdb->get_results( $this->wpdb->prepare( 'SELECT `time`, `request`, `response` FROM ' . $this->table_requests . ' WHERE 1 = %d', array( 1 ) ) );
+		if ( is_null( $results ) ) {
 			return array();
 		}
 		return $results;

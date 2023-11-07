@@ -29,7 +29,7 @@ class Language_Icon {
 	/**
 	 * Set lokal file.
 	 *
-	 * @param string $img
+	 * @param string $img The file with path as string.
 	 *
 	 * @return void
 	 */
@@ -46,12 +46,12 @@ class Language_Icon {
 	 */
 	public function save( string $language_code ): void {
 		global $wp_filesystem;
-		if( !empty($this->file) ) {
+		if ( ! empty( $this->file ) ) {
 			// get path.
-			$img_path = apply_filters( 'easy_language_icon_path', trailingslashit(Helper::get_plugin_path()).'gfx/'.$this->file, $this->file );
+			$img_path = apply_filters( 'easy_language_icon_path', trailingslashit( Helper::get_plugin_path() ) . 'gfx/' . $this->file, $this->file );
 
 			// check if file exists there.
-			if( false !== $img_path && file_exists( $img_path ) ) {
+			if ( false !== $img_path && file_exists( $img_path ) ) {
 				// check if file exist in db.
 				$attachment = Helper::get_attachment_by_post_name( pathinfo( $img_path, PATHINFO_FILENAME ) );
 
@@ -63,11 +63,11 @@ class Language_Icon {
 				// if no attachment could be found, add it.
 				if ( false === $attachment ) {
 					// set import path.
-					$import_path = trailingslashit(get_temp_dir()).$this->file;
+					$import_path = trailingslashit( get_temp_dir() ) . $this->file;
 
 					// copy the original to the import_path.
 					WP_Filesystem();
-					if( $wp_filesystem->copy( $img_path, $import_path ) ) {
+					if ( $wp_filesystem->copy( $img_path, $import_path ) ) {
 						// Prepare an array of post data for the attachment.
 						$attachment = array(
 							'name'     => basename( $this->file ),
@@ -125,10 +125,10 @@ class Language_Icon {
 	/**
 	 * Set attachment-ID.
 	 *
-	 * @param int $id
+	 * @param int $attachment_id The attachment-ID for the file.
 	 * @return void
 	 */
-	private function set_id( int $id ): void {
-		$this->id = $id;
+	private function set_id( int $attachment_id ): void {
+		$this->id = $attachment_id;
 	}
 }

@@ -191,14 +191,14 @@ class Text {
 
 		// save the simplification for this text.
 		$query = array(
-			'oid'         => $this->get_id(),
-			'time'        => gmdate( 'Y-m-d H:i:s' ),
+			'oid'            => $this->get_id(),
+			'time'           => gmdate( 'Y-m-d H:i:s' ),
 			'simplification' => $translated_text,
-			'hash' => $this->db->get_string_hash( $translated_text ),
-			'language'    => $target_language,
-			'used_api'    => $used_api,
-			'jobid'       => $job_id,
-			'user_id'     => $user_id,
+			'hash'           => $this->db->get_string_hash( $translated_text ),
+			'language'       => $target_language,
+			'used_api'       => $used_api,
+			'jobid'          => $job_id,
+			'user_id'        => $user_id,
 		);
 		$wpdb->insert( $wpdb->easy_language_simplifications, $query );
 
@@ -315,7 +315,7 @@ class Text {
 	 * @return void
 	 */
 	public function set_state( string $state ): void {
-		if( !in_array( $state, array( 'to_simplify', 'processing', 'in_use', 'ignore' ), true ) ) {
+		if ( ! in_array( $state, array( 'to_simplify', 'processing', 'in_use', 'ignore' ), true ) ) {
 			return;
 		}
 
@@ -334,7 +334,7 @@ class Text {
 		global $wpdb;
 
 		// get object count before we do anything.
-		$object_count = count($this->get_objects());
+		$object_count = count( $this->get_objects() );
 
 		// delete connection between text and given object_id.
 		if ( $object_id > 0 ) {
@@ -357,7 +357,7 @@ class Text {
 		}
 
 		// if this text is used only from 1 object, delete it completely including its simplifications.
-		if ( 1 === absint(get_option( 'easy_language_delete_unused_simplifications', 0 ) ) && 1 === $object_count ) {
+		if ( 1 === absint( get_option( 'easy_language_delete_unused_simplifications', 0 ) ) && 1 === $object_count ) {
 			$wpdb->delete( $wpdb->easy_language_originals, array( 'id' => $this->get_id() ) );
 			$wpdb->delete( $wpdb->easy_language_simplifications, array( 'oid' => $this->get_id() ) );
 		}
@@ -421,7 +421,7 @@ class Text {
 			array( $this->get_id() )
 		);
 
-		// get result
+		// get result.
 		$result = (array) $wpdb->get_results( $prepared_sql, ARRAY_A );
 
 		// return the time.
@@ -431,13 +431,13 @@ class Text {
 	/**
 	 * Return whether this text is used for given field.
 	 *
-	 * @param string $field
+	 * @param string $field The requested field (e.g. post_content, title ..).
 	 * @return bool
 	 * @noinspection PhpUnused
 	 */
 	public function is_field( string $field ): bool {
-		foreach( $this->get_objects() as $object_array ) {
-			if( $field === $object_array['field'] ) {
+		foreach ( $this->get_objects() as $object_array ) {
+			if ( $field === $object_array['field'] ) {
 				return true;
 			}
 		}
@@ -463,11 +463,11 @@ class Text {
 		$item_languages = array();
 
 		// loop through the objects of this text.
-		foreach( $this->get_objects() as $object_array ) {
+		foreach ( $this->get_objects() as $object_array ) {
 			$post_object = new Post_Object( $object_array['object_id'] );
-			$language = array_key_first($post_object->get_language());
+			$language    = array_key_first( $post_object->get_language() );
 			if ( ! empty( $languages[ $language ] ) ) {
-				$item_languages[$language] = $languages[ $language ]['label'];
+				$item_languages[ $language ] = $languages[ $language ]['label'];
 			}
 		}
 
@@ -496,7 +496,7 @@ class Text {
 		$result = (array) $wpdb->get_results( $prepared_sql, ARRAY_A );
 
 		// get API-object if its name could be read.
-		if( !empty($result) ) {
+		if ( ! empty( $result ) ) {
 			return Apis::get_instance()->get_api_by_name( $result[0]['used_api'] );
 		}
 
@@ -507,7 +507,7 @@ class Text {
 	/**
 	 * Get user who requested a specific simplification.
 	 *
-	 * @param string $language
+	 * @param string $language The requested language.
 	 * @return int
 	 */
 	public function get_user_for_simplification( string $language ): int {
@@ -523,5 +523,4 @@ class Text {
 		// return zero if no simplification exist.
 		return 0;
 	}
-
 }

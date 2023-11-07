@@ -338,7 +338,7 @@ class Switcher {
 					}
 
 					// bail if icon is requested, but not available for this language.
-					if( $show_icons && empty($settings['icon']) ) {
+					if ( $show_icons && empty( $settings['icon'] ) ) {
 						continue;
 					}
 
@@ -403,7 +403,7 @@ class Switcher {
 	 */
 	public function save_menu_options( int $menu_id, int $item_id ): void {
 		// bail on save via ajax.
-		if( wp_doing_ajax() ) {
+		if ( wp_doing_ajax() ) {
 			return;
 		}
 

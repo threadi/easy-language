@@ -144,7 +144,7 @@ class Capito extends Base implements Api_Base {
 			/* translators: %1$d will be replaced by the characters spent for Capito, %2$d will be the quota for Capito, %3$d will be the rest quota */
 			$text .= sprintf( __( '<p><strong>Actual character spent:</strong> %1$d<br><strong>Quota limit:</strong> %2$d<br><strong>Rest quota:</strong> %3$d</strong></p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ), $quota['character_spent'], $quota['character_limit'], absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) );
 		} elseif ( ! empty( $quota['unlimited'] ) ) {
-			$text .= __( '<p><strong>Unlimited quota</strong></p>', 'easy-language' );
+			$text .= '<p><strong>' . __( 'Unlimited quota', 'easy-language' ) . '</strong></p>';
 		} elseif ( -1 === $quota['character_limit'] ) {
 			$text .= '<p><strong>' . __( 'The available quota is retrieved after entering the API key in the API settings.', 'easy-language' ) . '</strong></p>';
 		}
@@ -230,9 +230,9 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'The easiest level of german language.', 'easy-language' ),
 				'url'         => 'de_a1',
 				'api_value'   => 'a1',
-				'icon' => 'icon-de-ls',
-				'img' => 'de_LS.png',
-				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a1' ) : ''
+				'icon'        => 'icon-de-ls',
+				'img'         => 'de_LS.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a1' ) : '',
 			),
 			'de_a2' => array(
 				'label'       => __( 'German A2', 'easy-language' ),
@@ -240,9 +240,9 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'Capito compares this with Leichte Sprache', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'a2',
-				'icon' => 'icon-de-ls',
-				'img' => 'de_LS.png',
-				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a2' ) : ''
+				'icon'        => 'icon-de-ls',
+				'img'         => 'de_LS.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a2' ) : '',
 			),
 			'de_b1' => array(
 				'label'       => __( 'German B1', 'easy-language' ),
@@ -250,9 +250,9 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'Capito compares this with Einfache Sprache', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'b1',
-				'icon' => 'icon-de-el',
-				'img' => 'de_EL.png',
-				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_b1' ) : ''
+				'icon'        => 'icon-de-el',
+				'img'         => 'de_EL.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_b1' ) : '',
 			),
 			'en_a1' => array(
 				'label'       => __( 'English A1', 'easy-language' ),
@@ -260,9 +260,9 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'The easiest level of english language.', 'easy-language' ),
 				'url'         => 'de_a1',
 				'api_value'   => 'a1',
-				'icon' => 'icon-de-ls',
-				'img' => 'en_LS.png',
-				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'en_a1' ) : ''
+				'icon'        => 'icon-de-ls',
+				'img'         => 'en_LS.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'en_a1' ) : '',
 			),
 			'en_a2' => array(
 				'label'       => __( 'English A2', 'easy-language' ),
@@ -270,9 +270,9 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'Capito compares this with Plain Sprache', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'a2',
-				'icon' => 'icon-de-ls',
-				'img' => 'en_LS.png',
-				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'en_a2' ) : ''
+				'icon'        => 'icon-de-ls',
+				'img'         => 'en_LS.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'en_a2' ) : '',
 			),
 			'en_b1' => array(
 				'label'       => __( 'English B1', 'easy-language' ),
@@ -280,9 +280,9 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'Capito compares this with Easy Language', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'b1',
-				'icon' => 'icon-de-ls',
-				'img' => 'en_EL.png',
-				'img_icon' => $this->is_active() ? Helper::get_icon_img_for_language_code( 'en_b1' ) : ''
+				'icon'        => 'icon-de-ls',
+				'img'         => 'en_EL.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'en_b1' ) : '',
 			),
 		);
 	}
@@ -351,9 +351,9 @@ class Capito extends Base implements Api_Base {
 		}
 
 		// check if quota-interval does already exist.
-		if (!wp_next_scheduled('easy_language_capito_request_quota')) {
+		if ( ! wp_next_scheduled( 'easy_language_capito_request_quota' ) ) {
 			// add it.
-			wp_schedule_event(time(), get_option('easy_language_capito_quota_interval', 'daily' ), 'easy_language_capito_request_quota');
+			wp_schedule_event( time(), get_option( 'easy_language_capito_quota_interval', 'daily' ), 'easy_language_capito_request_quota' );
 		}
 
 		$charset_collate = $wpdb->get_charset_collate();
@@ -431,7 +431,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	private function get_transients(): array {
 		return array(
-			'easy_language_capito_test_token'
+			'easy_language_capito_test_token',
 		);
 	}
 
@@ -445,9 +445,9 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Return the simplifications-object.
 	 *
-	 * @return Simplifications
+	 * @return object
 	 */
-	public function get_simplifications_obj(): Simplifications {
+	public function get_simplifications_obj(): object {
 		// get the object.
 		$obj = Simplifications::get_instance();
 
@@ -470,7 +470,7 @@ class Capito extends Base implements Api_Base {
 			$target_languages = array();
 		}
 
-		// define resulting list
+		// define resulting list.
 		$list = array();
 
 		foreach ( $this->get_supported_target_languages() as $language_code => $language ) {
@@ -502,11 +502,11 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Add settings tab.
 	 *
-	 * @param $tab
+	 * @param string $tab The tab internal name.
 	 *
 	 * @return void
 	 */
-	public function add_settings_tab( $tab ): void {
+	public function add_settings_tab( string $tab ): void {
 		// get list of available plugins and check if they support APIs.
 		$supports_api = false;
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
@@ -521,13 +521,13 @@ class Capito extends Base implements Api_Base {
 		}
 
 		// check active tab.
-		$activeClass = '';
+		$active_class = '';
 		if ( $this->get_name() === $tab ) {
-			$activeClass = ' nav-tab-active';
+			$active_class = ' nav-tab-active';
 		}
 
 		// output tab.
-		echo '<a href="' . esc_url( helper::get_settings_page_url() ) . '&tab=' . esc_attr( $this->get_name() ) . '" class="nav-tab' . esc_attr( $activeClass ) . '">' . __( 'Capito', 'easy-language' ) . '</a>';
+		echo '<a href="' . esc_url( helper::get_settings_page_url() ) . '&tab=' . esc_attr( $this->get_name() ) . '" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'Capito', 'easy-language' ) . '</a>';
 	}
 
 	/**
@@ -555,7 +555,7 @@ class Capito extends Base implements Api_Base {
 		}
 
 		?>
-		<form method="POST" action="<?php echo get_admin_url(); ?>options.php">
+		<form method="POST" action="<?php echo esc_url( get_admin_url() ); ?>options.php">
 			<?php
 			settings_fields( 'easyLanguageCapitoFields' );
 			do_settings_sections( 'easyLanguageCapitoPage' );
@@ -591,7 +591,7 @@ class Capito extends Base implements Api_Base {
 			// output.
 			?>
 			<p>
-				<strong><?php echo esc_html__( 'Quota', 'easy-language' ); ?>:</strong> <?php echo $quota_text; ?>
+				<strong><?php echo esc_html__( 'Quota', 'easy-language' ); ?>:</strong> <?php echo esc_html( $quota_text ); ?>
 				<a href="<?php echo esc_url( $update_quota_url ); ?>#statistics" class="button button-secondary"><?php echo esc_html__( 'Update now', 'easy-language' ); ?></a>
 			</p>
 			<?php
@@ -626,7 +626,7 @@ class Capito extends Base implements Api_Base {
 			$url = add_query_arg(
 				array(
 					'action' => 'easy_language_capito_test_token',
-					'nonce' => wp_create_nonce( 'easy-language-capito-test-token' )
+					'nonce'  => wp_create_nonce( 'easy-language-capito-test-token' ),
 				),
 				get_admin_url() . 'admin.php'
 			);
@@ -643,7 +643,7 @@ class Capito extends Base implements Api_Base {
 			// Show other description if token is set.
 			/* translators: %1$s will be replaced by the Capito URL */
 			$description  = sprintf( __( 'If you have any questions about the token provided by Capito, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
-			$description .= '<br><a href="'.esc_url($url).'" class="button button-secondary easy-language-settings-button">'.__( 'Test token', 'easy-language').'</a><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
+			$description .= '<br><a href="' . esc_url( $url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Test token', 'easy-language' ) . '</a><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
 		}
 
 		// if foreign simplification-plugin with API-support is used, hide the language-settings.
@@ -671,10 +671,10 @@ class Capito extends Base implements Api_Base {
 		);
 		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_api_key', array( 'sanitize_callback' => array( $this, 'validate_api_key' ) ) );
 
-		// Enable source-languages
-		// -> defaults to WP-locale
-		// -> if WPML, Polylang or TranslatePress is available, show additional languages
-		// -> but restrict list to languages supported by Capito
+		// Enable source-languages.
+		// -> defaults to WP-locale.
+		// -> if WPML, Polylang or TranslatePress is available, show additional languages.
+		// -> but restrict list to languages supported by Capito.
 		add_settings_field(
 			'easy_language_capito_source_languages',
 			__( 'Choose source languages', 'easy-language' ),
@@ -808,11 +808,11 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Validate the API token.
 	 *
-	 * @param $value
+	 * @param ?string $value The API-key.
 	 * @return ?string
 	 * @noinspection PhpUnused
 	 */
-	public function validate_api_key( $value ): ?string {
+	public function validate_api_key( ?string $value ): ?string {
 		$errors = get_settings_errors();
 
 		/**
@@ -827,19 +827,17 @@ class Capito extends Base implements Api_Base {
 		// if no token has been entered, show hint.
 		if ( empty( $value ) ) {
 			add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __( 'You did not enter an API token. All simplification options via the Capito API have been disabled.', 'easy-language' ) );
-		}
-		// if token has been changed, get the quota and delete settings hint.
-		elseif ( 0 !== strcmp( $value, get_option( 'easy_language_capito_api_key', '' ) ) ) {
+		} elseif ( 0 !== strcmp( $value, get_option( 'easy_language_capito_api_key', '' ) ) ) {
+			// if token has been changed, get the quota and delete settings hint.
 			$request = $this->get_test_request_response( $value );
-			if( in_array( $request->get_http_status(), array( 401, 404 ), true ) ) {
+			if ( in_array( $request->get_http_status(), array( 401, 404 ), true ) ) {
 				// show hint if token is not valid for API.
 				/* translators: %1$s is replaced by the URL for the API-log */
-				add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', sprintf( __( '<strong>Token could not be verified.</strong> Please take a look <a href="%1$s">in the log</a> to check the reason.', 'easy-language' ), esc_url(Helper::get_api_logs_page_url()) ) );
+				add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', sprintf( __( '<strong>Token could not be verified.</strong> Please take a look <a href="%1$s">in the log</a> to check the reason.', 'easy-language' ), esc_url( Helper::get_api_logs_page_url() ) ) );
 
 				// remove token.
 				$value = '';
-			}
-			else {
+			} else {
 				// get initial quota.
 				$this->get_quota_from_api( $value );
 			}
@@ -857,11 +855,11 @@ class Capito extends Base implements Api_Base {
 	 *
 	 * The source-language must be possible to simplify in the target-language.
 	 *
-	 * @param $values
+	 * @param ?array $values The values.
 	 *
 	 * @return array|null
 	 */
-	public function validate_language_settings( $values ): ?array {
+	public function validate_language_settings( ?array $values ): ?array {
 		$values = Helper::settings_validate_multiple_checkboxes( $values );
 		if ( empty( $values ) ) {
 			add_settings_error( 'easy_language_capito_target_languages', 'easy_language_capito_target_languages', __( 'You have to set a target-language for simplifications.', 'easy-language' ) );
@@ -876,11 +874,11 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Set the interval for the quota-schedule, if it is enabled.
 	 *
-	 * @param $value
+	 * @param ?string $value The value.
 	 *
 	 * @return ?string
 	 */
-	public function set_quota_interval( $value ): ?string {
+	public function set_quota_interval( ?string $value ): ?string {
 		$value = Helper::settings_validate_select_field( $value );
 		if ( ! empty( $value ) ) {
 			wp_clear_scheduled_hook( 'easy_language_capito_request_quota' );
@@ -903,7 +901,7 @@ class Capito extends Base implements Api_Base {
 			$source_languages = array();
 		}
 
-		// define resulting list
+		// define resulting list.
 		$list = array();
 
 		foreach ( $this->get_supported_source_languages() as $language_code => $language ) {
@@ -919,7 +917,7 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Get quota.
 	 *
-	 * @param string $token
+	 * @param string $token The token (optional).
 	 *
 	 * @return array
 	 */
@@ -1062,13 +1060,13 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function enable(): void {
 		// check if quota-interval does already exist.
-		if (!wp_next_scheduled('easy_language_capito_request_quota')) {
+		if ( ! wp_next_scheduled( 'easy_language_capito_request_quota' ) ) {
 			// add it.
-			wp_schedule_event(time(), get_option('easy_language_capito_quota_interval', 'daily' ), 'easy_language_capito_request_quota');
+			wp_schedule_event( time(), get_option( 'easy_language_capito_quota_interval', 'daily' ), 'easy_language_capito_request_quota' );
 		}
 
 		// save language-icons in db.
-		foreach( $this->get_supported_target_languages() as $language_code => $settings ) {
+		foreach ( $this->get_supported_target_languages() as $language_code => $settings ) {
 			$icon_obj = new Language_Icon();
 			$icon_obj->set_file( $settings['img'] );
 			$icon_obj->save( $language_code );
@@ -1088,26 +1086,24 @@ class Capito extends Base implements Api_Base {
 		$transients_obj = Transients::get_instance();
 
 		// run test only is necessary values are set.
-		if( $this->is_capito_token_set() ) {
+		if ( $this->is_capito_token_set() ) {
 			// send request.
 			$request = $this->get_test_request_response();
 
 			// add new transient for response to user.
 			$transient_obj = $transients_obj->add();
 			$transient_obj->set_name( 'easy_language_capito_test_token' );
-			if( 200 === $request->get_http_status() ) {
+			if ( 200 === $request->get_http_status() ) {
 				// show ok-message.
 				$transient_obj->set_message( __( 'Token could be successfully verified.', 'easy-language' ) );
 				$transient_obj->set_type( 'success' );
-			}
-			else {
+			} else {
 				// show error.
 				/* translators: %1$s is replaced by the URL for the API-log */
-				$transient_obj->set_message( sprintf( __( '<strong>Token could not be verified.</strong> Please take a look <a href="%1$s">in the log</a> to check the reason.', 'easy-language' ), esc_url(Helper::get_api_logs_page_url()) ) );
+				$transient_obj->set_message( sprintf( __( '<strong>Token could not be verified.</strong> Please take a look <a href="%1$s">in the log</a> to check the reason.', 'easy-language' ), esc_url( Helper::get_api_logs_page_url() ) ) );
 				$transient_obj->set_type( 'error' );
 			}
-		}
-		else {
+		} else {
 			// show error via new transients object.
 			$transient_obj = $transients_obj->add();
 			$transient_obj->set_message( __( 'Token missing.', 'easy-language' ) );
@@ -1116,7 +1112,7 @@ class Capito extends Base implements Api_Base {
 		$transient_obj->save();
 
 		// redirect user.
-		wp_redirect($_SERVER['HTTP_REFERER']);
+		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 	}
 
 	/**
@@ -1128,7 +1124,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	private function get_test_request_response( string $token = '' ): Request {
 		$request = new Request();
-		$request->set_token( empty($token) ? $this->get_token() : $token );
+		$request->set_token( empty( $token ) ? $this->get_token() : $token );
 		$request->set_url( EASY_LANGUAGE_CAPITO_SUBSCRIPTION_URL );
 		$request->set_method( 'GET' );
 		$request->send();
@@ -1143,8 +1139,8 @@ class Capito extends Base implements Api_Base {
 	 * @return array
 	 */
 	public function get_log_entries(): array {
-		$results = $this->wpdb->get_results( $this->wpdb->prepare( 'SELECT `time`, `request`, `response` FROM '.$this->table_requests.' WHERE 1 = %d', array( 1 ) ) );
-		if( is_null($results) ) {
+		$results = $this->wpdb->get_results( $this->wpdb->prepare( 'SELECT `time`, `request`, `response` FROM ' . $this->table_requests . ' WHERE 1 = %d', array( 1 ) ) );
+		if ( is_null( $results ) ) {
 			return array();
 		}
 		return $results;

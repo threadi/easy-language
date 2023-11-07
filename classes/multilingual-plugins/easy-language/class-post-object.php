@@ -29,9 +29,9 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 * @return string
 	 */
 	protected function get_simplification_type(): string {
-		if( empty($this->simplify_type) ) {
+		if ( empty( $this->simplify_type ) ) {
 			$this->simplify_type = 'simplifiable';
-			if( get_post_meta($this->get_id(), 'easy_language_simplification_original_id', true) ) {
+			if ( get_post_meta( $this->get_id(), 'easy_language_simplification_original_id', true ) ) {
 				$this->simplify_type = 'simplified';
 			}
 		}
@@ -111,7 +111,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		);
 		$result = new WP_Query( $query );
 		if ( 1 === $result->post_count ) {
-			return absint($result->posts[0]);
+			return absint( $result->posts[0] );
 		}
 		return 0;
 	}
@@ -140,7 +140,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 * @return string
 	 */
 	public function get_title(): string {
-		return get_the_title($this->get_id());
+		return get_the_title( $this->get_id() );
 	}
 
 	/**
@@ -170,9 +170,9 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			if ( in_array( get_option( 'easy_language_switcher_link', '' ), array( 'hide_not_translated', 'link_translated' ), true ) ) {
 				$url = get_permalink( $this->get_simplification_in_language( $language_code ) );
 			} elseif ( 'page' === get_option( 'show_on_front' ) ) {
-					$object_id          = absint( get_option( 'page_on_front', 0 ) );
-					$object             = new Post_Object( $object_id );
-					$url                = get_permalink( $object->get_simplification_in_language( $language_code ) );
+					$object_id = absint( get_option( 'page_on_front', 0 ) );
+					$object    = new Post_Object( $object_id );
+					$url       = get_permalink( $object->get_simplification_in_language( $language_code ) );
 			} elseif ( 'posts' === get_option( 'show_on_front' ) ) {
 				$url = get_home_url();
 			}
@@ -367,7 +367,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		);
 
 		// get text-limit from API.
-		$max_text_length = $api_obj->get_max_text_length();
+		$max_text_length          = $api_obj->get_max_text_length();
 		$max_text_length_exceeded = false;
 
 		// get entry-limit from API.
@@ -379,9 +379,9 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		);
 		$entries = Db::get_instance()->get_entries( $filter );
 		foreach ( $entries as $entry ) {
-			$text_length =  absint( strlen( $entry->get_original() ) );
+			$text_length                  = absint( strlen( $entry->get_original() ) );
 			$return_array['chars_count'] += $text_length;
-			if( $text_length > $max_text_length ) {
+			if ( $text_length > $max_text_length ) {
 				$max_text_length_exceeded = true;
 			}
 		}
@@ -409,12 +409,12 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		}
 
 		// if max text limit is exceeded, show hint.
-		if( $max_text_length_exceeded ) {
+		if ( $max_text_length_exceeded ) {
 			$return_array['status'] = 'above_text_limit';
 		}
 
 		// if more entries used as API would perform per minute.
-		if( count($entries) > $entry_limit_per_minute ) {
+		if ( count( $entries ) > $entry_limit_per_minute ) {
 			$return_array['status'] = 'above_entry_limit';
 		}
 
@@ -460,7 +460,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 * @return bool true if object is locked.
 	 */
 	public function is_locked(): bool {
-		if( !function_exists('wp_check_post_lock') ) {
+		if ( ! function_exists( 'wp_check_post_lock' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/post.php';
 		}
 		return wp_check_post_lock( $this->get_id() );
@@ -473,15 +473,15 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 * @noinspection PhpUnused
 	 */
 	public function is_automatic_mode_prevented(): bool {
-		return absint(get_post_meta( $this->get_id(), 'easy_language_prevent_automatic_mode', true )) === 1;
+		return absint( get_post_meta( $this->get_id(), 'easy_language_prevent_automatic_mode', true ) ) === 1;
 	}
 
 	/**
 	 * Add simplification object to this object if it is a not simplifiable object.
 	 *
 	 * @param string $target_language The target-language.
-	 * @param Base $api_object The API to use.
-	 * @param bool $prevent_automatic_mode True if automatic mode is prevented.
+	 * @param Base   $api_object The API to use.
+	 * @param bool   $prevent_automatic_mode True if automatic mode is prevented.
 	 * @return bool|Post_Object
 	 */
 	public function add_simplification_object( string $target_language, Base $api_object, bool $prevent_automatic_mode ): bool|Post_Object {
@@ -491,7 +491,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		// check if this object is already simplified in this language.
 		if ( false === $this->is_simplified_in_language( $target_language ) ) {
 			// get the source-language.
-			$source_language = helper::get_wp_lang();
+			$source_language = Helper::get_lang_of_object( $this->get_id(), $this->get_type() );
 			if ( empty( $source_language ) ) {
 				$source_language = Helper::get_wp_lang();
 			}
@@ -526,7 +526,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			update_post_meta( $copied_post_id, 'easy_language_api', $api_object->get_name() );
 
 			// set if automatic mode is prevented.
-			update_post_meta( $copied_post_id, 'easy_language_prevent_automatic_mode', $prevent_automatic_mode);
+			update_post_meta( $copied_post_id, 'easy_language_prevent_automatic_mode', $prevent_automatic_mode );
 
 			// set the language for the original object.
 			update_post_meta( $this->get_id(), 'easy_language_text_language', $source_language );
@@ -540,7 +540,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			// loop through the resulting texts and add each one for simplification.
 			foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
 				// bail if text is empty.
-				if( empty($text) ) {
+				if ( empty( $text ) ) {
 					continue;
 				}
 
@@ -589,14 +589,14 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	/**
 	 * Set automatic mode prevention on object.
 	 *
-	 * @param bool $prevent_automatic_mode
+	 * @param bool $prevent_automatic_mode True if the automatic mode should be prevented for this object.
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
 	 **/
-    public function set_automatic_mode_prevented(bool $prevent_automatic_mode): void {
+	public function set_automatic_mode_prevented( bool $prevent_automatic_mode ): void {
 		update_post_meta( $this->get_id(), 'easy_language_prevent_automatic_mode', $prevent_automatic_mode );
-    }
+	}
 
 	/**
 	 * Return language-specific title for the type of the given object.
@@ -620,7 +620,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	public function get_edit_link(): string {
 		// get the page builder used for this object.
 		$page_builder = $this->get_page_builder();
-		if( $page_builder ) {
+		if ( $page_builder ) {
 			// return its custom edit link.
 			return $page_builder->get_edit_link();
 		}

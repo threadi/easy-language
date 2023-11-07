@@ -86,12 +86,11 @@ class Gutenberg extends Parser_Base implements Parser {
 		$flow_blocks = $this->get_flow_text_blocks();
 
 		// get content if it is a valid flow-text-block.
-		if ( isset($flow_blocks[$block['blockName']]) ) {
-			if( strlen($flow_blocks[$block['blockName']]) > 0 && is_callable($flow_blocks[$block['blockName']]) ) {
-				$resulting_texts[] = call_user_func($flow_blocks[$block['blockName']], $block['blockName']);
-			}
-			else {
-				$resulting_texts[] = trim($block['innerHTML']);
+		if ( isset( $flow_blocks[ $block['blockName'] ] ) ) {
+			if ( strlen( $flow_blocks[ $block['blockName'] ] ) > 0 && is_callable( $flow_blocks[ $block['blockName'] ] ) ) {
+				$resulting_texts[] = call_user_func( $flow_blocks[ $block['blockName'] ], $block['blockName'] );
+			} else {
+				$resulting_texts[] = trim( $block['innerHTML'] );
 			}
 		}
 
@@ -114,7 +113,7 @@ class Gutenberg extends Parser_Base implements Parser {
 			'easy_language_gutenberg_blocks',
 			array(
 				'core/paragraph' => '',
-				'core/heading' => '',
+				'core/heading'   => '',
 				'core/list-item' => '',
 			)
 		);

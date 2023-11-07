@@ -93,12 +93,10 @@ function add_dialog( dialog ) {
 			confirm_dialog.unmount();
 			confirm_dialog = null;
 		}
-		if( ! document.getElementById('wp-easy-dialog-root') ) {
-			if( document.getElementById('wpadminbar') ) {
-				let root = document.createElement('div');
-				root.id = 'wp-easy-dialog-root';
-				document.getElementById('wpadminbar').append(root);
-			}
+		if( ! top.document.getElementById('wp-easy-dialog-root') ) {
+			let root = top.document.createElement('div');
+			root.id = 'wp-easy-dialog-root';
+			top.document.body.append(root);
 		}
 		confirm_dialog = ReactDOM.createRoot(document.getElementById('wp-easy-dialog-root'));
 		confirm_dialog.render(

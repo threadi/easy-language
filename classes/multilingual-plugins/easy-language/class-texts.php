@@ -125,9 +125,9 @@ class Texts {
 
 		if ( $original_post_id > 0 && ! empty( $target_language ) && $api_object ) {
 			// get post-object.
-			$post_obj = new Post_Object( $original_post_id );
+			$post_obj      = new Post_Object( $original_post_id );
 			$copy_post_obj = $post_obj->add_simplification_object( $target_language, $api_object, false );
-			if( $copy_post_obj ) {
+			if ( $copy_post_obj ) {
 				// forward user to the edit-page of the newly created object.
 				wp_safe_redirect( $copy_post_obj->get_page_builder()->get_edit_link() );
 				exit;
@@ -165,7 +165,7 @@ class Texts {
 			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
 
 			// cleanup language marker on original post, if it does not have any simplification.
-			if( false === $original_post->has_simplifications() ) {
+			if ( false === $original_post->has_simplifications() ) {
 				delete_post_meta( $original_post->get_id(), 'easy_language_text_language' );
 			}
 		}
@@ -177,7 +177,7 @@ class Texts {
 	}
 
 	/**
-	 * Get simplification via API if one is available.
+	 * Get simplification via API if one is available via admin_action-click.
 	 *
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
@@ -201,10 +201,9 @@ class Texts {
 		$object_type = isset( $_GET['type'] ) ? absint( $_GET['type'] ) : '';
 
 		if ( $object_id > 0 ) {
-			// TODO typen unterscheiden
 			// run simplification of this object.
-			$post_obj = new Post_Object( $object_id );
-			$post_obj->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping() );
+			$object = Helper::get_object( $object_id, $object_type );
+			$object->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping() );
 		}
 
 		// redirect user back to editor.
@@ -235,14 +234,14 @@ class Texts {
 
 		if ( $entry_id > 0 ) {
 			// get the requested text.
-			$query = array(
-				'id' => $entry_id,
+			$query   = array(
+				'id'         => $entry_id,
 				'not_locked' => true,
 			);
 			$entries = DB::get_instance()->get_entries( $query, array(), 1 );
 
 			// bail if we have no results.
-			if( empty($entries) ) {
+			if ( empty( $entries ) ) {
 				wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 				exit;
 			}
@@ -302,7 +301,7 @@ class Texts {
 			$pagebuilder_obj = $post_obj->get_page_builder();
 
 			// only get texts if pagebuilder is known.
-			if( false !== $pagebuilder_obj ) {
+			if ( false !== $pagebuilder_obj ) {
 				// set object-id to pagebuilder-object.
 				$pagebuilder_obj->set_object_id( $post_obj->get_id() );
 
@@ -338,7 +337,7 @@ class Texts {
 		if ( $post_obj->is_simplified() ) {
 			// bail if a simplification of this object is actual running.
 			$running_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, array() );
-			if( !empty($running_simplifications[$post_obj->get_md5()]) && absint($running_simplifications[$post_obj->get_md5()]) > 0 ) {
+			if ( ! empty( $running_simplifications[ $post_obj->get_md5() ] ) && absint( $running_simplifications[ $post_obj->get_md5() ] ) > 0 ) {
 				return;
 			}
 
@@ -371,25 +370,25 @@ class Texts {
 
 			// delete in DB existing texts of its object is not part of the actual content.
 			// also check for their simplifications.
-			$query = array(
+			$query   = array(
 				'object_id' => $post_id,
-				'lang' => $source_language
+				'object_type' => $post_obj->get_type(),
+				'lang'      => $source_language,
 			);
 			$entries = $this->db->get_entries( $query );
-			if( !empty($target_language) && !empty($entries) ) {
+			if ( ! empty( $target_language ) && ! empty( $entries ) ) {
 				foreach ( $entries as $entry ) {
 					// do nothing if this is a simplified text.
-					if( $entry->has_simplification_in_language( $target_language ) ) {
+					if ( $entry->has_simplification_in_language( $target_language ) ) {
 						continue;
 					}
-					if ( false === $entry->is_field( 'title') &&
+					if ( false === $entry->is_field( 'title' ) &&
 						false === in_array( trim( $entry->get_simplification( $target_language ) ), $parsed_texts, true )
 						&& false === in_array( $entry->get_original(), $parsed_texts, true )
 					) {
 						$entry->delete();
-					}
-					elseif( false !== $entry->is_field( 'title')
-						&& $title !== trim( $entry->get_simplification( $target_language ) )
+					} elseif ( false !== $entry->is_field( 'title' )
+						&& trim( $entry->get_simplification( $target_language ) !== $title )
 					) {
 						$entry->delete();
 					}
@@ -399,7 +398,7 @@ class Texts {
 			// loop through the resulting texts and compare them with the existing texts in object.
 			foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
 				// bail if text is empty.
-				if( empty($text) ) {
+				if ( empty( $text ) ) {
 					continue;
 				}
 
@@ -407,7 +406,7 @@ class Texts {
 				$original_text_obj = $this->db->get_entry_by_text( $text, $source_language );
 				if ( false === $original_text_obj ) {
 					// also check if this is a simplified text of the given language.
-					if( false === $this->db->get_entry_by_simplification( trim($text), $source_language ) ) {
+					if ( false === $this->db->get_entry_by_simplification( trim( $text ), $source_language ) ) {
 						// if not save the text for simplification.
 						$original_text_obj = $this->db->add( $text, $source_language, 'post_content' );
 						$original_text_obj->set_object( get_post_type( $post_obj->get_id() ), $post_obj->get_id(), $pagebuilder_obj->get_name() );
@@ -420,7 +419,7 @@ class Texts {
 			$original_title_obj = $this->db->get_entry_by_text( $title, $source_language );
 			if ( false === $original_title_obj ) {
 				// also check if this is a simplified text of the given language.
-				if( false === $this->db->get_entry_by_simplification( trim($title), $source_language ) ) {
+				if ( false === $this->db->get_entry_by_simplification( trim( $title ), $source_language ) ) {
 					// save the text for simplification.
 					$original_title_obj = $this->db->add( $title, $source_language, 'title' );
 					$original_title_obj->set_object( get_post_type( $post_id ), $post_id, $pagebuilder_obj->get_name() );
@@ -506,49 +505,49 @@ class Texts {
 		check_ajax_referer( 'easy-language-export-simplifications', 'nonce' );
 
 		// get language to export.
-		$export_language_code = isset($_GET['lang']) ? sanitize_text_field( $_GET['lang']) : '';
+		$export_language_code = isset( $_GET['lang'] ) ? sanitize_text_field( wp_unslash( $_GET['lang'] ) ) : '';
 
-		if( !empty($export_language_code) && class_exists('Translations') ) {
+		if ( ! empty( $export_language_code ) && class_exists( 'Translations' ) ) {
 
 			// define query for entries.
 			$query = array(
-				'state' => 'in_use',
+				'state'            => 'in_use',
 				'object_not_state' => 'trash',
-				'lang' => $export_language_code,
-				'target_lang' => $export_language_code
+				'lang'             => $export_language_code,
+				'target_lang'      => $export_language_code,
 			);
 
 			// return resulting entry-objects.
-			$entries = DB::get_instance()->get_entries($query);
+			$entries = DB::get_instance()->get_entries( $query );
 
 			// define translations-object which will be exported as po-file.
 			$translations = Translations::create( get_option( 'blogname' ) );
 			$translations->setDescription( __( 'List of with Easy Language simplified texts.', 'easy-language' ) );
-			$translations->getHeaders()->set('Last-Translator', get_option('admin_email') );
-			$translations->getHeaders()->set('X-Generator', Helper::get_plugin_name() );
+			$translations->getHeaders()->set( 'Last-Translator', get_option( 'admin_email' ) );
+			$translations->getHeaders()->set( 'X-Generator', Helper::get_plugin_name() );
 
 			// add each entry to the translation object.
-			foreach ($entries as $entry) {
-				$translation = Translation::create('', $entry->get_original() );
-				foreach( $entry->get_target_languages() as $language_code => $language ) {
-					if( !$translation->isTranslated() ) {
-						$translation->translate(trim($entry->get_simplification($language_code)));
+			foreach ( $entries as $entry ) {
+				$translation = Translation::create( '', $entry->get_original() );
+				foreach ( $entry->get_target_languages() as $language_code => $language ) {
+					if ( ! $translation->isTranslated() ) {
+						$translation->translate( trim( $entry->get_simplification( $language_code ) ) );
 					}
 				}
-				$translations->add($translation);
+				$translations->add( $translation );
 			}
 
 			// get the resulting po-file as string.
 			$po_generator = new PoGenerator();
-			$po = $po_generator->generateString( $translations );
+			$po           = $po_generator->generateString( $translations );
 
 			$replace_from = '"Last-Translator';
-			$po = str_replace( $replace_from, '"Language: '.$export_language_code.'\n"'.PHP_EOL.$replace_from, $po );
+			$po           = str_replace( $replace_from, '"Language: ' . $export_language_code . '\n"' . PHP_EOL . $replace_from, $po );
 
 			// return header.
 			header( 'Content-Type: application/octet-stream' );
-			header( 'Content-Disposition: inline; filename="' . sanitize_file_name( date('YmdHi') . '_'.get_option('blogname').'.po"' ) );
-			header( 'Content-Length: ' . strlen($po) );
+			header( 'Content-Disposition: inline; filename="' . sanitize_file_name( gmdate( 'YmdHi' ) . '_' . get_option( 'blogname' ) . '.po"' ) );
+			header( 'Content-Length: ' . strlen( $po ) );
 			echo $po;
 			exit;
 		}

@@ -417,4 +417,22 @@ abstract class Base {
 	public function get_log_entries(): array {
 		return array();
 	}
+
+	/**
+	 * Return simplifications-object.
+	 *
+	 * @return object|false
+	 */
+	public function get_simplifications_obj(): object|false {
+		return false;
+	}
+
+	/**
+	 * Return mapping languages.
+	 *
+	 * @return array
+	 */
+	public function get_mapping_languages(): array {
+		return array();
+	}
 }

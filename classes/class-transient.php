@@ -175,7 +175,7 @@ class Transient {
 		if ( $this->has_message() ) {
 			?>
 			<div class="easy-language-transient updated <?php echo esc_attr( $this->get_type() ); ?>" data-dismissible="<?php echo esc_attr( $this->get_name() ); ?>-<?php echo absint( $this->get_dismissible_days() ); ?>">
-				<h3><img src="<?php echo Helper::get_plugin_url() . '/gfx/easy-language-icon.png'; ?>" alt="" /> <?php echo esc_html( Helper::get_plugin_name() ); ?></h3>
+				<h3><img src="<?php echo esc_attr( Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ); ?>" alt="" /> <?php echo esc_html( Helper::get_plugin_name() ); ?></h3>
 				<?php
 				echo wp_kses_post( wpautop( $this->get_message() ) );
 				if ( $this->get_dismissible_days() > 0 ) {
@@ -279,7 +279,7 @@ class Transient {
 	 * @return void
 	 */
 	public function delete_dismiss(): void {
-		delete_option( 'el-dismissed-'.md5( $this->get_name()) );
+		delete_option( 'el-dismissed-' . md5( $this->get_name() ) );
 	}
 
 	/**

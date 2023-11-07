@@ -6,11 +6,12 @@
  */
 
 use easyLanguage\Helper;
+use easyLanguage\Multilingual_plugins\Easy_Language\PageBuilder\Elementor\Switcher_Widget;
 use Elementor\Controls_Manager;
 use Elementor\Core\DocumentTypes\Page;
 use Elementor\Core\DocumentTypes\Post;
 use easyLanguage\Multilingual_Plugins;
-use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor\Languages;
+use easyLanguage\Multilingual_plugins\Easy_Language\PageBuilder\Elementor\Languages;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 use Elementor\Plugin;
@@ -54,7 +55,7 @@ add_action( 'init', 'easy_language_pagebuilder_elementor_init' );
  * @return void
  */
 function easy_language_pagebuilder_elementor_register_widgets(): void {
-	Plugin::instance()->widgets_manager->register( new Elementor\Switcher_Widget() );
+	Plugin::instance()->widgets_manager->register( new Switcher_Widget() );
 }
 
 /**
@@ -79,7 +80,7 @@ function easy_language_add_elementor_page_settings_controls( Post $page ): void 
 		$page->start_controls_section(
 			'easy_language',
 			array(
-				'label' => esc_html__( 'Languages', 'easy-language' ),
+				'label' => esc_html__( 'Simplify texts', 'easy-language' ),
 				'tab'   => Controls_Manager::TAB_SETTINGS,
 			)
 		);
@@ -124,7 +125,7 @@ function easy_language_add_elementor_page_settings_controls_page( Page $page ): 
 		$page->start_controls_section(
 			'easy_language',
 			array(
-				'label' => esc_html__( 'Languages', 'easy-language' ),
+				'label' => esc_html__( 'Simplify texts', 'easy-language' ),
 				'tab'   => Controls_Manager::TAB_SETTINGS,
 			)
 		);
@@ -185,11 +186,30 @@ function easy_language_pagebuilder_elementor_styles(): void {
 		wp_register_script(
 			'easy-language-elementor-admin',
 			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'classes/multilingual-plugins/easy-language/admin/elementor.js',
-			array( 'jquery' ),
+			array( 'jquery', 'wp-easy-dialog' ),
 			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/elementor.js' ),
 			true
 		);
 		wp_enqueue_script( 'easy-language-elementor-admin' );
+
+		// embed the wp-easy-dialog-component.
+		$script_asset_path = Helper::get_plugin_path() . 'classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/index.asset.php';
+		$script_asset      = require $script_asset_path;
+		wp_enqueue_script(
+			'wp-easy-dialog',
+			Helper::get_plugin_url() . 'classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/index.js',
+			$script_asset['dependencies'],
+			$script_asset['version'],
+			true
+		);
+		$admin_css      = Helper::get_plugin_url() . 'classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/style-index.css';
+		$admin_css_path = Helper::get_plugin_path() . 'classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/style-index.css';
+		wp_enqueue_style(
+			'wp-easy-dialog',
+			$admin_css,
+			array( 'wp-components' ),
+			filemtime( $admin_css_path )
+		);
 
 		// embed simplification scripts.
 		$multilingual_plugin->get_simplifications_scripts();
@@ -204,7 +224,7 @@ add_action(
 	'elementor/dynamic_tags/register_tags',
 	function ( $dynamic_tags ) {
 		if ( Helper::is_plugin_active( 'elementor-pro/elementor-pro.php' ) ) {
-			$dynamic_tags->register( new easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor\Switcher() );
+			$dynamic_tags->register( new easyLanguage\Multilingual_plugins\Easy_Language\PageBuilder\Elementor\Switcher() );
 		}
 	}
 );

@@ -1,6 +1,8 @@
 <?php
 /**
  * File for interface which defines supports for different plugins.
+ *
+ * @package easy-language
  */
 
 namespace easyLanguage;

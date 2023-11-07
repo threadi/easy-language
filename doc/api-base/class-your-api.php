@@ -205,7 +205,7 @@ class Your_Api extends Base implements Api_Base {
 	 * @param string $tab The tab.
 	 * @return void
 	 */
-	public function add_settings_tab( $tab ): void {}
+	public function add_settings_tab( string $tab ): void {}
 
 	/**
 	 * We to not add settings for this plugin.
@@ -263,10 +263,10 @@ class Your_Api extends Base implements Api_Base {
 	}
 
 	public function deactivate(): void {
-		// TODO: Implement deactivate() method.
+		// tasks to run on deactivation of this API.
 	}
 
 	public function enable(): void {
-		// TODO: Implement enable() method.
+		// tasks to run on activation of this API.
 	}
 }

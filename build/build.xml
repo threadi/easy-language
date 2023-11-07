@@ -42,9 +42,13 @@
 
 	<!-- install composer -->
 	<target name="composer-install">
-		<delete file="${log.dir}/composer-install1.txt"/>
-		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-install1.txt">
+		<delete file="${log.dir}/composer-install.txt"/>
+		<delete file="${log.dir}/composer-update.txt"/>
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-install.txt">
 			<arg line="install"/>
+		</exec>
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-update.txt">
+			<arg line="update"/>
 		</exec>
 	</target>
 
@@ -121,6 +125,7 @@
 			<zipfileset dir="${src.dir}/libs" prefix="${plugin.slug}/libs" />
 			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
 			<zipfileset dir="${src.dir}/vendor/gettext" prefix="${plugin.slug}/vendor/gettext" />
+			<zipfileset dir="${src.dir}/vendor/composer" prefix="${plugin.slug}/vendor/composer" />
             <zipfileset dir="${src.dir}" includes="uninstall.php,readme.txt" prefix="${plugin.slug}" />
             <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
         </zip>
@@ -135,8 +140,11 @@
 		<for list="${pagebuilders}" param="pagebuilder">
 			<sequential>
 				<zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip" update="true">
-					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/parser/@{pagebuilder}" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/parser/@{pagebuilder}" erroronmissingdir="false" />
 					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/pagebuilder/" includes="@{pagebuilder}.php" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/pagebuilder/" />
+					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/pagebuilder/@{pagebuilder}" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/pagebuilder/@{pagebuilder}" erroronmissingdir="false">
+						<exclude name="**/src/**" />
+						<exclude name="**/node_modules/**" />
+					</zipfileset>
 					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/parser/" includes="class-@{pagebuilder}.php" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/parser/" />
 				</zip>
 			</sequential>

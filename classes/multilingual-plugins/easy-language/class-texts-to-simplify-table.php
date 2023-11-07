@@ -37,7 +37,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 		return array(
 			'options'         => '',
 			'date'            => __( 'date', 'easy-language' ),
-			'used_in' 		  => __( 'used in', 'easy-language' ),
+			'used_in'         => __( 'used in', 'easy-language' ),
 			'source_language' => __( 'source language', 'easy-language' ),
 			'target_language' => __( 'target language', 'easy-language' ),
 			'original'        => __( 'original', 'easy-language' ),
@@ -51,11 +51,17 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	 */
 	private function table_data(): array {
 		// order table.
-		$order_by = ( isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], array_keys( $this->get_sortable_columns() ) ) ) ? $_REQUEST['orderby'] : 'date';
-		$order   = ( isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], array( 'asc', 'desc' ) ) ) ? $_REQUEST['order'] : 'desc';
+		$order_by = ( isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], array_keys( $this->get_sortable_columns() ), true ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) : 'date';
+		$order    = ( isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], array( 'asc', 'desc' ), true ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) : 'desc';
 
-		// get results
-		return DB::get_instance()->get_entries( Init::get_instance()->get_filter_for_entries_to_simplify(), array( 'order_by' => $order_by, 'order' => $order ) );
+		// get results.
+		return DB::get_instance()->get_entries(
+			Init::get_instance()->get_filter_for_entries_to_simplify(),
+			array(
+				'order_by' => $order_by,
+				'order'    => $order,
+			)
+		);
 	}
 
 	/**
@@ -93,14 +99,14 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	/**
 	 * Define what data to show on each column of the table.
 	 *
-	 * @param  array|object  $item        Data.
-	 * @param  String $column_name - Current column name.
+	 * @param  array|object $item        Data.
+	 * @param  String       $column_name - Current column name.
 	 *
 	 * @return string
 	 */
 	public function column_default( $item, $column_name ): string {
 		// bail if item is not an entry-text.
-		if( !( $item instanceof Text ) ) {
+		if ( ! ( $item instanceof Text ) ) {
 			return '';
 		}
 
@@ -111,7 +117,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 		$column_name = apply_filters( 'easy_language_simplification_table_to_simplify', $column_name, $item );
 
 		// bail if column-name is not set.
-		if( false === $column_name ) {
+		if ( false === $column_name ) {
 			return '';
 		}
 
@@ -119,7 +125,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 		switch ( $column_name ) {
 			case 'options':
 				$options = array(
-					'<span class="dashicons dashicons-translation" title="'.__( 'Simplify now only with Easy Language Pro.', 'easy-language' ).'">&nbsp;</span>'
+					'<span class="dashicons dashicons-translation" title="' . __( 'Simplify now only with Easy Language Pro.', 'easy-language' ) . '">&nbsp;</span>',
 				);
 
 				$filtered_options = apply_filters( 'easy_language_simplification_to_simplify_table_options', $options, $item->get_id() );
@@ -133,7 +139,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 
 			// get source language.
 			case 'source_language':
-				$language = $item->get_source_language();
+				$language  = $item->get_source_language();
 				$languages = $languages_obj->get_possible_source_languages();
 				if ( ! empty( $languages[ $language ] ) ) {
 					return $languages[ $language ]['label'];
@@ -142,7 +148,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 
 			// get target languages.
 			case 'target_language':
-				return implode(',', $item->get_target_languages());
+				return implode( ',', $item->get_target_languages() );
 
 			// show original text.
 			case 'original':
@@ -150,7 +156,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 
 			// show hint for pro in used in column.
 			case 'used_in':
-				return '<span class="pro-marker">'.__( 'Only in Pro', 'easy-language' ).'</span>';
+				return '<span class="pro-marker">' . __( 'Only in Pro', 'easy-language' ) . '</span>';
 
 			// fallback if no column has been matched.
 			default:

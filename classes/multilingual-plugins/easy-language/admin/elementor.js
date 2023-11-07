@@ -4,13 +4,11 @@ window.addEventListener(
     let view = elementor.modules.controls.BaseData.extend(
 			{
 				onReady: function () {
-					this.$el.find( '.easy-language-translate-object' ).on(
+					this.$el.find( '.wp-easy-dialog' ).on(
                         'click',
 					function (e) {
 						e.preventDefault();
-
-						// TODO object-type im HTML ergänzen
-						easy_language_simplification_init( jQuery( this ).data( 'id' ), jQuery( this ).data( 'object-type' ) );
+						easy_language_create_dialog({ detail: JSON.parse(this.dataset.dialog) });
 					}
 					);
 				}
@@ -19,3 +17,12 @@ window.addEventListener(
 	elementor.addControlView( 'easy_languages', view );
 	}
 );
+
+/**
+ * Helper to create a new dialog with given config.
+ *
+ * @param config
+ */
+function easy_language_create_dialog( config ) {
+	document.body.dispatchEvent(new CustomEvent("wp-easy-dialog", config));
+}

@@ -5,7 +5,7 @@
  * @package easy-language
  */
 
-namespace easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor;
+namespace easyLanguage\Multilingual_plugins\Easy_Language\PageBuilder\Elementor;
 
 use Elementor\Base_Data_Control;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;

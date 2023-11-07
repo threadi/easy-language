@@ -8,7 +8,6 @@
 namespace easyLanguage;
 
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
-use wpdb;
 
 /**
  * Handler for logging in this plugin.
@@ -23,30 +22,13 @@ class Log_Api {
 	private static ?Log_Api $instance = null;
 
 	/**
-	 * Database-object
-	 *
-	 * @var wpdb
-	 */
-	private wpdb $wpdb;
-
-	/**
-	 * Name for own database-table.
-	 *
-	 * @var string
-	 */
-	private string $table_name;
-
-	/**
 	 * Constructor for Logging-Handler.
 	 */
 	private function __construct() {
 		global $wpdb;
 
-		// get the db-connection.
-		$this->wpdb = $wpdb;
-
 		// set the table-name.
-		$this->table_name = DB::get_instance()->get_wpdb_prefix() . 'easy_language_log';
+		$wpdb->easy_language_log_table = DB::get_instance()->get_wpdb_prefix() . 'easy_language_log';
 	}
 
 	/**
@@ -72,10 +54,12 @@ class Log_Api {
 	 * @return void
 	 */
 	public function create_table(): void {
-		$charset_collate = $this->wpdb->get_charset_collate();
+		global $wpdb;
+
+		$charset_collate = $wpdb->get_charset_collate();
 
 		// table for import-log.
-		$sql = "CREATE TABLE $this->table_name (
+		$sql = "CREATE TABLE $wpdb->easy_language_log_table (
             `id` mediumint(9) NOT NULL AUTO_INCREMENT,
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
             `api` varchar(40) DEFAULT '' NOT NULL,
@@ -96,8 +80,8 @@ class Log_Api {
 	 * @return void
 	 */
 	public function delete_table(): void {
-		$sql = 'DROP TABLE IF EXISTS ' . $this->table_name;
-		$this->wpdb->query( $sql );
+		global $wpdb;
+		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', $wpdb->easy_language_log_table ) );
 	}
 
 	/**
@@ -110,6 +94,8 @@ class Log_Api {
 	 * @return void
 	 */
 	public function add_log( string $api, int $http_state, string $request, string $response ): void {
+		global $wpdb;
+
 		// define state depending on http-state.
 		$state = 'error';
 		if ( 200 === $http_state ) {
@@ -126,8 +112,8 @@ class Log_Api {
 		/**
 		 * Insert log entry.
 		 */
-		$this->wpdb->insert(
-			$this->table_name,
+		$wpdb->insert(
+			$wpdb->easy_language_log_table,
 			array(
 				'time'       => gmdate( 'Y-m-d H:i:s' ),
 				'api'        => $api,
@@ -150,7 +136,7 @@ class Log_Api {
 	 * @return void
 	 */
 	private function clean_log(): void {
-		$sql = sprintf( 'DELETE FROM `' . $this->table_name . '` WHERE `time` < DATE_SUB(NOW(), INTERVAL %d DAY)', get_option( 'easy_language_log_max_age', 50 ) );
-		$this->wpdb->query( $sql );
+		global $wpdb;
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM `' . $wpdb->easy_language_log_table . '` WHERE 1 = %d AND `time` < DATE_SUB(NOW(), INTERVAL %d DAY)', array( 1, absint( get_option( 'easy_language_log_max_age', 50 ) ) ) ) );
 	}
 }

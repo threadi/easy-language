@@ -23,3 +23,33 @@
 }
 
 #easylanguage-simplification-dialog-step-description .elementor-button { color: #fff }
+
+.wp-easy-dialog {
+	color: #000;
+	line-height: 2;
+}
+
+.wp-easy-dialog button { margin-right: 12px }
+
+.wp-easy-dialog p { margin: 1em 0 }
+
+body.wp-easy-dialog-on-body.elementor-editor-active .components-modal__frame.wp-easy-dialog:after {
+	background-image: url(/wp-content/plugins/easy-language/gfx/easy-language-icon.png);
+	width: 60px;
+	height: 60px;
+	float: right;
+	content: "";
+	background-size: cover;
+	position: absolute;
+	right: 12px;
+	top: 12px;
+	z-index: 100;
+}
+
+body.wp-easy-dialog-on-body.elementor-editor-active .hide-header .wp-easy-dialog-text {
+	padding-right: 64px;
+}
+
+body.wp-easy-dialog-on-body.elementor-editor-active .components-modal__header .components-modal__header-heading {
+	padding-right: 64px;
+}

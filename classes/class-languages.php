@@ -90,27 +90,27 @@ class Languages {
 				'de_DE'          => array(
 					'label'   => __( 'German', 'easy-language' ),
 					'enabled' => true,
-					'icon' => 'de_icon_url'
+					'icon'    => 'de_icon_url',
 				),
 				'de_DE_formal'   => array(
 					'label'   => __( 'German (formal)', 'easy-language' ),
 					'enabled' => true,
-					'icon' => 'de_icon_url'
+					'icon'    => 'de_icon_url',
 				),
 				'de_AT'          => array(
 					'label'   => __( 'German (Austria)', 'easy-language' ),
 					'enabled' => true,
-					'icon' => 'at_icon_url'
+					'icon'    => 'at_icon_url',
 				),
 				'de_CH'          => array(
 					'label'   => __( 'German (Suisse)', 'easy-language' ),
 					'enabled' => true,
-					'icon' => 'ch_icon_url'
+					'icon'    => 'ch_icon_url',
 				),
 				'de_CH_informal' => array(
 					'label'   => __( 'German (Suisse, informal)', 'easy-language' ),
 					'enabled' => true,
-					'icon' => 'ch_icon_url'
+					'icon'    => 'ch_icon_url',
 				),
 			)
 		);
@@ -128,20 +128,20 @@ class Languages {
 				'de_EL' => array(
 					'label'       => __( 'Einfache Sprache', 'easy-language' ),
 					'enabled'     => true,
-					'description' => '', // __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language'),
+					'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
 					'url'         => 'de_el',
-					'icon' => 'icon-de-el',
-					'img' => 'de_EL.png',
-					'img_icon' => Helper::get_icon_img_for_language_code( 'de_EL' )
+					'icon'        => 'icon-de-el',
+					'img'         => 'de_EL.png',
+					'img_icon'    => Helper::get_icon_img_for_language_code( 'de_EL' ),
 				),
 				'de_LS' => array(
-					'label'       => __( 'Leichte Sprache', 'easy-language'),
+					'label'       => __( 'Leichte Sprache', 'easy-language' ),
 					'enabled'     => true,
-					'description' => '', // __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language'),
+					'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
 					'url'         => 'de_ls',
-					'icon' => 'icon-de-ls',
-					'img' => 'de_LS.png',
-					'img_icon' => Helper::get_icon_img_for_language_code( 'de_LS' )
+					'icon'        => 'icon-de-ls',
+					'img'         => 'de_LS.png',
+					'img_icon'    => Helper::get_icon_img_for_language_code( 'de_LS' ),
 				),
 			)
 		);

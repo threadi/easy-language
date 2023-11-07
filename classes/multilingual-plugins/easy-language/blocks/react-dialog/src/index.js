@@ -22,10 +22,15 @@ function Modal( args ) {
 		top.document.getElementById('react-dialog-root').remove();
 	};
 
+	let classNames = "modal";
+	if( args.dialog.className ) {
+		classNames = "modal " + args.dialog.className;
+	}
+
 	return (
 		<>
 			<div className="modal_bg" onClick={closeDialog} />
-			<div className="modal">
+			<div className={classNames}>
 				{args.dialog.title &&
 					<h1 className="react-dialog-title">{args.dialog.title}</h1>
 				}

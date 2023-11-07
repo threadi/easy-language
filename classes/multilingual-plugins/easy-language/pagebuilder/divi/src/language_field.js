@@ -47,10 +47,10 @@ function Get_Language_Options( args ) {
 			},
 			body: JSON.stringify({post: args.object_id}),
 		})
-			.then((response) => response.json())
-			.then((data) => {
-				setOptions(data);
-			})
+		.then((response) => response.json())
+		.then((data) => {
+			setOptions(data);
+		})
 	};
 
 	// run request.

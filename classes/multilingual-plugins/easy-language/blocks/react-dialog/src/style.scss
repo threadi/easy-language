@@ -22,8 +22,20 @@
 		background-color: var(--wp--preset--color--white);
 		color: var(--wp--preset--color--black);
 		z-index: 9000;
-		border-radius: 16px;
+		border-radius: 8px;
 		box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.04);
+
+		&.wp-dialog-error {
+			border-left: 3px solid red;
+		}
+
+		&.wp-dialog-hint {
+			border-left: 3px solid yellow;
+		}
+
+		&.wp-dialog-success {
+			border-left: 3px solid green;
+		}
 	}
 
 	.modalContent {

@@ -204,7 +204,7 @@ class Db {
 	 *
 	 * @param array $filter Set filter (optional).
 	 * @param array $order Order list (optional).
-	 * @param int $limit Limit the list (optional).
+	 * @param int   $limit Limit the list (optional).
 	 *
 	 * @return array Array of Text-objects
 	 */
@@ -221,14 +221,14 @@ class Db {
 
 		// set ordering: default goes for title first, then other fields (to show fast proceed as titles are smaller than other texts).
 		$sql_order = " ORDER BY IF( o.field = 'title', 0, 1 ) ASC";
-		if( !empty($order) && !empty( $order['order_by']) && !empty( $order['order']) && in_array( $order['order'], array('asc','desc'), true ) ) {
-			if( 'date' === $order['order_by'] ) {
-				$sql_order = " ORDER BY o.time ".sanitize_text_field($order['order']);
+		if ( ! empty( $order ) && ! empty( $order['order_by'] ) && ! empty( $order['order'] ) && in_array( $order['order'], array( 'asc', 'desc' ), true ) ) {
+			if ( 'date' === $order['order_by'] ) {
+				$sql_order = ' ORDER BY o.time ' . sanitize_text_field( $order['order'] );
 			}
 		}
 
 		// init vars-array for prepared statement.
-		$vars       = array( '1' );
+		$vars = array( '1' );
 
 		if ( ! empty( $filter ) ) {
 			if ( ! empty( $filter['id'] ) ) {
@@ -245,18 +245,17 @@ class Db {
 			}
 			if ( ! empty( $filter['state'] ) ) {
 				$sql_where .= ' AND o.state = %s';
-				$vars[]    = $filter['state'];
+				$vars[]     = $filter['state'];
 			}
 			if ( ! empty( $filter['lang'] ) ) {
 				if ( ! empty( $filter['target_lang'] ) ) {
 					$sql_join[ $wpdb->easy_language_simplifications ] = ' LEFT JOIN ' . $wpdb->easy_language_simplifications . ' s ON s.oid = o.id';
-					$sql_where .= ' AND (s.language = %s OR o.lang = %s)';
-					$vars[]     = $filter['target_lang'];
-				}
-				else {
+					$sql_where                                       .= ' AND (s.language = %s OR o.lang = %s)';
+					$vars[] = $filter['target_lang'];
+				} else {
 					$sql_where .= ' AND o.lang = %s';
 				}
-				$vars[]     = $filter['lang'];
+				$vars[] = $filter['lang'];
 			}
 			if ( ! empty( $filter['field'] ) ) {
 				$sql_where .= ' AND o.field = %s';
@@ -284,34 +283,34 @@ class Db {
 			}
 			if ( ! empty( $filter['simplification_hash'] ) ) {
 				$sql_join[ $wpdb->easy_language_simplifications ] = ' INNER JOIN ' . $wpdb->easy_language_simplifications . ' s ON s.oid = o.id';
-				$sql_where .= ' AND s.hash = %s';
-				$vars[]     = $filter['simplification_hash'];
+				$sql_where                                       .= ' AND s.hash = %s';
+				$vars[] = $filter['simplification_hash'];
 			}
-			if( ! empty( $filter['not_locked']) ) {
+			if ( ! empty( $filter['not_locked'] ) ) {
 				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
 				$sql_select                                        .= ', oo.object_id, oo.object_type';
 			}
-			if( ! empty( $filter['not_prevented']) ) {
+			if ( ! empty( $filter['not_prevented'] ) ) {
 				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
 				$sql_select                                        .= ', oo.object_id, oo.object_type';
 			}
-			if( ! empty( $filter['object_state']) ) {
+			if ( ! empty( $filter['object_state'] ) ) {
 				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
 				$sql_select                                        .= ', oo.object_id, oo.object_type';
 			}
-			if( ! empty( $filter['object_not_state'] ) ) {
+			if ( ! empty( $filter['object_not_state'] ) ) {
 				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
 				$sql_select                                        .= ', oo.object_id, oo.object_type';
 			}
-			if( ! empty( $filter['has_simplification'] ) ) {
+			if ( ! empty( $filter['has_simplification'] ) ) {
 				$sql_join[ $wpdb->easy_language_simplifications ] = ' INNER JOIN ' . $wpdb->easy_language_simplifications . ' s ON s.oid = o.id';
 			}
 		}
 
 		// limit the list of entries.
 		$sql_limit = '';
-		if( absint($limit) > 0 ) {
-			$sql_limit = ' LIMIT '.absint($limit);
+		if ( absint( $limit ) > 0 ) {
+			$sql_limit = ' LIMIT ' . absint( $limit );
 		}
 
 		// define base-statement.
@@ -334,25 +333,25 @@ class Db {
 		foreach ( $results as $result ) {
 			// only add post-type-objects if not_locked is set and if they are not locked.
 			$add = true;
-			if( !empty( $filter['not_locked'] ) ) {
-				$object = Helper::get_object( absint($result['object_id']), $result['object_type'] );
-				$add = !$object->is_locked();
+			if ( ! empty( $filter['not_locked'] ) ) {
+				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
+				$add    = ! $object->is_locked();
 			}
-			if( !empty( $filter['not_prevented'] ) && false !== $add ) {
-				$object = Helper::get_object( absint($result['object_id']), $result['object_type'] );
-				$add = !$object->is_automatic_mode_prevented();
+			if ( ! empty( $filter['not_prevented'] ) && false !== $add ) {
+				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
+				$add    = ! $object->is_automatic_mode_prevented();
 			}
-			if( !empty( $filter['object_state'] ) && false !== $add ) {
-				$object = Helper::get_object( absint($result['object_id']), $result['object_type'] );
-				$add = $object->has_state($filter['object_state']);
+			if ( ! empty( $filter['object_state'] ) && false !== $add ) {
+				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
+				$add    = $object->has_state( $filter['object_state'] );
 			}
-			if( !empty( $filter['object_not_state'] ) && false !== $add ) {
-				$object = Helper::get_object( absint($result['object_id']), $result['object_type'] );
-				$add = !$object->has_state($filter['object_not_state']);
+			if ( ! empty( $filter['object_not_state'] ) && false !== $add ) {
+				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
+				$add    = ! $object->has_state( $filter['object_not_state'] );
 			}
 
 			// add entry to list.
-			if( $add ) {
+			if ( $add ) {
 				// create Text-object for this text.
 				$obj = new Text( $result['id'] );
 				$obj->set_original( $result['original'] );
@@ -386,7 +385,7 @@ class Db {
 	 */
 	public function get_entry_by_text( string $text, string $source_language ): bool|Text {
 		// return already loaded object.
-		if ( !empty( $this->texts[ $this->get_string_hash( $text . $source_language ) ] ) ) {
+		if ( ! empty( $this->texts[ $this->get_string_hash( $text . $source_language ) ] ) ) {
 			return $this->texts[ $this->get_string_hash( $text . $source_language ) ];
 		}
 
@@ -422,7 +421,7 @@ class Db {
 			// get object via DB-request.
 			$query     = array(
 				'simplification_hash' => $this->get_string_hash( $simplification ),
-				'lang' => $language,
+				'lang'                => $language,
 			);
 			$text_objs = $this->get_entries( $query );
 			if ( ! empty( $text_objs ) ) {

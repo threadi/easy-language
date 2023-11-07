@@ -1,6 +1,8 @@
 <?php
 /**
  * File for interface which defines supports for different APIS.
+ *
+ * @package easy-language
  */
 
 namespace easyLanguage;
@@ -52,10 +54,10 @@ interface Api_Base {
 	/**
 	 * Add settings-tab for this plugin.
 	 *
-	 * @param $tab
+	 * @param string $tab The tab internal name.
 	 * @return void
 	 */
-	public function add_settings_tab( $tab ): void;
+	public function add_settings_tab( string $tab ): void;
 
 	/**
 	 * Add settings-page for this plugin.

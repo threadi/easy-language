@@ -5,7 +5,7 @@
  * @package easy-language
  */
 
-namespace easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor;
+namespace easyLanguage\Multilingual_plugins\Easy_Language\PageBuilder\Elementor;
 
 use Elementor\Core\DynamicTags\Tag;
 use Elementor\Modules\DynamicTags\Module;

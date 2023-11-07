@@ -20,29 +20,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handler for log-output in backend.
  */
 class Language_Icons_Table extends WP_List_Table {
-
-	/**
-	 * database-object
-	 *
-	 * @var wpdb
-	 */
-	private wpdb $wpdb;
-
-	/**
-	 * Name for own database-table.
-	 *
-	 * @var string
-	 */
-	private string $table_name;
-
-	/**
-	 * Constructor for Logging-Handler.
-	 */
-	public function __construct() {
-		// call parent constructor.
-		parent::__construct();
-	}
-
 	/**
 	 * Override the parent columns method. Defines the columns to use in your listing table
 	 *
@@ -50,7 +27,7 @@ class Language_Icons_Table extends WP_List_Table {
 	 */
 	public function get_columns(): array {
 		return array(
-			'language'    => __( 'Language', 'easy-language' ),
+			'language' => __( 'Language', 'easy-language' ),
 			'icon'     => __( 'Icon', 'easy-language' ),
 		);
 	}
@@ -62,9 +39,9 @@ class Language_Icons_Table extends WP_List_Table {
 	 */
 	private function table_data(): array {
 		$languages = array();
-		foreach( array_merge( Languages::get_instance()->get_active_languages(), Languages::get_instance()->get_possible_source_languages() ) as $language_code => $language ) {
+		foreach ( array_merge( Languages::get_instance()->get_active_languages(), Languages::get_instance()->get_possible_source_languages() ) as $language_code => $language ) {
 			$language['code'] = $language_code;
-			$languages[] = $language;
+			$languages[]      = $language;
 		}
 		return $languages;
 	}
@@ -102,10 +79,10 @@ class Language_Icons_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Define what data to show on each column of the table
+	 * Define what data to show on each column of the table.
 	 *
-	 * @param  array  $item        Data
-	 * @param  String $column_name - Current column name
+	 * @param  array  $item        Data.
+	 * @param  String $column_name - Current column name.
 	 *
 	 * @return string
 	 */
@@ -113,13 +90,13 @@ class Language_Icons_Table extends WP_List_Table {
 		switch ( $column_name ) {
 			// show language.
 			case 'language':
-				return esc_html($item['label']);
+				return esc_html( $item['label'] );
 
 			// show icon and replace-option.
 			case 'icon':
-				$output = wp_kses_post(Helper::get_icon_img_for_language_code( $item['code'] ) );
-				$output .= ' <a href="#" class="replace-icon">'.esc_html__( 'Replace', 'easy-language' ).'</a>';
-				$output .= '<span data-language-code="'.esc_attr($item['code']).'"></span>';
+				$output  = wp_kses_post( Helper::get_icon_img_for_language_code( $item['code'] ) );
+				$output .= ' <a href="#" class="replace-icon">' . esc_html__( 'Replace', 'easy-language' ) . '</a>';
+				$output .= '<span data-language-code="' . esc_attr( $item['code'] ) . '"></span>';
 				return $output;
 
 			// default output for any unknown column.

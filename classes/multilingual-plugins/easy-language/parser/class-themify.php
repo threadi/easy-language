@@ -72,14 +72,14 @@ class Themify extends Parser_Base implements Parser {
 					'heading',
 					'sub_heading',
 				),
-				'text'         => array(
+				'text'          => array(
 					'content_text',
 				),
-				'buttons' => array(
+				'buttons'       => array(
 					'content_button' => array(
-						'label'
-					)
-				)
+						'label',
+					),
+				),
 			)
 		);
 	}
@@ -102,8 +102,8 @@ class Themify extends Parser_Base implements Parser {
 
 		// get editor contents and loop through its array.
 		$data = ThemifyBuilder_Data_Manager::get_data( $this->get_object_id() );
-		if( !empty($data) ) {
-			foreach( $data as $container ) {
+		if ( ! empty( $data ) ) {
+			foreach ( $data as $container ) {
 				$resulting_texts = $this->get_widgets( (array) $container, $resulting_texts );
 			}
 		}
@@ -129,9 +129,9 @@ class Themify extends Parser_Base implements Parser {
 
 		// get editor contents and loop through its array.
 		$data = ThemifyBuilder_Data_Manager::get_data( $this->get_object_id() );
-		if( !empty($data) ) {
-			foreach( $data as $name => $container ) {
-				$data[$name] = $this->replace_content_in_widgets( (array) $container, $simplified_part );
+		if ( ! empty( $data ) ) {
+			foreach ( $data as $name => $container ) {
+				$data[ $name ] = $this->replace_content_in_widgets( (array) $container, $simplified_part );
 			}
 		}
 
@@ -159,7 +159,7 @@ class Themify extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return !empty(get_post_meta( $post_object->get_id(), '_themify_builder_settings_json', true ));
+		return ! empty( get_post_meta( $post_object->get_id(), '_themify_builder_settings_json', true ) );
 	}
 
 	/**
@@ -194,29 +194,28 @@ class Themify extends Parser_Base implements Parser {
 	/**
 	 * Loop through the container to get the flow-text-modules.
 	 *
-	 * @param array $container
-	 * @param array $resulting_texts
+	 * @param array $container The container to parse.
+	 * @param array $resulting_texts The resulting list of texts.
 	 * @return array
 	 */
-	private function get_widgets(array $container, array $resulting_texts): array {
-		foreach( $container as $name => $sub_container ) {
-			foreach( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-				if ( !is_array($sub_container) && 'mod_name' === $name && $sub_container === $flow_text_name ) {
-					foreach( $flow_text_settings as $entry_name => $entry ) {
-						if( is_array($entry) ) {
-							foreach( $entry as $sub_entry ) {
-								foreach( $container['mod_settings'][$entry_name] as $index2 => $sub_sub_container ) {
-									if (!empty($container['mod_settings'][$entry_name][$index2][$sub_entry])) {
-										$resulting_texts[$container['mod_settings'][$entry_name][$index2][$sub_entry]] = $container['mod_settings'][$entry_name][$index2][$sub_entry];
+	private function get_widgets( array $container, array $resulting_texts ): array {
+		foreach ( $container as $name => $sub_container ) {
+			foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
+				if ( ! is_array( $sub_container ) && 'mod_name' === $name && $sub_container === $flow_text_name ) {
+					foreach ( $flow_text_settings as $entry_name => $entry ) {
+						if ( is_array( $entry ) ) {
+							foreach ( $entry as $sub_entry ) {
+								foreach ( $container['mod_settings'][ $entry_name ] as $index2 => $sub_sub_container ) {
+									if ( ! empty( $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ) ) {
+										$resulting_texts[ $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ] = $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ];
 									}
 								}
 							}
-						}
-						else {
-							$resulting_texts[$container['mod_settings'][$entry]] = $container['mod_settings'][$entry];
+						} else {
+							$resulting_texts[ $container['mod_settings'][ $entry ] ] = $container['mod_settings'][ $entry ];
 						}
 					}
-				} elseif( is_array( $sub_container ) ) {
+				} elseif ( is_array( $sub_container ) ) {
 					$resulting_texts = $this->get_widgets( $sub_container, $resulting_texts );
 				}
 			}
@@ -229,38 +228,36 @@ class Themify extends Parser_Base implements Parser {
 	/**
 	 * Replace simplified content in widgets.
 	 *
-	 * @param array $container
-	 * @param string $simplified_part
+	 * @param array  $container The container to parse.
+	 * @param string $simplified_part The simplified text.
 	 * @return array
 	 */
 	private function replace_content_in_widgets( array $container, string $simplified_part ): array {
 		// loop through the entries in this container.
-		foreach( $container as $name => $sub_container ) {
-			if( is_array($sub_container) ) {
-				if ('modules' === $name) {
-					foreach ($sub_container as $index => $module) {
-						foreach ($this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings) {
-							if ($module['mod_name'] === $flow_text_name) {
-								foreach ($flow_text_settings as $entry_name => $entry) {
-									if( is_array($entry) ) {
-										foreach( $entry as $sub_entry ) {
-											foreach( $container[$name][$index]['mod_settings'][$entry_name] as $index2 => $sub_sub_entry ) {
-												if ($this->get_text() === $container[$name][$index]['mod_settings'][$entry_name][$index2][$sub_entry]) {
-													$container[$name][$index]['mod_settings'][$entry_name][$index2][$sub_entry] = $simplified_part;
+		foreach ( $container as $name => $sub_container ) {
+			if ( is_array( $sub_container ) ) {
+				if ( 'modules' === $name ) {
+					foreach ( $sub_container as $index => $module ) {
+						foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
+							if ( $module['mod_name'] === $flow_text_name ) {
+								foreach ( $flow_text_settings as $entry_name => $entry ) {
+									if ( is_array( $entry ) ) {
+										foreach ( $entry as $sub_entry ) {
+											foreach ( $container[ $name ][ $index ]['mod_settings'][ $entry_name ] as $index2 => $sub_sub_entry ) {
+												if ( $this->get_text() === $container[ $name ][ $index ]['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ) {
+													$container[ $name ][ $index ]['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] = $simplified_part;
 												}
 											}
 										}
-									} else {
-										if ($this->get_text() === $container[$name][$index]['mod_settings'][$entry]) {
-											$container[$name][$index]['mod_settings'][$entry] = $simplified_part;
-										}
+									} elseif ( $this->get_text() === $container[ $name ][ $index ]['mod_settings'][ $entry ] ) {
+											$container[ $name ][ $index ]['mod_settings'][ $entry ] = $simplified_part;
 									}
 								}
 							}
 						}
 					}
 				} else {
-					$container[$name] = $this->replace_content_in_widgets($sub_container, $simplified_part);
+					$container[ $name ] = $this->replace_content_in_widgets( $sub_container, $simplified_part );
 				}
 			}
 		}

@@ -57,26 +57,4 @@ class Multilingual_Plugins {
 	public function get_available_plugins(): array {
 		return apply_filters( 'easy_language_register_plugin', array() );
 	}
-
-	/**
-	 * Return true, if other multilingual-plugin with enabled support for the given languages is active.
-	 *
-	 * @param array $languages
-	 *
-	 * @return bool
-	 */
-	public function is_plugin_with_support_for_given_languages_enabled( array $languages ): bool {
-		foreach ( $this->get_available_plugins() as $plugin_obj ) {
-			if ( 'easy-language' !== $plugin_obj->get_name() ) {
-				foreach ( $plugin_obj->get_active_languages() as $language_code => $enabled ) {
-					if ( ! empty( $languages[ $language_code ] ) ) {
-						return true;
-					}
-				}
-			}
-		}
-
-		// return false if no language could be found.
-		return false;
-	}
 }

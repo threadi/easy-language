@@ -9,4 +9,4 @@ languages/*.json
 /classes/multilingual-plugins/easy-language/blocks/switcher/build/
 /classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/
 /classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/
-/classes/multilingual-plugins/easy-language/parser/divi/build/
+/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/

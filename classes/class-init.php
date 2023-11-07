@@ -90,7 +90,7 @@ class Init {
 	 * @return void
 	 */
 	public function plugin_init(): void {
-		// TODO remove if languages are in WP-repo
+		// TODO remove if languages are in WP-repo.
 		load_plugin_textdomain( 'easy-language', false, dirname( plugin_basename( EASY_LANGUAGE ) ) . '/languages' );
 	}
 
@@ -135,7 +135,7 @@ class Init {
 				// set transient name.
 				$transient_name = 'easy_language_plugin_' . $plugin_obj->get_name();
 
-				// get transient-object for this plugin
+				// get transient-object for this plugin.
 				$transient_obj = $transients_obj->get_transient_by_name( $transient_name );
 				if ( $transient_obj->is_set() ) {
 					// bail if this transient is already set.
@@ -152,7 +152,7 @@ class Init {
 				$message = sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional language.', 'easy-language' ), $plugin_obj->get_title() );
 				if ( false === $plugin_obj->is_supporting_apis() ) {
 					/* translators: %1$s will be replaced by the name of the multilingual-plugin */
-					$message .= '<br><br>' . sprintf( __( 'Due to limitations of this plugin, it is unfortunately not possible for us to provide automatic simplification for easy or plain language. If you want to use this, deactivate %1$s and use only the <i>Easy Language</i> plugin for this.', 'easy-language' ), $plugin_obj->get_title() );
+					$message .= '<br><br>' . sprintf( __( 'Due to limitations of %1$s, it is unfortunately not possible for us to provide automatic simplification for easy or plain language. If you want to use this, you could use the <i>Easy Language</i> plugin alongside %1$s.', 'easy-language' ), esc_html($plugin_obj->get_title()), esc_html($plugin_obj->get_title()) );
 				}
 				$transient_obj->set_message( $message );
 				$transient_obj->save();
@@ -169,8 +169,8 @@ class Init {
 	/**
 	 * Compile the capabilities.
 	 *
-	 * @param string $singular
-	 * @param string $plural
+	 * @param string $singular The singular name.
+	 * @param string $plural The plural name.
 	 *
 	 * @return string[]
 	 */
@@ -269,7 +269,7 @@ class Init {
 
 		// delete transient for step 1.
 		$transients_obj = Transients::get_instance();
-		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_intro_step_1' );
+		$transient_obj  = $transients_obj->get_transient_by_name( 'easy_language_intro_step_1' );
 		$transient_obj->delete_dismiss();
 		$transient_obj->delete();
 
@@ -280,7 +280,7 @@ class Init {
 		Helper::set_intro_step1();
 
 		// return ok.
-		wp_send_json( array('result' => 'ok') );
+		wp_send_json( array( 'result' => 'ok' ) );
 
 		// return nothing more.
 		wp_die();
@@ -297,28 +297,28 @@ class Init {
 		check_ajax_referer( 'easy-language-set-icon-for-language', 'nonce' );
 
 		// get icon from request.
-		$icon = isset($_POST['icon']) ? absint($_POST['icon']) : 0;
+		$icon = isset( $_POST['icon'] ) ? absint( $_POST['icon'] ) : 0;
 
 		// get language code from request.
-		$language_code = isset($_POST['language']) ? sanitize_text_field( wp_unslash( $_POST['language']) ) : '';
+		$language_code = isset( $_POST['language'] ) ? sanitize_text_field( wp_unslash( $_POST['language'] ) ) : '';
 
-		if( $icon > 0 && !empty($language_code) ) {
+		if ( $icon > 0 && ! empty( $language_code ) ) {
 			// get actual assignments of the language.
 			$attachment = Helper::get_attachment_by_language_code( $language_code );
 
 			// remove the language from this assignment.
 			$assigned_languages = get_post_meta( $attachment->ID, 'easy_language_code', true );
-			if( !empty($assigned_languages[$language_code]) ) {
-				unset($assigned_languages[$language_code]);
+			if ( ! empty( $assigned_languages[ $language_code ] ) ) {
+				unset( $assigned_languages[ $language_code ] );
 			}
 			update_post_meta( $attachment->ID, 'easy_language_code', $assigned_languages );
 
 			// add the language to the new attachment.
 			$assigned_languages = get_post_meta( $icon, 'easy_language_code', true );
-			if( !is_array($assigned_languages) ) {
+			if ( ! is_array( $assigned_languages ) ) {
 				$assigned_languages = array();
 			}
-			$assigned_languages[$language_code] = 1;
+			$assigned_languages[ $language_code ] = 1;
 			update_post_meta( $icon, 'easy_language_code', $assigned_languages );
 
 			// reset image list in db.

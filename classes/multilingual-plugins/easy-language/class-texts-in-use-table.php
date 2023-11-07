@@ -21,15 +21,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handler for log-output in backend.
  */
 class Texts_In_Use_Table extends WP_List_Table {
-
-	/**
-	 * Constructor for Logging-Handler.
-	 */
-	public function __construct() {
-		// call parent constructor.
-		parent::__construct();
-	}
-
 	/**
 	 * Override the parent columns method. Defines the columns to use in your listing table
 	 *
@@ -41,11 +32,11 @@ class Texts_In_Use_Table extends WP_List_Table {
 			'date'            => __( 'date', 'easy-language' ),
 			'used_api'        => __( 'used API', 'easy-language' ),
 			'user'            => __( 'requesting user', 'easy-language' ),
-			'used_in'		  => __( 'used in', 'easy-language' ),
+			'used_in'         => __( 'used in', 'easy-language' ),
 			'source_language' => __( 'source language', 'easy-language' ),
 			'target_language' => __( 'target language', 'easy-language' ),
 			'original'        => __( 'original', 'easy-language' ),
-			'simplification'     => __( 'simplification', 'easy-language' ),
+			'simplification'  => __( 'simplification', 'easy-language' ),
 		);
 	}
 
@@ -56,25 +47,31 @@ class Texts_In_Use_Table extends WP_List_Table {
 	 */
 	private function table_data(): array {
 		// order table.
-		$order_by = ( isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], array_keys( $this->get_sortable_columns() ) ) ) ? $_REQUEST['orderby'] : 'date';
-		$order   = ( isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], array( 'asc', 'desc' ) ) ) ? $_REQUEST['order'] : 'desc';
+		$order_by = ( isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], array_keys( $this->get_sortable_columns() ), true ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) : 'date';
+		$order    = ( isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], array( 'asc', 'desc' ), true ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) : 'desc';
 
 		// define query for entries.
 		$query = array(
-			'state' => 'in_use',
-			'object_not_state' => 'trash',
-			'has_simplification' => true
+			'state'              => 'in_use',
+			'object_not_state'   => 'trash',
+			'has_simplification' => true,
 		);
 
 		// get language-filter.
 		$lang = $this->get_lang_filter();
-		if( !empty($lang) ) {
-			$query['lang'] = $lang;
+		if ( ! empty( $lang ) ) {
+			$query['lang']        = $lang;
 			$query['target_lang'] = $lang;
 		}
 
 		// return resulting entry-objects.
-		return DB::get_instance()->get_entries( $query, array( 'order_by' => $order_by, 'order' => $order ) );
+		return DB::get_instance()->get_entries(
+			$query,
+			array(
+				'order_by' => $order_by,
+				'order'    => $order,
+			)
+		);
 	}
 
 	/**
@@ -113,13 +110,13 @@ class Texts_In_Use_Table extends WP_List_Table {
 	 * Define what data to show on each column of the table.
 	 *
 	 * @param array|object $item Data.
-	 * @param String $column_name Current column name.
+	 * @param String       $column_name Current column name.
 	 *
 	 * @return string
 	 */
 	public function column_default( $item, $column_name ): string {
 		// bail if item is not an entry-text.
-		if( !( $item instanceof Text ) ) {
+		if ( ! ( $item instanceof Text ) ) {
 			return '';
 		}
 
@@ -136,7 +133,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 		$column_name = apply_filters( 'easy_language_simplification_table_used_in', $column_name, $item );
 
 		// bail if column-name is not set.
-		if( false === $column_name ) {
+		if ( false === $column_name ) {
 			return '';
 		}
 
@@ -149,8 +146,8 @@ class Texts_In_Use_Table extends WP_List_Table {
 			// show simplification as not formatted text.
 			case 'simplification':
 				$texts = '';
-				foreach( $target_languages as $language_code => $target_language ) {
-					$texts .= wp_strip_all_tags($item->get_simplification( $language_code ));
+				foreach ( $target_languages as $language_code => $target_language ) {
+					$texts .= wp_strip_all_tags( $item->get_simplification( $language_code ) );
 				}
 				return $texts;
 
@@ -169,11 +166,11 @@ class Texts_In_Use_Table extends WP_List_Table {
 
 			// show target language.
 			case 'target_language':
-				foreach( $target_languages as $language_code => $language ) {
-					if ($api_obj) {
+				foreach ( $target_languages as $language_code => $language ) {
+					if ( $api_obj ) {
 						$languages = $api_obj->get_active_target_languages();
-						if (!empty($languages[$language_code])) {
-							return $languages[$language_code]['label'];
+						if ( ! empty( $languages[ $language_code ] ) ) {
+							return $languages[ $language_code ]['label'];
 						}
 					}
 				}
@@ -182,7 +179,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 			// show options.
 			case 'options':
 				$options = array(
-					'<span class="dashicons dashicons-trash" title="'.__( 'Delete entry only with Easy Language Pro.', 'easy-language' ).'">&nbsp;</span>'
+					'<span class="dashicons dashicons-trash" title="' . __( 'Delete entry only with Easy Language Pro.', 'easy-language' ) . '">&nbsp;</span>',
 				);
 
 				$filtered_options = apply_filters( 'easy_language_simplification_table_options', $options, $item->get_id() );
@@ -199,14 +196,14 @@ class Texts_In_Use_Table extends WP_List_Table {
 
 			// show requesting user.
 			case 'user':
-				foreach( $target_languages as $language_code => $language ) {
+				foreach ( $target_languages as $language_code => $language ) {
 					$user_id = $item->get_user_for_simplification( $language_code );
-					if ($user_id > 0) {
-						$user = new WP_User($user_id);
-						if (current_user_can('edit_users')) {
-							return '<a href="' . get_edit_user_link($user->ID) . '">' . esc_html($user->display_name) . '</a>';
+					if ( $user_id > 0 ) {
+						$user = new WP_User( $user_id );
+						if ( current_user_can( 'edit_users' ) ) {
+							return '<a href="' . get_edit_user_link( $user->ID ) . '">' . esc_html( $user->display_name ) . '</a>';
 						} else {
-							return esc_html($user->display_name);
+							return esc_html( $user->display_name );
 						}
 					}
 				}
@@ -216,7 +213,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 
 			// show hint for pro in used in column.
 			case 'used_in':
-				return '<span class="pro-marker">'.__( 'Only in Pro', 'easy-language' ).'</span>';
+				return '<span class="pro-marker">' . __( 'Only in Pro', 'easy-language' ) . '</span>';
 
 			// fallback if no column has been matched.
 			default:
@@ -235,37 +232,37 @@ class Texts_In_Use_Table extends WP_List_Table {
 
 		// define initial list.
 		$list = array(
-			"all"       => '<a href="'.esc_url($url).'">'.__( 'All', 'easy-language').'</a>',
+			'all' => '<a href="' . esc_url( $url ) . '">' . __( 'All', 'easy-language' ) . '</a>',
 		);
 
 		// get all languages from items and add their languages to the list.
-		$query = array(
-			'state' => 'in_use',
-			'object_not_state' => 'trash'
+		$query           = array(
+			'state'            => 'in_use',
+			'object_not_state' => 'trash',
 		);
-		$entries = DB::get_instance()->get_entries($query);
+		$entries         = DB::get_instance()->get_entries( $query );
 		$languages_array = array();
-		foreach( $entries as $item ) {
+		foreach ( $entries as $item ) {
 			// get object of the used api.
 			$api_obj = $item->get_api();
-			if( false !== $api_obj && empty($languages_array[$item->get_source_language()]) ) {
+			if ( false !== $api_obj && empty( $languages_array[ $item->get_source_language() ] ) ) {
 				// get source languages of this api.
 				$source_languages = $api_obj->get_active_source_languages();
 
 				// add the source language to list.
-				$languages_array[$item->get_source_language()] = $source_languages[$item->get_source_language()]['label'];
+				$languages_array[ $item->get_source_language() ] = $source_languages[ $item->get_source_language() ]['label'];
 			}
-			foreach( $item->get_target_languages() as $language_code => $target_language ) {
-				if( empty( $language_code[$language_code]) ) {
-					$languages_array[$language_code] = $target_language;
+			foreach ( $item->get_target_languages() as $language_code => $target_language ) {
+				if ( empty( $language_code[ $language_code ] ) ) {
+					$languages_array[ $language_code ] = $target_language;
 				}
 			}
 		}
 
 		// convert languages to list-entries.
-		foreach( $languages_array as $language_code => $language ) {
-			$url = add_query_arg( array('lang' => $language_code) );
-			$list[$language] = '<a href="'.esc_url($url).'">'.esc_html($language).'</a>';
+		foreach ( $languages_array as $language_code => $language ) {
+			$url               = add_query_arg( array( 'lang' => $language_code ) );
+			$list[ $language ] = '<a href="' . esc_url( $url ) . '">' . esc_html( $language ) . '</a>';
 		}
 
 		// return resulting list.
@@ -275,27 +272,29 @@ class Texts_In_Use_Table extends WP_List_Table {
 	/**
 	 * Add export-buttons on top of table.
 	 *
-	 * @param $which
+	 * @param string $which The position.
 	 * @return void
 	 */
 	public function extra_tablenav( $which ): void {
-		if( 'top' === $which ) {
+		if ( 'top' === $which ) {
 			$language_code = $this->get_lang_filter();
 
-			if( !empty($language_code) ) {
+			if ( ! empty( $language_code ) ) {
 				// define export-URL.
 				$url = add_query_arg(
 					array(
 						'action' => 'easy_language_export_simplifications',
 						'nonce'  => wp_create_nonce( 'easy-language-export-simplifications' ),
-						'lang' => $language_code
+						'lang'   => $language_code,
 					),
 					get_admin_url() . 'admin.php'
 				);
-				?><a href="<?php echo esc_url($url); ?>" class="button"><?php echo esc_html__( 'Export as Portable Object (po)', 'easy-language' ); ?></a><?php
-			}
-			else {
-				?><span class="button disabled" title="<?php echo esc_html__('Choose a language above to export', 'easy-language' ); ?>"><?php echo esc_html__( 'Export as Portable Object (po)', 'easy-language' ); ?></span><?php
+				?><a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Export as Portable Object (po)', 'easy-language' ); ?></a>
+				<?php
+			} else {
+				?>
+				<span class="button disabled" title="<?php echo esc_html__( 'Choose a language above to export', 'easy-language' ); ?>"><?php echo esc_html__( 'Export as Portable Object (po)', 'easy-language' ); ?></span>
+				<?php
 			}
 		}
 	}
@@ -306,11 +305,11 @@ class Texts_In_Use_Table extends WP_List_Table {
 	 * @return string
 	 */
 	private function get_lang_filter(): string {
-		return isset($_GET['lang']) ? sanitize_text_field( $_GET['lang'] ) : '';
+		return isset( $_GET['lang'] ) ? sanitize_text_field( wp_unslash( $_GET['lang'] ) ) : '';
 	}
 
 	/**
-	 * Message to be displayed when there are no items
+	 * Message to be displayed when there are no items.
 	 *
 	 * @since 3.1.0
 	 */

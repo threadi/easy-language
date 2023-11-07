@@ -95,40 +95,38 @@ class Apis {
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function export_api_log(): void {
-		global $wpdb;
-
 		// check nonce.
 		check_ajax_referer( 'easy-language-export-api-log', 'nonce' );
 
 		// get name of the api to export.
-		$export_api = isset($_GET['api']) ? sanitize_text_field( $_GET['api']) : '';
+		$export_api = isset( $_GET['api'] ) ? sanitize_text_field( wp_unslash( $_GET['api'] ) ) : '';
 
-		if( !empty($export_api) ) {
+		if ( ! empty( $export_api ) ) {
 			// get api object.
 			$api_object = $this->get_api_by_name( $export_api );
-			if( false !== $api_object ) {
+			if ( false !== $api_object ) {
 				// get the entries.
 				$entries = array(
 					array(
 						__( 'Date', 'easy-language' ),
 						__( 'Request', 'easy-language' ),
-						__( 'Response', 'easy-language' )
-					)
+						__( 'Response', 'easy-language' ),
+					),
 				);
-				foreach( $api_object->get_log_entries() as $entry ) {
+				foreach ( $api_object->get_log_entries() as $entry ) {
 					$entries[] = array(
 						$entry->time,
 						$entry->request,
-						$entry->response
+						$entry->response,
 					);
 				}
 
 				// set header for response as CSV-download.
-				header("Content-type: application/csv");
-				header("Content-Disposition: attachment; filename=".sanitize_file_name(date('YmdHi')."_".get_option('blogname').".csv"));
-				$fp = fopen('php://output', 'w');
-				foreach ($entries as $row) {
-					fputcsv($fp, $row);
+				header( 'Content-type: application/csv' );
+				header( 'Content-Disposition: attachment; filename=' . sanitize_file_name( gmdate( 'YmdHi' ) . '_' . get_option( 'blogname' ) . '.csv' ) );
+				$fp = fopen( 'php://output', 'w' );
+				foreach ( $entries as $row ) {
+					fputcsv( $fp, $row );
 				}
 				exit;
 			}

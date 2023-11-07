@@ -108,10 +108,20 @@ class No_Api extends Base implements Api_Base {
 		);
 	}
 
+	/**
+	 * Return target languages.
+	 *
+	 * @return array
+	 */
 	public function get_supported_target_languages(): array {
 		return array();
 	}
 
+	/**
+	 * Return active target languages.
+	 *
+	 * @return array
+	 */
 	public function get_active_target_languages(): array {
 		return array();
 	}
@@ -127,10 +137,27 @@ class No_Api extends Base implements Api_Base {
 		);
 	}
 
-	public function add_settings_tab( $tab ): void {}
+	/**
+	 * Add settings tab: none for this API.
+	 *
+	 * @param string $tab The tab internal name.
+	 *
+	 * @return void
+	 */
+	public function add_settings_tab( string $tab ): void {}
 
+	/**
+	 * Add settings page: none for this API.
+	 *
+	 * @return void
+	 */
 	public function add_settings_page(): void {}
 
+	/**
+	 * Add settings: none for this API.
+	 *
+	 * @return void
+	 */
 	public function add_settings(): void {}
 
 	/**
@@ -142,6 +169,11 @@ class No_Api extends Base implements Api_Base {
 		return $this->get_name() === get_option( 'easy_language_api' );
 	}
 
+	/**
+	 * Run installer-tasks.
+	 *
+	 * @return void
+	 */
 	public function install(): void {}
 
 	/**
@@ -153,12 +185,27 @@ class No_Api extends Base implements Api_Base {
 		// nothing to do.
 	}
 
+	/**
+	 * Run uninstaller tasks.
+	 *
+	 * @return void
+	 */
 	public function uninstall(): void {}
 
+	/**
+	 * Get simplification object for this API: none for this one.
+	 *
+	 * @return \stdClass
+	 */
 	public function get_simplifications_obj(): object {
 		return new \stdClass();
 	}
 
+	/**
+	 * Add cli options: none for this API.
+	 *
+	 * @return void
+	 */
 	public function cli(): void {}
 
 	/**

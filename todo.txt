@@ -3,13 +3,7 @@ ToDo
 
 Funktionales
 ------------
-* Divi React Dialog: Vereinfachung ausführen & visualisieren
-* Optionen für Handling in Tabellen ergänzen ("+" => sofort übersetzen / nur erstellen, "translate" => sichtbar/nicht sichtbar
-* Option an Post-Types ergänzen mit denen ein Redakteur weitere/erneute Übersetzungen verhindern kann
--> kann nur vom Redakteur, der das Schloss setzte, gelöst werden
-* Test-Matrix dokumentieren (aka: welche Kombinationen von Plugins sollten getestet werden)
-* Test-Vereinfachung ermöglichen mit einfachem Eingabefeld, welches die Eingabe an die aktive API schickt und die Übersetzung danach anzeigt.
-* Keys nur demjenigen anzeigen der sie eingegeben hat. wenn ein anderer nutzer das formular aufruft, den Key nicht anzeigen.
+* bei "zu vereinfachen" auch löschen button einbauen & "alle löschen"
 * Kompatibilität mit Plugins testen
 -> Caching-Plugins
 -> Order-Plugins
@@ -22,3 +16,9 @@ Später:
 * Vereinfachungen über eigenes Object erfassen und ausgeben
 * Vereinfachung per REST API statt AJAX-Request durchführen
 * sprachspezifische Suche im Frontend
+* Optionen für Handling in Tabellen ergänzen ("+" => sofort übersetzen / nur erstellen, "translate" => sichtbar/nicht sichtbar
+* Option an Post-Types ergänzen mit denen ein Redakteur weitere/erneute Übersetzungen verhindern kann
+-> kann nur vom Redakteur, der das Schloss setzte, gelöst werden
+* Test-Matrix dokumentieren (aka: welche Kombinationen von Plugins sollten getestet werden)
+* Test-Vereinfachung ermöglichen mit einfachem Eingabefeld, welches die Eingabe an die aktive API schickt und die Übersetzung danach anzeigt.
+* Keys nur demjenigen anzeigen der sie eingegeben hat. wenn ein anderer nutzer das formular aufruft, den Key nicht anzeigen.

@@ -5,10 +5,10 @@ msgstr ""
 "Project-Id-Version: Easy Language @@VersionNumber@@\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/easy-language\n"
 "POT-Creation-Date: 2023-11-07T15:12:20+01:00\n"
-"PO-Revision-Date: 2023-11-07 15:12+0100\n"
+"PO-Revision-Date: 2023-11-07 15:22+0100\n"
 "Last-Translator: Thomas Zwirner <info@thomaszwirner.de>\n"
 "Language-Team: \n"
-"Language: de_DE\n"
+"Language: de_AT\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -48,7 +48,7 @@ msgstr "Zeichen verbraucht"
 
 #: classes/abstract-base.php:328
 msgid "Rest quota"
-msgstr "Restquote"
+msgstr "Restliches Kontingent"
 
 #. translators: %1$d will be replaced by the link to Capito
 #: classes/apis/capito/class-capito.php:142
@@ -108,7 +108,7 @@ msgstr "Deutsch"
 #: classes/apis/capito/class-capito.php:189
 #: classes/apis/chatgpt/class-chatgpt.php:170
 msgid "Informal german spoken in germany."
-msgstr "Informelles Deutsch, wie es in Deutschland gesprochen wird."
+msgstr "Informelles Deutsch, das in Deutschland gesprochen wird."
 
 #: classes/apis/capito/class-capito.php:193
 #: classes/apis/chatgpt/class-chatgpt.php:174
@@ -118,7 +118,7 @@ msgstr "Deutsch (CH)"
 #: classes/apis/capito/class-capito.php:195
 #: classes/apis/chatgpt/class-chatgpt.php:176
 msgid "Informal german spoken in suisse."
-msgstr "In der Schweiz wird informelles Deutsch gesprochen."
+msgstr "Informelles Deutsch, das in der Schweiz gesprochen wird."
 
 #: classes/apis/capito/class-capito.php:199
 #: classes/apis/chatgpt/class-chatgpt.php:180
@@ -610,15 +610,15 @@ msgid ""
 "check the <a href=\"%1$s\">API-settings</a>, select one and start "
 "simplifying the texts in your website in easy or plain language."
 msgstr ""
-"<strong>Sie haben Easy Language installiert - schön und danke!</strong> "
-"Prüfen Sie nun die <a href=\"%1$s\">Einstellungen</a>, wählen Sie eine API "
-"aus und beginnen Sie damit, die Texte auf Ihrer Website in leichter oder "
-"einfacher Sprache zu vereinfachen."
+"<strong>Sie haben Easy Language installiert - sehr schön und danke!</strong> "
+"Gehen Sie nun zu den <a href=\"%1$s\">Einstellungen</a>, wählen Sie eine API "
+"aus und beginnen Sie mit der Vereinfachung von Texten in Ihrer Website in "
+"Einfacher oder Leichter Sprache."
 
 #. translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name
 #: classes/class-helper.php:420
 msgid "Show this %1$s in %2$s "
-msgstr "Übersetzen Sie über %1$s "
+msgstr "Zeige diese %1$s über %2$s "
 
 #. translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name
 #: classes/class-helper.php:431
@@ -1015,7 +1015,7 @@ msgstr "Vereinfachen mit %1$s"
 #: classes/multilingual-plugins/easy-language/class-init.php:405
 #: classes/multilingual-plugins/easy-language/class-init.php:1285
 msgid "Just add %1$s"
-msgstr "Einfach %1$s erstellen"
+msgstr "Nur %1$s erstellen"
 
 #. translators: %1$s will be replaced by the object-type-name (e.g. post or page), %2$s will be replaced by the object-title
 #: classes/multilingual-plugins/easy-language/class-init.php:417
@@ -1118,7 +1118,7 @@ msgstr ""
 
 #: classes/multilingual-plugins/easy-language/class-init.php:1057
 msgid "Generate permalink for translated objects"
-msgstr "Generieren Permalink für vereinfachte Objekte"
+msgstr "Generiere Permalink für vereinfachte Objekte"
 
 #: classes/multilingual-plugins/easy-language/class-init.php:1064
 msgid ""
@@ -1213,11 +1213,11 @@ msgstr "Filter für Leichte Sprache"
 
 #: classes/multilingual-plugins/easy-language/class-init.php:1352
 msgid "show translated content"
-msgstr "Zeige Inhalt an"
+msgstr "vereinfachten Inhalt anzeigen"
 
 #: classes/multilingual-plugins/easy-language/class-init.php:1353
 msgid "show not translated content"
-msgstr "Zeige Inhalt an"
+msgstr "nicht vereinfachten Inhalt anzeigen"
 
 #: classes/multilingual-plugins/easy-language/class-init.php:1354
 msgid "show changed content"
@@ -1259,7 +1259,7 @@ msgstr ""
 
 #: classes/multilingual-plugins/easy-language/class-init.php:1652
 msgid "Faulty simplification request!"
-msgstr "Fehlerhafter Anfrage zu Vereinfachung"
+msgstr "Fehlerhafter Anfrage zu Vereinfachung!"
 
 #. translators: %1$s will be replaced by the path to the easy language icon
 #: classes/multilingual-plugins/easy-language/class-init.php:1756
@@ -1456,9 +1456,7 @@ msgstr ""
 #. translators: %1$s will be replaced by the URL for API-settings
 #: classes/multilingual-plugins/easy-language/class-rest-api.php:219
 msgid "Choose an API"
-msgstr ""
-"Bitte wählen Sie die API aus, die Sie zum Übersetzen Ihrer Website verwenden "
-"möchten."
+msgstr "API wählen"
 
 #. translators: %1$s will be replaced by the API-title
 #: classes/multilingual-plugins/easy-language/class-rest-api.php:232
@@ -1765,7 +1763,9 @@ msgstr "Hinweis"
 #: inc/settings/advanced.php:173 inc/settings/advanced.php:205
 msgid ""
 "After click on this button the intro for this plugin will be re-initialized."
-msgstr "Nach Klick auf den Button wird das Intro zum Plugin re-initalisiert."
+msgstr ""
+"Nach einem Klick auf diese Schaltfläche wird das Intro für dieses Plugin neu "
+"initialisiert."
 
 #: inc/settings/advanced.php:187
 msgid "Do you really want to delete all simplifications?"
@@ -1921,7 +1921,7 @@ msgstr "Neues Icon auswählen"
 
 #: admin/js.js:82
 msgid "Use this icon"
-msgstr "Dieses Symbol verwenden"
+msgstr "Dieses Icon verwenden"
 
 #: admin/js.js:106
 msgid "Icon successfully replaced."
@@ -2073,6 +2073,11 @@ msgctxt "block description"
 msgid "Provides a Block for Language Switcher."
 msgstr "Bietet einen Block für die Sprachumschaltung."
 
+#, fuzzy
+#~| msgid "Choose API"
+#~ msgid "Choose an API</a></p>"
+#~ msgstr "API wählen"
+
 #~ msgid "<p><strong>Unlimited quota</strong></p>"
 #~ msgstr "<p><strong>Unbegrenztes Kontingent</strong></p>"
 
@@ -2223,6 +2228,28 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 #~ msgid "Add translation in %s"
 #~ msgstr "Übersetzung in %1$s hinzufügen"
 
+#~ msgid "Edit translation in %1$s"
+#~ msgstr "Übersetzung in %1$s bearbeiten"
+
+#~ msgid "Delete translation in %1$s"
+#~ msgstr "Übersetzung in %1$s löschen"
+
+#~ msgid "Automatic translation of each text."
+#~ msgstr "Automatische Übersetzung der einzelnen Texte."
+
+#~ msgid ""
+#~ "Each for translation requested text will be translated automatic in the "
+#~ "intervall set below. Be aware that this is not an automatic "
+#~ "simplification in frontend initiated through the visitor."
+#~ msgstr ""
+#~ "Jeder für die Übersetzung angeforderte Text wird automatisch im unten "
+#~ "eingestellten Intervall übersetzt. Seien Sie sich bewusst, dass dies "
+#~ "nicht eine automatische Vereinfachung im Frontend durch den Besucher "
+#~ "initiiert."
+
+#~ msgid "Choose translation-mode"
+#~ msgstr "Wählen Sie den Übersetzungsmodus"
+
 #~ msgid "No translation-API active."
 #~ msgstr "Keine Übersetzungs-API aktiv."
 
@@ -2254,9 +2281,6 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 #~ msgid "Use your own API Key with Easy Language Pro"
 #~ msgstr "Verwende deinen eigenen API Key mit Easy Language Pro"
 
-#~ msgid "Choose API for translations"
-#~ msgstr "Wählen Sie eine API für Übersetzungen"
-
 #~ msgid ""
 #~ "<strong>Your quota for the ChatGpt API is completely depleted.</strong> "
 #~ "You will not be able to use any simplifications from ChatGpt. Please "
@@ -2278,26 +2302,6 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 #~ "verwendet.</strong> Bitte wenden Sie sich an den <a href=\"%1$s\" "
 #~ "target=\"_blank\">ChatGpt support (öffnet neues Fenster)</a> um das "
 #~ "Kontingent zu erhöhen."
-
-#~ msgid ""
-#~ "<p>Mit dem <a href=\"%1$s\" target=\"_blank\"><strong>SUMM AI</strong> "
-#~ "(öffnet neues Fenster)</a> KI-basierten Tool jeden komplizierten Text "
-#~ "barrierefrei und verständlich machen.<br>Erzeuge einfache und leicht "
-#~ "verständliche Texte in deiner Webseite.</p><p>Diese API vereinfacht Texte "
-#~ "nach den offiziellen Regeln des Leichte Sprache e.V.<br>Diese gibt vor "
-#~ "wie Texte in Leichter Sprache geschrieben sein müssen.</p><p><strong>Mit "
-#~ "dem kostenfreien Easy Language-Plugin steht dir ein Kontingent von %2$d "
-#~ "Zeichen für Text-Vereinfachungen zur Verfügung.</strong></p>"
-#~ msgstr ""
-#~ "<p>Mit dem <a href=\"%1$s\" target=\"_blank\"><strong>SUMM AI</strong> "
-#~ "(öffnet neues Fenster)</a> KI-basierten Tool jeden komplizierten Text "
-#~ "barrierefrei und verständlich machen.<br>Erzeuge einfache und leicht "
-#~ "verständliche Texte in deiner Webseite.</p><p>Diese API vereinfacht Texte "
-#~ "nach den offiziellen Regeln des Leichte Sprache e.V.<br>Diese gibt vor "
-#~ "wie Texte in Leichter Sprache geschrieben werden müssen.</"
-#~ "p><p><strong>Mit dem kostenfreien Easy Language-Plugin steht dir ein "
-#~ "Kontingent von %2$d Zeichen für Text-Vereinfachungen zur Verfügung.</"
-#~ "strong></p>"
 
 #~ msgid ""
 #~ "<p>The Capito API allows you to automatically translate the entire "
@@ -2332,7 +2336,7 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 #~ "Kontingent:</strong> %5$d</strong></p>"
 
 #~ msgid "Translate this term in %1$s with %2$s"
-#~ msgstr "Übersetzen Sie diesen Begriff in %1$s mit %2$s"
+#~ msgstr "Übersetze diesen Term in %1$s mit %2$s"
 
 #~ msgid "Translate page"
 #~ msgstr "Übersetze diese Seite"
@@ -2374,5 +2378,5 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 #~ "You can get the SUMM AI API Key from the provider <a href=\"%1$s\" "
 #~ "target=\"_blank\">here</a>."
 #~ msgstr ""
-#~ "Sie können den SUMM AI API-Schlüssel vom Anbieter <a href=\"%1$s\" "
+#~ "Du kannst den SUMM AI API-Schlüssel vom Anbieter <a href=\"%1$s\" "
 #~ "target=\"_blank\">hier</a> erhalten."

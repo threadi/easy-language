@@ -33,6 +33,7 @@ function easy_language_reset_processing_simplification( object_id, type ) {
 			data: {
 				'action': 'easy_language_reset_processing_simplification',
 				'post': object_id,
+				'type': type,
 				'nonce': easyLanguageSimplificationJsVars.reset_processing_simplification_nonce
 			},
 			success: function() {
@@ -91,8 +92,33 @@ function easy_language_add_simplification_object( object_id, type, language, sim
 				'nonce': easyLanguageSimplificationJsVars.add_simplification_nonce
 			},
 			success: function(data) {
-				if( 'ok' === data.status && "auto" === simplification_mode ) {
+				if( 'ok' === data.status && "auto" === simplification_mode && "ok" === data.quota_state.status ) {
 					easy_language_get_simplification( data.object_id, data.object_type, false );
+				}
+				else if( 'ok' === data.status && "auto" === simplification_mode && "above_entry_limit" === data.quota_state.status ) {
+					let dialog_config = {
+						detail: {
+							/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
+							title: __('%1$s ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
+							texts: [
+								/* translators: %1$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the API-title */
+								'<p>' + __( 'To many text-widgets in this %1$s for adhoc simplification with %2$s.', 'easy-language' ).replace("%1$s", data.object_type_name).replace("%2$s", data.api_title) + '</p>'
+							],
+							buttons: [
+								{
+									'action': 'location.href="' + data.edit_link + '";',
+									'variant': 'primary',
+									/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
+									'text': __('Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
+								},
+								{
+									'action': 'location.reload();',
+									'text': __('Cancel', 'easy-language')
+								}
+							]
+						}
+					}
+					easy_language_create_dialog( dialog_config );
 				}
 				else if( 'ok' === data.status && "manually" === simplification_mode ) {
 					// create dialog.
@@ -131,7 +157,7 @@ function easy_language_add_simplification_object( object_id, type, language, sim
 						dialog_config = {
 							detail: {
 								/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
-								title: __('%1$s ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
+								title: __('<i>%1$s</i> is ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
 								texts: [
 									/* translators: %1$s and %4$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title, %3$s will be replaced by the language-name */
 									__('<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.</p>', 'easy-language').replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language).replace('%4$s', data.object_type_name)

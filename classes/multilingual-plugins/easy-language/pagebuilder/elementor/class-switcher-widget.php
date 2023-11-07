@@ -5,11 +5,10 @@
  * @package easy-language
  */
 
-namespace easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor;
+namespace easyLanguage\Multilingual_plugins\Easy_Language\PageBuilder\Elementor;
 
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
-use Exception;
 
 /**
  * Object to handle the language switcher-widget.
@@ -17,17 +16,6 @@ use Exception;
  * @noinspection PhpUnused
  */
 class Switcher_Widget extends Widget_Base {
-	/**
-	 * Class constructor.
-	 *
-	 * @param array $data Widget data.
-	 * @param array $args Widget arguments.
-	 * @throws Exception possible throw exception
-	 */
-	public function __construct( $data = array(), $args = null ) {
-		parent::__construct( $data, $args );
-	}
-
 	/**
 	 * Retrieve the widget name.
 	 *

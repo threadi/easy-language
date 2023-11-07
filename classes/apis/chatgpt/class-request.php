@@ -229,7 +229,7 @@ class Request {
 		// secure end-time.
 		$end_time = microtime( true );
 
-		// save duration
+		// save duration.
 		$this->duration = $end_time - $start_time;
 
 		// secure response.
@@ -295,11 +295,11 @@ class Request {
 	/**
 	 * Set target-language for this request.
 	 *
-	 * @param $lang
+	 * @param string $lang The target language.
 	 *
 	 * @return void
 	 */
-	public function set_target_language( $lang ): void {
+	public function set_target_language( string $lang ): void {
 		$this->target_language = $lang;
 	}
 
@@ -315,7 +315,7 @@ class Request {
 	/**
 	 * Set source-language for this request.
 	 *
-	 * @param string $lang The source language as string (e.g. "de_EL")
+	 * @param string $lang The source language as string (e.g. "de_EL").
 	 *
 	 * @return void
 	 */
@@ -332,7 +332,7 @@ class Request {
 		// save the text in db and return the resulting text-object.
 		$query = array(
 			'time'       => gmdate( 'Y-m-d H:i:s' ),
-			'request'    => serialize( $this->get_request() ),
+			'request'    => wp_json_encode( $this->get_request() ),
 			'response'   => $this->get_response(),
 			'duration'   => $this->duration,
 			'httpstatus' => $this->get_http_status(),
@@ -373,11 +373,11 @@ class Request {
 	/**
 	 * Set method for the request.
 	 *
-	 * @param string $string
+	 * @param string $method The method (POST or GET).
 	 *
 	 * @return void
 	 */
-	public function set_method( string $string ): void {
-		$this->method = $string;
+	public function set_method( string $method ): void {
+		$this->method = $method;
 	}
 }

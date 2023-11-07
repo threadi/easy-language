@@ -80,11 +80,6 @@ class Pagebuilder_Support {
 	 * @return void
 	 */
 	public function add_meta_box( string $post_type ): void {
-		// bail if support for our own languages is handled by other multilingual plugin.
-		if ( Multilingual_Plugins::get_instance()->is_plugin_with_support_for_given_languages_enabled( $this->init->get_supported_languages() ) ) {
-			return;
-		}
-
 		// only for supported post-types.
 		$post_types = Init::get_instance()->get_supported_post_types();
 		if ( ! empty( $post_types[ $post_type ] ) ) {

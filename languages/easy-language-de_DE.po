@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Easy Language @@VersionNumber@@\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/easy-language\n"
-"POT-Creation-Date: 2023-11-05T15:31:04+01:00\n"
-"PO-Revision-Date: 2023-11-05 15:31+0100\n"
+"POT-Creation-Date: 2023-11-07T15:12:20+01:00\n"
+"PO-Revision-Date: 2023-11-07 15:12+0100\n"
 "Last-Translator: Thomas Zwirner <info@thomaszwirner.de>\n"
 "Language-Team: \n"
 "Language: de_DE\n"
@@ -13,14 +13,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.3.2\n"
 "X-Domain: easy-language\n"
 
 #. Plugin Name of the plugin
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:140
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:197
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:212
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher-widget.php:64
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:157
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:214
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:228
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:53
 msgid "Easy Language"
 msgstr "Easy Language - Einfache und Leichte Sprache"
 
@@ -37,6 +37,18 @@ msgstr "laOlaWeb"
 #. Author URI of the plugin
 msgid "https://laolaweb.com"
 msgstr "https://laolaweb.com"
+
+#: classes/abstract-base.php:326 classes/apis/capito/class-capito.php:594
+msgid "Quota"
+msgstr "Kontingent"
+
+#: classes/abstract-base.php:327
+msgid "Character spent"
+msgstr "Zeichen verbraucht"
+
+#: classes/abstract-base.php:328
+msgid "Rest quota"
+msgstr "Restliches Kontingent"
 
 #. translators: %1$d will be replaced by the link to Capito
 #: classes/apis/capito/class-capito.php:142
@@ -68,8 +80,8 @@ msgstr ""
 "strong> %3$d</strong></p>"
 
 #: classes/apis/capito/class-capito.php:147
-msgid "<p><strong>Unlimited quota</strong></p>"
-msgstr "<p><strong>Unbegrenztes Kontingent</strong></p>"
+msgid "Unlimited quota"
+msgstr "Unbegrenztes Kontingent"
 
 #: classes/apis/capito/class-capito.php:149
 msgid ""
@@ -199,10 +211,6 @@ msgstr "Jetzt aktuelles Kontingent abrufen."
 msgid "Unlimited."
 msgstr "Unbegrenzt."
 
-#: classes/apis/capito/class-capito.php:594 classes/class-base.php:326
-msgid "Quota"
-msgstr "Kontingent"
-
 #: classes/apis/capito/class-capito.php:595
 msgid "Update now"
 msgstr "Aktualisiere jetzt"
@@ -222,13 +230,13 @@ msgstr "Capito Einstellungen"
 msgid ""
 "Get your Capito API Token <a href=\"%1$s\" target=\"_blank\">here (opens new "
 "window)</a>.<br>If you have any questions about the token provided by "
-"Capito, please contact their support: <a href=\"%1$s\" target=\"_blank\">"
-"%1$s (opens new window)</a>"
+"Capito, please contact their support: <a href=\"%1$s\" "
+"target=\"_blank\">%1$s (opens new window)</a>"
 msgstr ""
 "Hole dir einen Capito API Token <a href=\"%1$s\" target=\"_blank\">hier "
 "(öffnet neues Fenster)</a>.<br>Wenn Sie Fragen zu dem von Capito "
-"bereitgestellten Token haben, wenden Sie sich bitte an den Support: <a href="
-"\"%1$s\" target=\"_blank\">%1$s (öffnet neues Fenster)</a>"
+"bereitgestellten Token haben, wenden Sie sich bitte an den Support: <a "
+"href=\"%1$s\" target=\"_blank\">%1$s (öffnet neues Fenster)</a>"
 
 #. translators: %1$s will be replaced by the Capito URL
 #: classes/apis/capito/class-capito.php:645
@@ -298,22 +306,22 @@ msgstr ""
 "Texten über die Capito API wurden deaktiviert."
 
 #. translators: %1$s is replaced by the URL for the API-log
-#: classes/apis/capito/class-capito.php:837
-#: classes/apis/capito/class-capito.php:1106
+#: classes/apis/capito/class-capito.php:836
+#: classes/apis/capito/class-capito.php:1103
 msgid ""
-"<strong>Token could not be verified.</strong> Please take a look <a href="
-"\"%1$s\">in the log</a> to check the reason."
+"<strong>Token could not be verified.</strong> Please take a look <a "
+"href=\"%1$s\">in the log</a> to check the reason."
 msgstr ""
 "<strong>Der Token konnte nicht verifiziert werden.</strong> Bitte werfen Sie "
 "einen Blick in das <a href=\"%1$s\">API Log</a>, um den Grund zu überprüfen."
 
-#: classes/apis/capito/class-capito.php:867
-#: classes/apis/chatgpt/class-chatgpt.php:721
+#: classes/apis/capito/class-capito.php:865
+#: classes/apis/chatgpt/class-chatgpt.php:719
 msgid "You have to set a target-language for simplifications."
 msgstr "Sie müssen eine Zielsprache für Vereinfachungen festlegen."
 
-#: classes/apis/capito/class-capito.php:869
-#: classes/apis/chatgpt/class-chatgpt.php:723
+#: classes/apis/capito/class-capito.php:867
+#: classes/apis/chatgpt/class-chatgpt.php:721
 msgid ""
 "At least one language cannot (currently) be translated into the selected "
 "target languages by the API."
@@ -322,7 +330,7 @@ msgstr ""
 "Zielsprachen vereinfacht werden."
 
 #. translators: %1$s will be replaced by the URL for Capito support.
-#: classes/apis/capito/class-capito.php:975
+#: classes/apis/capito/class-capito.php:973
 msgid ""
 "<strong>Your quota for the Capito API is completely depleted.</strong> You "
 "will not be able to use any simplifications from Capito. Please contact the "
@@ -335,22 +343,22 @@ msgstr ""
 "neues Fenster)</a> um das Kontingent zu erhöhen."
 
 #. translators: %1$s will be replaced by the URL for Capito support.
-#: classes/apis/capito/class-capito.php:984
+#: classes/apis/capito/class-capito.php:982
 msgid ""
 "<strong>More than 80%% of your quota for the Capito API has already been "
 "used.</strong> Please contact the <a href=\"%1$s\" target=\"_blank\">Capito "
 "support (opens new window)</a> about extending the quota."
 msgstr ""
 "<strong>Mehr als 80% des Kontingents für die Capito API wurden bereits "
-"verwendet.</strong> Bitte wenden Sie sich an den <a href=\"%1$s\" target="
-"\"_blank\">Capito support (öffnet neues Fenster)</a> um das Kontingent zu "
-"erhöhen."
+"verwendet.</strong> Bitte wenden Sie sich an den <a href=\"%1$s\" "
+"target=\"_blank\">Capito support (öffnet neues Fenster)</a> um das "
+"Kontingent zu erhöhen."
 
-#: classes/apis/capito/class-capito.php:1100
+#: classes/apis/capito/class-capito.php:1098
 msgid "Token could be successfully verified."
 msgstr "Token erfolgreich verifiziert."
 
-#: classes/apis/capito/class-capito.php:1113
+#: classes/apis/capito/class-capito.php:1109
 msgid "Token missing."
 msgstr "Token fehlt."
 
@@ -385,7 +393,7 @@ msgid "Einfache Sprache"
 msgstr "Einfache Sprache"
 
 #: classes/apis/chatgpt/class-chatgpt.php:199
-#: classes/apis/summ-ai/class-summ-ai.php:215
+#: classes/apis/summ-ai/class-summ-ai.php:215 classes/class-languages.php:131
 msgid "The Einfache Sprache used in Germany, Suisse and Austria."
 msgstr ""
 "Die Einfache Sprache, wie sie in Deutschland, Schweiz und Österreich "
@@ -398,7 +406,7 @@ msgid "Leichte Sprache"
 msgstr "Leichte Sprache"
 
 #: classes/apis/chatgpt/class-chatgpt.php:209
-#: classes/apis/summ-ai/class-summ-ai.php:225
+#: classes/apis/summ-ai/class-summ-ai.php:225 classes/class-languages.php:140
 #: doc/api-base/class-your-api.php:121
 msgid "The Leichte Sprache used in Germany, Suisse and Austria."
 msgstr ""
@@ -418,13 +426,13 @@ msgstr "ChatGpt Einstellungen"
 msgid ""
 "Get your ChatGpt API Token <a href=\"%1$s\" target=\"_blank\">here (opens "
 "new window)</a>.<br>If you have any questions about the token provided by "
-"ChatGpt, please contact their support: <a href=\"%1$s\" target=\"_blank\">"
-"%1$s (opens new window)</a>"
+"ChatGpt, please contact their support: <a href=\"%1$s\" "
+"target=\"_blank\">%1$s (opens new window)</a>"
 msgstr ""
 "Hole dir einen ChatGpt API Token <a href=\"%1$s\" target=\"_blank\">hier "
 "(öffnet neues Fenster)</a>.<br>Wenn Sie Fragen zu dem von ChatGpt "
-"bereitgestellten Token haben, wenden Sie sich bitte an den Support: <a href="
-"\"%1$s\" target=\"_blank\">%1$s (öffnet neues Fenster)</a>"
+"bereitgestellten Token haben, wenden Sie sich bitte an den Support: <a "
+"href=\"%1$s\" target=\"_blank\">%1$s (öffnet neues Fenster)</a>"
 
 #. translators: %1$s will be replaced by the Chatgpt URL
 #: classes/apis/chatgpt/class-chatgpt.php:358
@@ -573,38 +581,30 @@ msgstr ""
 "für Text-Vereinfachungen zur Verfügung.</strong></p>"
 
 #. translators: %1$s will be replaced by the link to laolaweb.com
-#: classes/apis/summ-ai/class-summ-ai.php:525
+#: classes/apis/summ-ai/class-summ-ai.php:537
 msgid ""
 "Get more quota with <a href=\"%1$s\" target=\"_blank\" title=\"link opens "
-"new window\">Easy Language Pro</a> and custom <a href=\"%2$s\" target="
-"\"_blank\">SUMM AI API Key</a>"
+"new window\">Easy Language Pro</a> and custom <a href=\"%2$s\" "
+"target=\"_blank\">SUMM AI API Key</a>"
 msgstr ""
 "Mehr Kontingent mit <a href=\"%1$s\" target=\"_blank\" title=\"link opens "
-"new window\">Easy Language Pro</a> & individuellem <a href=\"%2$s\" target="
-"\"_blank\">SUMM AI API Key</a>"
+"new window\">Easy Language Pro</a> & individuellem <a href=\"%2$s\" "
+"target=\"_blank\">SUMM AI API Key</a>"
 
-#: classes/class-apis.php:113
+#: classes/class-apis.php:111
 msgid "Date"
 msgstr "Datum"
 
-#: classes/class-apis.php:114
+#: classes/class-apis.php:112
 msgid "Request"
 msgstr "Anfrage"
 
-#: classes/class-apis.php:115
+#: classes/class-apis.php:113
 msgid "Response"
 msgstr "Antwort"
 
-#: classes/class-base.php:327
-msgid "Character spent"
-msgstr "Zeichen verbraucht"
-
-#: classes/class-base.php:328
-msgid "Rest quota"
-msgstr "Restliches Kontingent"
-
 #. translators: %1$s will be replaced by the URL for api settings-URL.
-#: classes/class-helper.php:410
+#: classes/class-helper.php:401
 msgid ""
 "<strong>You have installed Easy Language - nice and thank you!</strong> Now "
 "check the <a href=\"%1$s\">API-settings</a>, select one and start "
@@ -616,12 +616,12 @@ msgstr ""
 "Einfacher oder Leichter Sprache."
 
 #. translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name
-#: classes/class-helper.php:429
+#: classes/class-helper.php:420
 msgid "Show this %1$s in %2$s "
 msgstr "Zeige diese %1$s über %2$s "
 
 #. translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name
-#: classes/class-helper.php:440
+#: classes/class-helper.php:431
 msgid "Create a simplification of this %1$s in %2$s "
 msgstr "Vereinfachung in %1$s löschen "
 
@@ -664,24 +664,24 @@ msgstr "Seite"
 msgid "pages"
 msgstr "Seiten"
 
-#: classes/class-install.php:162
+#: classes/class-install.php:161
 msgid "Editor for Easy Language"
 msgstr "Redakteur für Leichte Sprache"
 
-#: classes/class-language-icons-table.php:53
-#: classes/multilingual-plugins/easy-language/class-pagebuilder-support.php:95
+#: classes/class-language-icons-table.php:30
+#: classes/multilingual-plugins/easy-language/class-pagebuilder-support.php:94
 msgid "Language"
 msgstr "Sprache"
 
-#: classes/class-language-icons-table.php:54
+#: classes/class-language-icons-table.php:31
 msgid "Icon"
 msgstr "Icon"
 
-#: classes/class-language-icons-table.php:121
+#: classes/class-language-icons-table.php:98
 msgid "Replace"
 msgstr "Ersetzen"
 
-#: classes/class-language-icons-table.php:137
+#: classes/class-language-icons-table.php:114
 msgid "No icons found."
 msgstr "Keine Icons gefunden."
 
@@ -701,39 +701,39 @@ msgstr "Deutsch (Schweiz)"
 msgid "German (Suisse, informal)"
 msgstr "Deutsch (Schweiz, informell)"
 
-#: classes/class-log-api-table.php:61
+#: classes/class-log-api-table.php:52
 msgid "state"
 msgstr "Status"
 
-#: classes/class-log-api-table.php:62
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:41
+#: classes/class-log-api-table.php:53
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:32
 #: classes/multilingual-plugins/easy-language/class-texts-table.php:75
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:39
 msgid "date"
 msgstr "Datum"
 
-#: classes/class-log-api-table.php:63 inc/settings/settings.php:51
+#: classes/class-log-api-table.php:54 inc/settings/settings.php:51
 msgid "API"
 msgstr "API"
 
-#: classes/class-log-api-table.php:64
+#: classes/class-log-api-table.php:55
 msgid "request"
 msgstr "Anfrage"
 
-#: classes/class-log-api-table.php:65
+#: classes/class-log-api-table.php:56
 msgid "response"
 msgstr "Antwort"
 
-#: classes/class-log-api-table.php:175
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:238
+#: classes/class-log-api-table.php:171
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:235
 msgid "All"
 msgstr "Alle"
 
-#: classes/class-log-api-table.php:221 classes/class-log-api-table.php:224
+#: classes/class-log-api-table.php:217 classes/class-log-api-table.php:221
 msgid "Export as CSV"
 msgstr "Export als CSV"
 
-#: classes/class-log-api-table.php:224
+#: classes/class-log-api-table.php:221
 msgid "Choose an API to export above"
 msgstr "Wähle eine API oben für den Export aus"
 
@@ -746,63 +746,225 @@ msgstr "Verstecke diese Nachricht für %1$d Tage."
 msgid "Dismiss"
 msgstr "Ausblenden"
 
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:168
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:205
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:250
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:316
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:342
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:490
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:558
+msgid "Simplification canceled"
+msgstr "Vereinfachung abgebrochen"
+
+#. translators: %1$s will be replaced by the object-title
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:171
+msgid "Simplification for <i>%1$s</i> is already running."
+msgstr "Die Vereinfachung für <i>%1$s</i> läuft bereits."
+
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:177
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:499
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:566
+#: classes/multilingual-plugins/easy-language/class-init.php:1530
+#: classes/multilingual-plugins/easy-language/class-init.php:1561
+#: classes/multilingual-plugins/easy-language/class-init.php:1623
+#: classes/multilingual-plugins/easy-language/class-init.php:1658
+#: admin/js.js:55
+msgid "OK"
+msgstr "OK"
+
+#. translators: %1$s will be replaced by the object-title
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:208
+msgid ""
+"A previously running simplification of texts of this %1$s failed. How do you "
+"want to deal with it?"
+msgstr ""
+"Eine zuvor durchgeführte Vereinfachung von Texten dieser %1$s ist "
+"fehlgeschlagen. Wie wollen Sie damit umgehen?"
+
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:214
+msgid "Run simplification again"
+msgstr "Vereinfachung erneut durchführen"
+
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:219
+msgid "Ignore the failed simplifications"
+msgstr "Fehlgeschlagene Vereinfachungen ignorieren"
+
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:223
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:268
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:334
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:360
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:419
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:547
+#: classes/multilingual-plugins/easy-language/class-init.php:409
+#: classes/multilingual-plugins/easy-language/class-init.php:1289
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:124
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:148
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#. translators: %1$s will be replaced by the object-title (like page or post), %2$s will be replaced by the API-title
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:253
+msgid ""
+"The %1$s contains more text widgets than the API %2$s could handle in a "
+"short time.<br>The texts will be automatically simplified in the background."
+msgstr ""
+"Die %1$s enthält mehr Text-Widgets, als die API %2$s in kurzer Zeit "
+"verarbeiten kann.<br>Die Texte werden im Hintergrund automatisch vereinfacht."
+
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:259
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:325
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:351
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:409
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:537
+msgid "Show in frontend"
+msgstr "Website anzeigen"
+
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:264
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:330
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:356
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:414
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:542
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#. translators: %1$s will be replaced by the object-title (like page or post), %2$s will be replaced by the API-title
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:274
+msgid ""
+"The %1$s contains more text widgets than the API %2$s could handle in a "
+"short time.<br>The texts could be automatically simplified in the background "
+"if you enable this on the page settings."
+msgstr ""
+"Die %1$s enthält mehr Text-Widgets, als die API %2$s in kurzer Zeit "
+"verarbeiten kann.<br>Die Texte können automatisch im Hintergrund vereinfacht "
+"werden, wenn Sie dies in den Seiteneinstellungen aktivieren."
+
+#. translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:319
+msgid ""
+"<strong>The texts in this %1$s are already simplified.</strong><br>%2$s was "
+"not used. Nothing has been changed."
+msgstr ""
+"<strong>Die Texte in dieser %1$s sind bereits vereinfacht.</strong><br>%2$s "
+"wurde nicht verwendet. Es wurde nichts geändert."
+
+#. translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:345
+msgid ""
+"<strong>Some texts in this %1$s are already simplified.</strong><br>Other "
+"missing simplifications has been run via %2$s and are insert into the text."
+msgstr ""
+"<strong>Einige Texte in diesem %1$s sind bereits vereinfacht.</"
+"strong><br>Weitere fehlende Vereinfachungen wurden über %2$s durchgeführt "
+"und in den Text eingefügt."
+
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:400
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:528
+msgid "Simplification processed"
+msgstr "Vereinfachungen abgeschlossen"
+
+#. translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:403
+msgid ""
+"<strong>Simplifications have been returned from %2$s.</strong><br>They were "
+"inserted into the %1$s."
+msgstr ""
+"<strong>Vereinfachungen der Texte wurden von %2$s zurückgegeben.</"
+"strong><br>Sie wurden in die %1$s eingefügt."
+
+#. translators: %1$s will be replaced by the URL for the API-log in plugin-settings
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:493
+msgid ""
+"<strong>No simplifications get from API.</strong><br>Please check the <a "
+"href=\"%1$s\">API-log</a> for errors."
+msgstr ""
+"<strong>Keine Vereinfachungen von der API zurückgegeben.</strong><br>Bitte "
+"prüfen Sie das <a href=\"%1$s\">API-Log</a> auf Fehler."
+
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:504
+msgid ""
+"<strong>No simplifications get from API.</strong><br>Please consult an "
+"administrator to check the API-log."
+msgstr ""
+"<strong>Von der API werden keine Vereinfachungen zurückgegeben.</"
+"strong><br>Bitte sprich einen Administrator darauf an das API-Log zu prüfen."
+
+#. translators: %1$s will be replaced by the object-title (like post or page)
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:531
+msgid ""
+"The texts are already simplified local.<br><strong>We did not use the API to "
+"simplify them again.</strong><br>The texts in this %1$s are replaced with "
+"its local available simplification."
+msgstr ""
+"Die Texte sind bereits lokal vereinfacht.<br><strong>Wir haben die API nicht "
+"verwendet, um sie erneut zu vereinfachen.</strong><br>Die Texte in diesem "
+"%1$s werden durch ihre lokal verfügbare Vereinfachung ersetzt."
+
+#: classes/multilingual-plugins/easy-language/abstract-objects.php:560
+msgid ""
+"We got simplified texts from API but does not replace any texts. This might "
+"be an error with the pagebuilder-support of the Easy Language plugin."
+msgstr ""
+"Wir haben vereinfachte Texte von der API erhalten, aber es werden keine "
+"Texte ersetzt. Dies könnte ein Fehler mit der Pagebuilder-Unterstützung des "
+"Easy Language Plugins sein."
+
 #: classes/multilingual-plugins/easy-language/class-init.php:219
 msgid "Used simplification"
 msgstr "Verwendete Vereinfachung"
 
 #. translators: %1$s will be replaced by the name of the PageBuilder (like Elementor)
-#: classes/multilingual-plugins/easy-language/class-init.php:282
-#: classes/multilingual-plugins/easy-language/class-init.php:442
-#: classes/multilingual-plugins/easy-language/class-init.php:1263
+#: classes/multilingual-plugins/easy-language/class-init.php:279
+#: classes/multilingual-plugins/easy-language/class-init.php:436
+#: classes/multilingual-plugins/easy-language/class-init.php:1254
 msgid "Used page builder %1$s not available"
 msgstr "Der verwendete PageBuilder %1$s ist nicht verfügbar"
 
 #. translators: %1$s is the name of the language
-#: classes/multilingual-plugins/easy-language/class-init.php:289
-#: classes/multilingual-plugins/easy-language/class-init.php:342
+#: classes/multilingual-plugins/easy-language/class-init.php:286
+#: classes/multilingual-plugins/easy-language/class-init.php:339
 msgid "Delete simplification in %1$s."
 msgstr "Vereinfachung in %1$s löschen."
 
 #. translators: %1$s is the name of the language
-#: classes/multilingual-plugins/easy-language/class-init.php:299
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:352
+#: classes/multilingual-plugins/easy-language/class-init.php:296
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:354
 msgid "Edit simplification in %1$s."
 msgstr "Vereinfachung in %1$s bearbeiten."
 
 #. translators: %1$s is the name of the language, %2$s is the name of the used API, %3$s will be the API-title
-#: classes/multilingual-plugins/easy-language/class-init.php:314
+#: classes/multilingual-plugins/easy-language/class-init.php:311
 msgid "Simplify this %1$s in %2$s with %3$s."
 msgstr "Vereinfache diesen %1$s in %2$s mit %3$s."
 
 #. translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-init.php:318
+#: classes/multilingual-plugins/easy-language/class-init.php:315
 msgid "To many text-widgets in this %1$s for simplification with %2$s."
 msgstr "Zu viele Text-Widgets in diesem %1$s zur Vereinfachung mit %2$s."
 
 #. translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-init.php:322
+#: classes/multilingual-plugins/easy-language/class-init.php:319
 msgid "Not enough quota to simplify this %1$s in %2$s with %3$s."
 msgstr ""
 "Nicht ausreichen Kontingent zum Vereinfachen von %1$s in %2$s mit %3$s "
 "verfügbar."
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-init.php:326
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:285
+#: classes/multilingual-plugins/easy-language/class-init.php:323
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:287
 msgid "API %1$s not configured."
 msgstr "API %1$s nicht konfiguriert."
 
-#: classes/multilingual-plugins/easy-language/class-init.php:334
+#: classes/multilingual-plugins/easy-language/class-init.php:331
 msgid "Show in fronted (opens new window)"
 msgstr "Zeige in Frontend (öffnet neues Fenster)"
 
 #. translators: %1$s will be replaced by the object-title
-#: classes/multilingual-plugins/easy-language/class-init.php:349
+#: classes/multilingual-plugins/easy-language/class-init.php:346
 msgid "Enable automatic simplification?"
 msgstr "Aktiviere automatische Vereinfachung?"
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-init.php:352
+#: classes/multilingual-plugins/easy-language/class-init.php:349
 msgid ""
 "After activation the texts in this object will automatic simplified with the "
 "API %1$s."
@@ -810,31 +972,31 @@ msgstr ""
 "Nach der Aktivierung werden die Texte in diesem Objekt automatisch mit der "
 "API %1$s vereinfacht."
 
-#: classes/multilingual-plugins/easy-language/class-init.php:358
+#: classes/multilingual-plugins/easy-language/class-init.php:355
 msgid "Yes, enable it"
 msgstr "Ja, aktiviere es"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:362
+#: classes/multilingual-plugins/easy-language/class-init.php:360
 msgid "No, let it disabled"
 msgstr "Nein, lass es deaktiviert"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:366
+#: classes/multilingual-plugins/easy-language/class-init.php:364
 msgid "Automatic simplification is prevented"
 msgstr "Automatische Vereinfachung jedes Textes deaktiviert"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:371
+#: classes/multilingual-plugins/easy-language/class-init.php:369
 msgid "Original content has been changed!"
 msgstr "Original-Inhalt hat sich geändert!"
 
 #. translators: %1$s will be replaced by the object-title
-#: classes/multilingual-plugins/easy-language/class-init.php:395
-#: classes/multilingual-plugins/easy-language/class-init.php:1279
+#: classes/multilingual-plugins/easy-language/class-init.php:389
+#: classes/multilingual-plugins/easy-language/class-init.php:1269
 msgid "Add simplification for %1$s"
 msgstr "Vereinfachung in %1$s hinzufügen"
 
 #. translators: %1$s will be replaced by the object-type-name (e.g. post or page), %2$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-init.php:398
-#: classes/multilingual-plugins/easy-language/class-init.php:1282
+#: classes/multilingual-plugins/easy-language/class-init.php:392
+#: classes/multilingual-plugins/easy-language/class-init.php:1272
 msgid ""
 "Please decide how you want to proceed to simplify this %1$s.<br>Note that "
 "the use of the API %2$s may incur costs."
@@ -844,45 +1006,32 @@ msgstr ""
 "verbunden sein kann."
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-init.php:405
-#: classes/multilingual-plugins/easy-language/class-init.php:1289
+#: classes/multilingual-plugins/easy-language/class-init.php:399
+#: classes/multilingual-plugins/easy-language/class-init.php:1279
 msgid "Simplify now via %1$s"
 msgstr "Vereinfachen mit %1$s"
 
 #. translators: %1$s will be replaced by the object-type-name (e.g. post or page)
-#: classes/multilingual-plugins/easy-language/class-init.php:411
-#: classes/multilingual-plugins/easy-language/class-init.php:1295
+#: classes/multilingual-plugins/easy-language/class-init.php:405
+#: classes/multilingual-plugins/easy-language/class-init.php:1285
 msgid "Just add %1$s"
 msgstr "Nur %1$s erstellen"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:415
-#: classes/multilingual-plugins/easy-language/class-init.php:1299
-#: classes/multilingual-plugins/easy-language/class-post-object.php:579
-#: classes/multilingual-plugins/easy-language/class-post-object.php:624
-#: classes/multilingual-plugins/easy-language/class-post-object.php:690
-#: classes/multilingual-plugins/easy-language/class-post-object.php:716
-#: classes/multilingual-plugins/easy-language/class-post-object.php:775
-#: classes/multilingual-plugins/easy-language/class-post-object.php:907
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:121
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:145
-msgid "Cancel"
-msgstr "Abbrechen"
-
 #. translators: %1$s will be replaced by the object-type-name (e.g. post or page), %2$s will be replaced by the object-title
-#: classes/multilingual-plugins/easy-language/class-init.php:423
-#: classes/multilingual-plugins/easy-language/class-init.php:1307
+#: classes/multilingual-plugins/easy-language/class-init.php:417
+#: classes/multilingual-plugins/easy-language/class-init.php:1297
 msgid "Create a simplified %1$s for <i>%2$s</i> to edit is manually."
 msgstr ""
 "Erstellen Sie eine vereinfachte %1$s für <i>%2$s</i> um diese manuell zu "
 "bearbeiten."
 
 #. translators: %1$s is the name of the language
-#: classes/multilingual-plugins/easy-language/class-init.php:432
+#: classes/multilingual-plugins/easy-language/class-init.php:426
 msgid "Simplify this %1$s."
 msgstr "Vereinfache diese %1$s."
 
-#. translators: %1$s is the name object (e.g. page or post)
-#: classes/multilingual-plugins/easy-language/class-init.php:437
+#. translators: %1$s is the name of the object (e.g. page or post)
+#: classes/multilingual-plugins/easy-language/class-init.php:431
 msgid ""
 "This %1$s has been edited with an unknown page builder or the classic editor"
 msgstr ""
@@ -890,25 +1039,25 @@ msgstr ""
 "Editor bearbeitet"
 
 #. translators: %1$s will be replaced by the object-name (e.g. page oder post)
-#: classes/multilingual-plugins/easy-language/class-init.php:623
+#: classes/multilingual-plugins/easy-language/class-init.php:617
 msgid "Simplify this %1$s"
 msgstr "Vereinfache diese %1$s"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:946
-#: classes/multilingual-plugins/easy-language/class-init.php:1195
+#: classes/multilingual-plugins/easy-language/class-init.php:940
+#: classes/multilingual-plugins/easy-language/class-init.php:1189
 msgid "General Settings"
 msgstr "Allgemeine Einstellungen"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:966
+#: classes/multilingual-plugins/easy-language/class-init.php:960
 msgid "Choose supported post-types"
 msgstr "Wähle unterstützte Post-Types"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1003
+#: classes/multilingual-plugins/easy-language/class-init.php:997
 msgid "Choose languages"
 msgstr "Wähle Sprachen"
 
 #. translators: %1$s will be replaced by the settings-URL for the active API
-#: classes/multilingual-plugins/easy-language/class-init.php:1011
+#: classes/multilingual-plugins/easy-language/class-init.php:1005
 msgid ""
 "Go to <a href=\"%1$s\">API-settings</a> to choose the languages you want to "
 "use."
@@ -917,17 +1066,17 @@ msgstr ""
 "auszuwählen, die Sie verwenden möchten."
 
 #. translators: %1$s will be replaced by the settings-URL for the active API
-#: classes/multilingual-plugins/easy-language/class-init.php:1011
+#: classes/multilingual-plugins/easy-language/class-init.php:1005
 msgid "Choose the language you want to use for simplifications of texts."
 msgstr ""
 "Wählen Sie die Sprache aus, die Sie für die Vereinfachung von Texten "
 "verwenden möchten."
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1021
+#: classes/multilingual-plugins/easy-language/class-init.php:1015
 msgid "Set object state on plugin deactivation"
 msgstr "Objektstatus bei Plugin-Deaktivierung festlegen"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1028
+#: classes/multilingual-plugins/easy-language/class-init.php:1022
 msgid ""
 "If plugin is disabled your simplified objects will get the state set here. "
 "If plugin is reactivated they will be set to their state before."
@@ -940,26 +1089,26 @@ msgstr ""
 "der Deinstallation werden alle vereinfachten Objekte gelöscht, unabhängig "
 "von der Einstellung hier."
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1030
-#: classes/multilingual-plugins/easy-language/class-init.php:1051
+#: classes/multilingual-plugins/easy-language/class-init.php:1024
+#: classes/multilingual-plugins/easy-language/class-init.php:1045
 msgid "Do not change anything"
 msgstr "Ändere nichts"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1031
-#: classes/multilingual-plugins/easy-language/class-init.php:1052
+#: classes/multilingual-plugins/easy-language/class-init.php:1025
+#: classes/multilingual-plugins/easy-language/class-init.php:1046
 msgid "Set to draft"
 msgstr "Setze auf Entwurf"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1032
-#: classes/multilingual-plugins/easy-language/class-init.php:1053
+#: classes/multilingual-plugins/easy-language/class-init.php:1026
+#: classes/multilingual-plugins/easy-language/class-init.php:1047
 msgid "Set to trash"
 msgstr "Verschiebe in den Papierkorb"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1042
+#: classes/multilingual-plugins/easy-language/class-init.php:1036
 msgid "Set object state on API change"
 msgstr "Objektstatus bei Änderung der API festlegen"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1049
+#: classes/multilingual-plugins/easy-language/class-init.php:1043
 msgid ""
 "If the API is changed, set all objects of the former API to the state set "
 "here."
@@ -967,11 +1116,11 @@ msgstr ""
 "Wenn die API geändert wird, setze alle Objekte der vorherigen API auf den "
 "hier festgelegten Status."
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1063
+#: classes/multilingual-plugins/easy-language/class-init.php:1057
 msgid "Generate permalink for translated objects"
 msgstr "Generiere Permalink für vereinfachte Objekte"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1070
+#: classes/multilingual-plugins/easy-language/class-init.php:1064
 msgid ""
 "If enabled an individual permalink will be generated from title after "
 "simplification of the title."
@@ -979,15 +1128,15 @@ msgstr ""
 "Wenn diese Option aktiviert ist, wird nach der Vereinfachung des Titels ein "
 "individueller Permalink aus dem Titel generiert."
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1080
+#: classes/multilingual-plugins/easy-language/class-init.php:1074
 msgid "Automatic Settings"
 msgstr "Einstellungen zum Automatismus"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1088
+#: classes/multilingual-plugins/easy-language/class-init.php:1082
 msgid "Enable automatic simplifications"
 msgstr "Aktiviere automatische Vereinfachung"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1095
+#: classes/multilingual-plugins/easy-language/class-init.php:1089
 msgid ""
 "If enabled open simplifications will be run automatically in the intervall "
 "set below."
@@ -995,49 +1144,49 @@ msgstr ""
 "Wenn diese Option aktiviert ist, werden offene Vereinfachungen automatisch "
 "in dem unten angegebenen Intervall durchgeführt."
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1103
+#: classes/multilingual-plugins/easy-language/class-init.php:1097
 msgid "Number of items per run"
 msgstr "Anzahl von Einträgen pro Durchlauf"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1110
+#: classes/multilingual-plugins/easy-language/class-init.php:1104
 msgid "The amount of items per automatic simplification run."
 msgstr ""
 "Anzahl von Einträgen die pro Durchlauf bei der automatischen Vereinfachung "
 "bearbeitet werden."
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1124
+#: classes/multilingual-plugins/easy-language/class-init.php:1118
 msgid "Interval for automatic simplification"
 msgstr "Intervall für die automatische Vereinfachung"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1133
+#: classes/multilingual-plugins/easy-language/class-init.php:1127
 msgid "Simplification are run automatically in this intervall."
 msgstr ""
 "Die Vereinfachungen werden in diesem Intervall automatisch durchgeführt."
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1143
+#: classes/multilingual-plugins/easy-language/class-init.php:1137
 msgid "Frontend Settings"
 msgstr "Frontend-Einstellungen"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1151
+#: classes/multilingual-plugins/easy-language/class-init.php:1145
 msgid "Choose link-mode for language switcher"
 msgstr "Wählen Sie den Link-Modus für den Sprachumschalter"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1160
+#: classes/multilingual-plugins/easy-language/class-init.php:1154
 msgid "do not link translated pages"
 msgstr "keine vereinfachten Seiten verlinken"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1162
+#: classes/multilingual-plugins/easy-language/class-init.php:1156
 msgid ""
 "The links in the switcher will general link to the language-specific "
 "homepage."
 msgstr ""
 "Die Links im Umschalter verweisen immer auf die sprachspezifische Homepage."
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1165
+#: classes/multilingual-plugins/easy-language/class-init.php:1159
 msgid "link translated pages"
 msgstr "vereinfachte Seiten verlinken"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1167
+#: classes/multilingual-plugins/easy-language/class-init.php:1161
 msgid ""
 "The Links in the switcher will link to the translated page. If a page is not "
 "translated, the link will target the language-specific homepage."
@@ -1046,11 +1195,11 @@ msgstr ""
 "Seite nicht vereinfacht ist, führt der Link zur sprachspezifischen "
 "Startseite."
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1170
+#: classes/multilingual-plugins/easy-language/class-init.php:1164
 msgid "do not link not translated pages"
 msgstr "nur vereinfachte Seiten verlinken"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1172
+#: classes/multilingual-plugins/easy-language/class-init.php:1166
 msgid ""
 "The Links in the switcher will link to the translated page. If a page is not "
 "translated, the link will not be visible."
@@ -1058,65 +1207,62 @@ msgstr ""
 "Die Links im Umschalter verweisen auf die vereinfachte Seite. Wenn eine "
 "Seite nicht vereinfacht ist, ist der Link nicht sichtbar."
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1375
+#: classes/multilingual-plugins/easy-language/class-init.php:1351
 msgid "Filter easy language"
 msgstr "Filter für Leichte Sprache"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1376
+#: classes/multilingual-plugins/easy-language/class-init.php:1352
 msgid "show translated content"
 msgstr "vereinfachten Inhalt anzeigen"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1377
+#: classes/multilingual-plugins/easy-language/class-init.php:1353
 msgid "show not translated content"
 msgstr "nicht vereinfachten Inhalt anzeigen"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1378
+#: classes/multilingual-plugins/easy-language/class-init.php:1354
 msgid "show changed content"
 msgstr "geänderten Inhalt anzeigen"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1379
+#: classes/multilingual-plugins/easy-language/class-init.php:1355
 msgid "show not changed content"
 msgstr "nicht geänderten Inhalt anzeigen"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1543
-#: classes/multilingual-plugins/easy-language/class-init.php:1574
-#: classes/multilingual-plugins/easy-language/class-init.php:1634
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:245
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:264
+#: classes/multilingual-plugins/easy-language/class-init.php:1522
+#: classes/multilingual-plugins/easy-language/class-init.php:1553
+#: classes/multilingual-plugins/easy-language/class-init.php:1613
+#: classes/multilingual-plugins/easy-language/class-init.php:1650
+#: classes/multilingual-plugins/easy-language/admin/divi.js:56
+#: classes/multilingual-plugins/easy-language/admin/divi.js:75
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:249
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:268
 msgid "Error"
 msgstr "Fehler"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1545
+#: classes/multilingual-plugins/easy-language/class-init.php:1524
 msgid "Requested object is not intended to be simplified!"
 msgstr "Das angeforderte Objekt ist nicht zur Vereinfachung gedacht!"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:1551
-#: classes/multilingual-plugins/easy-language/class-init.php:1582
-#: classes/multilingual-plugins/easy-language/class-init.php:1644
-#: classes/multilingual-plugins/easy-language/class-post-object.php:533
-#: classes/multilingual-plugins/easy-language/class-post-object.php:856
-#: classes/multilingual-plugins/easy-language/class-post-object.php:926
-#: admin/js.js:55
-msgid "OK"
-msgstr "OK"
-
-#: classes/multilingual-plugins/easy-language/class-init.php:1576
+#: classes/multilingual-plugins/easy-language/class-init.php:1555
 msgid "No API activated!"
 msgstr "Keine API aktiviert!"
 
 #. translators: %1$s will be replaced by the support-URL
-#: classes/multilingual-plugins/easy-language/class-init.php:1637
+#: classes/multilingual-plugins/easy-language/class-init.php:1616
 msgid ""
-"<strong>This error should never happen!</strong> Please contact the <a href="
-"\"%1$s\" target=\"_blank\">Plugin-support (opens new window)</a> about the "
-"following error:"
+"<strong>This error should never happen!</strong> Please contact the <a "
+"href=\"%1$s\" target=\"_blank\">Plugin-support (opens new window)</a> about "
+"the following error:"
 msgstr ""
 "<strong>Dieser Fehler sollte niemals auftreten!</strong> Bitte kontaktiere "
 "den <a href=\"%1$s\" target=\"_blank\">Plugin-support (opens new window)</a> "
 "über den folgenden Fehler:"
 
+#: classes/multilingual-plugins/easy-language/class-init.php:1652
+msgid "Faulty simplification request!"
+msgstr "Fehlerhafter Anfrage zu Vereinfachung!"
+
 #. translators: %1$s will be replaced by the path to the easy language icon
-#: classes/multilingual-plugins/easy-language/class-init.php:1754
+#: classes/multilingual-plugins/easy-language/class-init.php:1756
 msgid ""
 "<p><img src=\"%1$s\" alt=\"Easy Language Logo\"><strong>Start to simplify "
 "texts in your pages.</strong></p><p>Simply click here and choose which page "
@@ -1127,47 +1273,47 @@ msgstr ""
 "Sie die Seite aus, deren Texte Sie vereinfachen möchten.</p>"
 
 #. translators: %1$d will be replaced by a percentage value between 0 and 100.
-#: classes/multilingual-plugins/easy-language/class-init.php:1824
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:264
+#: classes/multilingual-plugins/easy-language/class-init.php:1826
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:258
 msgid "Quota for the used API is used for %1$d%%!"
 msgstr "Kontingent für diese API wurde genutzt zu %1$d%%!"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:2202
+#: classes/multilingual-plugins/easy-language/class-init.php:2213
 msgid "Simplifications:"
 msgstr "Vereinfachungen:"
 
 #. translators: %1$d and %2$d will be replaced by digits, %3$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-init.php:2204
+#: classes/multilingual-plugins/easy-language/class-init.php:2215
 msgid "%1$d of %2$d texts simplified via %3$s"
 msgstr "%1$d von %2$d Texte vereinfacht über %3$s"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:2286
+#: classes/multilingual-plugins/easy-language/class-init.php:2299
 msgid "every 5th minute"
 msgstr "jede 5. Minute"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:2290
+#: classes/multilingual-plugins/easy-language/class-init.php:2303
 msgid "every minute"
 msgstr "jede Minute"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:2316
+#: classes/multilingual-plugins/easy-language/class-init.php:2329
 msgid "Easy Language automatic cronjob"
 msgstr "Easy Language Automatischer Cronjob"
 
-#: classes/multilingual-plugins/easy-language/class-init.php:2321
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:194
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:209
+#: classes/multilingual-plugins/easy-language/class-init.php:2334
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:211
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:225
 msgid "Easy Language API check"
 msgstr "Easy Language API Prüfung"
 
 #. translators: %1$s will be replaced by the type of the object, %2$s will be replaced by the name of the language
-#: classes/multilingual-plugins/easy-language/class-pagebuilder-support.php:140
-#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:99
-#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:147
+#: classes/multilingual-plugins/easy-language/class-pagebuilder-support.php:136
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:96
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:141
 msgid "You are editing this %1$s in the language <strong>%2$s</strong>."
 msgstr "Sie bearbeiten diesen %1$s in der Sprache <strong>%2$s</strong>."
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:204
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:198
 msgid ""
 "There would be %1$d characters to simplify in this %2$s. That is more than "
 "the %3$d available in quota."
@@ -1176,7 +1322,7 @@ msgstr ""
 "%3$d, die im Kontingent verfügbar sind."
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:213
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:207
 msgid ""
 "This %1$s contains more texts than %2$s would simplify in one loop. Simplify "
 "via API will not be possible."
@@ -1185,28 +1331,31 @@ msgstr ""
 "könnte. Eine Vereinfachung über die API ist nicht möglich."
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:222
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:216
 msgid "One or more texts are to long to simplify them with %1$s."
 msgstr "Ein oder mehrere Texte sind zu lang, um sie mit %1$s zu vereinfachen."
 
 #. translators: %1$d will be replaced by the amount of characters in this page/post, %2$s will be replaced by the name of this page-type (post or page)
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:231
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:225
 msgid "There would be %1$d characters translated in this %2$s."
 msgstr "In diesem %2$s würden %1$d Zeichen vereinfacht."
 
 #. translators: %1$s will be replaced by tne object-type-name (e.g. post oder page), %2$s will be replaced by the API-name
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:236
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:230
 msgid "Simplify this %1$s with %2$s."
 msgstr "Vereinfache diesen %1$s mit %2$s."
 
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:240
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:234
 #: classes/multilingual-plugins/easy-language/pagebuilder/divi.php:42
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:171
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:82
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:127
+#: releases/easy-language_2.0.0/easy-language/classes/multilingual-plugins/easy-language/pagebuilder/divi.php:42
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:173
 msgid "Simplify texts"
 msgstr "Texte vereinfachen"
 
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:242
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:173
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:236
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:175
 msgid ""
 "<strong>Are you sure you want to simplify these texts via API?</"
 "strong><br>Hint: this could cause costs with the API."
@@ -1214,193 +1363,55 @@ msgstr ""
 "<strong>Sind Sie sicher, dass Sie diese Texte über die API vereinfachen "
 "wollen?</strong><br>Hinweis: Dies könnte Kosten für die API verursachen."
 
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:248
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:242
 #: inc/settings/advanced.php:193
 #: classes/multilingual-plugins/easy-language/admin/js.js:26
 #: classes/multilingual-plugins/easy-language/admin/js.js:80
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:179
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:181
 msgid "Yes"
 msgstr "Ja"
 
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:253
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:247
 #: inc/settings/advanced.php:198
 #: classes/multilingual-plugins/easy-language/admin/js.js:31
 #: classes/multilingual-plugins/easy-language/admin/js.js:85
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:184
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:186
 msgid "No"
 msgstr "Nein"
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:261
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:255
 msgid "Simplify with %1$s."
 msgstr "Vereinfachen mit %1$s."
 
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:269
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:270
 msgid "Not automatic simplified"
 msgstr "Nicht automatisch vereinfachen"
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:276
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:278
 msgid "No quota for automatic simplification with %1$s available."
 msgstr "Kein Kontingent für automatische Vereinfachung mit %1$s verfügbar."
 
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:300
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:302
 msgid "No simplification-API active."
 msgstr "Keine Vereinfachungs-API aktiv."
 
 #. translators: %1$s will be replaced by the language title
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:316
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:318
 msgid "Add simplification in %1$s."
 msgstr "Vereinfachung in %1$s hinzufügen."
 
 #. translators: %1$s will be replaced by the page-title where the original content resides
-#: classes/multilingual-plugins/easy-language/class-parser-base.php:323
+#: classes/multilingual-plugins/easy-language/class-parser-base.php:325
 msgid "Original content in %1$s."
 msgstr "Ursprünglicher Inhalt in %1$s."
 
-#: classes/multilingual-plugins/easy-language/class-post-object.php:524
-#: classes/multilingual-plugins/easy-language/class-post-object.php:561
-#: classes/multilingual-plugins/easy-language/class-post-object.php:606
-#: classes/multilingual-plugins/easy-language/class-post-object.php:672
-#: classes/multilingual-plugins/easy-language/class-post-object.php:698
-#: classes/multilingual-plugins/easy-language/class-post-object.php:847
-#: classes/multilingual-plugins/easy-language/class-post-object.php:918
-msgid "Simplification canceled"
-msgstr "Vereinfachung abgebrochen"
-
-#. translators: %1$s will be replaced by the object-title
-#: classes/multilingual-plugins/easy-language/class-post-object.php:527
-msgid "Simplification for <i>%1$s</i> is already running."
-msgstr "Die Vereinfachung für <i>%1$s</i> läuft bereits."
-
-#. translators: %1$s will be replaced by the object-title
-#: classes/multilingual-plugins/easy-language/class-post-object.php:564
-msgid ""
-"A previously running simplification of texts of this %1$s failed. How do you "
-"want to deal with it?"
-msgstr ""
-"Eine zuvor durchgeführte Vereinfachung von Texten dieser %1$s ist "
-"fehlgeschlagen. Wie wollen Sie damit umgehen?"
-
-#: classes/multilingual-plugins/easy-language/class-post-object.php:570
-msgid "Run simplification again"
-msgstr "Vereinfachung erneut durchführen"
-
-#: classes/multilingual-plugins/easy-language/class-post-object.php:575
-msgid "Ignore the failed simplifications"
-msgstr "Fehlgeschlagene Vereinfachungen ignorieren"
-
-#. translators: %1$s will be replaced by the object-title (like page or post), %2$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-post-object.php:609
-msgid ""
-"The %1$s contains more text widgets than the API %2$s could handle in a "
-"short time.<br>The texts will be automatically simplified in the background."
-msgstr ""
-"Die %1$s enthält mehr Text-Widgets, als die API %2$s in kurzer Zeit "
-"verarbeiten kann.<br>Die Texte werden im Hintergrund automatisch vereinfacht."
-
-#: classes/multilingual-plugins/easy-language/class-post-object.php:615
-#: classes/multilingual-plugins/easy-language/class-post-object.php:681
-#: classes/multilingual-plugins/easy-language/class-post-object.php:707
-#: classes/multilingual-plugins/easy-language/class-post-object.php:765
-#: classes/multilingual-plugins/easy-language/class-post-object.php:897
-msgid "Show in frontend"
-msgstr "Website anzeigen"
-
-#: classes/multilingual-plugins/easy-language/class-post-object.php:620
-#: classes/multilingual-plugins/easy-language/class-post-object.php:686
-#: classes/multilingual-plugins/easy-language/class-post-object.php:712
-#: classes/multilingual-plugins/easy-language/class-post-object.php:770
-#: classes/multilingual-plugins/easy-language/class-post-object.php:902
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#. translators: %1$s will be replaced by the object-title (like page or post), %2$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-post-object.php:630
-msgid ""
-"The %1$s contains more text widgets than the API %2$s could handle in a "
-"short time.<br>The texts could be automatically simplified in the background "
-"if you enable this on the page settings."
-msgstr ""
-"Die %1$s enthält mehr Text-Widgets, als die API %2$s in kurzer Zeit "
-"verarbeiten kann.<br>Die Texte können automatisch im Hintergrund vereinfacht "
-"werden, wenn Sie dies in den Seiteneinstellungen aktivieren."
-
-#. translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title
-#: classes/multilingual-plugins/easy-language/class-post-object.php:675
-msgid ""
-"<strong>The texts in this %1$s are already simplified.</strong><br>%2$s was "
-"not used. Nothing has been changed."
-msgstr ""
-"<strong>Die Texte in dieser %1$s sind bereits vereinfacht.</strong><br>%2$s "
-"wurde nicht verwendet. Es wurde nichts geändert."
-
-#. translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title
-#: classes/multilingual-plugins/easy-language/class-post-object.php:701
-msgid ""
-"<strong>Some texts in this %1$s are already simplified.</strong><br>Other "
-"missing simplifications has been run via %2$s and are insert into the text."
-msgstr ""
-"<strong>Einige Texte in diesem %1$s sind bereits vereinfacht.</"
-"strong><br>Weitere fehlende Vereinfachungen wurden über %2$s durchgeführt "
-"und in den Text eingefügt."
-
-#: classes/multilingual-plugins/easy-language/class-post-object.php:756
-#: classes/multilingual-plugins/easy-language/class-post-object.php:888
-msgid "Simplification processed"
-msgstr "Vereinfachungen abgeschlossen"
-
-#. translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title
-#: classes/multilingual-plugins/easy-language/class-post-object.php:759
-msgid ""
-"<strong>Simplifications have been returned from %2$s.</strong><br>They were "
-"inserted into the %1$s."
-msgstr ""
-"<strong>Vereinfachungen der Texte wurden von %2$s zurückgegeben.</"
-"strong><br>Sie wurden in die %1$s eingefügt."
-
-#. translators: %1$s will be replaced by the URL for the API-log in plugin-settings
-#: classes/multilingual-plugins/easy-language/class-post-object.php:850
-msgid ""
-"<strong>No simplifications get from API.</strong><br>Please check the <a "
-"href=\"%1$s\">API-log</a> for errors."
-msgstr ""
-"<strong>Keine Vereinfachungen von der API zurückgegeben.</strong><br>Bitte "
-"prüfen Sie das <a href=\"%1$s\">API-Log</a> auf Fehler."
-
-#: classes/multilingual-plugins/easy-language/class-post-object.php:861
-msgid ""
-"<strong>No simplifications get from API.</strong><br>Please consult an "
-"administrator to check the API-log."
-msgstr ""
-"<strong>Von der API werden keine Vereinfachungen zurückgegeben.</"
-"strong><br>Bitte sprich einen Administrator darauf an das API-Log zu prüfen."
-
-#. translators: %1$s will be replaced by the object-title (like post or page)
-#: classes/multilingual-plugins/easy-language/class-post-object.php:891
-msgid ""
-"The texts are already simplified local.<br><strong>We did not use the API to "
-"simplify them again.</strong><br>The texts in this %1$s are replaced with "
-"its local available simplification."
-msgstr ""
-"Die Texte sind bereits lokal vereinfacht.<br><strong>Wir haben die API nicht "
-"verwendet, um sie erneut zu vereinfachen.</strong><br>Die Texte in diesem "
-"%1$s werden durch ihre lokal verfügbare Vereinfachung ersetzt."
-
-#: classes/multilingual-plugins/easy-language/class-post-object.php:920
-msgid ""
-"We got simplified texts from API but does not replace any texts. This might "
-"be an error with the pagebuilder-support of the Easy Language plugin."
-msgstr ""
-"Wir haben vereinfachte Texte von der API erhalten, aber es werden keine "
-"Texte ersetzt. Dies könnte ein Fehler mit der Pagebuilder-Unterstützung des "
-"Easy Language Plugins sein."
-
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:137
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:154
 msgid "Easy Language Automatic Simplification Cron Check"
 msgstr "Easy Language Prüfung des automatische Vereinfachung cronjobs"
 
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:143
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:160
 msgid ""
 "To use automatic simplification for texts in your website the Easy Language "
 "plugin adds a WordPress cronjob which is used to perform this tasks."
@@ -1410,23 +1421,19 @@ msgstr ""
 "fügt das Easy Language Plugin einen WordPress Cronjob hinzu, der diese "
 "Aufgabe übernimmt.<br><strong>Alles in Ordnung mit dem Cronjob!</strong>"
 
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:161
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:178
 msgid "Cronjob to automatic simplify texts in your website does not exist!"
 msgstr ""
 "Cronjob zum automatischen Vereinfachen von Texten in Ihrer Website gibt es "
 "nicht!"
 
 #. translators: %1$s will be replaced by the URL to recreate the schedule
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:163
-msgid ""
-"<p><a href=\"%1$s\" class=\"button button-primary\">Recreate the schedules</"
-"a></p>"
-msgstr ""
-"<p><a href=\"%1$s\" class=\"button button-primary\">Erstellen den Cronjob "
-"neu</a></p>"
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:180
+msgid "Recreate the schedules"
+msgstr "Erstelle die Cronjobs neu"
 
 #. translators: %1$s will be replaced by the date of the planned next schedule run (which is in the past)
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:173
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:190
 msgid ""
 "Cronjob to simplify texts should have been run at %1$s, but was not executed!"
 "<br><strong>Please check the cron-system of your WordPress-installation.</"
@@ -1436,7 +1443,7 @@ msgstr ""
 "aber nicht ausgeführt!<br><strong>Bitte überprüfen Sie das Cron-System Ihrer "
 "WordPress-Installation.</strong>"
 
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:200
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:217
 msgid ""
 "To use simplification for texts in your website the Easy Language plugin "
 "uses APIs from SUMM AI, Capito and ChatGpt which needs some configuration."
@@ -1447,14 +1454,12 @@ msgstr ""
 "Konfiguration benötigen.<br><strong>Keine Api aktiv!</strong>"
 
 #. translators: %1$s will be replaced by the URL for API-settings
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:202
-msgid ""
-"<p><a href=\"%1$s\" class=\"button button-primary\">Choose an API</a></p>"
-msgstr ""
-"<p><a href=\"%1$s\" class=\"button button-primary\">Wählen eine API</a></p>"
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:219
+msgid "Choose an API"
+msgstr "API wählen"
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:216
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:232
 msgid ""
 "To use simplification for texts in your website the Easy Language plugin "
 "uses APIs from SUMM AI, Capito and ChatGpt which needs some configuration."
@@ -1466,7 +1471,7 @@ msgstr ""
 "API %1$s!</strong>"
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:225
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:241
 msgid ""
 "<strong>The actual active API %1$s is not configured.</strong> It will not "
 "be usable to simplify texts in your website."
@@ -1475,16 +1480,14 @@ msgstr ""
 "kann nicht verwendet werden, um Texte auf Ihrer Website zu vereinfachen."
 
 #. translators: %1$s will be replaced with the API-settings-URL
-#: classes/multilingual-plugins/easy-language/class-rest-api.php:227
-msgid ""
-"<p><a href=\"%1$s\" class=\"button button-primary\">Configure API now</a></p>"
-msgstr ""
-"<p><a href=\"%1$s\" class=\"button button-primary\">Wählen eine API</a></p>"
+#: classes/multilingual-plugins/easy-language/class-rest-api.php:243
+msgid "Configure API now"
+msgstr "API jetzt konfigurieren"
 
 #: classes/multilingual-plugins/easy-language/class-switcher.php:96
 #: classes/multilingual-plugins/easy-language/class-switcher.php:165
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher-widget.php:46
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher.php:41
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:35
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher.php:41
 #: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/index.js:1
 #: classes/multilingual-plugins/easy-language/blocks/switcher/build/index.js:1
 msgid "Language Switcher"
@@ -1496,80 +1499,80 @@ msgid "Show this site in %1$s."
 msgstr "Zeige diese Seite in %1$s an."
 
 #: classes/multilingual-plugins/easy-language/class-switcher.php:388
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher-widget.php:106
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:95
 #: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/index.js:1
 #: classes/multilingual-plugins/easy-language/blocks/switcher/build/index.js:1
 msgid "Show icons"
 msgstr "Zeige Icons"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:42
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:33
 #: classes/multilingual-plugins/easy-language/class-texts-table.php:76
 msgid "used API"
 msgstr "verwendete API"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:43
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:34
 #: classes/multilingual-plugins/easy-language/class-texts-table.php:77
 msgid "requesting user"
 msgstr "Anfordernder Nutzer"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:44
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:35
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:40
 msgid "used in"
 msgstr "verwendet in"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:45
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:36
 #: classes/multilingual-plugins/easy-language/class-texts-table.php:78
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:41
 msgid "source language"
 msgstr "Ausgangssprache"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:46
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:37
 #: classes/multilingual-plugins/easy-language/class-texts-table.php:79
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:42
 msgid "target language"
 msgstr "Ziel-Sprache"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:47
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:38
 #: classes/multilingual-plugins/easy-language/class-texts-table.php:80
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:43
 msgid "original"
 msgstr "Original"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:48
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:39
 #: classes/multilingual-plugins/easy-language/class-texts-table.php:81
 msgid "simplification"
 msgstr "Vereinfachung"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:168
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:180
-#: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:141
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:165
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:177
+#: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:147
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:185
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:182
 msgid "Delete entry only with Easy Language Pro."
 msgstr "Löschen von Einträgen nur in Easy Language Pro."
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:215
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:212
 #: classes/multilingual-plugins/easy-language/class-texts-table.php:209
 msgid "without login"
 msgstr "ohne Anmeldung"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:219
-#: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:153
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:216
+#: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:159
 msgid "Only in Pro"
 msgstr "Nur in Pro"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:295
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:298
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:292
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:296
 msgid "Export as Portable Object (po)"
 msgstr "Export als Portable Object (po)"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:298
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:296
 msgid "Choose a language above to export"
 msgstr "Wähle eine Sprache oben für den Export aus"
 
-#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:318
+#: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:317
 msgid "No simplified texts found."
 msgstr "Keine vereinfachten Texte gefunden."
 
@@ -1577,55 +1580,50 @@ msgstr "Keine vereinfachten Texte gefunden."
 msgid "Only in Easy Language Pro."
 msgstr "Nur in Easy Language Pro."
 
-#: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:122
+#: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:128
 msgid "Simplify now only with Easy Language Pro."
 msgstr "Vereinfache sofort nur in Easy Language Pro."
 
-#: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:167
+#: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:173
 msgid "No texts found which should be simplified."
 msgstr "Keine Texte gefunden die vereinfacht werden sollen."
 
-#: classes/multilingual-plugins/easy-language/class-texts.php:522
+#: classes/multilingual-plugins/easy-language/class-texts.php:524
 msgid "List of with Easy Language simplified texts."
 msgstr "Liste von mit Easy Language vereinfachten Texten."
 
-#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:85
-#: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:133
-msgid "Languages"
-msgstr "Sprachen"
-
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher-widget.php:64
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:53
 msgid "Menu"
 msgstr "Menü"
 
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher-widget.php:99
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:88
 #: inc/admin.php:116 inc/settings/settings.php:18
 #: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/index.js:1
 #: classes/multilingual-plugins/easy-language/blocks/switcher/build/index.js:1
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher-widget.php:108
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher-widget.php:120
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:97
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:109
 msgid "Show"
 msgstr "Anzeigen"
 
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher-widget.php:109
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher-widget.php:121
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:98
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:110
 msgid "Hide"
 msgstr "Verstecken"
 
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher-widget.php:118
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:107
 #: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/index.js:1
 #: classes/multilingual-plugins/easy-language/blocks/switcher/build/index.js:1
 msgid "Hide actual language"
 msgstr "Verstecke die aktuelle Sprache"
 
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher-widget.php:132
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:121
 msgid "Spacing"
 msgstr "Abstand"
 
-#: classes/multilingual-plugins/easy-language/parser/elementor/class-switcher-widget.php:140
+#: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:129
 msgid "Margin"
 msgstr "Aussenabstand"
 
@@ -1941,6 +1939,42 @@ msgstr ""
 "<p><strong>Löschung der vereinfachten Texte abgeschlossen.</strong><br>Sie "
 "können nun mit den Vereinfachungen beginnen.</p>"
 
+#: classes/multilingual-plugins/easy-language/admin/divi.js:14
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:207
+msgid "Simplification in progress"
+msgstr "Vereinfachung in Arbeit"
+
+#. translators: [error] will be replaced by the http-error-message (e.g. "Gateway timed our"), %1$s will be replaced with the Pro-URL
+#: classes/multilingual-plugins/easy-language/admin/divi.js:59
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:252
+msgid ""
+"<p><strong>The following error occurred during: [error]</strong> - at least "
+"one simplification could not be processed.<br><br><strong>Possible causes:</"
+"strong></p><ul><li>The server settings for WordPress hosting prevent longer "
+"lasting requests. Contact your hosters support for a solution.</li><li>The "
+"API used took too long to simplify the text. Shorten particularly long texts "
+"or contact API support for further assistance.</li><li>Use automatic "
+"simplifications in the background without the risk of hitting timeouts on "
+"your own hosting.</li></ul>"
+msgstr ""
+"<p><strong>Der folgende Fehler ist aufgetreten: [error]</strong> - "
+"mindestens eine Vereinfachung konnte nicht verarbeitet werden."
+"<br><br><strong>Mögliche Ursachen:</strong></p><ul><li>Die "
+"Servereinstellungen für das WordPress-Hosting verhindern länger dauernde "
+"Anfragen. Wenden Sie sich an den Support Ihres Hosters, um eine Lösung zu "
+"finden.</li><li>Die verwendete API hat zu lange gebraucht, um den Text zu "
+"vereinfachen. Kürzen Sie besonders lange Texte oder kontaktieren Sie den API-"
+"Support für weitere Hilfe.</ul>"
+
+#: classes/multilingual-plugins/easy-language/admin/divi.js:77
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:270
+msgid ""
+"<p><strong>Any error occurred during simplification.</strong><br>Please "
+"check your error-log for the reason."
+msgstr ""
+"<strong>Keine Vereinfachungen von der API zurückgegeben.</strong><br>Bitte "
+"prüfen Sie das API-Log auf Fehler."
+
 #. translators: %1$s will be replaced by the object type name (e.g. page or post)
 #: classes/multilingual-plugins/easy-language/admin/js.js:17
 msgid "Delete simplified %1$s"
@@ -1967,13 +2001,13 @@ msgstr ""
 "diese %3$s erstellen willst?</strong>"
 
 #. translators: %1$s will be replaced by the object type name (e.g. page or post)
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:101
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:131
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:104
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:134
 msgid "%1$s ready for simplification"
 msgstr "%1$s bereit zur Vereinfachung"
 
 #. translators: %1$s and %4$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title, %3$s will be replaced by the language-name
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:104
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:107
 msgid ""
 "<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet "
 "simplified.<br>If you decide to edit this %4$s by yourself its texts will "
@@ -1984,57 +2018,24 @@ msgstr ""
 "werden seine Texte nicht automatisch im Hintergrund vereinfacht.</p>"
 
 #. translators: %1$s will be replaced by the API-title
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:111
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:114
 msgid "Simplify now via API %1$s"
 msgstr "Jetzt mit %1$s vereinfachen"
 
 #. translators: %1$s will be replaced by the object type name (e.g. page or post)
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:117
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:141
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:120
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:144
 msgid "Edit %1$s"
 msgstr "Bearbeite %1$s"
 
 #. translators: %1$s and %4$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title, %3$s will be replaced by the language-name
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:134
+#: classes/multilingual-plugins/easy-language/admin/simplifications.js:137
 msgid ""
 "<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet "
 "simplified.</p>"
 msgstr ""
 "<p>Die %1$s <i>%2$s</i> wurde in %3$s erstellt.<br>Die Texte sind noch nicht "
 "vereinfacht.</p>"
-
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:204
-msgid "Simplification in progress"
-msgstr "Vereinfachung in Arbeit"
-
-#. translators: [error] will be replaced by the http-error-message (e.g. "Gateway timed our"), %1$s will be replaced with the Pro-URL
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:248
-msgid ""
-"<p><strong>The following error occurred during: [error]</strong> - at least "
-"one simplification could not be processed.<br><br><strong>Possible causes:</"
-"strong></p><ul><li>The server settings for WordPress hosting prevent longer "
-"lasting requests. Contact your hosters support for a solution.</li><li>The "
-"API used took too long to simplify the text. Shorten particularly long texts "
-"or contact API support for further assistance.</li><li>Use automatic "
-"simplifications in the background without the risk of hitting timeouts on "
-"your own hosting.</li></ul>"
-msgstr ""
-"<p><strong>Der folgende Fehler ist aufgetreten: [error]</strong> - "
-"mindestens eine Vereinfachung konnte nicht verarbeitet werden."
-"<br><br><strong>Mögliche Ursachen:</strong></p><ul><li>Die "
-"Servereinstellungen für das WordPress-Hosting verhindern länger dauernde "
-"Anfragen. Wenden Sie sich an den Support Ihres Hosters, um eine Lösung zu "
-"finden.</li><li>Die verwendete API hat zu lange gebraucht, um den Text zu "
-"vereinfachen. Kürzen Sie besonders lange Texte oder kontaktieren Sie den API-"
-"Support für weitere Hilfe.</ul>"
-
-#: classes/multilingual-plugins/easy-language/admin/simplifications.js:266
-msgid ""
-"<p><strong>Any error occurred during simplification.</strong><br>Please "
-"check your error-log for the reason."
-msgstr ""
-"<strong>Keine Vereinfachungen von der API zurückgegeben.</strong><br>Bitte "
-"prüfen Sie das API-Log auf Fehler."
 
 #: classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/index.js:1
 msgid "Provides a Block for Language Switcher in navigation."
@@ -2072,6 +2073,37 @@ msgctxt "block description"
 msgid "Provides a Block for Language Switcher."
 msgstr "Bietet einen Block für die Sprachumschaltung."
 
+#, fuzzy
+#~| msgid "Choose API"
+#~ msgid "Choose an API</a></p>"
+#~ msgstr "API wählen"
+
+#~ msgid "<p><strong>Unlimited quota</strong></p>"
+#~ msgstr "<p><strong>Unbegrenztes Kontingent</strong></p>"
+
+#~ msgid ""
+#~ "<p><a href=\"%1$s\" class=\"button button-primary\">Recreate the "
+#~ "schedules</a></p>"
+#~ msgstr ""
+#~ "<p><a href=\"%1$s\" class=\"button button-primary\">Erstellen den Cronjob "
+#~ "neu</a></p>"
+
+#~ msgid ""
+#~ "<p><a href=\"%1$s\" class=\"button button-primary\">Choose an API</a></p>"
+#~ msgstr ""
+#~ "<p><a href=\"%1$s\" class=\"button button-primary\">Wählen eine API</a></"
+#~ "p>"
+
+#~ msgid ""
+#~ "<p><a href=\"%1$s\" class=\"button button-primary\">Configure API now</"
+#~ "a></p>"
+#~ msgstr ""
+#~ "<p><a href=\"%1$s\" class=\"button button-primary\">Wählen eine API</a></"
+#~ "p>"
+
+#~ msgid "Languages"
+#~ msgstr "Sprachen"
+
 #~ msgid "Simplify this text?"
 #~ msgstr "Vereinfache diesen Text?"
 
@@ -2100,11 +2132,11 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 #~ "data-ignore-texts=\"1\">Ignore the failed simplifications</a>"
 #~ msgstr ""
 #~ "Eine zuvor durchgeführte Vereinfachung von Texten dieses %1$s ist "
-#~ "fehlgeschlagen. Wie wollen Sie damit umgehen?<br><br><a href=\"#\" class="
-#~ "\"button button-primary\" data-run-again=\"1\">Vereinfachungen erneut "
-#~ "durchführen</a> Die <a href=\"#\" class=\"button button-primary elementor-"
-#~ "button\" data-ignore-texts=\"1\">fehlgeschlagenen Vereinfachungen "
-#~ "ignorieren</a>"
+#~ "fehlgeschlagen. Wie wollen Sie damit umgehen?<br><br><a href=\"#\" "
+#~ "class=\"button button-primary\" data-run-again=\"1\">Vereinfachungen "
+#~ "erneut durchführen</a> Die <a href=\"#\" class=\"button button-primary "
+#~ "elementor-button\" data-ignore-texts=\"1\">fehlgeschlagenen "
+#~ "Vereinfachungen ignorieren</a>"
 
 #~ msgid "Do you want to simplify this object?"
 #~ msgstr "Möchten Sie dieses Objekt vereinfachen?"
@@ -2262,13 +2294,14 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 
 #~ msgid ""
 #~ "<strong>More than 80%% of your quota for the ChatGpt API has already been "
-#~ "used.</strong> Please contact the <a href=\"%1$s\" target=\"_blank"
-#~ "\">ChatGpt support (opens new window)</a> about extending the quota."
+#~ "used.</strong> Please contact the <a href=\"%1$s\" "
+#~ "target=\"_blank\">ChatGpt support (opens new window)</a> about extending "
+#~ "the quota."
 #~ msgstr ""
 #~ "<strong>Mehr als 80% des Kontingents für die ChatGpt API wurden bereits "
-#~ "verwendet.</strong> Bitte wenden Sie sich an den <a href=\"%1$s\" target="
-#~ "\"_blank\">ChatGpt support (öffnet neues Fenster)</a> um das Kontingent "
-#~ "zu erhöhen."
+#~ "verwendet.</strong> Bitte wenden Sie sich an den <a href=\"%1$s\" "
+#~ "target=\"_blank\">ChatGpt support (öffnet neues Fenster)</a> um das "
+#~ "Kontingent zu erhöhen."
 
 #~ msgid ""
 #~ "<p>The Capito API allows you to automatically translate the entire "
@@ -2286,20 +2319,20 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 #~ "<p>The SUMM AI API allows you to automatically translate the entire "
 #~ "website into plain and/or simple language via quota-limited API.</p><p>In "
 #~ "the free Easy Language plugin you have a quota of %1$d characters you "
-#~ "will be able to translate.</p><p>You need <a href=\"%2$s\" target=\"_blank"
-#~ "\">Easy Language Pro (opens new window)</a> and a SUMM AI API key to "
-#~ "translate more texts: <a href=\"%3$s\" target=\"_blank\">%3$s</a>.</"
-#~ "p><p><strong>Actual character spent:</strong> %4$d<br><strong>Quota limit:"
-#~ "</strong> %1$d<br><strong>Rest quota:</strong> %5$d</strong></p>"
+#~ "will be able to translate.</p><p>You need <a href=\"%2$s\" "
+#~ "target=\"_blank\">Easy Language Pro (opens new window)</a> and a SUMM AI "
+#~ "API key to translate more texts: <a href=\"%3$s\" target=\"_blank\">%3$s</"
+#~ "a>.</p><p><strong>Actual character spent:</strong> %4$d<br><strong>Quota "
+#~ "limit:</strong> %1$d<br><strong>Rest quota:</strong> %5$d</strong></p>"
 #~ msgstr ""
 #~ "<p>Mit der SUMM AI API können Sie die gesamte Website über eine "
 #~ "kontingentierte API automatisch in einfache Sprache übersetzen.</p><p>Im "
 #~ "kostenlosen Easy Language Plugin haben Sie ein Kontingent von %1$d "
 #~ "Zeichen, die Sie übersetzen können.</p><p>Sie benötigen <a href=\"%2$s\" "
 #~ "target=\"_blank\">Easy Language Pro (öffnet neues Fenster)</a> und einen "
-#~ "SUMM AI API Key zur Übersetzung von mehr Texten: <a href=\"%3$s\" target="
-#~ "\"_blank\">%3$s</a>.</p><p><strong>Aktuall verbrauchte Zeichen:</strong> "
-#~ "%4$d<br><strong>Kontingent-Limit:</strong> %1$d<br><strong>Rest "
+#~ "SUMM AI API Key zur Übersetzung von mehr Texten: <a href=\"%3$s\" "
+#~ "target=\"_blank\">%3$s</a>.</p><p><strong>Aktuall verbrauchte Zeichen:</"
+#~ "strong> %4$d<br><strong>Kontingent-Limit:</strong> %1$d<br><strong>Rest "
 #~ "Kontingent:</strong> %5$d</strong></p>"
 
 #~ msgid "Translate this term in %1$s with %2$s"
@@ -2342,8 +2375,8 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 #~ msgstr "SUMM AI API Key"
 
 #~ msgid ""
-#~ "You can get the SUMM AI API Key from the provider <a href=\"%1$s\" target="
-#~ "\"_blank\">here</a>."
+#~ "You can get the SUMM AI API Key from the provider <a href=\"%1$s\" "
+#~ "target=\"_blank\">here</a>."
 #~ msgstr ""
-#~ "Du kannst den SUMM AI API-Schlüssel vom Anbieter <a href=\"%1$s\" target="
-#~ "\"_blank\">hier</a> erhalten."
+#~ "Du kannst den SUMM AI API-Schlüssel vom Anbieter <a href=\"%1$s\" "
+#~ "target=\"_blank\">hier</a> erhalten."
