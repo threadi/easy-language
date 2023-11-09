@@ -156,7 +156,7 @@ class Text {
 		}
 
 		// get from DB.
-		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `simplification` FROM ' . $wpdb->easy_language_simplifications . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
+		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `simplification` FROM ' . DB::get_instance()->get_table_name_simplifications() . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
 		if ( ! empty( $result ) ) {
 			// save in object.
 			$this->simplifications[ $language ] = $result['simplification'];
@@ -200,7 +200,7 @@ class Text {
 			'jobid'          => $job_id,
 			'user_id'        => $user_id,
 		);
-		$wpdb->insert( $wpdb->easy_language_simplifications, $query );
+		$wpdb->insert( DB::get_instance()->get_table_name_simplifications(), $query );
 
 		// change state of text to "simplified".
 		$this->set_state( 'simplified' );
@@ -320,7 +320,7 @@ class Text {
 		}
 
 		global $wpdb;
-		$wpdb->update( $wpdb->easy_language_originals, array( 'state' => $state ), array( 'id' => $this->get_id() ) );
+		$wpdb->update( DB::get_instance()->get_table_name_originals(), array( 'state' => $state ), array( 'id' => $this->get_id() ) );
 	}
 
 	/**
@@ -339,7 +339,7 @@ class Text {
 		// delete connection between text and given object_id.
 		if ( $object_id > 0 ) {
 			$wpdb->delete(
-				$wpdb->easy_language_originals_objects,
+				DB::get_instance()->get_table_name_originals_objects(),
 				array(
 					'oid'       => $this->get_id(),
 					'blog_id'   => get_current_blog_id(),
@@ -348,7 +348,7 @@ class Text {
 			);
 		} else {
 			$wpdb->delete(
-				$wpdb->easy_language_originals_objects,
+				DB::get_instance()->get_table_name_originals_objects(),
 				array(
 					'oid'     => $this->get_id(),
 					'blog_id' => get_current_blog_id(),
@@ -358,8 +358,8 @@ class Text {
 
 		// if this text is used only from 1 object, delete it completely including its simplifications.
 		if ( 1 === absint( get_option( 'easy_language_delete_unused_simplifications', 0 ) ) && 1 === $object_count ) {
-			$wpdb->delete( $wpdb->easy_language_originals, array( 'id' => $this->get_id() ) );
-			$wpdb->delete( $wpdb->easy_language_simplifications, array( 'oid' => $this->get_id() ) );
+			$wpdb->delete( DB::get_instance()->get_table_name_originals(), array( 'id' => $this->get_id() ) );
+			$wpdb->delete( DB::get_instance()->get_table_name_simplifications(), array( 'oid' => $this->get_id() ) );
 		}
 	}
 
@@ -371,11 +371,14 @@ class Text {
 	public function get_objects(): array {
 		global $wpdb;
 
+		// get our own DB-object.
+		$db = DB::get_instance();
+
 		// get from DB.
 		$prepared_sql = $wpdb->prepare(
 			'SELECT o.`id`, oo.`object_type`, oo.`object_id`, oo.`page_builder`, o.`field`, oo.`state`
-				FROM ' . $wpdb->easy_language_originals_objects . ' oo
-				JOIN ' . $wpdb->easy_language_originals . ' o ON (o.id = oo.oid)
+				FROM ' . $db->get_table_name_originals_objects() . ' oo
+				JOIN ' . $db->get_table_name_originals() . ' o ON (o.id = oo.oid)
 				WHERE oo.`oid` = %d AND oo.`blog_id` = %d',
 			array( $this->get_id(), get_current_blog_id() )
 		);
@@ -402,7 +405,7 @@ class Text {
 			'blog_id'      => get_current_blog_id(),
 			'page_builder' => $page_builder,
 		);
-		$wpdb->insert( $wpdb->easy_language_originals_objects, $query );
+		$wpdb->insert( DB::get_instance()->get_table_name_originals_objects(), $query );
 	}
 
 	/**
@@ -416,7 +419,7 @@ class Text {
 		// get from DB.
 		$prepared_sql = $wpdb->prepare(
 			'SELECT o.`time`
-				FROM ' . $wpdb->easy_language_originals . ' o
+				FROM ' . DB::get_instance()->get_table_name_originals() . ' o
 				WHERE o.`id` = %d',
 			array( $this->get_id() )
 		);
@@ -487,7 +490,7 @@ class Text {
 		// get from DB.
 		$prepared_sql = $wpdb->prepare(
 			'SELECT s.`used_api`
-				FROM ' . $wpdb->easy_language_simplifications . ' s
+				FROM ' . DB::get_instance()->get_table_name_simplifications() . ' s
 				WHERE s.`oid` = %d',
 			array( $this->get_id() )
 		);
@@ -514,7 +517,7 @@ class Text {
 		global $wpdb;
 
 		// get from DB.
-		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `user_id` FROM ' . $wpdb->easy_language_simplifications . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
+		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `user_id` FROM ' . DB::get_instance()->get_table_name_simplifications() . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
 		if ( ! empty( $result ) ) {
 			// return result.
 			return $result['user_id'];

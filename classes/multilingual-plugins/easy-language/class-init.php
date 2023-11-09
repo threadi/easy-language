@@ -7,11 +7,11 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
+use easyLanguage\Api_Base;
 use easyLanguage\Apis;
 use easyLanguage\Base;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
-use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_Plugins_Base;
 use easyLanguage\Transients;
 use WP_Admin_Bar;
@@ -161,6 +161,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		add_filter( 'site_status_tests', array( $this, 'add_site_status_test' ) );
 		add_action( 'admin_action_easy_language_create_automatic_cron', array( $this, 'create_automatic_simplification_cron' ) );
 		add_filter( 'easy_language_get_object', array( $this, 'get_post_object' ), 20, 2 );
+		add_filter( 'easy_language_first_simplify_dialog', array( $this, 'change_first_simplify_dialog' ), 10, 3 );
+		add_action( 'admin_action_easy_language_delete_text_for_simplification', array( $this, 'delete_text_for_simplification' ) );
+		add_action( 'admin_action_easy_language_delete_all_to_simplified_texts', array( $this, 'delete_all_to_simplified_texts' ) );
 	}
 
 	/**
@@ -169,6 +172,20 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return void
 	 */
 	public function admin_init(): void {
+		// get active API.
+		$api_obj = Apis::get_instance()->get_active_api();
+
+		// bail if no API is set.
+		if ( ! ( $api_obj instanceof Api_Base ) ) {
+			return;
+		}
+
+		// bail if actual WordPress-language is not in the supported source language list.
+		$source_languages = $api_obj->get_supported_source_languages();
+		if ( empty( $source_languages[ Helper::get_wp_lang() ] ) ) {
+			return;
+		}
+
 		// get supported post-types and loop through them.
 		foreach ( $this->get_supported_post_types() as $post_type => $enabled ) {
 			// get the post type as object to get additional settings of it.
@@ -406,15 +423,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 							),
 						);
 
-						// change options if active API is not configured.
-						if ( false === $api_obj->is_configured() ) {
-							/* translators: %1$s will be replaced by the object-type-name (e.g. post or page), %2$s will be replaced by the object-title */
-							$dialog['texts'][0]              = '<p>' . sprintf( __( 'Create a simplified %1$s for <i>%2$s</i> to edit is manually.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $post_object->get_title() ) ) . '</p>';
-							$dialog['buttons'][0]            = $dialog['buttons'][1];
-							$dialog['buttons'][0]['variant'] = 'primary';
-							$dialog['buttons'][1]            = $dialog['buttons'][2];
-							unset( $dialog['buttons'][2] );
-						}
+						// change the dialog via hook.
+						$dialog = apply_filters( 'easy_language_first_simplify_dialog', $dialog, $api_obj, $post_object );
 
 						// show link to add simplification for this language.
 						/* translators: %1$s is the name of the language */
@@ -499,14 +509,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return void
 	 */
 	public function option_locale_changed( string $old_value, string $value ): void {
-		// if new value is empty, it is the en_US-default.
+		// if new value is empty, use our fallback.
 		if ( empty( $value ) ) {
-			$value = 'en_US';
+			$value = EASY_LANGUAGE_LANGUAGE_EMERGENCY;
 		}
 
 		// same for old_value.
 		if ( empty( $old_value ) ) {
-			$old_value = 'en_US';
+			$old_value = EASY_LANGUAGE_LANGUAGE_EMERGENCY;
 		}
 
 		// get actual setting for source languages.
@@ -520,7 +530,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// check if the new value is supported as source language by active APIs.
 		$add     = false;
 		$api_obj = Apis::get_instance()->get_active_api();
-		if ( false !== $api_obj ) {
+		if ( $api_obj instanceof Api_Base ) {
 			$source_languages = $api_obj->get_supported_source_languages();
 			if ( ! empty( $source_languages[ $value ] ) ) {
 				$add = true;
@@ -534,6 +544,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// update resulting setting.
 		update_option( 'easy_language_source_languages', $languages );
+
+		// validate language support on API.
+		$api_obj = Apis::get_instance()->get_active_api();
+		if ( $api_obj instanceof Api_Base ) {
+			Helper::validate_language_support_on_api( $api_obj );
+		}
 	}
 
 	/**
@@ -551,6 +567,20 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// do not show if user has no capabilities for this.
 		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// get active API.
+		$api_obj = Apis::get_instance()->get_active_api();
+
+		// bail if no API is set.
+		if ( ! ( $api_obj instanceof Api_Base ) ) {
+			return;
+		}
+
+		// bail if actual WordPress-language is not in the supported source language list.
+		$source_languages = $api_obj->get_supported_source_languages();
+		if ( empty( $source_languages[ Helper::get_wp_lang() ] ) ) {
 			return;
 		}
 
@@ -694,19 +724,18 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			if ( false === $api_obj ) {
 				$api_obj = Apis::get_instance()->get_available_apis()[0];
 			}
-			$mappings = $api_obj->get_mapping_languages();
-			foreach ( $api_obj->get_supported_source_languages() as $source_language => $enabled ) {
-				if ( ! empty( $mappings[ $source_language ] ) ) {
-					foreach ( $mappings[ $source_language ] as $language ) {
-						$languages[ $language ] = '1';
+			if ( $api_obj instanceof Api_Base ) {
+				$mappings = $api_obj->get_mapping_languages();
+				foreach ( $api_obj->get_supported_source_languages() as $source_language => $enabled ) {
+					if ( ! empty( $mappings[ $source_language ] ) ) {
+						foreach ( $mappings[ $source_language ] as $language ) {
+							$languages[ $language ] = '1';
+						}
 					}
 				}
 			}
 			update_option( 'easy_language_languages', $languages );
 		}
-
-		// get post-type-names.
-		$post_type_names = \easyLanguage\Init::get_instance()->get_post_type_names();
 
 		// get our own simplifier-role.
 		$translator_role = get_role( 'el_simplifier' );
@@ -746,6 +775,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				// remove marker.
 				delete_post_meta( $post_id, 'easy_language_simplification_state_changed_from' );
 			}
+
+			// get post-type-names.
+			$post_type_names = \easyLanguage\Init::get_instance()->get_post_type_names();
 
 			// add cap for translator-role to edit this post-types.
 			if ( ! empty( $post_type_names[ $post_type ] ) ) {
@@ -1286,15 +1318,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					),
 				);
 
-				// change options if active API is not configured.
-				if ( false === $api_obj->is_configured() ) {
-					/* translators: %1$s will be replaced by the object-type-name (e.g. post or page), %2$s will be replaced by the object-title */
-					$dialog['texts'][0]              = '<p>' . sprintf( __( 'Create a simplified %1$s for <i>%2$s</i> to edit is manually.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $post_object->get_title() ) ) . '</p>';
-					$dialog['buttons'][0]            = $dialog['buttons'][1];
-					$dialog['buttons'][0]['variant'] = 'primary';
-					$dialog['buttons'][1]            = $dialog['buttons'][2];
-					unset( $dialog['buttons'][2] );
-				}
+				// change the dialog via hook.
+				$dialog = apply_filters( 'easy_language_first_simplify_dialog', $dialog, $api_obj, $post_object );
 
 				// show link to add simplification for this language.
 				$actions[ 'easy-language-' . $language_code ] = '<a href="' . esc_url( $create_translation ) . '" class="wp-easy-dialog" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '"><i class="dashicons dashicons-plus"></i> ' . esc_html( $settings['label'] ) . '</a>';
@@ -1318,8 +1343,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		return apply_filters(
 			'easy_language_get_object_by_wp_object',
 			match ( get_class( $wp_object ) ) {
-			'WP_Post' => new Post_Object( $id ),
-			default => false,
+				'WP_Post' => new Post_Object( $id ),
+				default => false,
 			},
 			$wp_object,
 			$id
@@ -1355,7 +1380,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * Filter for translated content in table-list.
+	 * Filter for simplified content in table-list.
 	 *
 	 * @param WP_Query $query The query-object.
 	 *
@@ -1679,12 +1704,18 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * Embed translation-related scripts, which are also used by some PageBuilders.
+	 * Embed simplification-related scripts, which are also used by some PageBuilders.
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
 	 */
 	public function get_simplifications_scripts(): void {
+		// bail if actual language is not in possible source language list.
+		$source_languages = Languages::get_instance()->get_possible_source_languages();
+		if ( empty( $source_languages[ Helper::get_wp_lang() ] ) ) {
+			return;
+		}
+
 		// backend-simplifications-JS.
 		wp_enqueue_script(
 			'easy-language-simplifications',
@@ -1722,7 +1753,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * Embed our own scripts.
+	 * Embed our own backend-scripts.
 	 *
 	 * @return void
 	 */
@@ -1992,9 +2023,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		if ( $object_id > 0 ) {
 			$filter = array(
-				'object_id' => $object_id,
+				'object_id'   => $object_id,
 				'object_type' => $object_type,
-				'state'     => 'processing',
+				'state'       => 'processing',
 			);
 
 			// get all simplified entries.
@@ -2143,7 +2174,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				$return['title']            = $copy_obj->get_title();
 				$return['api_title']        = $api_object->get_title();
 				$return['edit_link']        = $copy_obj->get_edit_link();
-				$return['quota_state']		= $copy_obj->get_quota_state( $api_object );
+				$return['quota_state']      = $copy_obj->get_quota_state( $api_object );
 			}
 		}
 
@@ -2384,5 +2415,95 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// otherwise we return false.
 		return false;
+	}
+
+	/**
+	 * Change the initial simplify dialog depending on API-configuration.
+	 *
+	 * @param array    $dialog The dialog-configuration.
+	 * @param Api_Base $api_obj The API.
+	 * @param object   $post_object The object used.
+	 *
+	 * @return array
+	 */
+	public function change_first_simplify_dialog( array $dialog, Api_Base $api_obj, object $post_object ): array {
+		// change options if active API is not configured.
+		if ( false === $api_obj->is_configured() ) {
+			if ( $api_obj->has_settings() && current_user_can( 'manage_options' ) ) {
+				/* translators: %1$s will be replaced by the API-title, %2$s will be replaced by the object-type-name (e.g. post or page), %3$s will be replaced by the object-title */
+				$dialog['texts'][0] = '<p>' . sprintf( __( 'The actual active API %1$s is not yet configured. You can configure it <a href="%2$s">here</a>.<br>Create a simplified %3$s for <i>%4$s</i> to edit is manually.', 'easy-language' ), esc_html( $api_obj->get_title() ), esc_url( $api_obj->get_settings_url() ), esc_html( $post_object->get_type_name() ), esc_html( $post_object->get_title() ) ) . '</p>';
+			} else {
+				/* translators: %1$s will be replaced by the API-title, %2$s will be replaced by the object-type-name (e.g. post or page), %3$s will be replaced by the object-title */
+				$dialog['texts'][0] = '<p>' . sprintf( __( 'The actual active API %1$s is not yet configured.<br>Create a simplified %2$s for <i>%3$s</i> to edit is manually.', 'easy-language' ), esc_html( $api_obj->get_title() ), esc_html( $post_object->get_type_name() ), esc_html( $post_object->get_title() ) ) . '</p>';
+			}
+			$dialog['buttons'][0]            = $dialog['buttons'][1];
+			$dialog['buttons'][0]['variant'] = 'primary';
+			$dialog['buttons'][1]            = $dialog['buttons'][2];
+			unset( $dialog['buttons'][2] );
+		}
+
+		// return resulting dialog.
+		return $dialog;
+	}
+
+	/**
+	 * Delete the requested simplification.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function delete_text_for_simplification(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-delete-text-for-simplification', 'nonce' );
+
+		// get requested text.
+		$text_id = ! empty( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
+		if ( $text_id > 0 ) {
+			$text_obj = new Text( $text_id );
+			$text_obj->delete();
+
+			// show success-message.
+			$transients_obj = Transients::get_instance();
+			$transient_obj  = $transients_obj->add();
+			$transient_obj->set_name( 'easy_language_text_deleted' );
+			$transient_obj->set_message( __( '<strong>The chosen text is deleted.</strong>', 'easy-language' ) );
+			$transient_obj->set_type( 'success' );
+			$transient_obj->save();
+		}
+
+		// redirect user back to list.
+		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		exit;
+	}
+
+	/**
+	 * Delete all to simplified texts.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function delete_all_to_simplified_texts(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-delete-all-to-simplified_texts', 'nonce' );
+
+		// get all texts which should be simplified.
+		$entries = DB::get_instance()->get_entries( Init::get_instance()->get_filter_for_entries_to_simplify() );
+
+		// delete them.
+		foreach( $entries as $entry ) {
+			$entry->delete();
+		}
+
+		// show success-message.
+		$transients_obj = Transients::get_instance();
+		$transient_obj  = $transients_obj->add();
+		$transient_obj->set_name( 'easy_language_text_deleted' );
+		$transient_obj->set_message( __( '<strong>All to simplified texts has been deleted.</strong>', 'easy-language' ) );
+		$transient_obj->set_type( 'success' );
+		$transient_obj->save();
+
+		// redirect user back to list.
+		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		exit;
 	}
 }

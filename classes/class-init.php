@@ -236,24 +236,27 @@ class Init {
 	/**
 	 * If chosen api changes, cleanup the former API (e.g. let it delete its transients) and enable the new API
 	 * with individual settings.
-	 * Global settings are run via @function easy_language_admin_validate_chosen_api().
+	 * Global settings after user-interaction are run via @function easy_language_admin_validate_chosen_api().
 	 *
 	 * @param string $old_value The name of the former API.
-	 * @param string $value The name of the new API.
+	 * @param string $new_value The name of the new API.
 	 *
 	 * @return void
 	 */
-	public function update_easy_language_api( string $old_value, string $value ): void {
+	public function update_easy_language_api( string $old_value, string $new_value ): void {
 		// run disable tasks on former API.
 		$old_api_obj = Apis::get_instance()->get_api_by_name( $old_value );
-		if ( false !== $old_api_obj ) {
+		if ( $old_api_obj instanceof Api_Base ) {
 			$old_api_obj->disable();
 		}
 
 		// run enable tasks on new API.
-		$new_api_obj = Apis::get_instance()->get_api_by_name( $value );
-		if ( false !== $new_api_obj ) {
+		$new_api_obj = Apis::get_instance()->get_api_by_name( $new_value );
+		if ( $new_api_obj instanceof Api_Base ) {
 			$new_api_obj->enable();
+
+			// validate language support on API.
+			Helper::validate_language_support_on_api( $new_api_obj );
 		}
 	}
 

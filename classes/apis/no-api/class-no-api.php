@@ -105,6 +105,18 @@ class No_Api extends Base implements Api_Base {
 				'enable'      => true,
 				'description' => __( 'German spoken in Austria.', 'easy-language' ),
 			),
+			'en_UK' => array(
+				'label'       => __( 'English (UK)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'English spoken in the United Kingdom.', 'easy-language' ),
+				'api_value'   => 'en',
+			),
+			'en_US' => array(
+				'label'       => __( 'English (US)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'English spoken in the USA.', 'easy-language' ),
+				'api_value'   => 'en',
+			),
 		);
 	}
 

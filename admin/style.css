@@ -53,10 +53,12 @@
 
 td.easy-language .easy-language-trash { color: #b32d2e; }
 
-td[class^="easy-language"] a, td[class^="easy-language"] span {
+td[class^="easy-language"] a, td[class^="easy-language"] span, .text-translations-table .options span, .text-translations-table .options a {
     display: inline-block;
     margin-right: 0.8em;
 }
+
+.text-translations-table .options { white-space: nowrap }
 
 .easy-language-transient {
     position: relative;
@@ -68,6 +70,14 @@ td[class^="easy-language"] a, td[class^="easy-language"] span {
     display: inline-block;
     margin-right: 8px;
     width: 32px;
+}
+
+.easy-language-transient p { line-height: 2 }
+
+.easy-language-transient ul {
+	list-style: disc;
+	margin-left: 14px;
+	margin-top: 0;
 }
 
 .easy-language-translate-object span {

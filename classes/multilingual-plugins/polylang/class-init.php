@@ -223,4 +223,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// return resulting list of locales (e.g. "de_EL").
 		return $languages;
 	}
+
+	/**
+	 * Additional cli functions we do not use for this plugin.
+	 *
+	 * @return void
+	 */
+	public function cli(): void {}
 }

@@ -121,17 +121,49 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 			return '';
 		}
 
+		// add option to delete a single simplification item.
+		$delete_link = add_query_arg(
+			array(
+				'action' => 'easy_language_delete_text_for_simplification',
+				'id'     => $item->get_id(),
+				'nonce'  => wp_create_nonce( 'easy-language-delete-text-for-simplification' ),
+			),
+			get_admin_url() . 'admin.php'
+		);
+
+		// create deletion dialog.
+		$dialog_simplification = array(
+			'title'   => __( 'Delete this not simplified text?', 'easy-language' ),
+			'texts'   => array(
+				__( '<p>The deletion of this text will not alter any contents.<br>The deleted text will not automatically be simplified.</p>', 'easy-language' ),
+			),
+			'buttons' => array(
+				array(
+					'action'  => 'location.href="' . $delete_link . '";',
+					'variant' => 'primary',
+					'text'    => __( 'Yes', 'easy-language' ),
+				),
+				array(
+					'action'  => 'closeDialog();',
+					'variant' => 'secondary',
+					'text'    => __( 'No', 'easy-language' ),
+				),
+			),
+		);
+
 		// show content depending on column.
 		switch ( $column_name ) {
 			case 'options':
 				$options = array(
 					'<span class="dashicons dashicons-translation" title="' . __( 'Simplify now only with Easy Language Pro.', 'easy-language' ) . '">&nbsp;</span>',
+					'<a href="' . esc_url( $delete_link ) . '" class="dashicons dashicons-trash wp-easy-dialog" data-dialog="' . esc_attr( wp_json_encode( $dialog_simplification ) ) . '" title="' . __( 'Delete this text.', 'easy-language' ) . '">&nbsp;</a>',
 				);
 
-				$filtered_options = apply_filters( 'easy_language_simplification_to_simplify_table_options', $options, $item->get_id() );
+				// get additional options.
+				$options = apply_filters( 'easy_language_simplification_to_simplify_table_options', $options, $item->get_id() );
 
 				// return html-output.
-				return implode( '', $filtered_options );
+				return implode( '', $options );
 
 			// get date of this entry.
 			case 'date':
@@ -161,6 +193,27 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 			// fallback if no column has been matched.
 			default:
 				return print_r( $item, true );
+		}
+	}
+
+	/**
+	 * Add export-buttons on top of table.
+	 *
+	 * @param string $which The position.
+	 * @return void
+	 */
+	public function extra_tablenav( $which ): void {
+		if ( 'top' === $which ) {
+			// define delete all URL.
+			$url = add_query_arg(
+				array(
+					'action' => 'easy_language_delete_all_to_simplified_texts',
+					'nonce'  => wp_create_nonce( 'easy-language-delete-all-to-simplified_texts' ),
+				),
+				get_admin_url() . 'admin.php'
+			);
+			?><a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Delete all', 'easy-language' ); ?></a>
+			<?php
 		}
 	}
 

@@ -231,4 +231,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			icl_cache_clear();
 		}
 	}
+
+	/**
+	 * Additional cli functions we do not use for this plugin.
+	 *
+	 * @return void
+	 */
+	public function cli(): void {}
 }

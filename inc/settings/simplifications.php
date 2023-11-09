@@ -102,6 +102,7 @@ function easy_language_settings_simplifications_to_simplify(): void {
 	<?php
 	$simplifications_table = new Texts_To_Simplify_Table();
 	$simplifications_table->prepare_items();
+	$simplifications_table->views();
 	$simplifications_table->display();
 }
 add_action( 'easy_language_settings_simplifications_to_simplify_page', 'easy_language_settings_simplifications_to_simplify' );

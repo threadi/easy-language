@@ -96,7 +96,11 @@ class Apis {
 	 */
 	public function export_api_log(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-export-api-log', 'nonce' );
+		if( ( isset($_REQUEST['nonce']) && !wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-export-api-log' ) || empty($_REQUEST['nonce']) ) ) {
+			// redirect user back.
+			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+			exit;
+		}
 
 		// get name of the api to export.
 		$export_api = isset( $_GET['api'] ) ? sanitize_text_field( wp_unslash( $_GET['api'] ) ) : '';

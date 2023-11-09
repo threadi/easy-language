@@ -178,4 +178,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return void
 	 */
 	public function get_simplifications_scripts(): void {}
+
+	/**
+	 * Additional cli functions we do not use for this plugin.
+	 *
+	 * @return void
+	 */
+	public function cli(): void {}
 }

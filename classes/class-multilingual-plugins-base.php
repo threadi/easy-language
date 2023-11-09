@@ -66,4 +66,11 @@ interface Multilingual_Plugins_Base {
 	 * @return void
 	 */
 	public function get_simplifications_scripts(): void;
+
+	/**
+	 * Initialize our main CLI-functions.
+	 *
+	 * @return void
+	 */
+	public function cli(): void;
 }

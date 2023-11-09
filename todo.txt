@@ -3,7 +3,8 @@ ToDo
 
 Funktionales
 ------------
-* bei "zu vereinfachen" auch löschen button einbauen & "alle löschen"
+* Datenbankfehler bei wpdb->insert abfangen und loggen
+-> allgemeines Log ergänzen?
 * Kompatibilität mit Plugins testen
 -> Caching-Plugins
 -> Order-Plugins

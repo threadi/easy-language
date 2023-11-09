@@ -371,9 +371,9 @@ class Texts {
 			// delete in DB existing texts of its object is not part of the actual content.
 			// also check for their simplifications.
 			$query   = array(
-				'object_id' => $post_id,
+				'object_id'   => $post_id,
 				'object_type' => $post_obj->get_type(),
-				'lang'      => $source_language,
+				'lang'        => $source_language,
 			);
 			$entries = $this->db->get_entries( $query );
 			if ( ! empty( $target_language ) && ! empty( $entries ) ) {
@@ -502,7 +502,11 @@ class Texts {
 	 */
 	public function export_simplifications(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-export-simplifications', 'nonce' );
+		if ( ( isset( $_REQUEST['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-export-simplifications' ) || empty( $_REQUEST['nonce'] ) ) ) {
+			// redirect user back.
+			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+			exit;
+		}
 
 		// get language to export.
 		$export_language_code = isset( $_GET['lang'] ) ? sanitize_text_field( wp_unslash( $_GET['lang'] ) ) : '';

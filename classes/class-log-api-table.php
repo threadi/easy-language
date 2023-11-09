@@ -7,7 +7,6 @@
 
 namespace easyLanguage;
 
-use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use WP_List_Table;
 
 // prevent direct access.
@@ -19,29 +18,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handler for log-output in backend.
  */
 class Log_Api_Table extends WP_List_Table {
-	/**
-	 * Name for own database-table.
-	 *
-	 * @var string
-	 */
-	private string $table_name;
-
-	/**
-	 * Constructor for Logging-Handler.
-	 */
-	public function __construct() {
-		global $wpdb;
-
-		// get the db-connection.
-		$this->wpdb = $wpdb;
-
-		// set the table-name.
-		$this->table_name = DB::get_instance()->get_wpdb_prefix() . 'easy_language_log';
-
-		// call parent constructor.
-		parent::__construct();
-	}
-
 	/**
 	 * Override the parent columns method. Defines the columns to use in your listing table
 	 *
@@ -63,6 +39,13 @@ class Log_Api_Table extends WP_List_Table {
 	 * @return array
 	 */
 	private function table_data(): array {
+		// check nonce.
+		if( isset($_REQUEST['nonce']) && !wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-export-simplifications' ) ) {
+			// redirect user back.
+			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+			exit;
+		}
+
 		global $wpdb;
 
 		// order table.
@@ -80,7 +63,7 @@ class Log_Api_Table extends WP_List_Table {
 		$api   = $this->get_api_filter();
 		$where = '';
 		if ( ! empty( $api ) ) {
-			$where .= ' AND `api` = "%3$s"';
+			$where .= ' AND `api` = "%4$s"';
 			$vars[] = $api;
 		}
 
@@ -239,6 +222,6 @@ class Log_Api_Table extends WP_List_Table {
 	 * @return string
 	 */
 	private function get_base_sql(): string {
-		return 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM `' . $this->table_name . '` WHERE 1 = %1$d';
+		return 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM `' . Log_Api::get_instance()->get_table_name() . '` WHERE 1 = %1$d';
 	}
 }

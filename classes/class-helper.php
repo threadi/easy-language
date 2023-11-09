@@ -105,13 +105,12 @@ class Helper {
 	}
 
 	/**
-	 * Return the active Wordpress-language depending on our own support.
-	 * If language is unknown for our plugin, use english.
+	 * Return the active Wordpress-language.
 	 *
 	 * @return string The language in locale-format, e.g. "ab_CD").
 	 */
 	public static function get_wp_lang(): string {
-		$wp_language = get_bloginfo( 'language' );
+		$wp_language = get_option( 'WPLANG' );
 
 		/**
 		 * Consider the main language set in Polylang for the web page
@@ -134,7 +133,7 @@ class Helper {
 		}
 
 		// return language in format ab_CD (e.g. en_US).
-		return str_replace( '-', '_', $wp_language );
+		return $wp_language;
 	}
 
 	/**
@@ -498,5 +497,69 @@ class Helper {
 
 		// fallback and use the WordPress-language.
 		return self::get_wp_lang();
+	}
+
+	/**
+	 * Return the URL for main WordPress settings.
+	 *
+	 * @return string
+	 */
+	public static function get_wp_settings_url(): string {
+		return admin_url().'options-general.php';
+	}
+
+	/**
+	 * Validate the language support of given API.
+	 *
+	 * @param Api_Base $api The API to check.
+	 *
+	 * @return void
+	 */
+	public static function validate_language_support_on_api( Api_Base $api ): void {
+		// get the transients-object.
+		$transients_obj = Transients::get_instance();
+
+		// get the actual language in WordPress.
+		$language = Helper::get_wp_lang();
+
+		// if actual language is not supported as possible source language, show hint.
+		$source_languages = $api->get_supported_source_languages();
+		if( empty($source_languages[$language]) ) {
+			// create list of languages this API supports as HTML-list.
+			$language_list = '<ul>';
+			foreach( $api->get_supported_source_languages() as $settings ) {
+				$language_list .= '<li>'.esc_html($settings['label']).'</li>';
+			}
+			$language_list .= '</ul>';
+
+			// get language-name.
+			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
+			$translations = wp_get_available_translations();
+			$language_name = $language;
+			if( !empty($translations[$language]) ) {
+				$language_name = $translations[$language]['native_name'];
+			}
+			if( 'en_US' === $language_name ) {
+				$language_name = 'English (United States)';
+			}
+
+			// create transient hint.
+			$transient_obj = $transients_obj->add();
+			$transient_obj->set_dismissible_days( 2 );
+			$transient_obj->set_name( 'easy_language_source_language_not_supported' );
+			/* translators: %1$s will be replaced by name of the actual language, %2$s will be replaced by the API-title, %3$s will be replaced by the URL for WordPress-settings, %5$s will be replaced by a list of languages, %6$s will be replaced by the URL for the API-settings. */
+			$transient_obj->set_message( sprintf( __( '<strong>The language of your website (%1$s) is not supported as source language for simplifications via %2$s!</strong><br>You will not be able to use %3$s.<br>You will not be able to simplify any texts.<br>You have to <a href="%4$s">switch the language</a> in WordPress to one of the following supported source languages: %5$s Or <a href="%6$s">choose another API</a> which supports the language.', 'easy-language' ), esc_html($language_name), esc_html( $api->get_title() ), esc_html( $api->get_title() ), esc_url( Helper::get_wp_settings_url() ), wp_kses_post( $language_list ), esc_url( Helper::get_settings_page_url() ) ) );
+			$transient_obj->set_type( 'error' );
+			$transient_obj->save();
+
+			// remove activation hint.
+			$transients_obj->get_transient_by_name( 'easy_language_api_changed' )->delete();
+
+			// remove intro.
+			delete_option( 'easy_language_intro_step_2' );
+		}
+		else {
+			$transients_obj->get_transient_by_name( 'easy_language_source_language_not_supported' )->delete();
+		}
 	}
 }

@@ -43,17 +43,33 @@ class Db {
 	/**
 	 * Constructor for this object.
 	 */
-	private function __construct() {
-		global $wpdb;
+	private function __construct() {}
 
-		// set the table-name for original-texts.
-		$wpdb->easy_language_originals = $this->get_wpdb_prefix() . 'easy_language_originals';
+	/**
+	 * Get table name for the original text.
+	 *
+	 * @return string
+	 */
+	public function get_table_name_originals(): string {
+		return $this->get_wpdb_prefix() . 'easy_language_originals';
+	}
 
-		// set the table-name for objects which are using original-texts.
-		$wpdb->easy_language_originals_objects = $this->get_wpdb_prefix() . 'easy_language_originals_objects';
+	/**
+	 * Get the table name for the objects where the original texts are used.
+	 *
+	 * @return string
+	 */
+	public function get_table_name_originals_objects(): string {
+		return $this->get_wpdb_prefix() . 'easy_language_originals_objects';
+	}
 
-		// set the table-name for simplifications.
-		$wpdb->easy_language_simplifications = $this->get_wpdb_prefix() . 'easy_language_simplifications';
+	/**
+	 * Get the table name for simplifications.
+	 *
+	 * @return string
+	 */
+	public function get_table_name_simplifications(): string {
+		return $this->get_wpdb_prefix() . 'easy_language_simplifications';
 	}
 
 	/**
@@ -105,10 +121,10 @@ class Db {
 		$charset_collate = $wpdb->get_charset_collate();
 
 		// table for original-texts to translate.
-		$sql = "CREATE TABLE $wpdb->easy_language_originals (
+		$sql = 'CREATE TABLE ' . $this->get_table_name_originals() . " (
             `id` mediumint(9) NOT NULL AUTO_INCREMENT,
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-            `original` text DEFAULT '' NOT NULL,
+            `original` longtext DEFAULT '' NOT NULL,
             `field` varchar(32) DEFAULT '' NOT NULL,
             `hash` varchar(32) DEFAULT '' NOT NULL,
             `lang` varchar(5) DEFAULT '' NOT NULL,
@@ -118,7 +134,7 @@ class Db {
 		dbDelta( $sql );
 
 		// table for objects which are using original-texts.
-		$sql = "CREATE TABLE $wpdb->easy_language_originals_objects (
+		$sql = 'CREATE TABLE ' . $this->get_table_name_originals_objects() . " (
             `oid` mediumint(9) NOT NULL,
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
             `object_type` varchar(100) DEFAULT '' NOT NULL,
@@ -130,10 +146,10 @@ class Db {
 		dbDelta( $sql );
 
 		// table for language- and api-specific simplifications of texts.
-		$sql = "CREATE TABLE $wpdb->easy_language_simplifications (
+		$sql = 'CREATE TABLE ' . $this->get_table_name_simplifications() . " (
             `oid` mediumint(9) NOT NULL,
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-            `simplification` text DEFAULT '' NOT NULL,
+            `simplification` longtext DEFAULT '' NOT NULL,
             `hash` varchar(32) DEFAULT '' NOT NULL,
             `language` varchar(20) DEFAULT '' NOT NULL,
             `used_api` varchar(40) DEFAULT '' NOT NULL,
@@ -150,9 +166,9 @@ class Db {
 	 */
 	public function delete_tables(): void {
 		global $wpdb;
-		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->easy_language_originals );
-		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->easy_language_originals_objects );
-		$wpdb->query( 'DROP TABLE IF EXISTS ' . $wpdb->easy_language_simplifications );
+		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS `%1$s`', $this->get_table_name_originals() ) );
+		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS `%1$s`', $this->get_table_name_originals_objects() ) );
+		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS `%1$s`', $this->get_table_name_simplifications() ) );
 	}
 
 	/**
@@ -186,7 +202,7 @@ class Db {
 			'state'    => 'to_simplify',
 			'field'    => $field,
 		);
-		$wpdb->insert( $wpdb->easy_language_originals, $query );
+		$wpdb->insert( $this->get_table_name_originals(), $query );
 
 		// get DB-id.
 		$id = $wpdb->insert_id;
@@ -249,9 +265,9 @@ class Db {
 			}
 			if ( ! empty( $filter['lang'] ) ) {
 				if ( ! empty( $filter['target_lang'] ) ) {
-					$sql_join[ $wpdb->easy_language_simplifications ] = ' LEFT JOIN ' . $wpdb->easy_language_simplifications . ' s ON s.oid = o.id';
-					$sql_where                                       .= ' AND (s.language = %s OR o.lang = %s)';
-					$vars[] = $filter['target_lang'];
+					$sql_join[ $this->get_table_name_simplifications() ] = ' LEFT JOIN ' . $this->get_table_name_simplifications() . ' s ON s.oid = o.id';
+					$sql_where .= ' AND (s.language = %s OR o.lang = %s)';
+					$vars[]     = $filter['target_lang'];
 				} else {
 					$sql_where .= ' AND o.lang = %s';
 				}
@@ -262,48 +278,48 @@ class Db {
 				$vars[]     = $filter['field'];
 			}
 			if ( ! empty( $filter['object_id'] ) ) {
-				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
-				$sql_select                                        .= ', oo.object_id';
-				$sql_where .= ' AND oo.object_id = %d';
-				$sql_where .= ' AND oo.blog_id = %d';
-				$vars[]     = absint( $filter['object_id'] );
-				$vars[]     = absint( get_current_blog_id() );
+				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
+				$sql_select .= ', oo.object_id';
+				$sql_where  .= ' AND oo.object_id = %d';
+				$sql_where  .= ' AND oo.blog_id = %d';
+				$vars[]      = absint( $filter['object_id'] );
+				$vars[]      = absint( get_current_blog_id() );
 				if ( ! empty( $filter['object_state'] ) ) {
 					$sql_where .= ' AND oo.state = %s';
 					$vars[]     = $filter['object_state'];
 				}
 			}
 			if ( ! empty( $filter['object_type'] ) ) {
-				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
-				$sql_select                                        .= ', oo.object_type';
-				$sql_where .= ' AND oo.object_type = %s';
-				$sql_where .= ' AND oo.blog_id = %d';
-				$vars[]     = $filter['object_type'];
-				$vars[]     = absint( get_current_blog_id() );
+				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
+				$sql_select .= ', oo.object_type';
+				$sql_where  .= ' AND oo.object_type = %s';
+				$sql_where  .= ' AND oo.blog_id = %d';
+				$vars[]      = $filter['object_type'];
+				$vars[]      = absint( get_current_blog_id() );
 			}
 			if ( ! empty( $filter['simplification_hash'] ) ) {
-				$sql_join[ $wpdb->easy_language_simplifications ] = ' INNER JOIN ' . $wpdb->easy_language_simplifications . ' s ON s.oid = o.id';
-				$sql_where                                       .= ' AND s.hash = %s';
-				$vars[] = $filter['simplification_hash'];
+				$sql_join[ $this->get_table_name_simplifications() ] = ' INNER JOIN ' . $this->get_table_name_simplifications() . ' s ON s.oid = o.id';
+				$sql_where .= ' AND s.hash = %s';
+				$vars[]     = $filter['simplification_hash'];
 			}
 			if ( ! empty( $filter['not_locked'] ) ) {
-				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
-				$sql_select                                        .= ', oo.object_id, oo.object_type';
+				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
+				$sql_select .= ', oo.object_id, oo.object_type';
 			}
 			if ( ! empty( $filter['not_prevented'] ) ) {
-				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
-				$sql_select                                        .= ', oo.object_id, oo.object_type';
+				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
+				$sql_select .= ', oo.object_id, oo.object_type';
 			}
 			if ( ! empty( $filter['object_state'] ) ) {
-				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
-				$sql_select                                        .= ', oo.object_id, oo.object_type';
+				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
+				$sql_select .= ', oo.object_id, oo.object_type';
 			}
 			if ( ! empty( $filter['object_not_state'] ) ) {
-				$sql_join[ $wpdb->easy_language_originals_objects ] = ' INNER JOIN ' . $wpdb->easy_language_originals_objects . ' oo ON oo.oid = o.id';
-				$sql_select                                        .= ', oo.object_id, oo.object_type';
+				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
+				$sql_select .= ', oo.object_id, oo.object_type';
 			}
 			if ( ! empty( $filter['has_simplification'] ) ) {
-				$sql_join[ $wpdb->easy_language_simplifications ] = ' INNER JOIN ' . $wpdb->easy_language_simplifications . ' s ON s.oid = o.id';
+				$sql_join[ $this->get_table_name_simplifications() ] = ' INNER JOIN ' . $this->get_table_name_simplifications() . ' s ON s.oid = o.id';
 			}
 		}
 
@@ -314,7 +330,7 @@ class Db {
 		}
 
 		// define base-statement.
-		$sql = 'SELECT `id`, `original`, `lang`%1$s FROM ' . $wpdb->easy_language_originals . ' AS o';
+		$sql = 'SELECT `id`, `original`, `lang`%1$s FROM ' . $this->get_table_name_originals() . ' AS o';
 
 		// add additional result-rows.
 		$sql = sprintf( $sql, $sql_select );
@@ -373,7 +389,7 @@ class Db {
 	 */
 	public function reset_simplifications(): void {
 		global $wpdb;
-		$wpdb->query( 'TRUNCATE TABLE ' . $wpdb->easy_language_simplifications );
+		$wpdb->query( sprintf( 'TRUNCATE TABLE `%1$s`', $this->get_table_name_simplifications() ) );
 	}
 
 	/**

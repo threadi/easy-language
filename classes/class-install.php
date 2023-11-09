@@ -114,10 +114,10 @@ class Install {
 	 * @return void
 	 */
 	private function activation_tasks(): void {
-		// create log table if not exist.
+		// create API-log table if it does not exist.
 		Log_Api::get_instance()->create_table();
 
-		// create simplification tables if not exist.
+		// create simplification tables if they do not exist.
 		Db::get_instance()->create_table();
 
 		// set debug-mode to disabled per default.
@@ -171,7 +171,7 @@ class Install {
 			$admin_role->add_cap( $capability );
 		}
 
-		// get the active APIs to call its install-routines.
+		// get the available APIs to call its install-routines.
 		$apis_obj = Apis::get_instance();
 		foreach ( $apis_obj->get_available_apis() as $api_obj ) {
 			$api_obj->install();

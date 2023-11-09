@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling von operations via WP CLI.
+ * File for handling of operations via WP CLI.
  *
  * @package easy-language
  */
