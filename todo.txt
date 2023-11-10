@@ -3,8 +3,6 @@ ToDo
 
 Funktionales
 ------------
-* Datenbankfehler bei wpdb->insert abfangen und loggen
--> allgemeines Log ergänzen?
 * Kompatibilität mit Plugins testen
 -> Caching-Plugins
 -> Order-Plugins
@@ -14,8 +12,10 @@ Funktionales
 -> SiteOrigin
 
 Später:
-* Vereinfachungen über eigenes Object erfassen und ausgeben
-* Vereinfachung per REST API statt AJAX-Request durchführen
+* weitere Gutenberg-Blöcke:
+-> Plugin "Accordion Blocks"
+* Vereinfachungen über eigenes PHP-Object erfassen und ausgeben
+* Vereinfachung per REST API statt AJAX-Request durchführen (bei Divi schon begonnen)
 * sprachspezifische Suche im Frontend
 * Optionen für Handling in Tabellen ergänzen ("+" => sofort übersetzen / nur erstellen, "translate" => sichtbar/nicht sichtbar
 * Option an Post-Types ergänzen mit denen ein Redakteur weitere/erneute Übersetzungen verhindern kann

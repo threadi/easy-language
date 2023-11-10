@@ -258,6 +258,14 @@ class Init {
 			// validate language support on API.
 			Helper::validate_language_support_on_api( $new_api_obj );
 		}
+
+		// Log event.
+		if( empty($old_value) ) {
+			Log::get_instance()->add_log( 'API initialized with ' . $new_value, 'success' );
+		}
+		else {
+			Log::get_instance()->add_log( 'API changed from ' . $old_value . ' to ' . $new_value, 'success' );
+		}
 	}
 
 	/**
@@ -281,6 +289,9 @@ class Init {
 
 		// set intro step 1.
 		Helper::set_intro_step1();
+
+		// Log event.
+		Log::get_instance()->add_log( 'Intro resetted', 'success' );
 
 		// return ok.
 		wp_send_json( array( 'result' => 'ok' ) );
@@ -326,6 +337,9 @@ class Init {
 
 			// reset image list in db.
 			delete_option( 'easy_language_icons' );
+
+			// Log event.
+			Log::get_instance()->add_log( 'New icon set for '.$language_code, 'success' );
 		}
 
 		// return nothing.

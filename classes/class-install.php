@@ -24,8 +24,7 @@ class Install {
 	/**
 	 * Constructor for Init-Handler.
 	 */
-	private function __construct() {
-	}
+	private function __construct() {}
 
 	/**
 	 * Prevent cloning of this object.
@@ -114,6 +113,9 @@ class Install {
 	 * @return void
 	 */
 	private function activation_tasks(): void {
+		// create log table if it does not exist.
+		Log::get_instance()->create_table();
+
 		// create API-log table if it does not exist.
 		Log_Api::get_instance()->create_table();
 

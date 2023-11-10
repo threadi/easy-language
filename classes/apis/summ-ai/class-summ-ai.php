@@ -242,6 +242,7 @@ class Summ_AI extends Base implements Api_Base {
 	public function get_mapping_languages(): array {
 		return array(
 			'de_DE' => array( 'de_LS', 'de_EL' ),
+			'de_DE_formal' => array( 'de_LS', 'de_EL' ),
 		);
 	}
 

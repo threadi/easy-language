@@ -178,6 +178,7 @@ class Uninstall {
 		/**
 		 * Delete DB-tables.
 		 */
+		Log::get_instance()->delete_table();
 		Log_Api::get_instance()->delete_table();
 		Db::get_instance()->delete_tables();
 

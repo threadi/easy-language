@@ -12,6 +12,7 @@ use easyLanguage\Apis;
 use easyLanguage\Base;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
+use easyLanguage\Log;
 use easyLanguage\Multilingual_Plugins_Base;
 use easyLanguage\Transients;
 use WP_Admin_Bar;
@@ -324,7 +325,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						} elseif ( 'above_entry_limit' === $quota_status['status'] && $api_obj->is_configured() ) {
 							// show simple not clickable icon if API is configured but limit for texts is exceeded
 							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
-							echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'To many text-widgets in this %1$s for simplification with %2$s.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</span>';
+							echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'To many text-widgets in this %1$s for simplification with %2$s.<br>The %3$s will be simplified in background automatically.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $api_obj->get_title() ), esc_html( $post_object->get_type_name() ) ) ) . '">&nbsp;</span>';
 						} elseif ( $api_obj->is_configured() ) {
 							// show simple not clickable icon if API is configured but no quota available.
 							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
@@ -504,14 +505,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * If locale setting changed in WP, change the plugin-settings.
 	 *
 	 * @param string $old_value The old value of the changed option.
-	 * @param string $value The new value of the changed option.
+	 * @param string $new_value The new value of the changed option.
 	 *
 	 * @return void
 	 */
-	public function option_locale_changed( string $old_value, string $value ): void {
+	public function option_locale_changed( string $old_value, string $new_value ): void {
 		// if new value is empty, use our fallback.
-		if ( empty( $value ) ) {
-			$value = EASY_LANGUAGE_LANGUAGE_EMERGENCY;
+		if ( empty( $new_value ) ) {
+			$new_value = EASY_LANGUAGE_LANGUAGE_EMERGENCY;
 		}
 
 		// same for old_value.
@@ -532,14 +533,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$api_obj = Apis::get_instance()->get_active_api();
 		if ( $api_obj instanceof Api_Base ) {
 			$source_languages = $api_obj->get_supported_source_languages();
-			if ( ! empty( $source_languages[ $value ] ) ) {
+			if ( ! empty( $source_languages[ $new_value ] ) ) {
 				$add = true;
 			}
 		}
 
 		// add the new language as activate language.
 		if ( false !== $add ) {
-			$languages[ $value ] = '1';
+			$languages[ $new_value ] = '1';
 		}
 
 		// update resulting setting.
@@ -550,6 +551,13 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		if ( $api_obj instanceof Api_Base ) {
 			Helper::validate_language_support_on_api( $api_obj );
 		}
+
+		// update SUMM AI setting.
+		$languages = array( Helper::get_wp_lang() => '1' );
+		update_option( 'easy_language_summ_ai_source_languages', $languages );
+
+		// Log event.
+		Log::get_instance()->add_log( 'Locale in WordPress changed from '.$old_value.' to '.$new_value, 'success' );
 	}
 
 	/**
@@ -823,6 +831,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// TODO entfernen sobald sprachen im repo sind.
 		load_plugin_textdomain( 'easy-language', false, dirname( plugin_basename( EASY_LANGUAGE ) ) . '/languages' );
 
+		// Log event.
+		Log::get_instance()->add_log( 'Plugin activated', 'success' );
+
 		// set transient for intro step 1 with hint where to start.
 		Helper::set_intro_step1();
 	}
@@ -870,6 +881,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				}
 			}
 		}
+
+		// Log event.
+		Log::get_instance()->add_log( 'Plugin deactivated', 'success' );
 	}
 
 	/**
@@ -944,6 +958,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy_language_automatic_item_count',
 			'easy_language_automatic_simplification_enabled',
 			'easy_language_icons',
+			EASY_LANGUAGE_OPTION_DELETION_COUNT,
+			EASY_LANGUAGE_OPTION_DELETION_MAX,
+			EASY_LANGUAGE_OPTION_DELETION_RUNNING,
+			'easy_language_source_languages'
 		);
 		foreach ( $options as $option ) {
 			delete_option( $option );
@@ -1532,6 +1550,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 			// bail if object is not a simplified object.
 			if ( ! $object || ! $object->is_simplified() ) {
+				// Log event.
+				Log::get_instance()->add_log( 'Requested object '.$object_id.' ('.$object_type.') is not intended to be simplified.', 'error' );
+
 				// collect return array.
 				$return = array(
 					1,
@@ -1563,6 +1584,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 			// bail if no API is activated.
 			if ( false === $api_obj ) {
+				// Log event.
+				Log::get_instance()->add_log( 'No API active for simplification of texts.', 'error' );
+
 				// collect return array.
 				$return = array(
 					1,
@@ -1623,6 +1647,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					$error_message .= '* no result returned<br>';
 				}
 
+				// Log event.
+				Log::get_instance()->add_log( 'Simplification of '.$object_id.' ('.$object_type.') run in an error: '.$error_message, 'error' );
+
 				// collect return array for this error.
 				$return = array(
 					1,
@@ -1645,6 +1672,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						),
 					),
 				);
+
+				// return results.
 				wp_send_json( $return );
 				wp_die();
 			}
@@ -1835,7 +1864,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * Show quota hint in backend tables.
+	 * Show quota hint in backend tables for post-type-objects.
 	 *
 	 * @param Base $api_obj The used API.
 	 *
@@ -1950,6 +1979,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// bail if deletion is already running.
 		if ( 1 === absint( get_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING, 0 ) ) ) {
+			// Log event.
+			Log::get_instance()->add_log( 'Deletion of simplified texts is already running.', 'error' );
+
 			return;
 		}
 
@@ -1971,6 +2003,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 			// update counter.
 			update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, absint( get_option( update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, 0 ) ) ) + 1 );
+
+			// Log event
+			Log::get_instance()->add_log( 'Text '.$entry->get_id().' deleted', 'success' );
 		}
 
 		// remove running marker.
@@ -2501,6 +2536,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$transient_obj->set_message( __( '<strong>All to simplified texts has been deleted.</strong>', 'easy-language' ) );
 		$transient_obj->set_type( 'success' );
 		$transient_obj->save();
+
+		// Log event.
+		Log::get_instance()->add_log( 'All to simplify texts has been deleted', 'success' );
 
 		// redirect user back to list.
 		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );

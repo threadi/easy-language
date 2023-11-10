@@ -1,6 +1,6 @@
 <?php
 /**
- * File for output of logged entries in a table in WP-admin.
+ * File for output of logged entries for API-actions in a table in WP-admin.
  *
  * @package easy-language
  */
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Handler for log-output in backend.
+ * Handler for api-log-output in backend.
  */
 class Log_Api_Table extends WP_List_Table {
 	/**
@@ -40,7 +40,7 @@ class Log_Api_Table extends WP_List_Table {
 	 */
 	private function table_data(): array {
 		// check nonce.
-		if( isset($_REQUEST['nonce']) && !wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-export-simplifications' ) ) {
+		if( isset($_REQUEST['nonce']) && !wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-table-log-api' ) ) {
 			// redirect user back.
 			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 			exit;

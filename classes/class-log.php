@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handler for logging API-actions in this plugin.
+ * File for handler for logging in this plugin.
  *
  * @package easy-language
  */
@@ -12,14 +12,14 @@ use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 /**
  * Handler for logging in this plugin.
  */
-class Log_Api {
+class Log {
 
 	/**
 	 * Instance of this object.
 	 *
-	 * @var ?Log_Api
+	 * @var ?Log
 	 */
-	private static ?Log_Api $instance = null;
+	private static ?Log $instance = null;
 
 	/**
 	 * Constructor for Logging-Handler.
@@ -36,7 +36,7 @@ class Log_Api {
 	/**
 	 * Return the instance of this Singleton object.
 	 */
-	public static function get_instance(): Log_Api {
+	public static function get_instance(): Log {
 		if ( ! static::$instance instanceof static ) {
 			static::$instance = new static();
 		}
@@ -49,7 +49,7 @@ class Log_Api {
 	 * @return string
 	 */
 	public function get_table_name(): string {
-		return DB::get_instance()->get_wpdb_prefix() . 'easy_language_api_log';
+		return DB::get_instance()->get_wpdb_prefix() . 'easy_language_log';
 	}
 
 	/**
@@ -66,10 +66,8 @@ class Log_Api {
 		$sql = 'CREATE TABLE ' . $this->get_table_name() . " (
             `id` mediumint(9) NOT NULL AUTO_INCREMENT,
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-            `api` varchar(40) DEFAULT '' NOT NULL,
-            `http_state` varchar(3) DEFAULT '' NOT NULL,
-            `request` longtext DEFAULT '' NOT NULL,
-            `response` longtext DEFAULT '' NOT NULL,
+            `log` longtext DEFAULT '' NOT NULL,
+            `user_id` int(11) DEFAULT 0 NOT NULL,
             `state` varchar(40) DEFAULT '' NOT NULL,
             UNIQUE KEY id (id)
         ) $charset_collate;";
@@ -91,20 +89,13 @@ class Log_Api {
 	/**
 	 * Add a single log-entry.
 	 *
-	 * @param string $api The used API.
-	 * @param int    $http_state The http-state of the request.
-	 * @param string $request The request as dump.
-	 * @param string $response The response as dump.
+	 * @param string $entry The entry-text.
+	 * @param string $state The state (error or success),
+	 *
 	 * @return void
 	 */
-	public function add_log( string $api, int $http_state, string $request, string $response ): void {
+	public function add_log( string $entry, string $state ): void {
 		global $wpdb;
-
-		// define state depending on http-state.
-		$state = 'error';
-		if ( 200 === $http_state ) {
-			$state = 'success';
-		}
 
 		/**
 		 * If debug is not enabled, just log errors.
@@ -114,24 +105,25 @@ class Log_Api {
 		}
 
 		/**
+		 * Get active user.
+		 */
+		$user_id = 0;
+		if( $user = wp_get_current_user() ) {
+			$user_id = $user->ID;
+		}
+
+		/**
 		 * Insert log entry.
 		 */
 		$wpdb->insert(
 			$this->get_table_name(),
 			array(
 				'time'       => gmdate( 'Y-m-d H:i:s' ),
-				'api'        => $api,
-				'http_state' => $http_state,
-				'request'    => $request,
-				'response'   => $response,
+				'log'        => $entry,
 				'state'      => $state,
+				'user_id'    => $user_id
 			)
 		);
-
-		// log error.
-		if( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during adding API log entry: '.$wpdb->last_error, 'error' );
-		}
 
 		/**
 		 * Run cleanup of logs.

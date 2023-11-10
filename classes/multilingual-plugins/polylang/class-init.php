@@ -181,6 +181,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		global $wp_filesystem;
 
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			require_once wp_normalize_path( ABSPATH . '/wp-admin/includes/file.php' );
+		}
+
 		// set URL.
 		$flags['url'] = plugins_url( 'gfx/' . $code . '.png', EASY_LANGUAGE );
 

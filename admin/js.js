@@ -141,7 +141,7 @@ function easy_language_start_data_deletion() {
 				'action': 'easy_language_run_data_deletion',
 				'nonce': easyLanguageJsVars.run_delete_data_nonce
 			},
-			success: function() {
+			success: function( data ) {
 				easy_language_get_data_deletion_info();
 			}
 		}

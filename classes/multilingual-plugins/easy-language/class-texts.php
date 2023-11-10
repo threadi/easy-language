@@ -11,6 +11,7 @@ namespace easyLanguage\Multilingual_plugins\Easy_Language;
 use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
+use easyLanguage\Log;
 use Gettext\Translation;
 use Gettext\Translations;
 use WP_Post;
@@ -128,11 +129,21 @@ class Texts {
 			$post_obj      = new Post_Object( $original_post_id );
 			$copy_post_obj = $post_obj->add_simplification_object( $target_language, $api_object, false );
 			if ( $copy_post_obj ) {
+				// Log event.
+				Log::get_instance()->add_log( 'New simplification object created: '.$copy_post_obj->get_title(), 'success' );
+
 				// forward user to the edit-page of the newly created object.
 				wp_safe_redirect( $copy_post_obj->get_page_builder()->get_edit_link() );
 				exit;
 			}
+
+			// Log event.
+			Log::get_instance()->add_log( 'Error during creating of new simplification object based on '.$post_obj->get_title(), 'error' );
+
 		}
+
+		// Log event.
+		Log::get_instance()->add_log( 'Faulty request to create new simplified object.', 'error' );
 
 		// redirect user.
 		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
@@ -150,6 +161,9 @@ class Texts {
 	public function delete_object( int $post_id ): void {
 		// get the object.
 		$post_obj = new Post_Object( $post_id );
+
+		// secure the title.
+		$post_title = $post_obj->get_title();
 
 		// if this is a simplified object, clean it up.
 		if ( $post_obj->is_simplified() ) {
@@ -174,6 +188,9 @@ class Texts {
 		foreach ( $post_obj->get_entries() as $entry ) {
 			$entry->delete( $post_id );
 		}
+
+		// Log event.
+		Log::get_instance()->add_log( 'Deleted simplified object <i>'.$post_title.'</i>', 'error' );
 	}
 
 	/**
@@ -201,6 +218,9 @@ class Texts {
 		$object_type = isset( $_GET['type'] ) ? absint( $_GET['type'] ) : '';
 
 		if ( $object_id > 0 ) {
+			// Log event.
+			Log::get_instance()->add_log( 'Request to simplify object '.absint($object_id).' ('.$object_type.') without JS.', 'success' );
+
 			// run simplification of this object.
 			$object = Helper::get_object( $object_id, $object_type );
 			$object->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping() );
@@ -242,6 +262,9 @@ class Texts {
 
 			// bail if we have no results.
 			if ( empty( $entries ) ) {
+				// Log event.
+				Log::get_instance()->add_log( 'Requested object '.$entry_id.' could not be found for simplification.' , 'error' );
+
 				wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 				exit;
 			}
@@ -254,6 +277,9 @@ class Texts {
 
 			// bail if no objects could be found.
 			if ( empty( $post_objects ) ) {
+				// Log event.
+				Log::get_instance()->add_log( 'Requested object '.$entry_id.' could not be found for simplification. #2' , 'error' );
+
 				wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 				exit;
 			}
@@ -263,6 +289,9 @@ class Texts {
 
 			// bail if none could be found.
 			if ( false === $object ) {
+				// Log event.
+				Log::get_instance()->add_log( 'Requested object '.$entry_id.' could not be found for simplification. #3' , 'error' );
+
 				wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 				exit;
 			}
@@ -294,6 +323,9 @@ class Texts {
 
 		// get the object.
 		$post_obj = new Post_Object( $post_id );
+
+		// Log event.
+		Log::get_instance()->add_log( 'Check updated <i>'.$post_obj->get_title().'</i>' , 'success' );
 
 		// if this is an original object, check its contents.
 		if ( $post_obj->is_simplifiable() ) {
@@ -432,6 +464,9 @@ class Texts {
 			foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
 				$original_post->remove_changed_marker( $language_code );
 			}
+
+			// Log event.
+			Log::get_instance()->add_log( 'Update of '.$post_obj->get_title(). ' has been processed.', 'success' );
 		}
 	}
 
@@ -458,6 +493,9 @@ class Texts {
 				// remove changed marker on original post.
 				$original_post->remove_changed_marker( $language_code );
 			}
+
+			// Log event.
+			Log::get_instance()->add_log( '<i>'.$post_obj->get_title().'</i> has been moved to trash and cleaned up.', 'success' );
 		}
 	}
 
@@ -481,6 +519,9 @@ class Texts {
 				// add language from list of translated languages on original post.
 				$original_post->add_language( $language_code );
 			}
+
+			// Log event.
+			Log::get_instance()->add_log( $post_obj->get_title().' has been removed from trash.', 'success' );
 		}
 	}
 
@@ -547,6 +588,9 @@ class Texts {
 
 			$replace_from = '"Last-Translator';
 			$po           = str_replace( $replace_from, '"Language: ' . $export_language_code . '\n"' . PHP_EOL . $replace_from, $po );
+
+			// Log event.
+			Log::get_instance()->add_log( 'Simplifications exported.', 'success' );
 
 			// return header.
 			header( 'Content-Type: application/octet-stream' );

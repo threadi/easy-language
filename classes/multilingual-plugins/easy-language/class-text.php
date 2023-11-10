@@ -11,6 +11,7 @@ use easyLanguage\Base;
 use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
+use easyLanguage\Log;
 
 /**
  * Object for single translatable text based on DB-dataset.
@@ -202,11 +203,17 @@ class Text {
 		);
 		$wpdb->insert( DB::get_instance()->get_table_name_simplifications(), $query );
 
-		// change state of text to "simplified".
-		$this->set_state( 'simplified' );
+		// log error.
+		if( $wpdb->last_error ) {
+			Log::get_instance()->add_log( 'Error during adding simplification of text in DB: '.$wpdb->last_error, 'error' );
+		}
+		else {
+			// change state of text to "simplified".
+			$this->set_state( 'simplified' );
 
-		// save simplification in object.
-		$this->simplifications[ $target_language ] = $translated_text;
+			// save simplification in object.
+			$this->simplifications[ $target_language ] = $translated_text;
+		}
 	}
 
 	/**
@@ -321,6 +328,11 @@ class Text {
 
 		global $wpdb;
 		$wpdb->update( DB::get_instance()->get_table_name_originals(), array( 'state' => $state ), array( 'id' => $this->get_id() ) );
+
+		// log error.
+		if( $wpdb->last_error ) {
+			Log::get_instance()->add_log( 'Error during updating state of entry in DB: '.$wpdb->last_error, 'error' );
+		}
 	}
 
 	/**
@@ -406,6 +418,11 @@ class Text {
 			'page_builder' => $page_builder,
 		);
 		$wpdb->insert( DB::get_instance()->get_table_name_originals_objects(), $query );
+
+		// log error.
+		if( $wpdb->last_error ) {
+			Log::get_instance()->add_log( 'Error during adding object to original in DB: '.$wpdb->last_error, 'error' );
+		}
 	}
 
 	/**

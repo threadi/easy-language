@@ -9,6 +9,7 @@ namespace easyLanguage\Multilingual_plugins\Wpml;
 
 use easyLanguage\Base;
 use easyLanguage\Languages;
+use easyLanguage\Log;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use easyLanguage\Multilingual_Plugins_Base;
 use easyLanguage\Transients;
@@ -159,6 +160,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	public function admin_init(): void {
 		// bail of WPML-class does not exist.
 		if ( ! class_exists( 'WPML_Flags_Factory' ) ) {
+			// Log event.
+			Log::get_instance()->add_log( 'WPML-objects missing - WPML support will not be activated.', 'error' );
+
 			return;
 		}
 

@@ -9,6 +9,7 @@ namespace easyLanguage;
 
 // prevent direct access.
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
+use PLL_Settings;
 use WP_Admin_Bar;
 use WP_Post;
 use WP_Query;
@@ -113,14 +114,14 @@ class Helper {
 		$wp_language = get_option( 'WPLANG' );
 
 		/**
-		 * Consider the main language set in Polylang for the web page
+		 * Consider the main language set in Polylang for the web page.
 		 */
 		if ( self::is_plugin_active( 'polylang/polylang.php' ) && function_exists( 'pll_default_language' ) ) {
-			$wp_language = pll_default_language();
+			$wp_language = pll_current_language( 'locale' );
 		}
 
 		/**
-		 * Consider the main language set in WPML for the web page
+		 * Consider the main language set in WPML for the web page.
 		 */
 		if ( self::is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' ) ) {
 			global $sitepress;
@@ -251,10 +252,10 @@ class Helper {
 	/**
 	 * Validate multiple radio-fields.
 	 *
-	 * @param ?array $values The list of values.
+	 * @param ?string $values The list of values.
 	 * @return string|null
 	 */
-	public static function settings_validate_multiple_radios( ?array $values ): ?string {
+	public static function settings_validate_multiple_radios( ?string $values ): ?string {
 		$filter = current_filter();
 		if ( ! empty( $filter ) ) {
 			$filter = str_replace( 'sanitize_option_', '', $filter );

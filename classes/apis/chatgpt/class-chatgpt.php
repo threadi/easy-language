@@ -12,6 +12,7 @@ use easyLanguage\Api_Base;
 use easyLanguage\Base;
 use easyLanguage\Helper;
 use easyLanguage\Language_Icon;
+use easyLanguage\Log;
 use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use easyLanguage\Transients;
@@ -273,7 +274,7 @@ class ChatGpt extends Base implements Api_Base {
 			}
 		}
 
-		// bail of plugin does not support api OR this API is not enabled.
+		// bail of plugin does not support API OR this API is not enabled.
 		if ( false === $supports_api || $this->get_name() !== get_option( 'easy_language_api', '' ) ) {
 			return;
 		}
@@ -693,6 +694,9 @@ class ChatGpt extends Base implements Api_Base {
 		} elseif ( 0 !== strcmp( $value, get_option( 'easy_language_chatgpt_api_key', '' ) ) ) {
 			// if token has been changed, delete settings hint.
 			Transients::get_instance()->get_transient_by_name( 'easy_language_api_changed' )->delete();
+
+			// Log event.
+			Log::get_instance()->add_log( 'Token for ChatGpt has been changed.', 'success' );
 		}
 
 		// show intro if it has not been shown until now.

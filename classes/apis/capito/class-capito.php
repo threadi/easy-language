@@ -12,6 +12,7 @@ use easyLanguage\Base;
 use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Language_Icon;
+use easyLanguage\Log;
 use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use easyLanguage\Transients;
@@ -835,11 +836,17 @@ class Capito extends Base implements Api_Base {
 				/* translators: %1$s is replaced by the URL for the API-log */
 				add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', sprintf( __( '<strong>Token could not be verified.</strong> Please take a look <a href="%1$s">in the log</a> to check the reason.', 'easy-language' ), esc_url( Helper::get_api_logs_page_url() ) ) );
 
+				// Log event.
+				Log::get_instance()->add_log( sprintf( 'Token for Capito has been changed, but we get an error from API by validation of the key. Please <a href="%1$s">check API log</a>.', esc_url(Helper::get_api_logs_page_url()) ), 'error' );
+
 				// remove token.
 				$value = '';
 			} else {
 				// get initial quota.
 				$this->get_quota_from_api( $value );
+
+				// Log event.
+				Log::get_instance()->add_log( 'Token for Capito has been changed.', 'success' );
 			}
 
 			// delete api-settings hint.

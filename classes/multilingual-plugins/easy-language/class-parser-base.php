@@ -208,6 +208,15 @@ class Parser_Base {
 						?>
 					</p>
 					<?php
+					if ( 1 === absint( get_option( 'easy_language_automatic_simplification_enabled', 0 ) ) ) {
+						?>
+						<label><input type="checkbox" name="automatic_mode_prevented" data-id="<?php echo absint( $post_object->get_id() ); ?>" class="easy-language-automatic-simplification-prevention" value="1"
+								<?php
+								if ( $post_object->is_automatic_mode_prevented() ) {
+									?>
+									checked="checked"<?php } ?>><?php echo esc_html__( 'Not automatic simplified', 'easy-language' ); ?></label>
+						<?php
+					}
 				} elseif ( 'above_text_limit' === $quota_state['status'] && $api_obj->is_configured() ) {
 					?>
 					<p>

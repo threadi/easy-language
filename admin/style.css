@@ -280,7 +280,10 @@ body .text-translations-table #source_language, body .text-translations-table #t
 	width: 80px;
 }
 
-.settings_page_easy_language_settings .attachment-thumbnail { width: 18px;height: auto }
+.settings_page_easy_language_settings .attachment-thumbnail {
+	width: 18px !important;
+	height: auto !important
+}
 
 .settings_page_easy_language_settings #options { width: 42px; }
 

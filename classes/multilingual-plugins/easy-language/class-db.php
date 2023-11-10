@@ -8,6 +8,7 @@
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
 use easyLanguage\Helper;
+use easyLanguage\Log;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -127,7 +128,7 @@ class Db {
             `original` longtext DEFAULT '' NOT NULL,
             `field` varchar(32) DEFAULT '' NOT NULL,
             `hash` varchar(32) DEFAULT '' NOT NULL,
-            `lang` varchar(5) DEFAULT '' NOT NULL,
+            `lang` varchar(20) DEFAULT '' NOT NULL,
             `state` varchar(40) DEFAULT '' NOT NULL,
             UNIQUE KEY id (id)
         ) $charset_collate;";
@@ -203,6 +204,11 @@ class Db {
 			'field'    => $field,
 		);
 		$wpdb->insert( $this->get_table_name_originals(), $query );
+
+		// log error.
+		if( $wpdb->last_error ) {
+			Log::get_instance()->add_log( 'Error during adding entry in DB: '.$wpdb->last_error, 'error' );
+		}
 
 		// get DB-id.
 		$id = $wpdb->insert_id;
@@ -341,9 +347,6 @@ class Db {
 		// prepare SQL-statement.
 		$prepared_sql = $wpdb->prepare( $sql, $vars );
 
-		// get init instance.
-		$init = Init::get_instance();
-
 		// get entries.
 		$results = $wpdb->get_results( $prepared_sql, ARRAY_A );
 		foreach ( $results as $result ) {
@@ -351,19 +354,27 @@ class Db {
 			$add = true;
 			if ( ! empty( $filter['not_locked'] ) ) {
 				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
-				$add    = ! $object->is_locked();
+				if( $object ) {
+					$add = ! $object->is_locked();
+				}
 			}
 			if ( ! empty( $filter['not_prevented'] ) && false !== $add ) {
 				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
-				$add    = ! $object->is_automatic_mode_prevented();
+				if( $object ) {
+					$add = ! $object->is_automatic_mode_prevented();
+				}
 			}
 			if ( ! empty( $filter['object_state'] ) && false !== $add ) {
 				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
-				$add    = $object->has_state( $filter['object_state'] );
+				if( $object ) {
+					$add = $object->has_state( $filter['object_state'] );
+				}
 			}
 			if ( ! empty( $filter['object_not_state'] ) && false !== $add ) {
 				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
-				$add    = ! $object->has_state( $filter['object_not_state'] );
+				if( $object ) {
+					$add = ! $object->has_state( $filter['object_not_state'] );
+				}
 			}
 
 			// add entry to list.

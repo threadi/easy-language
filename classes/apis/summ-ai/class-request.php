@@ -7,10 +7,10 @@
 
 namespace easyLanguage\Apis\Summ_Ai;
 
+use easyLanguage\Log;
 use easyLanguage\Log_Api;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use WP_Error;
-use wpdb;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -103,13 +103,6 @@ class Request {
 	private string $table_requests;
 
 	/**
-	 * Database-object
-	 *
-	 * @var wpdb
-	 */
-	private wpdb $wpdb;
-
-	/**
 	 * The content of this request.
 	 *
 	 * @var array
@@ -141,11 +134,6 @@ class Request {
 	 * Constructor.
 	 */
 	public function __construct() {
-		global $wpdb;
-
-		// get the db-connection.
-		$this->wpdb = $wpdb;
-
 		// table for requests and responses.
 		$this->table_requests = DB::get_instance()->get_wpdb_prefix() . 'easy_language_summ_ai';
 	}
@@ -191,6 +179,9 @@ class Request {
 
 		// bail if no text for simplification is given.
 		if ( ! $this->has_text() ) {
+			// Log event.
+			Log::get_instance()->add_log( 'SUMM AI: no text given for simplification.', 'error' );
+
 			return;
 		}
 
@@ -372,6 +363,8 @@ class Request {
 	 * @return void
 	 */
 	private function save_in_db(): void {
+		global $wpdb;
+
 		// save the text in db and return the resulting text-object.
 		$query = array(
 			'time'       => gmdate( 'Y-m-d H:i:s' ),
@@ -382,7 +375,12 @@ class Request {
 			'quota'      => strlen( $this->get_text() ),
 			'blog_id'    => get_current_blog_id(),
 		);
-		$this->wpdb->insert( $this->table_requests, $query );
+		$wpdb->insert( $this->table_requests, $query );
+
+		// log error.
+		if( $wpdb->last_error ) {
+			Log::get_instance()->add_log( 'Error during adding API log entry: '.$wpdb->last_error, 'error' );
+		}
 	}
 
 	/**

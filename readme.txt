@@ -19,11 +19,11 @@ The [SUMM AI](https://summ-ai.com) API is usable without API Key to simplify 180
 #### Features ####
 
 * Supported APIs to simplify texts in your website: [SUMM AI](https://summ-ai.com), [Capito](https://www.capito.eu), [ChatGpt](https://chat.openai.com)
-* The SUMM AI API is also usable with TranslatePress
-* Adds easy language to other multilingual plugins like WPML, Polylang, Sublanguage, TranslatePress
+* The SUMM AI API is also usable in TranslatePress Automatic translations
+* Adds easy language to other multilingual plugins like WPML, Polylang, Sublanguage, TranslatePress (and can be run alongside with them)
 * PageBuilder: native support for Block Editor (Gutenberg), Avada, Elementor, Divi, WPBakery and Themify
 * Multisite: all simplified texts will be available to any other blog in the network to prevent double simplification
-* Own translator role for users to only simplified texts.
+* Own translator role for users to only simplified texts
 
 The development repository is on [GitHub](https://github.com/threadi/easy-language).
 
@@ -36,6 +36,9 @@ If you want to use [Capito](https://www.capito.eu) or [ChatGpt](https://chat.ope
 * Support for any post-type (e.g. product description in WooCommerce)
 * Support for any taxonomies (e.g. product attributes)
 * Usage of custom SUMM AI API Key
+* Use other source languages, e.g. english or francais
+* Simplification of single texts
+* Show where any simplified text is used in your website
 
 ---
 
@@ -56,11 +59,15 @@ Yes, it is. We do not load any external files. API requests happen between your 
 
 = Can I use this plugin in a multisite-installation? =
 
-Yes, you can! All translated texts will be available to any other blog in the multisite-network.
+Yes, you can! All simplified texts will be available to any other blog in the multisite-network.
 
-= Will I be notified if the original content of a translated page changes? =
+= Will I be notified if the original content of a simplified page changes? =
 
-Yes, an icon is displayed in the page or post list for this purpose. As soon as you manually adjust the content of the translated page and save it, the icon disappears again. We intentionally do not offer synchronization of new or adapted content of a page, as this is difficult to transfer with plain language.
+Yes, an icon is displayed in the page or post list for this purpose. As soon as you manually adjust the content of the simplified page and save it, the icon disappears again. We intentionally do not offer synchronization of new or adapted content of a page, as this is difficult to transfer with plain language.
+
+= Can I use WPML or Polylang to translate my page in english and with simplified texts of your plugin together? =
+
+Yes, you can use Easy Language alongside all supported multilingual-plugins. You can translate your pages e.g. in english and use Easy Language to simplify the texts. Be aware to place two language-switcher in your website: the one of your multilingual-plugin and the one from Easy Language.
 
 == Screenshots ==
 
