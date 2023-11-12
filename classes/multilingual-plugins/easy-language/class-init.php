@@ -1768,8 +1768,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			)
 		);
 
-		// enable internationalization of our script.
-		wp_set_script_translations( 'easy-language-simplifications', 'easy-language', trailingslashit( plugin_dir_path( EASY_LANGUAGE ) ) . 'languages/' );
+		if( function_exists( 'wp_set_script_translations' ) ) {
+			// enable internationalization of our script.
+			wp_set_script_translations('easy-language-simplifications', 'easy-language', trailingslashit(plugin_dir_path(EASY_LANGUAGE)) . 'languages/');
+		}
 
 		// add jquery-dirty script.
 		wp_enqueue_script(
@@ -1812,8 +1814,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			)
 		);
 
-		// enable internationalization of our script.
-		wp_set_script_translations( 'easy-language-plugin-admin', 'easy-language', trailingslashit( plugin_dir_path( EASY_LANGUAGE ) ) . 'languages/' );
+		if( function_exists( 'wp_set_script_translations' ) ) {
+			// enable internationalization of our script.
+			wp_set_script_translations('easy-language-plugin-admin', 'easy-language', trailingslashit(plugin_dir_path(EASY_LANGUAGE)) . 'languages/');
+		}
 
 		// embed the wp-easy-dialog-component.
 		$script_asset_path = Helper::get_plugin_path() . 'vendor/threadi/wp-easy-dialog/build/index.asset.php';
