@@ -58,6 +58,7 @@
         <delete file="${log.dir}/npm-build2.txt"/>
 		<delete file="${log.dir}/npm-build3.txt"/>
 		<delete file="${log.dir}/npm-build4.txt"/>
+		<delete file="${log.dir}/npm-build5.txt"/>
         <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build1.txt">
             <arg line="run build:switcher"/>
         </exec>
@@ -65,10 +66,13 @@
             <arg line="run build:navigation-switcher"/>
         </exec>
 		<exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build3.txt">
-			<arg line="run build:wp-easy-dialog"/>
-		</exec>
-		<exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build4.txt">
 			<arg line="run build:react-dialog"/>
+		</exec>
+		<exec dir="${src.dir}/vendor/threadi/wp-easy-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build4.txt">
+			<arg line="install"/>
+		</exec>
+		<exec dir="${src.dir}/vendor/threadi/wp-easy-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build5.txt">
+			<arg line="run build"/>
 		</exec>
     </target>
 
@@ -105,7 +109,7 @@
     </target>
 
     <!-- init project -->
-    <target name="init" description="initialize the project" depends="npm-build,composer-install,json-translations" />
+    <target name="init" description="initialize the project" depends="composer-install,npm-build,json-translations" />
 
     <!-- create release-zip -->
     <target name="build" description="builds a new release" depends="init,setVersionNumber">
@@ -126,6 +130,7 @@
 			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
 			<zipfileset dir="${src.dir}/vendor/gettext" prefix="${plugin.slug}/vendor/gettext" />
 			<zipfileset dir="${src.dir}/vendor/composer" prefix="${plugin.slug}/vendor/composer" />
+			<zipfileset dir="${src.dir}/vendor/threadi/wp-easy-dialog/build/" prefix="${plugin.slug}/vendor/threadi/wp-easy-dialog/build/" />
             <zipfileset dir="${src.dir}" includes="uninstall.php,readme.txt" prefix="${plugin.slug}" />
             <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
         </zip>

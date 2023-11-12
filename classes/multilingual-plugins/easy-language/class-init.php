@@ -1816,17 +1816,17 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		wp_set_script_translations( 'easy-language-plugin-admin', 'easy-language', trailingslashit( plugin_dir_path( EASY_LANGUAGE ) ) . 'languages/' );
 
 		// embed the wp-easy-dialog-component.
-		$script_asset_path = Helper::get_plugin_path() . 'classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/index.asset.php';
+		$script_asset_path = Helper::get_plugin_path() . 'vendor/threadi/wp-easy-dialog/build/index.asset.php';
 		$script_asset      = require $script_asset_path;
 		wp_enqueue_script(
 			'wp-easy-dialog',
-			Helper::get_plugin_url() . 'classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/index.js',
+			Helper::get_plugin_url() . 'vendor/threadi/wp-easy-dialog/build/index.js',
 			$script_asset['dependencies'],
 			$script_asset['version'],
 			true
 		);
-		$admin_css      = Helper::get_plugin_url() . 'classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/style-index.css';
-		$admin_css_path = Helper::get_plugin_path() . 'classes/multilingual-plugins/easy-language/blocks/wp-easy-dialog/build/style-index.css';
+		$admin_css      = Helper::get_plugin_url() . 'vendor/threadi/wp-easy-dialog/build/style-index.css';
+		$admin_css_path = Helper::get_plugin_path() . 'vendor/threadi/wp-easy-dialog/build/style-index.css';
 		wp_enqueue_style(
 			'wp-easy-dialog',
 			$admin_css,

@@ -3,6 +3,7 @@
   "require-dev": {
     "wp-coding-standards/wpcs": "^3.0.0"
   },
+  "minimum-stability": "stable",
   "scripts": {
     "post-install-cmd": [
       "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra"
@@ -17,6 +18,7 @@
     }
   },
   "require": {
-    "gettext/gettext": "^5.7"
+    "gettext/gettext": "^5.7",
+    "threadi/wp-easy-dialog": "dev-master"
   }
 }
