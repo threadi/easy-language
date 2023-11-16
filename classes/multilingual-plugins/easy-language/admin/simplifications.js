@@ -101,8 +101,8 @@ function easy_language_add_simplification_object( object_id, type, language, sim
 							/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
 							title: __('%1$s ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
 							texts: [
-								/* translators: %1$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the API-title */
-								'<p>' + __( 'To many text-widgets in this %1$s for adhoc simplification with %2$s.', 'easy-language' ).replace("%1$s", data.object_type_name).replace("%2$s", data.api_title) + '</p>'
+								/* translators: %1$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the API-title, %3$s will be replaced by the object name */
+								'<p>' + __( 'To many text-widgets in this %1$s for adhoc simplification with %2$s.<br>The %3$s will be simplified in background automatically.', 'easy-language' ).replace("%1$s", data.object_type_name).replace("%2$s", data.api_title).replace("%3$s", data.object_type_name) + '</p>'
 							],
 							buttons: [
 								{

@@ -325,6 +325,16 @@ body.wp-easy-dialog-on-body.wp-core-ui .components-modal__header .components-mod
 	padding-right: 64px;
 }
 
+body.wp-easy-dialog-on-body.wp-core-ui .wp-easy-dialog .wp-progressbar:after {
+	background-image: url(/wp-content/plugins/easy-language/gfx/loading.svg);
+	content: "";
+	display: block;
+	height: 40px;
+	width: 60px;
+	margin: 0 auto;
+	background-repeat: no-repeat;
+}
+
 .text-translations-table #used_in, .settings_page_easy_language_settings #used_in {
 	width: 120px;
 }
@@ -346,3 +356,11 @@ body.wp-easy-dialog-on-body.wp-core-ui .components-modal__header .components-mod
 	z-index: 2;
 	transform: rotate(145deg);
 }
+
+#wp-admin-bar-easy-language-simplification-process progress {
+	height: 12px;
+	width: 80px;
+}
+
+#wp-admin-bar-easy-language-simplification-process progress::-moz-progress-bar { background-color: var(--wp-admin-theme-color-darker-20); }
+#wp-admin-bar-easy-language-simplification-process progress::-webkit-progress-value { background-color: var(--wp-admin-theme-color-darker-20); }

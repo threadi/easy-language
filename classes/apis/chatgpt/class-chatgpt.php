@@ -171,8 +171,20 @@ class ChatGpt extends Base implements Api_Base {
 				'description' => __( 'Informal german spoken in germany.', 'easy-language' ),
 				'api_value'   => 'de',
 			),
+			'de_DE_formal' => array(
+				'label'       => __( 'German (Formal)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Formal german spoken in germany.', 'easy-language' ),
+				'api_value'   => 'de',
+			),
 			'de_CH' => array(
 				'label'       => __( 'German (CH)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
+				'api_value'   => 'de',
+			),
+			'de_CH_informal' => array(
+				'label'       => __( 'German (CH, informal)', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
 				'api_value'   => 'de',
@@ -252,7 +264,9 @@ class ChatGpt extends Base implements Api_Base {
 	public function get_mapping_languages(): array {
 		return array(
 			'de_DE' => array( 'de_LS', 'de_EL' ),
+			'de_DE_formal' => array( 'de_LS', 'de_EL' ),
 			'de_CH' => array( 'de_LS', 'de_EL' ),
+			'de_CH_informal' => array( 'de_LS', 'de_EL' ),
 			'de_AT' => array( 'de_LS', 'de_EL' ),
 		);
 	}

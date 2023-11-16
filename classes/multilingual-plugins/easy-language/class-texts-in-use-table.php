@@ -249,8 +249,10 @@ class Texts_In_Use_Table extends WP_List_Table {
 				// get source languages of this api.
 				$source_languages = $api_obj->get_active_source_languages();
 
-				// add the source language to list.
-				$languages_array[ $item->get_source_language() ] = $source_languages[ $item->get_source_language() ]['label'];
+				if( !empty($source_languages[ $item->get_source_language() ]) ) {
+					// add the source language to list.
+					$languages_array[ $item->get_source_language() ] = $source_languages[ $item->get_source_language() ]['label'];
+				}
 			}
 			foreach ( $item->get_target_languages() as $language_code => $target_language ) {
 				if ( empty( $language_code[ $language_code ] ) ) {

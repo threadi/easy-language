@@ -33,10 +33,15 @@ function easy_language_add_styles_and_js_admin(): void {
 	wp_enqueue_script(
 		'easy-language-admin',
 		plugins_url( '/admin/js.js', EASY_LANGUAGE ),
-		array( 'jquery' ),
+		array( 'jquery', 'wp-easy-dialog', 'wp-i18n' ),
 		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/admin/js.js' ),
 		true
 	);
+
+	if( function_exists( 'wp_set_script_translations' ) ) {
+		// enable internationalization of our script.
+		wp_set_script_translations('easy-language-admin', 'easy-language', trailingslashit(plugin_dir_path(EASY_LANGUAGE)) . 'languages/');
+	}
 
 	// add php-vars to our backend-js-script.
 	wp_localize_script(

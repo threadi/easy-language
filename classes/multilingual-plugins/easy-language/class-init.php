@@ -1616,7 +1616,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			// get info if this is a simplification-initialization.
 			$initialization = isset( $_POST['initialization'] ) ? filter_var( wp_unslash( $_POST['initialization'] ), FILTER_VALIDATE_BOOLEAN ) : false;
 
-			// run simplification of one text-entry in given object.
+			// run simplification of X text-entries in given object.
 			$object->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping(), absint( get_option( 'easy_language_api_text_limit_per_process', 1 ) ), $initialization );
 
 			// get running simplifications.
@@ -2264,6 +2264,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			return;
 		}
 
+		// get already simplified items.
+		$simplified_entries       = DB::get_instance()->get_entries( array( 'has_simplification' => true ) );
+		$simplified_entries_count = count( $simplified_entries );
+
 		// get actual items to process the simplification in background.
 		$entries_to_simplify       = DB::get_instance()->get_entries( $this->get_filter_for_entries_to_simplify() );
 		$entries_to_simplify_count = count( $entries_to_simplify );
@@ -2282,7 +2286,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// generate text depending on items to process.
 		$admin_bar_text = __( 'Simplifications:', 'easy-language' ) . ' <progress value="' . absint( $processed ) . '" max="100"></progress>';
 		/* translators: %1$d and %2$d will be replaced by digits, %3$s will be replaced by the API-title */
-		$admin_bar_title = sprintf( __( '%1$d of %2$d texts simplified via %3$s', 'easy-language' ), absint( $all_entries_count - $entries_to_simplify_count ), absint( $all_entries_count ), esc_html( $api_obj->get_title() ) );
+		$admin_bar_title = sprintf( __( '%1$d of %2$d texts simplified via %3$s', 'easy-language' ), absint( $simplified_entries_count ), absint( $simplified_entries_count + $entries_to_simplify_count ), esc_html( $api_obj->get_title() ) );
 
 		// hide bar if no simplifications are to run.
 		if ( 0 === $entries_to_simplify_count ) {

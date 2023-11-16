@@ -12,6 +12,8 @@ Funktionales
 -> SiteOrigin
 
 Später:
+* Support für https://wordpress.org/plugins/weglot/ ergänzen
+* Support für Linguise ergänzen
 * weitere Gutenberg-Blöcke:
 -> Plugin "Accordion Blocks"
 * Vereinfachungen über eigenes PHP-Object erfassen und ausgeben

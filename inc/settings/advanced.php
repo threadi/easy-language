@@ -100,14 +100,14 @@ function easy_language_admin_add_settings_advanced(): void {
 	// Set limit for texts per requests.
 	add_settings_field(
 		'easy_language_api_text_limit_per_process',
-		__( 'Simplifications per process', 'easy-language' ),
+		__( 'Simplifications per AJAX-request', 'easy-language' ),
 		'easy_language_admin_number_field',
 		'easyLanguageAdvancedPage',
 		'settings_section_advanced',
 		array(
 			'label_for'   => 'easy_language_api_text_limit_per_process',
 			'fieldId'     => 'easy_language_api_text_limit_per_process',
-			'description' => __( 'This value is in seconds. If you get a timeout from an API try to set this to a higher value.', 'easy-language' ),
+			'description' => __( 'This number of simplifications is carried out per run on an API.', 'easy-language' ),
 		)
 	);
 	register_setting( 'easyLanguageAdvancedFields', 'easy_language_api_text_limit_per_process' );

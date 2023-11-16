@@ -204,16 +204,21 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	 */
 	public function extra_tablenav( $which ): void {
 		if ( 'top' === $which ) {
-			// define delete all URL.
-			$url = add_query_arg(
-				array(
-					'action' => 'easy_language_delete_all_to_simplified_texts',
-					'nonce'  => wp_create_nonce( 'easy-language-delete-all-to-simplified_texts' ),
-				),
-				get_admin_url() . 'admin.php'
-			);
-			?><a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Delete all', 'easy-language' ); ?></a>
-			<?php
+			if( !empty($this->items) ) {
+				// define delete all URL.
+				$url = add_query_arg(
+					array(
+						'action' => 'easy_language_delete_all_to_simplified_texts',
+						'nonce'  => wp_create_nonce( 'easy-language-delete-all-to-simplified_texts' ),
+					),
+					get_admin_url() . 'admin.php'
+				);
+				?><a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Delete all', 'easy-language' ); ?></a>
+				<?php
+			}
+			else {
+				?><span class="button disabled"><?php echo esc_html__( 'Delete all', 'easy-language' ); ?></span><?php
+			}
 		}
 	}
 
