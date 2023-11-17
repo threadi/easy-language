@@ -69,7 +69,7 @@ class Undetected extends Parser_Base implements Parser {
 	public function get_parsed_texts(): array {
 		$content = apply_filters( 'the_content', $this->get_text() );
 		if ( ! empty( $content ) ) {
-			return array( $content );
+			return array( array( 'text' => $content, 'html' => true ) );
 		}
 		return array();
 	}

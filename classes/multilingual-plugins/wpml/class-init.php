@@ -8,6 +8,7 @@
 namespace easyLanguage\Multilingual_plugins\Wpml;
 
 use easyLanguage\Base;
+use easyLanguage\Helper;
 use easyLanguage\Languages;
 use easyLanguage\Log;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
@@ -189,7 +190,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				$path          = 'flags/';
 				$flag_path     = $base_path . $path . $language_code . '.png';
 				if ( ! file_exists( $flag_path ) ) {
-					copy( plugin_dir_path( EASY_LANGUAGE ) . 'gfx/' . $language_code . '.png', $flag_path );
+					if( !file_exists( dirname($flag_path) ) ) {
+						mkdir(dirname($flag_path));
+					}
+					copy( Helper::get_icon_path_for_language_code( $language_code ), $flag_path );
 				}
 
 				// collect possible simplifications.

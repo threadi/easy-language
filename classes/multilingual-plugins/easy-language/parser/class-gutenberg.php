@@ -58,6 +58,28 @@ class Gutenberg extends Parser_Base implements Parser {
 	}
 
 	/**
+	 * Define flow-text-blocks.
+	 *
+	 * @return array
+	 */
+	private function get_flow_text_blocks(): array {
+		return apply_filters(
+			'easy_language_gutenberg_blocks',
+			array(
+				'core/paragraph' => array(
+					'html' => true
+				),
+				'core/heading'   => array(
+					'html' => true
+				),
+				'core/list-item' => array(
+					'html' => true
+				),
+			)
+		);
+	}
+
+	/**
 	 * Return parsed texts.
 	 *
 	 * Loop through the blocks and save their flow-text-elements (e.g. paragraphs and headings) to list.
@@ -87,11 +109,13 @@ class Gutenberg extends Parser_Base implements Parser {
 
 		// get content if it is a valid flow-text-block.
 		if ( isset( $flow_blocks[ $block['blockName'] ] ) ) {
-			if ( strlen( $flow_blocks[ $block['blockName'] ] ) > 0 && is_callable( $flow_blocks[ $block['blockName'] ] ) ) {
-				$resulting_texts[] = call_user_func( $flow_blocks[ $block['blockName'] ], $block['blockName'] );
+			$add_to_result = $flow_blocks[ $block['blockName'] ];
+			if ( !empty( $flow_blocks[ $block['blockName'] ]['callback'] ) && is_callable( $flow_blocks[ $block['blockName'] ]['callback'] ) ) {
+				$add_to_result['text'] = call_user_func( $flow_blocks[ $block['blockName'] ]['callback'], $block['blockName'] );
 			} else {
-				$resulting_texts[] = trim( $block['innerHTML'] );
+				$add_to_result['text'] = trim( $block['innerHTML'] );
 			}
+			$resulting_texts[] = $add_to_result;
 		}
 
 		// loop through inner-blocks.
@@ -101,22 +125,6 @@ class Gutenberg extends Parser_Base implements Parser {
 
 		// return resulting list.
 		return $resulting_texts;
-	}
-
-	/**
-	 * Define flow-text-blocks.
-	 *
-	 * @return array
-	 */
-	private function get_flow_text_blocks(): array {
-		return apply_filters(
-			'easy_language_gutenberg_blocks',
-			array(
-				'core/paragraph' => '',
-				'core/heading'   => '',
-				'core/list-item' => '',
-			)
-		);
 	}
 
 	/**

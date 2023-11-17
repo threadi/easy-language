@@ -325,7 +325,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						} elseif ( 'above_entry_limit' === $quota_status['status'] && $api_obj->is_configured() ) {
 							// show simple not clickable icon if API is configured but limit for texts is exceeded
 							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
-							echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'To many text-widgets in this %1$s for simplification with %2$s.<br>The %3$s will be simplified in background automatically.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $api_obj->get_title() ), esc_html( $post_object->get_type_name() ) ) ) . '">&nbsp;</span>';
+							echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'To many text-widgets in this %1$s for simplification with %2$s. The %3$s will be simplified in background automatically.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $api_obj->get_title() ), esc_html( $post_object->get_type_name() ) ) ) . '">&nbsp;</span>';
 						} elseif ( $api_obj->is_configured() ) {
 							// show simple not clickable icon if API is configured but no quota available.
 							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
@@ -2197,23 +2197,25 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$target_language = isset( $_POST['language'] ) ? sanitize_text_field( wp_unslash( $_POST['language'] ) ) : '';
 
 		if ( $original_id > 0 && ! empty( $target_language ) && $api_object && ! empty( $original_type ) ) {
-			$object   = Helper::get_object( $original_id, $original_type );
-			$copy_obj = $object->add_simplification_object( $target_language, $api_object, false );
-			if ( $copy_obj ) {
-				// get language for output its title.
-				$languages = Languages::get_instance()->get_active_languages();
+			$object = Helper::get_object( $original_id, $original_type );
+			if ( $object ) {
+				$copy_obj = $object->add_simplification_object( $target_language, $api_object, false );
+				if ( $copy_obj ) {
+					// get language for output its title.
+					$languages = Languages::get_instance()->get_active_languages();
 
-				// collect return values.
-				$return['status']           = 'ok';
-				$return['object_id']        = $copy_obj->get_id();
-				$return['link']             = get_permalink( $copy_obj->get_id() );
-				$return['language']         = $languages[ $target_language ]['label'];
-				$return['object_type']      = $copy_obj->get_type();
-				$return['object_type_name'] = $copy_obj->get_type_name();
-				$return['title']            = $copy_obj->get_title();
-				$return['api_title']        = $api_object->get_title();
-				$return['edit_link']        = $copy_obj->get_edit_link();
-				$return['quota_state']      = $copy_obj->get_quota_state( $api_object );
+					// collect return values.
+					$return['status']           = 'ok';
+					$return['object_id']        = $copy_obj->get_id();
+					$return['link']             = get_permalink( $copy_obj->get_id() );
+					$return['language']         = $languages[ $target_language ]['label'];
+					$return['object_type']      = $copy_obj->get_type();
+					$return['object_type_name'] = $copy_obj->get_type_name();
+					$return['title']            = $copy_obj->get_title();
+					$return['api_title']        = $api_object->get_title();
+					$return['edit_link']        = $copy_obj->get_edit_link();
+					$return['quota_state']      = $copy_obj->get_quota_state( $api_object );
+				}
 			}
 		}
 

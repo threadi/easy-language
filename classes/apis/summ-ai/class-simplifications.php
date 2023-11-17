@@ -72,10 +72,11 @@ class Simplifications {
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.
 	 * @param string $target_language The target language of the text.
+	 * @param bool $is_html Marker if the text contains HTML-Code.
 	 * @return array The result as array.
 	 * @noinspection PhpUnused
 	 */
-	public function call_api( string $text_to_translate, string $source_language, string $target_language ): array {
+	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html ): array {
 		// build request.
 		$request_obj = $this->init->get_request_object();
 		$request_obj->set_url( $this->init->get_api_url() );

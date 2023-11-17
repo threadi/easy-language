@@ -190,7 +190,7 @@ class Texts {
 		}
 
 		// Log event.
-		Log::get_instance()->add_log( 'Deleted simplified object <i>'.$post_title.'</i>', 'error' );
+		Log::get_instance()->add_log( 'Deleted simplified object <i>'.$post_title.'</i>', 'success' );
 	}
 
 	/**
@@ -428,20 +428,25 @@ class Texts {
 			}
 
 			// loop through the resulting texts and compare them with the existing texts in object.
-			foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
+			foreach ( $pagebuilder_obj->get_parsed_texts() as $index => $text ) {
 				// bail if text is empty.
-				if ( empty( $text ) ) {
+				if ( empty( $text['text'] ) ) {
 					continue;
 				}
 
+				// set html-marker to true if not set.
+				if( !isset($text['html']) ) {
+					$text['html'] = true;
+				}
+
 				// check if the text is already saved as original text for simplification.
-				$original_text_obj = $this->db->get_entry_by_text( $text, $source_language );
+				$original_text_obj = $this->db->get_entry_by_text( $text['text'], $source_language );
 				if ( false === $original_text_obj ) {
 					// also check if this is a simplified text of the given language.
-					if ( false === $this->db->get_entry_by_simplification( trim( $text ), $source_language ) ) {
+					if ( false === $this->db->get_entry_by_simplification( trim( $text['text'] ), $source_language ) ) {
 						// if not save the text for simplification.
-						$original_text_obj = $this->db->add( $text, $source_language, 'post_content' );
-						$original_text_obj->set_object( get_post_type( $post_obj->get_id() ), $post_obj->get_id(), $pagebuilder_obj->get_name() );
+						$original_text_obj = $this->db->add( $text['text'], $source_language, 'post_content', $text['html'] );
+						$original_text_obj->set_object( get_post_type( $post_obj->get_id() ), $post_obj->get_id(), $index, $pagebuilder_obj->get_name() );
 						$original_text_obj->set_state( 'in_use' );
 					}
 				}
@@ -453,8 +458,8 @@ class Texts {
 				// also check if this is a simplified text of the given language.
 				if ( false === $this->db->get_entry_by_simplification( trim( $title ), $source_language ) ) {
 					// save the text for simplification.
-					$original_title_obj = $this->db->add( $title, $source_language, 'title' );
-					$original_title_obj->set_object( get_post_type( $post_id ), $post_id, $pagebuilder_obj->get_name() );
+					$original_title_obj = $this->db->add( $title, $source_language, 'title', false );
+					$original_title_obj->set_object( get_post_type( $post_id ), $post_id, 0, $pagebuilder_obj->get_name() );
 					$original_title_obj->set_state( 'in_use' );
 				}
 			}

@@ -403,17 +403,20 @@ class Text {
 	 * Set given ID and type as object which is using this text.
 	 *
 	 * @param string $type The object-type (e.g. post, page, category).
-	 * @param int    $item_id The object-ID from WP.
+	 * @param int $item_id The object-ID from WP.
+	 * @param int $order The order of this text in this object.
 	 * @param string $page_builder The used pagebuilder.
+	 *
 	 * @return void
 	 */
-	public function set_object( string $type, int $item_id, string $page_builder ): void {
+	public function set_object( string $type, int $item_id, int $order, string $page_builder ): void {
 		global $wpdb;
 		$query = array(
 			'oid'          => $this->get_id(),
 			'time'         => gmdate( 'Y-m-d H:i:s' ),
 			'object_type'  => $type,
 			'object_id'    => $item_id,
+			'order'        => $order,
 			'blog_id'      => get_current_blog_id(),
 			'page_builder' => $page_builder,
 		);
@@ -484,8 +487,8 @@ class Text {
 
 		// loop through the objects of this text.
 		foreach ( $this->get_objects() as $object_array ) {
-			$post_object = new Post_Object( $object_array['object_id'] );
-			$language    = array_key_first( $post_object->get_language() );
+			$object = Helper::get_object( $object_array['object_id'], $object_array['object_type'] );
+			$language    = array_key_first( $object->get_language() );
 			if ( ! empty( $languages[ $language ] ) ) {
 				$item_languages[ $language ] = $languages[ $language ]['label'];
 			}
@@ -543,4 +546,28 @@ class Text {
 		// return zero if no simplification exist.
 		return 0;
 	}
+
+	/**
+	 * Return whether this text contains HTML (depending on widgets in pageBuilders).
+	 *
+	 * @return bool
+	 */
+	public function is_html(): bool {
+		global $wpdb;
+
+		// get from DB.
+		$prepared_sql = $wpdb->prepare(
+			'SELECT o.`html`
+				FROM ' . DB::get_instance()->get_table_name_originals() . ' o
+				WHERE o.`id` = %d',
+			array( $this->get_id() )
+		);
+
+		// get result.
+		$result = (array) $wpdb->get_results( $prepared_sql, ARRAY_A );
+
+		// return the result.
+		return 1 === $result[0]['html'];
+	}
+
 }

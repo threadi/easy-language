@@ -61,38 +61,6 @@ class Elementor extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return parsed texts.
-	 *
-	 * Get the elementor-content and parse its widgets to get the content of flow-text-widgets.
-	 *
-	 * @return array
-	 */
-	public function get_parsed_texts(): array {
-		// do nothing if elementor is not active.
-		if ( false === $this->is_elementor_active() ) {
-			return array();
-		}
-
-		// define returning list.
-		$resulting_texts = array();
-
-		// get the actual elementor_data to get the texts of supported widgets.
-		$data = Plugin::$instance->documents->get( $this->get_object_id() )->get_elements_data();
-		if ( ! empty( $data ) ) {
-			foreach ( $data as $container ) {
-				if ( ! empty( $container['elements'] ) ) {
-					foreach ( $container['elements'] as $widget ) {
-						$resulting_texts = $this->get_widgets( (array) $widget, $resulting_texts );
-					}
-				}
-			}
-		}
-
-		// return resulting texts.
-		return $resulting_texts;
-	}
-
-	/**
 	 * Define flow-text-widgets.
 	 *
 	 * @return array
@@ -122,6 +90,54 @@ class Elementor extends Parser_Base implements Parser {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Return whether a given widget used HTML or not for its texts.
+	 *
+	 * @param string $widget_name
+	 *
+	 * @return bool
+	 */
+	private function is_flow_text_widget_html( string $widget_name ): bool {
+		// list of widget which use html-code.
+		$html_widgets = apply_filters( 'easy_language_elementor_html_widgets', array(
+			'text-editor' => true
+		));
+
+		return isset($html_widgets[$widget_name]);
+	}
+
+	/**
+	 * Return parsed texts.
+	 *
+	 * Get the elementor-content and parse its widgets to get the content of flow-text-widgets.
+	 *
+	 * @return array
+	 */
+	public function get_parsed_texts(): array {
+		// do nothing if elementor is not active.
+		if ( false === $this->is_elementor_active() ) {
+			return array();
+		}
+
+		// define returning list.
+		$resulting_texts = array();
+
+		// get the actual elementor_data to get the texts of supported widgets.
+		$data = Plugin::$instance->documents->get( $this->get_object_id() )->get_elements_data();
+		if ( ! empty( $data ) ) {
+			foreach ( $data as $container ) {
+				if ( ! empty( $container['elements'] ) ) {
+					foreach ( $container['elements'] as $widget ) {
+						$resulting_texts = $this->get_widgets( (array) $widget, $resulting_texts );
+					}
+				}
+			}
+		}
+
+		// return resulting texts.
+		return $resulting_texts;
 	}
 
 	/**
@@ -173,12 +189,18 @@ class Elementor extends Parser_Base implements Parser {
 					foreach ( $widget['settings'][ $name ] as $index => $content ) {
 						foreach ( $text as $content_key ) {
 							if ( ! empty( $widget['settings'][ $name ][ $index ][ $content_key ] ) ) {
-								$resulting_texts[] = $widget['settings'][ $name ][ $index ][ $content_key ];
+								$resulting_texts[] = array(
+									'text' => $widget['settings'][ $name ][ $index ][ $content_key ],
+									'html' => $this->is_flow_text_widget_html($widget['widgetType'])
+								);
 							}
 						}
 					}
 				} elseif ( ! empty( $widget['settings'][ $text ] ) ) {
-						$resulting_texts[] = $widget['settings'][ $text ];
+						$resulting_texts[] = array(
+							'text' => $widget['settings'][ $text ],
+							'html' => $this->is_flow_text_widget_html($widget['widgetType'])
+						);
 				}
 			}
 		}

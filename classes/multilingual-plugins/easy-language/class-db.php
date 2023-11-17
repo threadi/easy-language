@@ -127,6 +127,7 @@ class Db {
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
             `original` longtext DEFAULT '' NOT NULL,
             `field` varchar(32) DEFAULT '' NOT NULL,
+            `html` varchar(32) DEFAULT '' NOT NULL,
             `hash` varchar(32) DEFAULT '' NOT NULL,
             `lang` varchar(20) DEFAULT '' NOT NULL,
             `state` varchar(40) DEFAULT '' NOT NULL,
@@ -140,6 +141,7 @@ class Db {
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
             `object_type` varchar(100) DEFAULT '' NOT NULL,
             `object_id` int(100) DEFAULT 0 NOT NULL,
+            `order` int(100) DEFAULT 0 NOT NULL,
             `blog_id` int(100) DEFAULT 0 NOT NULL,
             `page_builder` varchar(100) DEFAULT '' NOT NULL,
             `state` varchar(40) DEFAULT '' NOT NULL
@@ -178,10 +180,11 @@ class Db {
 	 * @param string $text The original text.
 	 * @param string $source_language The language of this text.
 	 * @param string $field The field.
+	 * @param bool $html True if this text contains html-code.
 	 *
 	 * @return false|Text
 	 */
-	public function add( string $text, string $source_language, string $field ): false|Text {
+	public function add( string $text, string $source_language, string $field, bool $html ): false|Text {
 		global $wpdb;
 
 		// bail if text is empty.
@@ -201,6 +204,7 @@ class Db {
 			'hash'     => $this->get_string_hash( $text ),
 			'lang'     => $source_language,
 			'state'    => 'to_simplify',
+			'html'     => $html,
 			'field'    => $field,
 		);
 		$wpdb->insert( $this->get_table_name_originals(), $query );

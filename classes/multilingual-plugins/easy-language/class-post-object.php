@@ -345,84 +345,6 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return quota-state of this object regarding a given api.
-	 *
-	 * Possible states:
-	 * - ok => could be simplified
-	 * - above_limit => if characters of this object are more than the quota-limit
-	 * - above_text_limit => if one text is above the text-limit from used API
-	 * - exceeded => if quota is exceeded
-	 *
-	 * @param Base $api_obj The Api-object.
-	 *
-	 * @return array
-	 */
-	public function get_quota_state( Base $api_obj ): array {
-		// define return-array.
-		$return_array = array(
-			'status'        => 'ok',
-			'chars_count'   => 0,
-			'quota_percent' => 0,
-			'quota_rest'    => 0,
-		);
-
-		// get text-limit from API.
-		$max_text_length          = $api_obj->get_max_text_length();
-		$max_text_length_exceeded = false;
-
-		// get entry-limit from API.
-		$entry_limit_per_minute = $api_obj->get_max_requests_per_minute();
-
-		// get chars to simplify.
-		$filter  = array(
-			'object_id' => $this->get_id(),
-		);
-		$entries = Db::get_instance()->get_entries( $filter );
-		foreach ( $entries as $entry ) {
-			$text_length                  = absint( strlen( $entry->get_original() ) );
-			$return_array['chars_count'] += $text_length;
-			if ( $text_length > $max_text_length ) {
-				$max_text_length_exceeded = true;
-			}
-		}
-
-		// get quota value.
-		$quota_array = $api_obj->get_quota();
-		if ( ! empty( $quota_array['character_limit'] ) && 0 < $quota_array['character_limit'] ) {
-			$return_array['quota_percent'] = absint( $quota_array['character_spent'] ) / absint( $quota_array['character_limit'] );
-			$return_array['quota_rest']    = absint( $quota_array['character_limit'] ) - absint( $quota_array['character_spent'] );
-		}
-
-		// chars are above the rest of the quota.
-		if ( $return_array['quota_rest'] < $return_array['chars_count'] ) {
-			$return_array['status'] = 'above_limit';
-		}
-
-		// quota is exceeded.
-		if ( 0 === $return_array['quota_rest'] ) {
-			$return_array['status'] = 'exceeded';
-		}
-
-		// if unlimited-marker is set, set status to ok.
-		if ( ! empty( $quota_array['unlimited'] ) ) {
-			$return_array['status'] = 'ok';
-		}
-
-		// if max text limit is exceeded, show hint.
-		if ( $max_text_length_exceeded ) {
-			$return_array['status'] = 'above_text_limit';
-		}
-
-		// if more entries used as API would perform per minute.
-		if ( count( $entries ) > $entry_limit_per_minute ) {
-			$return_array['status'] = 'above_entry_limit';
-		}
-
-		// return ok.
-		return $return_array;
-	}
-
-	/**
 	 * Return whether this original object has simplifications.
 	 *
 	 * @return bool
@@ -510,7 +432,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			// add the copy.
 			$copied_post_id = wp_insert_post( $post_array );
 
-			// copy taxonomies and post-meta.
+			// copy taxonomies and post-metas of this post type object.
 			helper::copy_cpt( $this->get_id(), $copied_post_id );
 
 			// mark the copied post as simplified-object of the original.
@@ -538,19 +460,24 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			$pagebuilder_obj->set_text( $this->get_content() );
 
 			// loop through the resulting texts and add each one for simplification.
-			foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
+			foreach ( $pagebuilder_obj->get_parsed_texts() as $index => $text ) {
 				// bail if text is empty.
-				if ( empty( $text ) ) {
+				if ( empty( $text['text'] ) ) {
 					continue;
 				}
 
+				// set html-marker to true if not set.
+				if( !isset($text['html']) ) {
+					$text['html'] = true;
+				}
+
 				// check if the text is already saved as original text for simplification.
-				$original_text_obj = $db->get_entry_by_text( $text, $source_language );
+				$original_text_obj = $db->get_entry_by_text( $text['text'], $source_language );
 				if ( false === $original_text_obj ) {
 					// save the text for simplification.
-					$original_text_obj = $db->add( $text, $source_language, 'post_content' );
+					$original_text_obj = $db->add( $text['text'], $source_language, 'post_content', $text['html'] );
 				}
-				$original_text_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $pagebuilder_obj->get_name() );
+				$original_text_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $index, $pagebuilder_obj->get_name() );
 				$original_text_obj->set_state( 'to_simplify' );
 			}
 
@@ -558,9 +485,9 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			$original_title_obj = $db->get_entry_by_text( $pagebuilder_obj->get_title(), $source_language );
 			if ( false === $original_title_obj ) {
 				// save the text for simplification.
-				$original_title_obj = $db->add( $pagebuilder_obj->get_title(), $source_language, 'title' );
+				$original_title_obj = $db->add( $pagebuilder_obj->get_title(), $source_language, 'title', false );
 			}
-			$original_title_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $pagebuilder_obj->get_name() );
+			$original_title_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, 0, $pagebuilder_obj->get_name() );
 			$original_title_obj->set_state( 'to_simplify' );
 
 			// add this language as simplified language to original post.

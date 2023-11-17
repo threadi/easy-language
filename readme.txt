@@ -33,8 +33,8 @@ If you want to use [Capito](https://www.capito.eu) or [ChatGpt](https://chat.ope
 
 #### the Pro license includes:
 
-* Support for any post-type (e.g. product description in WooCommerce)
-* Support for any taxonomies (e.g. product attributes)
+* Support for more post-types
+* Support for any taxonomies (e.g. category descriptions)
 * Usage of custom SUMM AI API Key
 * Use other source languages, e.g. english or francais
 * Simplification of single texts

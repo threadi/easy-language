@@ -199,9 +199,11 @@ class Init {
 	 * @return array
 	 */
 	public function get_post_type_names(): array {
-		return array(
-			'post' => 'posts',
-			'page' => 'pages',
+		return apply_filters(
+			'easy_language_post_type_names', array(
+				'post' => 'posts',
+				'page' => 'pages',
+			)
 		);
 	}
 
@@ -211,25 +213,28 @@ class Init {
 	 * @return array
 	 */
 	public function get_post_type_settings(): array {
-		return array(
-			'post' => array(
-				'label_singular' => __( 'post', 'easy-language' ),
-				'label_plural'   => __( 'posts', 'easy-language' ),
-				'admin_edit_url' => add_query_arg(
-					array(),
-					admin_url() . 'edit.php'
-				),
-			),
-			'page' => array(
-				'label_singular' => __( 'page', 'easy-language' ),
-				'label_plural'   => __( 'pages', 'easy-language' ),
-				'admin_edit_url' => add_query_arg(
-					array(
-						'post_type' => 'page',
+		return apply_filters(
+			'easy_language_post_type_settings',
+				array(
+				'post' => array(
+					'label_singular' => __( 'post', 'easy-language' ),
+					'label_plural'   => __( 'posts', 'easy-language' ),
+					'admin_edit_url' => add_query_arg(
+						array(),
+						admin_url() . 'edit.php'
 					),
-					admin_url() . 'edit.php'
 				),
-			),
+				'page' => array(
+					'label_singular' => __( 'page', 'easy-language' ),
+					'label_plural'   => __( 'pages', 'easy-language' ),
+					'admin_edit_url' => add_query_arg(
+						array(
+							'post_type' => 'page',
+						),
+						admin_url() . 'edit.php'
+					),
+				),
+			)
 		);
 	}
 

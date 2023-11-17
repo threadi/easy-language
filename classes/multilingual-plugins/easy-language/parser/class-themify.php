@@ -85,6 +85,24 @@ class Themify extends Parser_Base implements Parser {
 	}
 
 	/**
+	 * Return whether a given widget used HTML or not for its texts.
+	 *
+	 * @param string $widget_name
+	 *
+	 * @return bool
+	 */
+	private function is_flow_text_widget_html( string $widget_name ): bool {
+		// list of widget which use html-code.
+		$html_widgets = apply_filters(
+			'easy_language_themify_html_widgets', array(
+				'text' => true
+			)
+		);
+
+		return isset($html_widgets[$widget_name]);
+	}
+
+	/**
 	 * Return parsed texts.
 	 *
 	 * Get the themify-content and parse its widgets to get the content of flow-text-widgets.
@@ -207,12 +225,18 @@ class Themify extends Parser_Base implements Parser {
 							foreach ( $entry as $sub_entry ) {
 								foreach ( $container['mod_settings'][ $entry_name ] as $index2 => $sub_sub_container ) {
 									if ( ! empty( $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ) ) {
-										$resulting_texts[ $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ] = $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ];
+										$resulting_texts[ $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ] = array(
+											'text' => $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ],
+											'html' => $this->is_flow_text_widget_html( $flow_text_name )
+										);
 									}
 								}
 							}
 						} else {
-							$resulting_texts[ $container['mod_settings'][ $entry ] ] = $container['mod_settings'][ $entry ];
+							$resulting_texts[ $container['mod_settings'][ $entry ] ] = array(
+								'text' => $container['mod_settings'][ $entry ],
+								'html' => $this->is_flow_text_widget_html( $flow_text_name )
+							);
 						}
 					}
 				} elseif ( is_array( $sub_container ) ) {

@@ -72,10 +72,11 @@ class Simplifications {
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.
 	 * @param string $target_language The target language of the text.
+	 * @param bool $is_html Marker if the text contains HTML-Code.
 	 * @return array The result as array.
 	 * @noinspection PhpUnused
 	 */
-	public function call_api( string $text_to_translate, string $source_language, string $target_language ): array {
+	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html ): array {
 		// map the languages with its shorthand (e.g. de_DE => de).
 		$source_language = $this->init->get_supported_source_languages()[ $source_language ]['api_value'];
 		$target_language = $this->init->get_supported_target_languages()[ $target_language ]['api_value'];

@@ -3,20 +3,19 @@ ToDo
 
 Funktionales
 ------------
-* Kompatibilität mit Plugins testen
--> Caching-Plugins
--> Order-Plugins
--> ..
+*
+
+für Später:
+* React Dialog auslagern in eigenes Repo
+* Support für https://wordpress.org/plugins/weglot/ ergänzen
+* Support für Linguise ergänzen
 * PageBuilder-Support:
 -> Beaver
 -> SiteOrigin
-
-Später:
-* Support für https://wordpress.org/plugins/weglot/ ergänzen
-* Support für Linguise ergänzen
 * weitere Gutenberg-Blöcke:
 -> Plugin "Accordion Blocks"
-* Vereinfachungen über eigenes PHP-Object erfassen und ausgeben
+* weitere Elementor-Widgets:
+-> Akkordion / FAQ
 * Vereinfachung per REST API statt AJAX-Request durchführen (bei Divi schon begonnen)
 * sprachspezifische Suche im Frontend
 * Optionen für Handling in Tabellen ergänzen ("+" => sofort übersetzen / nur erstellen, "translate" => sichtbar/nicht sichtbar

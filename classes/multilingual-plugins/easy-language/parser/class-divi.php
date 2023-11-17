@@ -77,6 +77,22 @@ class Divi extends Parser_Base implements Parser {
 	}
 
 	/**
+	 * Return whether a given widget used HTML or not for its texts.
+	 *
+	 * @param string $widget_name
+	 *
+	 * @return bool
+	 */
+	private function is_flow_text_widget_html( string $widget_name ): bool {
+		// list of widget which use html-code.
+		$html_widgets = apply_filters( 'easy_language_divi_html_widgets', array(
+			'et_pb_text' => true
+		));
+
+		return isset($html_widgets[$widget_name]);
+	}
+
+	/**
 	 * Return parsed texts.
 	 *
 	 * Get the divi-content and parse its widgets to get the content of flow-text-widgets.
@@ -98,14 +114,20 @@ class Divi extends Parser_Base implements Parser {
 			if ( empty( $attributes ) && ! empty( $matches[5] ) ) {
 				foreach ( $matches[5] as $texts ) {
 					if ( ! empty( $texts ) ) {
-						$resulting_texts[] = $texts;
+						$resulting_texts[] = array(
+							'text' => $texts,
+							'html' => $this->is_flow_text_widget_html( $shortcode )
+						);
 					}
 				}
 			} elseif ( ! empty( $attributes ) && ! empty( $matches[2] ) && ! empty( $matches[3] ) ) {
 				foreach ( $matches[2] as $key => $value ) {
 					foreach ( shortcode_parse_atts( $matches[3][ $key ] ) as $attribute => $attribute_value ) {
 						if ( in_array( $attribute, $attributes, true ) && ! empty( $attribute_value ) ) {
-							$resulting_texts[] = $attribute_value;
+							$resulting_texts[] = array(
+								'text' => $attribute_value,
+								'html' => $this->is_flow_text_widget_html( $shortcode )
+							);
 						}
 					}
 				}
