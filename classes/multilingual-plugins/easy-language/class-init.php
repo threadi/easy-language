@@ -808,7 +808,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// set amount of simplification items per automatic run.
 		if ( ! get_option( 'easy_language_automatic_item_count' ) ) {
-			update_option( 'easy_language_automatic_item_count', 1 );
+			update_option( 'easy_language_automatic_item_count', 6 );
 		}
 
 		// set intervall for automatic simplifications.
@@ -2140,7 +2140,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// get one text of a not locked, not prevented and actual not trashed object which should be simplified.
 		$query               = $this->get_filter_for_entries_to_simplify();
 		$query['not_locked'] = true;
-		$entries             = DB::get_instance()->get_entries( $query, array(), get_option( 'easy_language_automatic_item_count', 1 ) );
+		$entries             = DB::get_instance()->get_entries( $query, array(), get_option( 'easy_language_automatic_item_count', 6 ) );
 
 		// bail if no text could be found.
 		if ( empty( $entries ) ) {
