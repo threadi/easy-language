@@ -134,21 +134,21 @@ function easy_language_divi_add_scripts(): void {
 	);
 
 	// embed the react-dialog-component.
-	$script_asset_path = Helper::get_plugin_path() . 'classes/multilingual-plugins/easy-language/blocks/react-dialog/build/index.asset.php';
+	$script_asset_path = Helper::get_plugin_path() . 'vendor/threadi/react-dialog/build/index.asset.php';
 	$script_asset      = require $script_asset_path;
 	wp_enqueue_script(
 		'react-dialog',
-		Helper::get_plugin_url() . 'classes/multilingual-plugins/easy-language/blocks/react-dialog/build/index.js',
+		Helper::get_plugin_url() . 'vendor/threadi/react-dialog/build/index.js',
 		$script_asset['dependencies'],
 		$script_asset['version'],
 		true
 	);
-	$admin_css      = Helper::get_plugin_url() . 'classes/multilingual-plugins/easy-language/blocks/react-dialog/build/style-index.css';
-	$admin_css_path = Helper::get_plugin_path() . 'classes/multilingual-plugins/easy-language/blocks/react-dialog/build/style-index.css';
+	$admin_css      = Helper::get_plugin_url() . 'vendor/threadi/react-dialog/build/style-index.css';
+	$admin_css_path = Helper::get_plugin_path() . 'vendor/threadi/react-dialog/build/style-index.css';
 	wp_enqueue_style(
 		'react-dialog',
 		$admin_css,
-		array(),
+		array( 'wp-components' ),
 		filemtime( $admin_css_path )
 	);
 }

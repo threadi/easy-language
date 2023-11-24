@@ -488,9 +488,11 @@ class Text {
 		// loop through the objects of this text.
 		foreach ( $this->get_objects() as $object_array ) {
 			$object = Helper::get_object( $object_array['object_id'], $object_array['object_type'] );
-			$language    = array_key_first( $object->get_language() );
-			if ( ! empty( $languages[ $language ] ) ) {
-				$item_languages[ $language ] = $languages[ $language ]['label'];
+			if( false !== $object ) {
+				$language = array_key_first( $object->get_language() );
+				if ( ! empty( $languages[ $language ] ) ) {
+					$item_languages[ $language ] = $languages[ $language ]['label'];
+				}
 			}
 		}
 

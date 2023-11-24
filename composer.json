@@ -19,6 +19,7 @@
   },
   "require": {
     "gettext/gettext": "^5.7",
-    "threadi/wp-easy-dialog": "dev-master"
+    "threadi/wp-easy-dialog": "dev-master",
+    "threadi/react-dialog": "dev-master"
   }
 }
