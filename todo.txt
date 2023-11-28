@@ -3,10 +3,9 @@ ToDo
 
 Funktionales
 ------------
-*
+* SUMM AI Proxy-Anbindung so ändern, dass Proxy auch Merkmal "freemium beendet" zurückgeben kann wodurch Plugin diese möglichkeit deaktiviert und den Nutzer informiert
 
 für Später:
-* React Dialog auslagern in eigenes Repo
 * Support für https://wordpress.org/plugins/weglot/ ergänzen
 * Support für Linguise ergänzen
 * PageBuilder-Support:

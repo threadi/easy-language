@@ -304,6 +304,8 @@ body .text-translations-table #source_language, body .text-translations-table #t
 	}
 }
 
+a.wp-easy-dialog, span.wp-easy-dialog { cursor: pointer }
+
 body.wp-easy-dialog-on-body.wp-core-ui .components-modal__frame.wp-easy-dialog:after {
 	background-image: url(/wp-content/plugins/easy-language/gfx/easy-language-icon.png);
 	width: 60px;

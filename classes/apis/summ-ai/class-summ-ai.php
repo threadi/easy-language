@@ -347,6 +347,7 @@ class Summ_AI extends Base implements Api_Base {
 		return array(
 			'easy_language_summ_ai_source_languages',
 			'easy_language_summ_ai_target_languages',
+			'easy_language_summ_ai_disable_free_requests'
 		);
 	}
 
@@ -471,7 +472,16 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_api_url(): string {
-		return EASY_LANGUAGE_SUMM_AI_API_URL;
+		return $this->is_free_requests_enabled() ? EASY_LANGUAGE_SUMM_AI_API_URL : ''; // TODO
+	}
+
+	/**
+	 * Return the SUMM AI API token.
+	 *
+	 * @return string
+	 */
+	public function get_token(): string {
+		return $this->is_free_requests_enabled() ? get_option( EASY_LANGUAGE_HASH ) : ''; // TODO
 	}
 
 	/**
@@ -563,5 +573,23 @@ class Summ_AI extends Base implements Api_Base {
 			return array();
 		}
 		return $results;
+	}
+
+	/**
+	 * Disable free requests.
+	 *
+	 * @return void
+	 */
+	public function disable_free_requests(): void {
+		update_option( 'easy_language_summ_ai_disable_free_requests', 1 );
+	}
+
+	/**
+	 * Return whether free requests are enabled.
+	 *
+	 * @return bool
+	 */
+	public function is_free_requests_enabled(): bool {
+		return 1 !== absint( get_option( 'easy_language_summ_ai_disable_free_requests', 0 ) );
 	}
 }

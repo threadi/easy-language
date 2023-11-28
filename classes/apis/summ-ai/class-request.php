@@ -40,6 +40,13 @@ class Request {
 	private string $url = '';
 
 	/**
+	 * Token to use for the request.
+	 *
+	 * @var string
+	 */
+	private string $token = '';
+
+	/**
 	 * Collect the response-body.
 	 *
 	 * @var string
@@ -173,6 +180,7 @@ class Request {
 	 * @noinspection DuplicatedCode
 	 */
 	public function send(): void {
+		// bail if no request URL is given.
 		if ( empty( $this->url ) ) {
 			return;
 		}
@@ -199,7 +207,7 @@ class Request {
 		$headers = array_merge(
 			$this->header,
 			array(
-				'Authorization' => 'Token: ' . get_option( EASY_LANGUAGE_HASH ),
+				'Authorization' => 'Token: ' . $this->get_token(),
 			)
 		);
 
@@ -215,7 +223,7 @@ class Request {
 		// set request data.
 		$data = array();
 
-		// set request-data for POST.
+		// collect attributes to send request-data via POST-method.
 		if ( 'POST' === $this->get_method() ) {
 			$data['input_text']            = $this->get_text();
 			$data['input_text_type']       = $this->get_text_type();
@@ -233,7 +241,7 @@ class Request {
 		$start_time = microtime( true );
 
 		// send request and get the result-object.
-		$this->result = wp_remote_post( $this->url, $args );
+		$this->result = wp_safe_remote_post( $this->url, $args );
 
 		// secure end-time.
 		$end_time = microtime( true );
@@ -241,18 +249,24 @@ class Request {
 		// save duration.
 		$this->duration = $end_time - $start_time;
 
-		// secure response.
-		$this->response = wp_remote_retrieve_body( $this->get_result() );
+		// log error if something happened.
+		if ( is_wp_error( $this->result ) ) {
+			Log::get_instance()->add_log( sprintf( 'Error during request on API %1$s: '.$this->result->get_error_message(), esc_html($summ_ai_obj->get_name()) ), 'error' );
+		}
+		else {
+			// secure response.
+			$this->response = wp_remote_retrieve_body( $this->get_result() );
 
-		// secure http-status.
-		$this->http_status = absint( wp_remote_retrieve_response_code( $this->get_result() ) );
+			// secure http-status.
+			$this->http_status = absint( wp_remote_retrieve_response_code( $this->get_result() ) );
 
-		// log the request (with anonymized token).
-		$args['headers']['Authorization'] = 'anonymized';
-		Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, print_r( $args, true ), print_r( 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response, true ) );
+			// log the request (with anonymized token).
+			$args['headers']['Authorization'] = 'anonymized';
+			Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, print_r( $args, true ), print_r( 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response, true ) );
 
-		// save request and result in db.
-		$this->save_in_db();
+			// save request and result in db.
+			$this->save_in_db();
+		}
 	}
 
 	/**
@@ -401,5 +415,25 @@ class Request {
 	 */
 	public function set_is_test( bool $is_test ): void {
 		$this->is_test = $is_test;
+	}
+
+	/**
+	 * Get SUMM AI API token.
+	 *
+	 * @return string
+	 */
+	private function get_token(): string {
+		return $this->token;
+	}
+
+	/**
+	 * Set SUMM AI API token.
+	 *
+	 * @param string $token
+	 *
+	 * @return void
+	 */
+	public function set_token( string $token ): void {
+		$this->token = $token;
 	}
 }

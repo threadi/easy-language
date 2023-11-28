@@ -563,4 +563,30 @@ class Helper {
 			$transients_obj->get_transient_by_name( 'easy_language_source_language_not_supported' )->delete();
 		}
 	}
+
+	/**
+	 * Return dialog for not available page builder.
+	 *
+	 * @param $post_object
+	 * @param $page_builder
+	 *
+	 * @return array
+	 */
+	public static function get_dialog_for_unavailable_page_builder( $post_object, $page_builder ): array {
+		return array(
+			/* translators: %1$s will be replaced by the object-title */
+			'title'   => sprintf( __( 'Used page builder is not available', 'easy-language' ), esc_html( $post_object->get_title() ) ),
+			'texts'   => array(
+				/* translators: %1$s will be replaced by the API-title */
+				'<p>' . sprintf( __( 'This %1$s has been edited with %2$s.<br>This %3$s is currently not activated in your WordPress.<br>Therefore, unfortunately, this page cannot be simplified.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $page_builder->get_name() ), esc_html( $page_builder->get_name() ) ) . '</p>',
+			),
+			'buttons' => array(
+				array(
+					'action'  => 'closeDialog();',
+					'variant' => 'primary',
+					'text'    => __( 'OK', 'easy-language' ),
+				),
+			),
+		);
+	}
 }

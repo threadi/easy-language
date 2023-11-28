@@ -41,7 +41,7 @@ add_filter( 'easy_language_register_plugin', 'easy_language_register_plugin_tran
  * @return array
  */
 function easy_language_trp_add_to_wp_list( array $supported_languages_list ): array {
-	// remove our own filter to prevent loops.
+	// remove our own filter to prevent loop.
 	remove_filter( 'trp_wp_languages', 'easy_language_trp_add_to_wp_list' );
 
 	// get possible target-languages.

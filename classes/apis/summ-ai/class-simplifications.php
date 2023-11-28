@@ -72,7 +72,7 @@ class Simplifications {
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.
 	 * @param string $target_language The target language of the text.
-	 * @param bool $is_html Marker if the text contains HTML-Code.
+	 * @param bool $is_html Marker if the text contains HTML-Code. TODO until SUMM AI HTML is better supported
 	 * @return array The result as array.
 	 * @noinspection PhpUnused
 	 */
@@ -80,6 +80,7 @@ class Simplifications {
 		// build request.
 		$request_obj = $this->init->get_request_object();
 		$request_obj->set_url( $this->init->get_api_url() );
+		$request_obj->set_token( $this->init->get_token() );
 		$request_obj->set_text( $text_to_translate );
 		$request_obj->set_text_type( 'plain_text' );
 		$request_obj->set_is_test( $this->init->is_test_mode_active() );
@@ -94,10 +95,15 @@ class Simplifications {
 			$response = $request_obj->get_response();
 
 			// transform it to array.
-			$request_array = json_decode( $response, true );
+			$response_array = json_decode( $response, true );
 
-			// get translated text.
-			$translated_text = apply_filters( 'easy_language_simplified_text', $request_array['translated_text'], $request_array, $this );
+			// get simplified text.
+			$simplified_text = apply_filters( 'easy_language_simplified_text', $response_array['translated_text'], $response_array, $this );
+
+			// if request-array contains 'disabled', disable all free requests.
+			if( !empty($response_array['disabled']) ) {
+				$this->init->disable_free_requests();
+			}
 
 			// save character-count to quota if answer does not contain "no_count".
 			if ( empty( $request_array['no_count'] ) ) {
@@ -106,8 +112,8 @@ class Simplifications {
 
 			// return simplification to plugin which will save it.
 			return array(
-				'translated_text' => $translated_text,
-				'jobid'           => absint( $request_array['jobid'] ),
+				'translated_text' => $simplified_text,
+				'jobid'           => absint( $response_array['jobid'] ),
 			);
 		}
 
