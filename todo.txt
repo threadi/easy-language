@@ -4,10 +4,15 @@ ToDo
 Funktionales
 ------------
 * SUMM AI Proxy-Anbindung so ändern, dass Proxy auch Merkmal "freemium beendet" zurückgeben kann wodurch Plugin diese möglichkeit deaktiviert und den Nutzer informiert
+-> 1. sobald SUMM AI aktiviert wird, initial Status vom Proxy abfragen
+-> 2. wenn Status "disabled" ist, dann die kostenfreie Möglichkeit deaktivieren und den Nutzer darauf hinweisen, dass ein Key nötig ist
+-> 3. ebenso wenn bei einer Vereinfachung der Status "disabled" ist (hier dann einen Dialog anzeigen wenn Request vom User ausging oder Transient setzen wenn Automatismus lief)
 
 für Später:
 * Support für https://wordpress.org/plugins/weglot/ ergänzen
 * Support für Linguise ergänzen
+* nach Vereinfachung Nutzer darauf hinweisen, dass er sich professionelle Unterstützung für die weitere Bearbeitung holen kann
+-> Liste von Dienstleistern anzeigen die möglich wären (Capito, SUMM AI, Dritte ..)
 * PageBuilder-Support:
 -> Beaver
 -> SiteOrigin

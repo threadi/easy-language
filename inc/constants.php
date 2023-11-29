@@ -16,17 +16,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 const EASY_LANGUAGE_SUMM_AI_API_URL = 'https://api.laolaweb.com/summaiproxy/index.php';
 
 /**
- * Capito API URL for simplifications.
+ * capito API URL for simplifications.
  */
 const EASY_LANGUAGE_CAPITO_API_URL = 'https://api.capito.ai/simplification';
 
 /**
- * Capito API URL for quotas.
+ * capito API URL for quotas.
  */
 const EASY_LANGUAGE_CAPITO_API_URL_QUOTA = 'https://api.capito.ai/shop/me/quotas';
 
 /**
- * Capito API URL to get info about subscription.
+ * capito API URL to get info about subscription.
  */
 const EASY_LANGUAGE_CAPITO_SUBSCRIPTION_URL = 'https://api.capito.ai/shop/me/subscription';
 
@@ -85,7 +85,7 @@ const EASY_LANGUAGE_HASH = 'easy_language_hash';
 const EASY_LANGUAGE_SUMM_AI_QUOTA = 18000;
 
 /**
- * Quota for Capito API.
+ * Quota for capito API.
  * Changes will not work as this is also checked by API.
  */
 const EASY_LANGUAGE_CAPITO_QUOTA = 1000000;

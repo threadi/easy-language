@@ -214,7 +214,7 @@ class REST_Api {
 					'label' => __( 'Easy Language', 'easy-language' ),
 					'color' => 'gray',
 				),
-				'description' => __( 'To use simplification for texts in your website the Easy Language plugin uses APIs from SUMM AI, Capito and ChatGpt which needs some configuration.<br><strong>No Api active!</strong>', 'easy-language' ),
+				'description' => __( 'To use simplification for texts in your website the Easy Language plugin uses APIs from SUMM AI, capito and ChatGpt which needs some configuration.<br><strong>No Api active!</strong>', 'easy-language' ),
 				/* translators: %1$s will be replaced by the URL for API-settings */
 				'actions'     => '<p><a href="' . esc_url( Helper::get_settings_page_url() ) . '" class="button button-primary">' . esc_html__( 'Choose an API', 'easy-language' ) . '</a></p>',
 				'test'        => 'easy_language_check_api',
@@ -229,7 +229,7 @@ class REST_Api {
 					'color' => 'gray',
 				),
 				/* translators: %1$s will be replaced by the API-title */
-				'description' => sprintf( __( 'To use simplification for texts in your website the Easy Language plugin uses APIs from SUMM AI, Capito and ChatGpt which needs some configuration.<br><strong>All ok with the actual active API %1$s!</strong>', 'easy-language' ), esc_html( $api_obj->get_title() ) ),
+				'description' => sprintf( __( 'To use simplification for texts in your website the Easy Language plugin uses APIs from SUMM AI, capito and ChatGpt which needs some configuration.<br><strong>All ok with the actual active API %1$s!</strong>', 'easy-language' ), esc_html( $api_obj->get_title() ) ),
 				'actions'     => '',
 				'test'        => 'easy_language_check_api',
 			);

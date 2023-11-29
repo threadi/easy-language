@@ -10,7 +10,7 @@ Stable tag: 2.0.0
 
 == Description ==
 
-Have all texts on your website automatically simplified into easy language. Use a simplify-API like SUMM AI or Capito to make your site even more accessible for your visitors.
+Have all texts on your website automatically simplified into easy language. Use a simplify-API like SUMM AI or capito to make your site even more accessible for your visitors.
 
 #### Highlights ####
 
@@ -18,7 +18,7 @@ The [SUMM AI](https://summ-ai.com) API is usable without API Key to simplify 180
 
 #### Features ####
 
-* Supported APIs to simplify texts in your website: [SUMM AI](https://summ-ai.com), [Capito](https://www.capito.eu), [ChatGpt](https://chat.openai.com)
+* Supported APIs to simplify texts in your website: [SUMM AI](https://summ-ai.com), [capito](https://www.capito.eu), [ChatGpt](https://chat.openai.com)
 * The SUMM AI API is also usable in TranslatePress Automatic translations
 * Adds easy language to other multilingual plugins like WPML, Polylang, Sublanguage, TranslatePress (and can be run alongside with them)
 * PageBuilder: native support for Block Editor (Gutenberg), Avada, Elementor, Divi, WPBakery and Themify
@@ -29,7 +29,7 @@ The development repository is on [GitHub](https://github.com/threadi/easy-langua
 
 #### Requirements
 
-If you want to use [Capito](https://www.capito.eu) or [ChatGpt](https://chat.openai.com) you need an API Key for their API. Please contact their websites for more information.
+If you want to use [capito](https://www.capito.eu) or [ChatGpt](https://chat.openai.com) you need an API Key for their API. Please contact their websites for more information.
 
 #### the Pro license includes:
 
@@ -80,7 +80,7 @@ Yes, you can use Easy Language alongside all supported multilingual-plugins. You
 = 2.0.0 =
 * Plugin completely revised
 * Added simplification for posts and pages in Einfache or Leichte Sprache, manually or automatic
-* Added support for API-based simplifications via SUMM AI and Capito
+* Added support for API-based simplifications via SUMM AI and capito
 * Added support for different source and target languages
 * Added support for different PageBuilder (Block Editor, Classic Editor)
 * Added multiple hooks

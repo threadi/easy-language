@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handler for things the Capito supports.
+ * File for handler for things the capito supports.
  *
  * @package easy-language
  */
@@ -40,7 +40,7 @@ class Capito extends Base implements Api_Base {
 	 *
 	 * @var string
 	 */
-	protected string $title = 'Capito';
+	protected string $title = 'capito';
 
 	/**
 	 * Instance of this object.
@@ -139,10 +139,10 @@ class Capito extends Base implements Api_Base {
 		// get quota.
 		$quota = $this->get_quota();
 
-		/* translators: %1$d will be replaced by the link to Capito */
+		/* translators: %1$d will be replaced by the link to capito */
 		$text = sprintf( __( '<p><a href="%1$s" target="_blank"><strong>capito digital</strong> (opens new window)</a> is an AI-based tool for <i>Easy language</i>.<br>It helps you write better texts.</p><p>This API simplifies texts based on the Common European Framework of Reference for Languages.<br>This describes the <i>complexity of languages according to proficiency levels</i> (A1, A2, B1 ..).</p><p>The number of simplifications with capito digital is limited to <strong>quotas</strong>.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( $quota['character_limit'] > 0 ) {
-			/* translators: %1$d will be replaced by the characters spent for Capito, %2$d will be the quota for Capito, %3$d will be the rest quota */
+			/* translators: %1$d will be replaced by the characters spent for capito, %2$d will be the quota for capito, %3$d will be the rest quota */
 			$text .= sprintf( __( '<p><strong>Actual character spent:</strong> %1$d<br><strong>Quota limit:</strong> %2$d<br><strong>Rest quota:</strong> %3$d</strong></p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ), $quota['character_spent'], $quota['character_limit'], absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) );
 		} elseif ( ! empty( $quota['unlimited'] ) ) {
 			$text .= '<p><strong>' . __( 'Unlimited quota', 'easy-language' ) . '</strong></p>';
@@ -250,7 +250,7 @@ class Capito extends Base implements Api_Base {
 			'de_a2' => array(
 				'label'       => __( 'German A2', 'easy-language' ),
 				'enabled'     => true,
-				'description' => __( 'Capito compares this with Leichte Sprache', 'easy-language' ),
+				'description' => __( 'capito compares this with Leichte Sprache', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'a2',
 				'icon'        => 'icon-de-ls',
@@ -260,7 +260,7 @@ class Capito extends Base implements Api_Base {
 			'de_b1' => array(
 				'label'       => __( 'German B1', 'easy-language' ),
 				'enabled'     => true,
-				'description' => __( 'Capito compares this with Einfache Sprache', 'easy-language' ),
+				'description' => __( 'capito compares this with Einfache Sprache', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'b1',
 				'icon'        => 'icon-de-el',
@@ -280,7 +280,7 @@ class Capito extends Base implements Api_Base {
 			'en_a2' => array(
 				'label'       => __( 'English A2', 'easy-language' ),
 				'enabled'     => true,
-				'description' => __( 'Capito compares this with Plain Sprache', 'easy-language' ),
+				'description' => __( 'capito compares this with Plain Sprache', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'a2',
 				'icon'        => 'icon-de-ls',
@@ -290,7 +290,7 @@ class Capito extends Base implements Api_Base {
 			'en_b1' => array(
 				'label'       => __( 'English B1', 'easy-language' ),
 				'enabled'     => true,
-				'description' => __( 'Capito compares this with Easy Language', 'easy-language' ),
+				'description' => __( 'capito compares this with Easy Language', 'easy-language' ),
 				'url'         => 'de_a2',
 				'api_value'   => 'b1',
 				'icon'        => 'icon-de-ls',
@@ -545,7 +545,7 @@ class Capito extends Base implements Api_Base {
 		}
 
 		// output tab.
-		echo '<a href="' . esc_url( helper::get_settings_page_url() ) . '&tab=' . esc_attr( $this->get_name() ) . '" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'Capito', 'easy-language' ) . '</a>';
+		echo '<a href="' . esc_url( helper::get_settings_page_url() ) . '&tab=' . esc_attr( $this->get_name() ) . '" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'capito', 'easy-language' ) . '</a>';
 	}
 
 	/**
@@ -580,7 +580,7 @@ class Capito extends Base implements Api_Base {
 			submit_button();
 			?>
 		</form>
-		<h2 id="statistics"><?php esc_html_e( 'Capito Quota', 'easy-language' ); ?></h2>
+		<h2 id="statistics"><?php esc_html_e( 'capito Quota', 'easy-language' ); ?></h2>
 		<?php
 		if ( $this->is_capito_token_set() ) {
 			/**
@@ -627,18 +627,18 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function add_settings(): void {
 		/**
-		 * Capito settings Section
+		 * capito settings Section
 		 */
 		add_settings_section(
 			'settings_section_capito',
-			__( 'Capito Settings', 'easy-language' ),
+			__( 'capito Settings', 'easy-language' ),
 			'__return_true',
 			'easyLanguageCapitoPage'
 		);
 
 		// Set description for token field if it has not been set.
-		/* translators: %1$s will be replaced by the Capito URL */
-		$description = sprintf( __( 'Get your Capito API Token <a href="%1$s" target="_blank">here (opens new window)</a>.<br>If you have any questions about the token provided by Capito, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+		/* translators: %1$s will be replaced by the capito URL */
+		$description = sprintf( __( 'Get your capito API Token <a href="%1$s" target="_blank">here (opens new window)</a> (copy "Access Token").<br>If you have any questions about the token provided by capito, please contact their support: <a href="%2$s" target="_blank">%2$s (opens new window)</a>', 'easy-language' ), esc_url($this->get_token_url()), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_capito_token_set() ) {
 			// Set link to test the entered token.
 			$url = add_query_arg(
@@ -659,8 +659,8 @@ class Capito extends Base implements Api_Base {
 			);
 
 			// Show other description if token is set.
-			/* translators: %1$s will be replaced by the Capito URL */
-			$description  = sprintf( __( 'If you have any questions about the token provided by Capito, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+			/* translators: %1$s will be replaced by the capito URL */
+			$description  = sprintf( __( 'If you have any questions about the token provided by capito, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 			$description .= '<br><a href="' . esc_url( $url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Test token', 'easy-language' ) . '</a><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
 		}
 
@@ -672,10 +672,10 @@ class Capito extends Base implements Api_Base {
 			}
 		}
 
-		// Capito token.
+		// capito token.
 		add_settings_field(
 			'easy_language_capito_api_key',
-			__( 'Capito API Key', 'easy-language' ),
+			__( 'capito API Key', 'easy-language' ),
 			'easy_language_admin_text_field',
 			'easyLanguageCapitoPage',
 			'settings_section_capito',
@@ -692,7 +692,7 @@ class Capito extends Base implements Api_Base {
 		// Enable source-languages.
 		// -> defaults to WP-locale.
 		// -> if WPML, Polylang or TranslatePress is available, show additional languages.
-		// -> but restrict list to languages supported by Capito.
+		// -> but restrict list to languages supported by capito.
 		add_settings_field(
 			'easy_language_capito_source_languages',
 			__( 'Choose source languages', 'easy-language' ),
@@ -702,7 +702,7 @@ class Capito extends Base implements Api_Base {
 			array(
 				'label_for'   => 'easy_language_capito_source_languages',
 				'fieldId'     => 'easy_language_capito_source_languages',
-				'description' => __( 'These are the possible source languages for Capito-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
+				'description' => __( 'These are the possible source languages for capito-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
 				'options'     => $this->get_supported_source_languages(),
 				'readonly'    => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
 			)
@@ -719,7 +719,7 @@ class Capito extends Base implements Api_Base {
 			array(
 				'label_for'   => 'easy_language_capito_target_languages',
 				'fieldId'     => 'easy_language_capito_target_languages',
-				'description' => __( 'These are the possible target languages for Capito-simplifications.', 'easy-language' ),
+				'description' => __( 'These are the possible target languages for capito-simplifications.', 'easy-language' ),
 				'options'     => $this->get_supported_target_languages(),
 				'readonly'    => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
 			)
@@ -844,7 +844,7 @@ class Capito extends Base implements Api_Base {
 
 		// if no token has been entered, show hint.
 		if ( empty( $value ) ) {
-			add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __( 'You did not enter an API token. All simplification options via the Capito API have been disabled.', 'easy-language' ) );
+			add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __( 'You did not enter an API token. All simplification options via the capito API have been disabled.', 'easy-language' ) );
 		} elseif ( 0 !== strcmp( $value, get_option( 'easy_language_capito_api_key', '' ) ) ) {
 			// if token has been changed, get the quota and delete settings hint.
 			$request = $this->get_test_request_response( $value );
@@ -854,7 +854,7 @@ class Capito extends Base implements Api_Base {
 				add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', sprintf( __( '<strong>Token could not be verified.</strong> Please take a look <a href="%1$s">in the log</a> to check the reason.', 'easy-language' ), esc_url( Helper::get_api_logs_page_url() ) ) );
 
 				// Log event.
-				Log::get_instance()->add_log( sprintf( 'Token for Capito has been changed, but we get an error from API by validation of the key. Please <a href="%1$s">check API log</a>.', esc_url(Helper::get_api_logs_page_url()) ), 'error' );
+				Log::get_instance()->add_log( sprintf( 'Token for capito has been changed, but we get an error from API by validation of the key. Please <a href="%1$s">check API log</a>.', esc_url(Helper::get_api_logs_page_url()) ), 'error' );
 
 				// remove token.
 				$value = '';
@@ -863,7 +863,7 @@ class Capito extends Base implements Api_Base {
 				$this->get_quota_from_api( $value );
 
 				// Log event.
-				Log::get_instance()->add_log( 'Token for Capito has been changed.', 'success' );
+				Log::get_instance()->add_log( 'Token for capito has been changed.', 'success' );
 			}
 
 			// delete api-settings hint.
@@ -957,7 +957,7 @@ class Capito extends Base implements Api_Base {
 		$response = $request->get_response();
 
 		// transform it to an array and return it.
-		$results = json_decode( $response, ARRAY_A );
+		$results = json_decode( $response, true );
 		if ( is_array( $results ) ) {
 			return $results;
 		}
@@ -993,8 +993,8 @@ class Capito extends Base implements Api_Base {
 					$transient_obj = $transients_obj->add();
 					$transient_obj->set_dismissible_days( 2 );
 					$transient_obj->set_name( 'easy_language_capito_quota' );
-					/* translators: %1$s will be replaced by the URL for Capito support. */
-					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the Capito API is completely depleted.</strong> You will not be able to use any simplifications from Capito. Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
+					/* translators: %1$s will be replaced by the URL for capito support. */
+					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the capito API is completely depleted.</strong> You will not be able to use any simplifications from capito. Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 					$transient_obj->set_type( 'error' );
 					$transient_obj->save();
 				} elseif ( $percent > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
@@ -1002,8 +1002,8 @@ class Capito extends Base implements Api_Base {
 					$transient_obj = $transients_obj->add();
 					$transient_obj->set_dismissible_days( 2 );
 					$transient_obj->set_name( 'easy_language_capito_quota' );
-					/* translators: %1$s will be replaced by the URL for Capito support. */
-					$transient_obj->set_message( sprintf( __( '<strong>More than 80%% of your quota for the Capito API has already been used.</strong> Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
+					/* translators: %1$s will be replaced by the URL for capito support. */
+					$transient_obj->set_message( sprintf( __( '<strong>More than 80%% of your quota for the capito API has already been used.</strong> Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 					$transient_obj->set_type( 'error' );
 					$transient_obj->save();
 				}
@@ -1168,5 +1168,14 @@ class Capito extends Base implements Api_Base {
 			return array();
 		}
 		return $results;
+	}
+
+	/**
+	 * Get the URL where the user can get its token.
+	 *
+	 * @return string
+	 */
+	private function get_token_url(): string {
+		return 'https://digital.capito.eu/token';
 	}
 }

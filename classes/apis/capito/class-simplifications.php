@@ -1,6 +1,6 @@
 <?php
 /**
- * File for simplifications-handling of the Capito API.
+ * File for simplifications-handling of the capito API.
  *
  * @package easy-language
  */

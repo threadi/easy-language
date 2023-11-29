@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handler for each request to Capito API.
+ * File for handler for each request to capito API.
  *
  * @package easy-language
  */
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Create and send request to Capito API. Gets the response.
+ * Create and send request to capito API. Gets the response.
  */
 class Request {
 
@@ -166,11 +166,11 @@ class Request {
 		// bail if no text for simplification is given.
 		if ( 'PUT' === $this->get_method() && ! $this->has_text() ) {
 			// Log event.
-			Log::get_instance()->add_log( 'Capito: no text given for simplification.', 'error' );
+			Log::get_instance()->add_log( 'capito: no text given for simplification.', 'error' );
 			return;
 		}
 
-		// get Capito-object.
+		// get capito-object.
 		$capito_obj = Capito::get_instance();
 
 		// merge header-array.
