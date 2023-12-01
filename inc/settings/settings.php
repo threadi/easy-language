@@ -428,6 +428,9 @@ function easy_language_admin_multiple_checkboxes_field( array $attr ): void {
 			</div>
 			<?php
 		}
+		if ( ! empty( $attr['pro_hint'] ) ) {
+			do_action( 'easy_language_admin_show_pro_hint', $attr['pro_hint'] );
+		}
 	}
 }
 

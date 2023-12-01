@@ -83,6 +83,7 @@ class Simplifications {
 		$request_obj->set_token( $this->init->get_token() );
 		$request_obj->set_text( $text_to_translate );
 		$request_obj->set_text_type( 'plain_text' );
+		$request_obj->set_method( 'POST' );
 		$request_obj->set_is_test( $this->init->is_test_mode_active() );
 		$request_obj->set_source_language( $source_language );
 		$request_obj->set_target_language( $target_language );

@@ -1,6 +1,6 @@
 <?php
 /**
- * File for an extension of the translatePress-plugin with SUMM AI.
+ * File for an extension of the translatePress-plugin with capito.
  *
  * @package easy-language
  */
@@ -19,17 +19,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define our own translate-machine as extension for the translatePress-plugin.
  */
-class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
-
+class Translatepress_Capito_Machine_Translator extends TRP_Machine_Translator {
 	/**
-	 * Marker if this is a test-request.
-	 *
-	 * @var bool
-	 */
-	private bool $is_test = false;
-
-	/**
-	 * Send request to summ ai.
+	 * Send request to capito.
 	 *
 	 * @param string $source_language       From language.
 	 * @param string $language_code         To language.
@@ -40,20 +32,20 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function send_request( $source_language, $language_code, $string_to_translate ): WP_Error|array {
-		// get SUMM AI API-object.
+		// get capito API-object.
 		$api_object = Apis::get_instance()->get_active_api();
-		if ( false === $api_object || 'summ_ai' !== $api_object->get_name() ) {
-			return new WP_Error( 'error', __( 'No active SUMM AI API!', 'easy-language' ) );
+		if ( false === $api_object || 'capito' !== $api_object->get_name() ) {
+			return new WP_Error( 'error', __( 'No active capito API!', 'easy-language' ) );
 		}
 
-		// send request.
+		// build request.
 		$request_obj = $api_object->get_request_object();
 		$request_obj->set_token( $api_object->get_token() );
-		$request_obj->set_method( 'POST' );
 		$request_obj->set_url( $api_object->get_api_url() );
-		$request_obj->set_is_test( $this->is_test );
 		$request_obj->set_text( $string_to_translate );
-		$request_obj = apply_filters( 'easy_language_summ_ai_request_object', $request_obj );
+		$request_obj->set_source_language( $source_language );
+		$request_obj->set_target_language( $language_code );
+		$request_obj = apply_filters( 'easy_language_capito_request_object', $request_obj );
 		$request_obj->send();
 
 		// return request result.
@@ -140,8 +132,7 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 	 * @return WP_Error|array
 	 */
 	public function test_request(): WP_Error|array {
-		$this->is_test = true;
-		return $this->send_request( 'de_DE', 'de_ls', 'about' );
+		return $this->send_request( 'en', 'b1', 'about' );
 	}
 
 	/**

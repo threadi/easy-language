@@ -76,6 +76,7 @@ add_filter( 'trp_wp_languages', 'easy_language_trp_add_to_wp_list' );
  * @return array
  */
 function easy_language_trp_add_automatic_machine( array $api_list ): array {
+	$api_list['capito'] = 'easyLanguage\Multilingual_plugins\TranslatePress\Translatepress_Capito_Machine_Translator';
 	$api_list['summ-ai'] = 'easyLanguage\Multilingual_plugins\TranslatePress\Translatepress_Summ_Ai_Machine_Translator';
 	return $api_list;
 }
@@ -84,10 +85,16 @@ add_filter( 'trp_automatic_translation_engines_classes', 'easy_language_trp_add_
 /**
  * Add the automatic machine to the list in translatePress-backend.
  *
+ * TODO nur aktive APIs anzeigen wenn diese hiermit kompatibel sind
+ *
  * @param array $engines List of supported simplify engines.
  * @return mixed
  */
 function easy_language_trp_add_automatic_engine( array $engines ): array {
+	$engines[] = array(
+		'value' => 'capito',
+		'label' => __( 'capito', 'easy-language' ),
+	);
 	$engines[] = array(
 		'value' => 'summ-ai',
 		'label' => __( 'SUMM AI', 'easy-language' ),
@@ -129,7 +136,7 @@ function easy_language_trp_reset_simplifications(): void {
  * @return bool
  */
 function easy_language_trp_get_supported_languages( bool $all_are_available, array $languages, array $settings ): bool {
-	if ( 'summ-ai' === $settings['trp_machine_translation_settings']['translation-engine'] ) {
+	if ( in_array( $settings['trp_machine_translation_settings']['translation-engine'], array( 'summ-ai', 'capito'), true ) ) {
 		// remove our own filter to prevent loop.
 		remove_filter( 'trp_mt_available_supported_languages', 'easy_language_trp_get_supported_languages', 10, 3 );
 

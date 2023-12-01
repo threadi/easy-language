@@ -11,9 +11,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * SUMM AI API URL.
+ */
+const EASY_LANGUAGE_SUMM_AI_PAID_API_URL = 'https://backend.summ-ai.com/translate/v1/';
+
+/**
  * SUMM AI API URL for free version.
  */
-const EASY_LANGUAGE_SUMM_AI_API_URL = 'https://api.laolaweb.com/summaiproxy/index.php';
+const EASY_LANGUAGE_SUMM_AI_FREE_API_URL = 'https://api.laolaweb.com/summaiproxy/index.php';
+
+/**
+ * URL for Quota-Request to SUMM AI.
+ */
+const EASY_LANGUAGE_SUMM_AI_API_URL_QUOTA = 'https://backend.summ-ai.com/translate/v1/usage/';
 
 /**
  * capito API URL for simplifications.

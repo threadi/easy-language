@@ -40,7 +40,7 @@ class Request {
 	private string $url = '';
 
 	/**
-	 * Token to use for the request.
+	 * Token aka key to use for the request.
 	 *
 	 * @var string
 	 */
@@ -96,6 +96,13 @@ class Request {
 	private string $separator = 'interpunct';
 
 	/**
+	 * Source-language for this request.
+	 *
+	 * @var string
+	 */
+	private string $source_language;
+
+	/**
 	 * Target-language for this request.
 	 *
 	 * @var string
@@ -129,13 +136,6 @@ class Request {
 	 * @var bool
 	 */
 	private bool $is_test = false;
-
-	/**
-	 * Source-language for this request.
-	 *
-	 * @var string
-	 */
-	private string $source_language;
 
 	/**
 	 * Constructor.
@@ -185,8 +185,16 @@ class Request {
 			return;
 		}
 
+		// bail of no token given.
+		if( empty($this->get_token()) ) {
+			// Log event.
+			Log::get_instance()->add_log( 'SUMM AI: no API key given for simplification.', 'error' );
+
+			return;
+		}
+
 		// bail if no text for simplification is given.
-		if ( ! $this->has_text() ) {
+		if ( ! $this->has_text() && 'POST' === $this->get_method() ) {
 			// Log event.
 			Log::get_instance()->add_log( 'SUMM AI: no text given for simplification.', 'error' );
 
@@ -207,7 +215,7 @@ class Request {
 		$headers = array_merge(
 			$this->header,
 			array(
-				'Authorization' => 'Token: ' . $this->get_token(),
+				'Authorization' => ($summ_ai_obj->is_free_mode() ? 'Token: ' : 'Bearer ').$this->get_token(),
 			)
 		);
 
@@ -240,8 +248,15 @@ class Request {
 		// secure start-time.
 		$start_time = microtime( true );
 
-		// send request and get the result-object.
-		$this->result = wp_safe_remote_post( $this->url, $args );
+		// send request and get the result-object depending on used request method.
+		switch( $this->get_method() ) {
+			case 'POST':
+				$this->result = wp_safe_remote_post( $this->url, $args );
+				break;
+			case 'GET':
+				$this->result = wp_safe_remote_get( $this->url, $args );
+				break;
+		}
 
 		// secure end-time.
 		$end_time = microtime( true );
@@ -267,6 +282,16 @@ class Request {
 			// save request and result in db.
 			$this->save_in_db();
 		}
+	}
+
+	/**
+	 * Return whether this request is a test (which will not result in any simplification).
+	 * If true the communication is just tested.
+	 *
+	 * @return bool
+	 */
+	public function is_test(): bool {
+		return $this->is_test;
 	}
 
 	/**
@@ -418,7 +443,7 @@ class Request {
 	}
 
 	/**
-	 * Get SUMM AI API token.
+	 * Get SUMM AI API token aka key.
 	 *
 	 * @return string
 	 */
@@ -435,5 +460,17 @@ class Request {
 	 */
 	public function set_token( string $token ): void {
 		$this->token = $token;
+	}
+
+	/**
+	 * Set request method (GET, POST, HEAD ..)
+	 *
+	 * @param string $string
+	 * @return void
+	 */
+	public function set_method( string $string ): void {
+		if( in_array($string, array( 'GET', 'POST' ), true ) ) {
+			$this->method = $string;
+		}
 	}
 }

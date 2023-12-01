@@ -131,7 +131,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return the public description of the Capito API.
+	 * Return the public description of the capito API.
 	 *
 	 * @return string
 	 */
@@ -151,17 +151,7 @@ class Capito extends Base implements Api_Base {
 		}
 
 		// wrapper for buttons.
-		$text .= '<p>';
-
-		// help-button.
-		$text .= '<a href="' . esc_url( $this->get_language_specific_support_page() ) . '" target="_blank" class="button button-primary" title="' . esc_attr( __( 'Get help for this API', 'easy-language' ) ) . '"><span class="dashicons dashicons-editor-help"></span></a>';
-
-		// Show setting-button if this API is enabled.
-		if ( $this->is_active() ) {
-			$text .= '<a href="' . esc_html( $this->get_settings_url() ) . '" class="button button-primary" title="' . esc_html__( 'Go to settings', 'easy-languag' ) . '"><span class="dashicons dashicons-admin-generic"></span></a>';
-		}
-
-		$text .= '</p>';
+		$text .= $this->get_description_buttons();
 
 		// return resulting text.
 		return $text;
@@ -214,18 +204,6 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'Informal german spoken in austria.', 'easy-language' ),
 				'api_value'   => 'de',
 			),
-			'en_UK' => array(
-				'label'       => __( 'English (UK)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'English spoken in the United Kingdom.', 'easy-language' ),
-				'api_value'   => 'en',
-			),
-			'en_US' => array(
-				'label'       => __( 'English (US)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'English spoken in the USA.', 'easy-language' ),
-				'api_value'   => 'en',
-			),
 		);
 	}
 
@@ -267,36 +245,6 @@ class Capito extends Base implements Api_Base {
 				'img'         => 'de_EL.png',
 				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_b1' ) : '',
 			),
-			'en_a1' => array(
-				'label'       => __( 'English A1', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'The easiest level of english language.', 'easy-language' ),
-				'url'         => 'de_a1',
-				'api_value'   => 'a1',
-				'icon'        => 'icon-de-ls',
-				'img'         => 'en_LS.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'en_a1' ) : '',
-			),
-			'en_a2' => array(
-				'label'       => __( 'English A2', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'capito compares this with Plain Sprache', 'easy-language' ),
-				'url'         => 'de_a2',
-				'api_value'   => 'a2',
-				'icon'        => 'icon-de-ls',
-				'img'         => 'en_LS.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'en_a2' ) : '',
-			),
-			'en_b1' => array(
-				'label'       => __( 'English B1', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'capito compares this with Easy Language', 'easy-language' ),
-				'url'         => 'de_a2',
-				'api_value'   => 'b1',
-				'icon'        => 'icon-de-ls',
-				'img'         => 'en_EL.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'en_b1' ) : '',
-			),
 		);
 	}
 
@@ -314,8 +262,6 @@ class Capito extends Base implements Api_Base {
 			'de_AT' => array( 'de_a1', 'de_a2', 'de_b1' ),
 			'de_CH' => array( 'de_a1', 'de_a2', 'de_b1' ),
 			'de_CH_informal' => array( 'de_a1', 'de_a2', 'de_b1' ),
-			'en_UK'    => array( 'en_a1', 'en_a2', 'en_b1' ),
-			'en_US'    => array( 'en_a1', 'en_a2', 'en_b1' ),
 		);
 	}
 
@@ -705,6 +651,7 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'These are the possible source languages for capito-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
 				'options'     => $this->get_supported_source_languages(),
 				'readonly'    => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
+				'pro_hint' => $this->get_pro_hint()
 			)
 		);
 		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_source_languages', array( 'sanitize_callback' => 'easyLanguage\Helper::settings_validate_multiple_checkboxes' ) );
@@ -722,6 +669,7 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'These are the possible target languages for capito-simplifications.', 'easy-language' ),
 				'options'     => $this->get_supported_target_languages(),
 				'readonly'    => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
+				'pro_hint' => $this->get_pro_hint()
 			)
 		);
 		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_target_languages', array( 'sanitize_callback' => array( $this, 'validate_language_settings' ) ) );
@@ -1177,5 +1125,25 @@ class Capito extends Base implements Api_Base {
 	 */
 	private function get_token_url(): string {
 		return 'https://digital.capito.eu/token';
+	}
+
+	/**
+	 * Return whether this API has extended support in Easy Language Pro.
+	 *
+	 * @return bool
+	 */
+	public function is_extended_in_pro(): bool {
+		return true;
+	}
+
+	/**
+	 * Return custom pro-hint for API-chooser.
+	 *
+	 * @return string
+	 * @noinspection PhpUnused
+	 */
+	public function get_pro_hint(): string {
+		/* translators: %1$s will be replaced by the link to laolaweb.com */
+		return sprintf( __( 'Get support for more languages with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a>', 'easy-language' ), esc_url( Helper::get_pro_url() ) );
 	}
 }

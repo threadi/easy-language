@@ -347,14 +347,14 @@ class Texts {
 					// loop through the resulting texts and check if the text has been changed (aka: is not available in translation-db).
 					foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
 						// bail if text is empty.
-						if ( empty( $text ) ) {
+						if ( empty( $text['text'] ) ) {
 							continue;
 						}
 
 						$filter = array(
 							'object_id'   => $translated_post_id,
 							'object_type' => $post_obj->get_type(),
-							'hash'        => $this->db->get_string_hash( $text ),
+							'hash'        => $this->db->get_string_hash( $text['text'] ),
 						);
 						if ( empty( Db::get_instance()->get_entries( $filter ) ) ) {
 							// mark the object as changed as translated content has been changed or new content has been added in the given language.

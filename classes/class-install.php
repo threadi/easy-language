@@ -123,7 +123,7 @@ class Install {
 		Db::get_instance()->create_table();
 
 		// set debug-mode to disabled per default.
-		if ( ! get_option( 'easy_language_debug_mode' ) ) {
+		if ( false === get_option( 'easy_language_debug_mode' ) ) {
 			update_option( 'easy_language_debug_mode', '0' );
 		}
 
@@ -143,12 +143,12 @@ class Install {
 		}
 
 		// set text-simplification limit per process.
-		if ( ! get_option( 'easy_language_api_text_limit_per_process' ) ) {
+		if ( false === get_option( 'easy_language_api_text_limit_per_process' ) ) {
 			update_option( 'easy_language_api_text_limit_per_process', 1 );
 		}
 
 		// enable deletion of unused simplification.
-		if ( ! get_option( 'easy_language_delete_unused_simplifications' ) ) {
+		if ( false === get_option( 'easy_language_delete_unused_simplifications' ) ) {
 			update_option( 'easy_language_delete_unused_simplifications', 1 );
 		}
 

@@ -1,6 +1,6 @@
 === Easy Language ===
 Contributors: laolaweb, threadi
-Tags: easy language, plain language, leichte sprache, simplify, summ ai, capito
+Tags: easy language, leichte sprache, simplify, summ ai, capito
 Requires at least: 6.0
 Tested up to: 6.4.1
 Requires PHP: 8.0
@@ -10,32 +10,32 @@ Stable tag: 2.0.0
 
 == Description ==
 
-Have all texts on your website automatically simplified into easy language. Use a simplify-API like SUMM AI or capito to make your site even more accessible for your visitors.
+Have all texts on your website automatically simplified into easy language. Use a simplify-API from experts at SUMM AI or capito to make your site even more accessible for your visitors.
 
 #### Highlights ####
 
-The [SUMM AI](https://summ-ai.com) API is usable without API Key to simplify 18000 characters FOR FREE.
+The [SUMM AI](https://summ-ai.com) API is usable to simplify up to 18000 characters FOR FREE.
 
 #### Features ####
 
 * Supported APIs to simplify texts in your website: [SUMM AI](https://summ-ai.com), [capito](https://www.capito.eu), [ChatGpt](https://chat.openai.com)
-* The SUMM AI API is also usable in TranslatePress Automatic translations
-* Adds easy language to other multilingual plugins like WPML, Polylang, Sublanguage, TranslatePress (and can be run alongside with them)
+* SUMM AI and capito are also usable in TranslatePress Automatic translations
+* Adds easy language to other multilingual plugins like WPML, Polylang, Sublanguage, TranslatePress (and can be used alongside with them)
 * PageBuilder: native support for Block Editor (Gutenberg), Avada, Elementor, Divi, WPBakery and Themify
 * Multisite: all simplified texts will be available to any other blog in the network to prevent double simplification
-* Own translator role for users to only simplified texts
+* Own role for users to only simplify texts
 
 The development repository is on [GitHub](https://github.com/threadi/easy-language).
 
 #### Requirements
 
-If you want to use [capito](https://www.capito.eu) or [ChatGpt](https://chat.openai.com) you need an API Key for their API. Please contact their websites for more information.
+If you want to use [SUMM AI](https://summ-ai.com), [capito](https://www.capito.eu) or [ChatGpt](https://chat.openai.com) you need an API key for their respective API. Please contact their websites for more information.
 
 #### the Pro license includes:
 
+* Support for english as source language
 * Support for more post-types
 * Support for any taxonomies (e.g. category descriptions)
-* Usage of custom SUMM AI API Key
 * Use other source languages, e.g. english or francais
 * Simplification of single texts
 * Show where any simplified text is used in your website

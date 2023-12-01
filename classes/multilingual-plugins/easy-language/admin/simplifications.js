@@ -108,7 +108,7 @@ function easy_language_add_simplification_object( object_id, type, language, sim
 								{
 									'action': 'location.href="' + data.simplification_list_link + '";',
 									'variant': 'primary',
-									'text': __('Show to simplify list', 'easy-language')
+									'text': __('Go to simplify list', 'easy-language')
 								},
 								{
 									'action': 'location.href="' + data.edit_link + '";',

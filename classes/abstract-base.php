@@ -435,4 +435,26 @@ abstract class Base {
 	public function get_mapping_languages(): array {
 		return array();
 	}
+
+	/**
+	 * Return description buttons depending on settings for the API.
+	 *
+	 * @return string
+	 */
+	protected function get_description_buttons(): string {
+		$text = '<p>';
+
+		// help-button.
+		$text .= '<a href="' . esc_url( $this->get_language_specific_support_page() ) . '" target="_blank" class="button button-primary" title="' . esc_attr( __( 'Get help for this API', 'easy-language' ) ) . '"><span class="dashicons dashicons-editor-help"></span></a>';
+
+		// Show setting-button if this API is enabled.
+		if ( $this->is_active() ) {
+			$text .= '<a href="' . esc_html( $this->get_settings_url() ) . '" class="button button-primary" title="' . esc_html__( 'Go to settings', 'easy-language' ) . '"><span class="dashicons dashicons-admin-generic"></span></a>';
+		}
+
+		$text .= '</p>';
+
+		// return resulting text.
+		return $text;
+	}
 }
