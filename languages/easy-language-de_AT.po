@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Easy Language @@VersionNumber@@\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/easy-language\n"
-"POT-Creation-Date: 2023-12-01T14:39:04+01:00\n"
-"PO-Revision-Date: 2023-12-01 15:00+0100\n"
+"POT-Creation-Date: 2023-12-04T13:01:08+01:00\n"
+"PO-Revision-Date: 2023-12-04 13:02+0100\n"
 "Last-Translator: Thomas Zwirner <info@thomaszwirner.de>\n"
 "Language-Team: \n"
 "Language: de_AT\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.3.2\n"
+"X-Generator: Poedit 3.0.1\n"
 "X-Domain: easy-language\n"
 
 #. Plugin Name of the plugin
@@ -227,8 +227,8 @@ msgid ""
 msgstr ""
 "Hole dir einen capito API Token <a href=\"%1$s\" target=\"_blank\">hier "
 "(öffnet neues Fenster)</a>.<br>Wenn Sie Fragen zu dem von capito "
-"bereitgestellten Token haben, wenden Sie sich bitte an den Support: <a "
-"href=\"%1$s\" target=\"_blank\">%1$s (öffnet neues Fenster)</a>"
+"bereitgestellten Token haben, wenden Sie sich bitte an den Support: <a href="
+"\"%1$s\" target=\"_blank\">%1$s (öffnet neues Fenster)</a>"
 
 #. translators: %1$s will be replaced by the capito URL
 #: classes/apis/capito/class-capito.php:609
@@ -307,8 +307,8 @@ msgstr ""
 #: classes/apis/capito/class-capito.php:802
 #: classes/apis/capito/class-capito.php:1075
 msgid ""
-"<strong>Token could not be verified.</strong> Please take a look <a "
-"href=\"%1$s\">in the log</a> to check the reason."
+"<strong>Token could not be verified.</strong> Please take a look <a href="
+"\"%1$s\">in the log</a> to check the reason."
 msgstr ""
 "<strong>Der Token konnte nicht verifiziert werden.</strong> Bitte werfen Sie "
 "einen Blick in das <a href=\"%1$s\">API Log</a>, um den Grund zu überprüfen."
@@ -350,9 +350,9 @@ msgid ""
 "support (opens new window)</a> about extending the quota."
 msgstr ""
 "<strong>Mehr als 80%% des Kontingents für die capito API wurden bereits "
-"verwendet.</strong> Bitte wenden Sie sich an den <a href=\"%1$s\" "
-"target=\"_blank\">capito support (öffnet neues Fenster)</a> um das "
-"Kontingent zu erhöhen."
+"verwendet.</strong> Bitte wenden Sie sich an den <a href=\"%1$s\" target="
+"\"_blank\">capito support (öffnet neues Fenster)</a> um das Kontingent zu "
+"erhöhen."
 
 #: classes/apis/capito/class-capito.php:1070
 #: classes/apis/summ-ai/class-summ-ai.php:1264
@@ -367,11 +367,11 @@ msgstr "Token fehlt."
 #: classes/apis/capito/class-capito.php:1147
 #: classes/apis/summ-ai/class-summ-ai.php:601
 msgid ""
-"Get support for more languages with <a href=\"%1$s\" target=\"_blank\" "
-"title=\"link opens new window\">Easy Language Pro</a>"
+"More languages and Options with <a href=\"%1$s\" target=\"_blank\" title="
+"\"link opens new window\">Easy Language Pro</a>"
 msgstr ""
-"Erhalte mehr Sprachen mit <a href=\"%1$s\" target=\"_blank\" title=\"link "
-"opens new window\">Easy Language Pro</a>"
+"Mehr Sprachen und Optionen mit <a href=\"%1$s\" target=\"_blank\" title="
+"\"link opens new window\">Easy Language Pro</a>"
 
 #. translators: %1$d will be replaced by the link to Chatgpt
 #: classes/apis/chatgpt/class-chatgpt.php:131
@@ -437,13 +437,13 @@ msgstr "ChatGpt Einstellungen"
 msgid ""
 "Get your ChatGpt API Token <a href=\"%1$s\" target=\"_blank\">here (opens "
 "new window)</a>.<br>If you have any questions about the token provided by "
-"ChatGpt, please contact their support: <a href=\"%1$s\" "
-"target=\"_blank\">%1$s (opens new window)</a>"
+"ChatGpt, please contact their support: <a href=\"%1$s\" target=\"_blank\">"
+"%1$s (opens new window)</a>"
 msgstr ""
 "Hole dir einen ChatGpt API Token <a href=\"%1$s\" target=\"_blank\">hier "
 "(öffnet neues Fenster)</a>.<br>Wenn Sie Fragen zu dem von ChatGpt "
-"bereitgestellten Token haben, wenden Sie sich bitte an den Support: <a "
-"href=\"%1$s\" target=\"_blank\">%1$s (öffnet neues Fenster)</a>"
+"bereitgestellten Token haben, wenden Sie sich bitte an den Support: <a href="
+"\"%1$s\" target=\"_blank\">%1$s (öffnet neues Fenster)</a>"
 
 #. translators: %1$s will be replaced by the Chatgpt URL
 #: classes/apis/chatgpt/class-chatgpt.php:373
@@ -602,20 +602,19 @@ msgstr ""
 #: classes/apis/summ-ai/class-summ-ai.php:164
 msgid ""
 "<p><strong>You have completely depleted the free quota available with the "
-"Easy Language plugin.</strong><br>Enter your SUMM AI API key <a "
-"href=\"%2$s\">here</a> to get more.</p>"
+"Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href=\"%2$s"
+"\">here</a> to get more.</p>"
 msgstr ""
 "<p><strong>Sie haben das mit dem Easy Language Plugin verfügbare freie "
-"Kontingent vollständig ausgeschöpft.</strong><br>Geben Sie <a "
-"href=\"%2$s\">hier</a> Ihren SUMM AI API-Schlüssel ein, um mehr zu erhalten."
-"</p>"
+"Kontingent vollständig ausgeschöpft.</strong><br>Geben Sie <a href=\"%2$s"
+"\">hier</a> Ihren SUMM AI API-Schlüssel ein, um mehr zu erhalten.</p>"
 
 #. translators: %1$s will be replaced by the URL where the SUMM AI API key could be requested
 #: classes/apis/summ-ai/class-summ-ai.php:168
 msgid ""
 "<p><strong>You have almost used up your free quota available with the Easy "
-"Language plugin.</strong><br>Enter your SUMM AI API key <a "
-"href=\"%2$s\">here</a> to get more.</p>"
+"Language plugin.</strong><br>Enter your SUMM AI API key <a href=\"%2$s"
+"\">here</a> to get more.</p>"
 msgstr ""
 "<p><strong>Sie haben Ihr kostenloses Kontingent, das Ihnen mit dem Easy "
 "Language Plugin zur Verfügung steht, fast aufgebraucht.</strong><br>Geben "
@@ -658,8 +657,8 @@ msgstr ""
 msgid ""
 "<strong>If you want more <a href=\"%1$s\" target=\"_blank\">get your SUMM AI "
 "API key now (opens new window)</a></strong>.<br>If you have any questions "
-"about the key provided by SUMM AI, please contact their support: <a "
-"href=\"%1$s\" target=\"_blank\">%1$s (opens new window)</a>"
+"about the key provided by SUMM AI, please contact their support: <a href="
+"\"%1$s\" target=\"_blank\">%1$s (opens new window)</a>"
 msgstr ""
 "<strong>Wenn Du mehr benötigst <a href=\"%1$s\" target=\"_blank\">hole dir "
 "einen SUMM AI API Key hier (öffnet neues Fenster)</a>.<br>Wenn du fragen zu "
@@ -810,9 +809,8 @@ msgstr ""
 #: classes/apis/summ-ai/class-summ-ai.php:1017
 msgid ""
 "<strong>More than 80 percent of your quota for the SUMM AI API has already "
-"been used.</strong> Please contact the <a href=\"%1$s\" "
-"target=\"_blank\">SUMM AI support (opens new window)</a> about extending the "
-"quota."
+"been used.</strong> Please contact the <a href=\"%1$s\" target=\"_blank"
+"\">SUMM AI support (opens new window)</a> about extending the quota."
 msgstr ""
 "<strong>Mehr als 80 Prozent des Kontingents für die capito API wurden "
 "bereits verwendet.</strong> Bitte wenden Sie sich an den <a href=\"%1$s\" "
@@ -820,7 +818,6 @@ msgstr ""
 "Kontingent zu erhöhen."
 
 #: classes/apis/summ-ai/class-summ-ai.php:1135
-#: inc/multilingual-plugins/translatepress.php:93
 msgid "SUMM AI"
 msgstr "SUMM AI"
 
@@ -1001,7 +998,6 @@ msgstr "Status"
 
 #: classes/class-log-api-table.php:29
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:32
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:75
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:39
 msgid "date"
 msgstr "Datum"
@@ -1340,8 +1336,8 @@ msgstr "Unbekannter PageBuilder or Classic Editor"
 msgid ""
 "This %1$s has been edited with an unknown page builder.<br>This could also "
 "be the Classic Editor.<br>If this %1$s has been edited with another page "
-"builder, the plugin Easy Language does not support it atm.<br>Please <a "
-"href=\"%2$s\" target=\"_blank\">contact our support</a>."
+"builder, the plugin Easy Language does not support it atm.<br>Please <a href="
+"\"%2$s\" target=\"_blank\">contact our support</a>."
 msgstr ""
 "Dieser %1$s wurde mit einem unbekannten Seitenersteller bearbeitet.<br>Dies "
 "könnte auch der Classic Editor sein.<br>Wenn dieses %1$s mit einem anderen "
@@ -1568,9 +1564,9 @@ msgstr "Keine API aktiviert!"
 #. translators: %1$s will be replaced by the support-URL
 #: classes/multilingual-plugins/easy-language/class-init.php:1692
 msgid ""
-"<strong>This error should never happen!</strong> Please contact the <a "
-"href=\"%1$s\" target=\"_blank\">Plugin-support (opens new window)</a> about "
-"the following error:"
+"<strong>This error should never happen!</strong> Please contact the <a href="
+"\"%1$s\" target=\"_blank\">Plugin-support (opens new window)</a> about the "
+"following error:"
 msgstr ""
 "<strong>Dieser Fehler sollte niemals auftreten!</strong> Bitte kontaktiere "
 "den <a href=\"%1$s\" target=\"_blank\">Plugin-support (opens new window)</a> "
@@ -1701,7 +1697,6 @@ msgstr "Vereinfache diesen %1$s mit %2$s."
 #: classes/multilingual-plugins/easy-language/pagebuilder/divi.php:42
 #: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:83
 #: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:128
-#: releases/easy-language_2.0.0/easy-language/classes/multilingual-plugins/easy-language/pagebuilder/divi.php:42
 #: classes/multilingual-plugins/easy-language/admin/simplifications.js:229
 msgid "Simplify texts"
 msgstr "Texte vereinfachen"
@@ -1856,12 +1851,10 @@ msgid "Show icons"
 msgstr "Zeige Icons"
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:33
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:76
 msgid "used API"
 msgstr "verwendete API"
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:34
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:77
 msgid "requesting user"
 msgstr "Anfordernder Nutzer"
 
@@ -1871,25 +1864,21 @@ msgid "used in"
 msgstr "verwendet in"
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:36
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:78
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:41
 msgid "source language"
 msgstr "Ausgangssprache"
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:37
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:79
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:42
 msgid "target language"
 msgstr "Ziel-Sprache"
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:38
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:80
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:43
 msgid "original"
 msgstr "Original"
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:39
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:81
 msgid "simplification"
 msgstr "Vereinfachung"
 
@@ -1898,7 +1887,6 @@ msgid "Delete entry only with Easy Language Pro."
 msgstr "Löschen von Einträgen nur in Easy Language Pro."
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:212
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:209
 msgid "without login"
 msgstr "ohne Anmeldung"
 
@@ -1919,10 +1907,6 @@ msgstr "Wähle eine Sprache oben für den Export aus"
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:319
 msgid "No simplified texts found."
 msgstr "Keine vereinfachten Texte gefunden."
-
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:181
-msgid "Only in Easy Language Pro."
-msgstr "Nur in Easy Language Pro."
 
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:136
 msgid "Delete this not simplified text?"
@@ -1991,6 +1975,10 @@ msgstr "Abstand"
 #: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:128
 msgid "Margin"
 msgstr "Aussenabstand"
+
+#: classes/multilingual-plugins/translatepress/class-translatepress-capito-machine-translator.php:38
+msgid "No active capito API!"
+msgstr "Keine aktive capito API!"
 
 #: classes/multilingual-plugins/translatepress/class-translatepress-summ-ai-machine-translator.php:46
 msgid "No active SUMM AI API!"
@@ -2476,6 +2464,9 @@ msgctxt "block description"
 msgid "Provides a Block for Language Switcher."
 msgstr "Bietet einen Block für die Sprachumschaltung."
 
+#~ msgid "Only in Easy Language Pro."
+#~ msgstr "Nur in Easy Language Pro."
+
 #~ msgid "English A1"
 #~ msgstr "Englisch A1"
 
@@ -2555,11 +2546,11 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 #~ "data-ignore-texts=\"1\">Ignore the failed simplifications</a>"
 #~ msgstr ""
 #~ "Eine zuvor durchgeführte Vereinfachung von Texten dieses %1$s ist "
-#~ "fehlgeschlagen. Wie wollen Sie damit umgehen?<br><br><a href=\"#\" "
-#~ "class=\"button button-primary\" data-run-again=\"1\">Vereinfachungen "
-#~ "erneut durchführen</a> Die <a href=\"#\" class=\"button button-primary "
-#~ "elementor-button\" data-ignore-texts=\"1\">fehlgeschlagenen "
-#~ "Vereinfachungen ignorieren</a>"
+#~ "fehlgeschlagen. Wie wollen Sie damit umgehen?<br><br><a href=\"#\" class="
+#~ "\"button button-primary\" data-run-again=\"1\">Vereinfachungen erneut "
+#~ "durchführen</a> Die <a href=\"#\" class=\"button button-primary elementor-"
+#~ "button\" data-ignore-texts=\"1\">fehlgeschlagenen Vereinfachungen "
+#~ "ignorieren</a>"
 
 #~ msgid "Do you want to simplify this object?"
 #~ msgstr "Möchten Sie dieses Objekt vereinfachen?"
@@ -2714,14 +2705,13 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 
 #~ msgid ""
 #~ "<strong>More than 80%% of your quota for the ChatGpt API has already been "
-#~ "used.</strong> Please contact the <a href=\"%1$s\" "
-#~ "target=\"_blank\">ChatGpt support (opens new window)</a> about extending "
-#~ "the quota."
+#~ "used.</strong> Please contact the <a href=\"%1$s\" target=\"_blank"
+#~ "\">ChatGpt support (opens new window)</a> about extending the quota."
 #~ msgstr ""
 #~ "<strong>Mehr als 80% des Kontingents für die ChatGpt API wurden bereits "
-#~ "verwendet.</strong> Bitte wenden Sie sich an den <a href=\"%1$s\" "
-#~ "target=\"_blank\">ChatGpt support (öffnet neues Fenster)</a> um das "
-#~ "Kontingent zu erhöhen."
+#~ "verwendet.</strong> Bitte wenden Sie sich an den <a href=\"%1$s\" target="
+#~ "\"_blank\">ChatGpt support (öffnet neues Fenster)</a> um das Kontingent "
+#~ "zu erhöhen."
 
 #~ msgid ""
 #~ "<p>The Capito API allows you to automatically translate the entire "
@@ -2739,20 +2729,20 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 #~ "<p>The SUMM AI API allows you to automatically translate the entire "
 #~ "website into plain and/or simple language via quota-limited API.</p><p>In "
 #~ "the free Easy Language plugin you have a quota of %1$d characters you "
-#~ "will be able to translate.</p><p>You need <a href=\"%2$s\" "
-#~ "target=\"_blank\">Easy Language Pro (opens new window)</a> and a SUMM AI "
-#~ "API key to translate more texts: <a href=\"%3$s\" target=\"_blank\">%3$s</"
-#~ "a>.</p><p><strong>Actual character spent:</strong> %4$d<br><strong>Quota "
-#~ "limit:</strong> %1$d<br><strong>Rest quota:</strong> %5$d</strong></p>"
+#~ "will be able to translate.</p><p>You need <a href=\"%2$s\" target=\"_blank"
+#~ "\">Easy Language Pro (opens new window)</a> and a SUMM AI API key to "
+#~ "translate more texts: <a href=\"%3$s\" target=\"_blank\">%3$s</a>.</"
+#~ "p><p><strong>Actual character spent:</strong> %4$d<br><strong>Quota limit:"
+#~ "</strong> %1$d<br><strong>Rest quota:</strong> %5$d</strong></p>"
 #~ msgstr ""
 #~ "<p>Mit der SUMM AI API können Sie die gesamte Website über eine "
 #~ "kontingentierte API automatisch in einfache Sprache übersetzen.</p><p>Im "
 #~ "kostenlosen Easy Language Plugin haben Sie ein Kontingent von %1$d "
 #~ "Zeichen, die Sie übersetzen können.</p><p>Sie benötigen <a href=\"%2$s\" "
 #~ "target=\"_blank\">Easy Language Pro (öffnet neues Fenster)</a> und einen "
-#~ "SUMM AI API Key zur Übersetzung von mehr Texten: <a href=\"%3$s\" "
-#~ "target=\"_blank\">%3$s</a>.</p><p><strong>Aktuall verbrauchte Zeichen:</"
-#~ "strong> %4$d<br><strong>Kontingent-Limit:</strong> %1$d<br><strong>Rest "
+#~ "SUMM AI API Key zur Übersetzung von mehr Texten: <a href=\"%3$s\" target="
+#~ "\"_blank\">%3$s</a>.</p><p><strong>Aktuall verbrauchte Zeichen:</strong> "
+#~ "%4$d<br><strong>Kontingent-Limit:</strong> %1$d<br><strong>Rest "
 #~ "Kontingent:</strong> %5$d</strong></p>"
 
 #~ msgid "Translate this term in %1$s with %2$s"
@@ -2792,8 +2782,8 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 #~ msgstr "Bitte geben Sie Ihren summ ai Key ein."
 
 #~ msgid ""
-#~ "You can get the SUMM AI API Key from the provider <a href=\"%1$s\" "
-#~ "target=\"_blank\">here</a>."
+#~ "You can get the SUMM AI API Key from the provider <a href=\"%1$s\" target="
+#~ "\"_blank\">here</a>."
 #~ msgstr ""
-#~ "Du kannst den SUMM AI API-Schlüssel vom Anbieter <a href=\"%1$s\" "
-#~ "target=\"_blank\">hier</a> erhalten."
+#~ "Du kannst den SUMM AI API-Schlüssel vom Anbieter <a href=\"%1$s\" target="
+#~ "\"_blank\">hier</a> erhalten."

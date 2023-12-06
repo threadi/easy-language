@@ -5,6 +5,7 @@
  * @package easy-language
  */
 
+use easyLanguage\Apis;
 use easyLanguage\helper;
 use easyLanguage\Languages;
 use easyLanguage\Multilingual_plugins\TranslatePress\Init;
@@ -76,8 +77,11 @@ add_filter( 'trp_wp_languages', 'easy_language_trp_add_to_wp_list' );
  * @return array
  */
 function easy_language_trp_add_automatic_machine( array $api_list ): array {
-	$api_list['capito'] = 'easyLanguage\Multilingual_plugins\TranslatePress\Translatepress_Capito_Machine_Translator';
-	$api_list['summ-ai'] = 'easyLanguage\Multilingual_plugins\TranslatePress\Translatepress_Summ_Ai_Machine_Translator';
+	// get active API and add it if they support this plugin.
+	$api_obj = Apis::get_instance()->get_active_api();
+	if( $api_obj->is_supporting_translatepress() ) {
+		$api_list[$api_obj->get_name()] = $api_obj->get_translatepress_machine_class();
+	}
 	return $api_list;
 }
 add_filter( 'trp_automatic_translation_engines_classes', 'easy_language_trp_add_automatic_machine' );
@@ -85,20 +89,18 @@ add_filter( 'trp_automatic_translation_engines_classes', 'easy_language_trp_add_
 /**
  * Add the automatic machine to the list in translatePress-backend.
  *
- * TODO nur aktive APIs anzeigen wenn diese hiermit kompatibel sind
- *
  * @param array $engines List of supported simplify engines.
  * @return mixed
  */
 function easy_language_trp_add_automatic_engine( array $engines ): array {
-	$engines[] = array(
-		'value' => 'capito',
-		'label' => __( 'capito', 'easy-language' ),
-	);
-	$engines[] = array(
-		'value' => 'summ-ai',
-		'label' => __( 'SUMM AI', 'easy-language' ),
-	);
+	// get active API and add it if they support this plugin.
+	$api_obj = Apis::get_instance()->get_active_api();
+	if( $api_obj->is_supporting_translatepress() ) {
+		$engines[] = array(
+			'value' => $api_obj->get_name(),
+			'label' => $api_obj->get_title(),
+		);
+	}
 	return $engines;
 }
 add_filter( 'trp_machine_translation_engines', 'easy_language_trp_add_automatic_engine', 30 );
@@ -131,14 +133,15 @@ function easy_language_trp_reset_simplifications(): void {
  * Check for supported languages.
  *
  * @param bool  $all_are_available Whether all languages are available.
- * @param array $languages List of languages.
+ * @param array $trp_languages List of languages in translatepress.
  * @param array $settings List of settings.
  * @return bool
+ * @noinspection PhpUnusedParameterInspection
  */
-function easy_language_trp_get_supported_languages( bool $all_are_available, array $languages, array $settings ): bool {
+function easy_language_trp_get_supported_languages( bool $all_are_available, array $trp_languages, array $settings ): bool {
 	if ( in_array( $settings['trp_machine_translation_settings']['translation-engine'], array( 'summ-ai', 'capito'), true ) ) {
 		// remove our own filter to prevent loop.
-		remove_filter( 'trp_mt_available_supported_languages', 'easy_language_trp_get_supported_languages', 10, 3 );
+		remove_filter( 'trp_mt_available_supported_languages', 'easy_language_trp_get_supported_languages' );
 
 		// get possible target-languages.
 		$languages = Languages::get_instance()->get_possible_target_languages();
@@ -165,11 +168,12 @@ add_filter( 'trp_mt_available_supported_languages', 'easy_language_trp_get_suppo
  * Add settings for our individual language for language-switcher in frontend.
  *
  * @param array  $current_language The current language.
- * @param array  $published_languages The list of published languages.
+ * @param array  $trp_published_languages The list of published languages.
  * @param string $trp_language The translatePress-language.
  * @return array
+ * @noinspection PhpUnusedParameterInspection
  */
-function easy_language_trp_set_current_language_fields( array $current_language, array $published_languages, string $trp_language ): array {
+function easy_language_trp_set_current_language_fields( array $current_language, array $trp_published_languages, string $trp_language ): array {
 	// get possible target-languages.
 	$languages = Languages::get_instance()->get_possible_target_languages();
 

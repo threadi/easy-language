@@ -457,4 +457,22 @@ abstract class Base {
 		// return resulting text.
 		return $text;
 	}
+
+	/**
+	 * Return false whether this API would support translatepress-plugin.
+	 *
+	 * @return bool
+	 */
+	public function is_supporting_translatepress(): bool {
+		return false;
+	}
+
+	/**
+	 * Return class-name for translatepress-machine.
+	 *
+	 * @return string
+	 */
+	public function get_translatepress_machine_class(): string {
+		return '';
+	}
 }

@@ -598,7 +598,7 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_pro_hint(): string {
 		/* translators: %1$s will be replaced by the link to laolaweb.com */
-		return sprintf( __( 'Get support for more languages with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a>', 'easy-language' ), esc_url( Helper::get_pro_url() ) );
+		return sprintf( __( 'More languages and Options with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a>', 'easy-language' ), esc_url( Helper::get_pro_url() ) );
 	}
 
 	/**
@@ -1386,5 +1386,23 @@ class Summ_AI extends Base implements Api_Base {
 			),
 			Helper::get_settings_page_url()
 		);
+	}
+
+	/**
+	 * Return true whether this API would support translatepress-plugin.
+	 *
+	 * @return bool
+	 */
+	public function is_supporting_translatepress(): bool {
+		return true;
+	}
+
+	/**
+	 * Return class-name for translatepress-machine.
+	 *
+	 * @return string
+	 */
+	public function get_translatepress_machine_class(): string {
+		return 'easyLanguage\Multilingual_plugins\TranslatePress\Translatepress_Summ_Ai_Machine_Translator';
 	}
 }

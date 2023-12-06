@@ -9,9 +9,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-12-01T14:39:04+01:00\n"
+"POT-Creation-Date: 2023-12-04T13:01:08+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.6.0\n"
+"X-Generator: WP-CLI 2.9.0\n"
 "X-Domain: easy-language\n"
 
 #. Plugin Name of the plugin
@@ -296,7 +296,7 @@ msgstr ""
 #. translators: %1$s will be replaced by the link to laolaweb.com
 #: classes/apis/capito/class-capito.php:1147
 #: classes/apis/summ-ai/class-summ-ai.php:601
-msgid "Get support for more languages with <a href=\"%1$s\" target=\"_blank\" title=\"link opens new window\">Easy Language Pro</a>"
+msgid "More languages and Options with <a href=\"%1$s\" target=\"_blank\" title=\"link opens new window\">Easy Language Pro</a>"
 msgstr ""
 
 #. translators: %1$d will be replaced by the link to Chatgpt
@@ -592,7 +592,6 @@ msgid "<strong>More than 80 percent of your quota for the SUMM AI API has alread
 msgstr ""
 
 #: classes/apis/summ-ai/class-summ-ai.php:1135
-#: inc/multilingual-plugins/translatepress.php:93
 msgid "SUMM AI"
 msgstr ""
 
@@ -733,7 +732,6 @@ msgstr ""
 
 #: classes/class-log-api-table.php:29
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:32
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:75
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:39
 msgid "date"
 msgstr ""
@@ -1290,7 +1288,6 @@ msgstr ""
 #: classes/multilingual-plugins/easy-language/pagebuilder/divi.php:42
 #: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:83
 #: classes/multilingual-plugins/easy-language/pagebuilder/elementor.php:128
-#: releases/easy-language_2.0.0/easy-language/classes/multilingual-plugins/easy-language/pagebuilder/divi.php:42
 #: classes/multilingual-plugins/easy-language/admin/simplifications.js:229
 msgid "Simplify texts"
 msgstr ""
@@ -1410,12 +1407,10 @@ msgid "Show icons"
 msgstr ""
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:33
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:76
 msgid "used API"
 msgstr ""
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:34
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:77
 msgid "requesting user"
 msgstr ""
 
@@ -1425,25 +1420,21 @@ msgid "used in"
 msgstr ""
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:36
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:78
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:41
 msgid "source language"
 msgstr ""
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:37
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:79
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:42
 msgid "target language"
 msgstr ""
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:38
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:80
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:43
 msgid "original"
 msgstr ""
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:39
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:81
 msgid "simplification"
 msgstr ""
 
@@ -1452,7 +1443,6 @@ msgid "Delete entry only with Easy Language Pro."
 msgstr ""
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:212
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:209
 msgid "without login"
 msgstr ""
 
@@ -1472,10 +1462,6 @@ msgstr ""
 
 #: classes/multilingual-plugins/easy-language/class-texts-in-use-table.php:319
 msgid "No simplified texts found."
-msgstr ""
-
-#: classes/multilingual-plugins/easy-language/class-texts-table.php:181
-msgid "Only in Easy Language Pro."
 msgstr ""
 
 #: classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php:136
@@ -1541,6 +1527,10 @@ msgstr ""
 
 #: classes/multilingual-plugins/easy-language/pagebuilder/elementor/class-switcher-widget.php:128
 msgid "Margin"
+msgstr ""
+
+#: classes/multilingual-plugins/translatepress/class-translatepress-capito-machine-translator.php:38
+msgid "No active capito API!"
 msgstr ""
 
 #: classes/multilingual-plugins/translatepress/class-translatepress-summ-ai-machine-translator.php:46
