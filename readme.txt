@@ -38,7 +38,6 @@ The [SUMM AI](https://summ-ai.com) API is usable to simplify up to 9000 characte
 - Multisite support
 - Own role for users to only simplify texts
 
-
 #### Tested with other language plugins ####
 
 - WPML
@@ -55,7 +54,7 @@ The [SUMM AI](https://summ-ai.com) API is usable to simplify up to 9000 characte
 - WPBakery
 - Themify
 
-Please Note: The plugin was tested in a broad variety of WordPress-pages, but it we highly recommend to install and test the plugin in a development environment first.
+Please Note: The plugin was tested in a broad variety of WordPress-pages, but we highly recommend to install and test the plugin in a development environment first.
 
 The development repository is on [GitHub](https://github.com/threadi/easy-language).
 
@@ -71,6 +70,8 @@ If you want to use [SUMM AI](https://summ-ai.com), [capito](https://www.capito.e
 * Support for any taxonomies (e.g. category descriptions)
 * Simplification of single texts
 * Show where any simplified text is used in your website
+
+More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://laolaweb.com/en/plugins/easy-language-for-wordpress/)
 
 == Screenshots ==
 
