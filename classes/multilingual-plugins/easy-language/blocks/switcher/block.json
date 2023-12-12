@@ -1,0 +1,47 @@
+{
+	"$schema": "https://json.schemastore.org/block.json",
+	"apiVersion": 2,
+	"name": "easy-language/switcher",
+	"version": "2.0.0",
+	"title": "Language Switcher",
+	"category": "widgets",
+	"icon": "list-view",
+	"description": "Provides a Block for Language Switcher.",
+	"keywords": [ "easy language", "switcher" ],
+	"supports": {
+	  	"anchor": true,
+		"color": {
+			"gradients": true,
+			"link": true
+		},
+		"html": false,
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true
+		},
+		"__experimentalBorder": true
+	},
+	"textdomain": "easy-language",
+	"editorScript": "file:build/index.js",
+	"editorStyle": "file:build/index.css",
+	"style": "file:build/style-index.css",
+	"attributes": {
+		"preview": {
+			"type": "boolean",
+			"default": false
+		},
+		"show_icons": {
+			"type": "boolean",
+			"default": false
+		},
+		"hide_actual_language": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"example": {
+		"attributes": {
+			"preview": true
+		}
+	}
+}

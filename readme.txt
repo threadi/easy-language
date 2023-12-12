@@ -1,63 +1,91 @@
 === Easy Language ===
 Contributors: laolaweb, threadi
-Tags: easy language, plain language, leichte sprache, falc
+Tags: easy language, leichte sprache, simplify, summ ai, capito
 Requires at least: 6.0
-Tested up to: 6.4
+Tested up to: 6.4.2
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 1.0.0
+Stable tag: 2.0.0
 
 == Description ==
 
-Add easy language as additional language to the multilingual-plugin you are using. We actually support WPML, Polylang and TranslatePress.
+Simplify your website into easy language - supported by AI.
 
-This plugin also optimizes the HTML-output in frontend if an easy language is used.
+The Plugin Easy Language adds the functionality to simplify and display your pages and posts into easy or plain language. The translation process can be manually or support by an AI-engine.
+
+#### Automatic simplification with AI ####
+
+To auto-translate your text, you can use the service (API) from
+
+- [SUMM AI](https://summ-ai.com)
+- [capito](https://www.capito.eu)
+- [OpenAI (ChatGPT)](https://chat.openai.com)
+
+Free Quota: There is a free quota of 9.000 characters for the service of SUMM AI. For capito and OpenAI you need to create your personal API-Token.
+
+#### Highlights in Light Version ####
+
+The [SUMM AI](https://summ-ai.com) API is usable to simplify up to 9000 characters FOR FREE.
+
+#### Features in Light Version ####
+
+- Simplify German pages and blog posts into German easy or plain language (Supports German formal too)
+- Simplify selected pages or post one by one
+- Auto-simplify using the API of SUMM AI, capito or OpenAI (ChatGPT)
+- Edit the pages or post manually
+- Add a language switcher by shortcode at any position on your website
+- Multisite support
+- Own role for users to only simplify texts
+
+
+#### Tested with other language plugins ####
+
+- WPML
+- Polylang
+- Sublanguage
+- TranslatePress
+
+#### Compatible with major Page Builders ####
+
+- Block Editor (Gutenberg)
+- Avada
+- Elementor
+- Divi
+- WPBakery
+- Themify
+
+Please Note: The plugin was tested in a broad variety of WordPress-pages, but it we highly recommend to install and test the plugin in a development environment first.
 
 The development repository is on [GitHub](https://github.com/threadi/easy-language).
 
-== Steps for Polylang ==
+#### Requirements####
 
-After install and activation of Easy Language go to Languages > Languages. You will find there in "Choose a language" 3 new entries at the end of the list. Add one of them to use it.
+If you want to use [SUMM AI](https://summ-ai.com), [capito](https://www.capito.eu) or [ChatGpt](https://chat.openai.com) you need an API key for their respective API. Please contact their websites for more information.
 
-== Steps for TranslatePress ==
+#### the Pro license includes:
 
-After install and activation of Easy Language go to Settings > TranslatePress > General. You will find there in the language-select-field 3 new entries at the end of the list. Add one of them to use it.
-
-== Steps for WPML ==
-
-After install and activation of Easy Language you will find 3 new languages under WPML > Languages. Click on "Add languages" and enable the Easy Language you want to use.
-
-== Frequently Asked Questions ==
-
-= Does this plugin support automatic translate my texts in easy language? =
-
-Actually no. But this feature will be implemented in future versions. Feel free to contact us if you have any questions.
-
-= Why this plugin adds 3 Easy Languages? =
-
-The plugin supports the following 3 simple languages by itself:
-
-* Leichte Sprache in german
-* Easy Language in englisch
-* FALC for french
-
-They are all included during plugin activation and can then be used or disabled depending on the plugin.
-
-= How does this plugin change the HTML-output in frontend? =
-
-We set the language abbreviation in the HTML code to the corresponding main language. This allows screen readers to read out the plain language in the visitor's language. Unfortunately, this is necessary because there is no standardized ISO abbreviation for plain language that is also recognized by screen readers.
-
----
-
-== Installation ==
-
-1. Upload "easy-language" to the "/wp-content/plugins/" directory.
-2. Activate the plugin through the "Plugins" menu in WordPress.
+* Support for English (simplify to easy or plain language)
+* Support for French (simplify to FALC)
+* Support for more post-types, e.g. for WooCommerce
+* Support for any taxonomies (e.g. category descriptions)
+* Simplification of single texts
+* Show where any simplified text is used in your website
 
 == Screenshots ==
+
 
 == Changelog ==
 
 = 1.0.0 =
 * Initial release
+
+= 2.0.0 =
+* Plugin completely revised
+* Added simplification for posts and pages in Einfache or Leichte Sprache, manually or automatic
+* Added support for API-based simplifications via SUMM AI and capito
+* Added support for different source and target languages
+* Added support for different PageBuilder (Block Editor, Classic Editor)
+* Added multiple hooks
+* Extended support for simplifications with TranslatePress
+* WordPress Coding Standard 3.0 compatible

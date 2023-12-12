@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="easy-language" basedir="." default="help">
 
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="libs/ant-contrib-1.0b3.jar"/>
+		</classpath>
+	</taskdef>
+
     <!-- Include config file containing  -->
     <loadproperties srcFile="build.properties" />
 
@@ -12,11 +18,83 @@
     <!-- check for necessary vars -->
     <fail unless="plugin.slug" />
     <fail unless="plugin.version" />
+    <fail unless="npm.path" />
+	<fail unless="composer.path" />
+	<fail unless="apis" />
+	<fail unless="pagebuilders" />
     <fail message="Do not run as root!">
         <condition>
             <equals arg1="root" arg2="${user.name}"/>
         </condition>
     </fail>
+
+    <!-- install npm -->
+    <target name="npm-install">
+        <delete file="${log.dir}/npm-install1.txt"/>
+        <delete file="${log.dir}/npm-install2.txt"/>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install1.txt">
+            <arg line="i"/>
+        </exec>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install2.txt">
+            <arg line="i concurrently"/>
+        </exec>
+    </target>
+
+	<!-- install composer -->
+	<target name="composer-install">
+		<delete file="${log.dir}/composer-install.txt"/>
+		<delete file="${log.dir}/composer-update.txt"/>
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-install.txt">
+			<arg line="install"/>
+		</exec>
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-update.txt">
+			<arg line="update"/>
+		</exec>
+	</target>
+
+    <!-- build the Blocks via npm -->
+    <target name="npm-build" depends="npm-install">
+        <delete file="${log.dir}/npm-build1.txt"/>
+        <delete file="${log.dir}/npm-build2.txt"/>
+		<delete file="${log.dir}/npm-build3.txt"/>
+		<delete file="${log.dir}/npm-build4.txt"/>
+		<delete file="${log.dir}/npm-build5.txt"/>
+		<delete file="${log.dir}/npm-build6.txt"/>
+		<delete file="${log.dir}/npm-build7.txt"/>
+		<delete file="${log.dir}/npm-build8.txt"/>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build1.txt">
+            <arg line="run build:switcher"/>
+        </exec>
+        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build2.txt">
+            <arg line="run build:navigation-switcher"/>
+        </exec>
+		<exec dir="${src.dir}/vendor/threadi/wp-easy-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build3.txt">
+			<arg line="install"/>
+		</exec>
+		<exec dir="${src.dir}/vendor/threadi/wp-easy-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build4.txt">
+			<arg line="run build"/>
+		</exec>
+		<exec dir="${src.dir}/vendor/threadi/react-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build5.txt">
+			<arg line="install"/>
+		</exec>
+		<exec dir="${src.dir}/vendor/threadi/react-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build6.txt">
+			<arg line="run build"/>
+		</exec>
+		<exec dir="${src.dir}/classes/multilingual-plugins/easy-language/pagebuilder/divi/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build7.txt">
+			<arg line="install"/>
+		</exec>
+		<exec dir="${src.dir}/classes/multilingual-plugins/easy-language/pagebuilder/divi/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build8.txt">
+			<arg line="run build"/>
+		</exec>
+    </target>
+
+    <!-- generate json-translations -->
+    <target name="json-translations" depends="npm-build">
+        <delete file="${src.dir}/languages/*.json"/>
+        <exec dir="${src.dir}" failonerror="true" executable="wp">
+            <arg line="i18n make-json languages --no-purge"/>
+        </exec>
+    </target>
 
     <!-- set version number in plugin-file for the release -->
     <target name="setVersionNumber">
@@ -25,20 +103,76 @@
         <replace file="${src.dir}/${plugin.slug}-release.php">
             <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
         </replace>
+
+        <copy file="${src.dir}/languages/easy-language.pot" tofile="${log.dir}/languages/easy-language.pot"/>
+        <replace file="${src.dir}/languages/easy-language.pot">
+            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
+        </replace>
+
+        <copy file="${src.dir}/languages/easy-language-de_DE.po" tofile="${log.dir}/languages/easy-language-de_DE.po"/>
+        <replace file="${src.dir}/languages/easy-language-de_DE.po">
+            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
+        </replace>
+
+        <copy file="${src.dir}/languages/easy-language-de_DE_formal.po" tofile="${log.dir}/languages/easy-language-de_DE_formal.po"/>
+        <replace file="${src.dir}/languages/easy-language-de_DE_formal.po">
+            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
+        </replace>
     </target>
 
+    <!-- init project -->
+    <target name="init" description="initialize the project" depends="composer-install,npm-build,json-translations" />
+
     <!-- create release-zip -->
-    <target name="build" description="builds a new release" depends="setVersionNumber">
+    <target name="build" description="builds a new release" depends="init,setVersionNumber">
         <delete file="${build.dir}/${plugin.slug}_${plugin.version}.zip"/>
         <zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip">
-            <zipfileset dir="${src.dir}/classes" prefix="${plugin.slug}/classes" />
-            <zipfileset dir="${src.dir}/gfx" prefix="${plugin.slug}/gfx" />
-            <zipfileset dir="${src.dir}/inc" prefix="${plugin.slug}/inc" />
+			<zipfileset dir="${src.dir}/admin" prefix="${plugin.slug}/admin" />
+            <zipfileset dir="${src.dir}/classes" prefix="${plugin.slug}/classes">
+				<exclude name="**/apis/**" />
+				<exclude name="**/multilingual-plugins/easy-language/pagebuilder/**" />
+				<exclude name="**/multilingual-plugins/easy-language/parser/**" />
+			</zipfileset>
+			<zipfileset dir="${src.dir}/gfx" prefix="${plugin.slug}/gfx" />
+            <zipfileset dir="${src.dir}/inc" prefix="${plugin.slug}/inc">
+				<exclude name="**/apis/**" />
+			</zipfileset>
             <zipfileset dir="${src.dir}/languages" prefix="${plugin.slug}/languages" />
+			<zipfileset dir="${src.dir}/libs" prefix="${plugin.slug}/libs" />
+			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
+			<zipfileset dir="${src.dir}/vendor/gettext" prefix="${plugin.slug}/vendor/gettext" />
+			<zipfileset dir="${src.dir}/vendor/composer" prefix="${plugin.slug}/vendor/composer" />
+			<zipfileset dir="${src.dir}/vendor/threadi/wp-easy-dialog/build/" prefix="${plugin.slug}/vendor/threadi/wp-easy-dialog/build/" />
+			<zipfileset dir="${src.dir}/vendor/threadi/react-dialog/build/" prefix="${plugin.slug}/vendor/threadi/react-dialog/build/" />
             <zipfileset dir="${src.dir}" includes="uninstall.php,readme.txt" prefix="${plugin.slug}" />
             <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
         </zip>
-        <delete file="${src.dir}/${plugin.slug}-release.php"/>
+		<for list="${apis}" param="api">
+			<sequential>
+				<zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip" update="true">
+					<zipfileset dir="${src.dir}/classes/apis/@{api}" prefix="${plugin.slug}/classes/apis/@{api}" />
+					<zipfileset dir="${src.dir}/inc/apis/" includes="@{api}.php" prefix="${plugin.slug}/inc/apis/" />
+				</zip>
+			</sequential>
+		</for>
+		<for list="${pagebuilders}" param="pagebuilder">
+			<sequential>
+				<zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip" update="true">
+					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/pagebuilder/" includes="@{pagebuilder}.php" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/pagebuilder/" />
+					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/pagebuilder/@{pagebuilder}" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/pagebuilder/@{pagebuilder}" erroronmissingdir="false">
+						<exclude name="**/src/**" />
+						<exclude name="**/node_modules/**" />
+						<exclude name="**/package.json" />
+						<exclude name="**/package-lock.json" />
+					</zipfileset>
+					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/parser/" includes="class-@{pagebuilder}.php" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/parser/" />
+				</zip>
+			</sequential>
+		</for>
+		<delete file="${src.dir}/${plugin.slug}-release.php"/>
+        <copy file="${log.dir}/languages/easy-language.pot" tofile="${src.dir}/languages/easy-language.pot" overwrite="true" />
+        <copy file="${log.dir}/languages/easy-language-de_DE.po" tofile="${src.dir}/languages/easy-language-de_DE.po" overwrite="true" />
+        <copy file="${log.dir}/languages/easy-language-de_DE_formal.po" tofile="${src.dir}/languages/easy-language-de_DE_formal.po" overwrite="true" />
     </target>
 
     <target name="help">

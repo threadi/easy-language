@@ -1,20 +1,25 @@
 {
-  "name": "threadi/lw-simple-language",
+  "name": "threadi/easy-language",
   "require-dev": {
-    "wp-coding-standards/wpcs": "^2.3"
+    "wp-coding-standards/wpcs": "^3.0.0"
   },
-  "autoload": {
-    "psr-4": {
-      "Threadi\\Eml\\": "src/"
-    }
-  },
+  "minimum-stability": "stable",
   "scripts": {
     "post-install-cmd": [
-      "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs"
+      "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra"
     ],
     "post-update-cmd": [
-      "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs"
+      "\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra"
     ]
   },
-  "require": {}
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  },
+  "require": {
+    "gettext/gettext": "^5.7",
+    "threadi/wp-easy-dialog": "dev-master",
+    "threadi/react-dialog": "dev-master"
+  }
 }

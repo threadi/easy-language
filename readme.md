@@ -2,7 +2,16 @@
 
 ## About
 
-This repository provides the features of the free version of the WordPress plugin _Easy Language_. The repository is used as a basis for deploying the plugin to the WordPress repository. It is not intended to run as a plugin as it is, even if that is possible for development. 
+This repository provides the features of the free version of the WordPress plugin _Easy Language_. The repository is used as a basis for deploying the plugin to the WordPress repository. It is not intended to run as a plugin as it is, even if that is possible for development.
+
+## Usage
+
+After checkout go through the following steps:
+
+1. copy _build/build.properties.dist_ to _build/build.properties_.
+2. modify the build/build.properties file - note the comments in the file.
+3. execute the command in _build/_: `ant init`
+4. after that the plugin can be activated in WordPress
 
 ## Release
 
@@ -18,20 +27,52 @@ I recommend to use [PoEdit](https://poedit.net/) to translate texts for this plu
 
 Run in main directory:
 
-`wp i18n make-pot . languages/easy-language.pot --exclude=svn/`
+`wp i18n make-pot . languages/easy-language.pot --exclude=classes/multilingual-plugins/easy-language/blocks/navigation-switcher/src/,classes/multilingual-plugins/easy-language/blocks/switcher/src/,svn/`
 
 ### update translation-file
 
 1. Open .po-file of the language in PoEdit.
-2. Go to "Translate" > "Update from POT-file".
+2. Go to "Translate > "Update from POT-file".
 3. After this the new entries are added to the language-file.
 
 ### export translation-file
 
 1. Open .po-file of the language in PoEdit.
-2. Go to "File" > "Save".
+2. Go to File > Save.
 3. Upload the generated .mo-file and the .po-file to the plugin-folder languages/
 
-### validate file
+### generate json-translation-files
 
-`vendor/bin/phpcs --standard=WordPress .`
+Run in main directory:
+
+`wp i18n make-json languages`
+
+OR use ant in build/-directory: `ant json-translations`
+
+### Requirements
+
+`npm install`
+
+### Run for development
+
+`npm start`
+
+### Run for release
+
+`npm run build`
+
+Hint: will be called by ant-command mentioned above.
+
+## Check for WordPress Coding Standards
+
+### Initialize
+
+`composer install`
+
+### Run
+
+`vendor/bin/phpcs --standard=WordPress file`
+
+### Repair
+
+`vendor/bin/phpcbf --standard=WordPress file`

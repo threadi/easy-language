@@ -1,7 +1,4 @@
 /.idea
-/blocks/list/build/
-/blocks/show/build/
-/inc/constants2.php
 *.zip
 languages/*.json
 /build/languages/
@@ -9,3 +6,6 @@ languages/*.json
 /build/languages/index.php
 /build/build.properties
 /vendor/
+/classes/multilingual-plugins/easy-language/blocks/switcher/build/
+/classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/
+/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/

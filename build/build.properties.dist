@@ -3,3 +3,15 @@ plugin.slug=easy-language
 
 # version number to use
 plugin.version=
+
+# set path to npm-binary
+npm.path=
+
+# set path to composer-binary
+composer.path=
+
+# set list of APIs to embed in release
+apis=
+
+# set list of PageBuilder to embed in release
+pagebuilders=
