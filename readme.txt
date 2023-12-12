@@ -10,64 +10,67 @@ Stable tag: 2.0.0
 
 == Description ==
 
-Have all texts on your website automatically simplified into easy language. Use a simplify-API from experts at SUMM AI or capito to make your site even more accessible for your visitors.
+Simplify your website into easy language - supported by AI.
 
-#### Highlights ####
+The Plugin Easy Language adds the functionality to simplify and display your pages and posts into easy or plain language. The translation process can be manually or support by an AI-engine.
 
-The [SUMM AI](https://summ-ai.com) API is usable to simplify up to 18000 characters FOR FREE.
+#### Automatic simplification with AI ####
 
-#### Features ####
+To auto-translate your text, you can use the service (API) from
 
-* Supported APIs to simplify texts in your website: [SUMM AI](https://summ-ai.com), [capito](https://www.capito.eu), [ChatGpt](https://chat.openai.com)
-* SUMM AI and capito are also usable in TranslatePress Automatic translations
-* Adds easy language to other multilingual plugins like WPML, Polylang, Sublanguage, TranslatePress (and can be used alongside with them)
-* PageBuilder: native support for Block Editor (Gutenberg), Avada, Elementor, Divi, WPBakery and Themify
-* Multisite: all simplified texts will be available to any other blog in the network to prevent double simplification
-* Own role for users to only simplify texts
+- [SUMM AI](https://summ-ai.com)
+- [capito](https://www.capito.eu)
+- [OpenAI (ChatGPT)](https://chat.openai.com)
+
+Free Quota: There is a free quota of 9.000 characters for the service of SUMM AI. For capito and OpenAI you need to create your personal API-Token.
+
+#### Highlights in Light Version ####
+
+The [SUMM AI](https://summ-ai.com) API is usable to simplify up to 9000 characters FOR FREE.
+
+#### Features in Light Version ####
+
+- Simplify German pages and blog posts into German easy or plain language (Supports German formal too)
+- Simplify selected pages or post one by one
+- Auto-simplify using the API of SUMM AI, capito or OpenAI (ChatGPT)
+- Edit the pages or post manually
+- Add a language switcher by shortcode at any position on your website
+- Multisite support
+- Own role for users to only simplify texts
+
+
+#### Tested with other language plugins ####
+
+- WPML
+- Polylang
+- Sublanguage
+- TranslatePress
+
+#### Compatible with major Page Builders ####
+
+- Block Editor (Gutenberg)
+- Avada
+- Elementor
+- Divi
+- WPBakery
+- Themify
+
+Please Note: The plugin was tested in a broad variety of WordPress-pages, but it we highly recommend to install and test the plugin in a development environment first.
 
 The development repository is on [GitHub](https://github.com/threadi/easy-language).
 
-#### Requirements
+#### Requirements####
 
 If you want to use [SUMM AI](https://summ-ai.com), [capito](https://www.capito.eu) or [ChatGpt](https://chat.openai.com) you need an API key for their respective API. Please contact their websites for more information.
 
 #### the Pro license includes:
 
-* Support for english as source language
-* Support for more post-types
+* Support for English (simplify to easy or plain language)
+* Support for French (simplify to FALC)
+* Support for more post-types, e.g. for WooCommerce
 * Support for any taxonomies (e.g. category descriptions)
-* Use other source languages, e.g. english or francais
 * Simplification of single texts
 * Show where any simplified text is used in your website
-
----
-
-== Installation ==
-
-1. Upload "easy-language" to the "/wp-content/plugins/" directory.
-2. Activate the plugin through the "Plugins" menu in WordPress.
-
-== Frequently Asked Questions ==
-
-= Does this plugin has an impact to the performance in the frontend? =
-
-No. By this plugin simplified texts are handled as if they are Wordpress-native data. We do not output anything in fronted except the language switcher.
-
-= Is this plugin GPRD-compatible? =
-
-Yes, it is. We do not load any external files. API requests happen between your server and the API - not between them and your visitor.
-
-= Can I use this plugin in a multisite-installation? =
-
-Yes, you can! All simplified texts will be available to any other blog in the multisite-network.
-
-= Will I be notified if the original content of a simplified page changes? =
-
-Yes, an icon is displayed in the page or post list for this purpose. As soon as you manually adjust the content of the simplified page and save it, the icon disappears again. We intentionally do not offer synchronization of new or adapted content of a page, as this is difficult to transfer with plain language.
-
-= Can I use WPML or Polylang to translate my page in english and with simplified texts of your plugin together? =
-
-Yes, you can use Easy Language alongside all supported multilingual-plugins. You can translate your pages e.g. in english and use Easy Language to simplify the texts. Be aware to place two language-switcher in your website: the one of your multilingual-plugin and the one from Easy Language.
 
 == Screenshots ==
 

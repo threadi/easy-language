@@ -65,6 +65,9 @@ class Language_Icon {
 					// set import path.
 					$import_path = trailingslashit( get_temp_dir() ) . $this->file;
 
+					// allow SVG-files.
+					add_filter('upload_mimes', array( $this, 'allow_svg' ) );
+
 					// copy the original to the import_path.
 					WP_Filesystem();
 					if ( $wp_filesystem->copy( $img_path, $import_path ) ) {
@@ -81,7 +84,11 @@ class Language_Icon {
 						if ( absint( $attachment_id ) > 0 ) {
 							$attachment = get_post( $attachment_id );
 						}
+
 					}
+
+					// remove SVG as allowed files.
+					remove_filter('upload_mimes', array( $this, 'allow_svg' ) );
 				}
 
 				if ( false !== $attachment ) {
@@ -130,5 +137,18 @@ class Language_Icon {
 	 */
 	private function set_id( int $attachment_id ): void {
 		$this->id = $attachment_id;
+	}
+
+	/**
+	 * Allow SVG as file-type.
+	 *
+	 * @param array $file_types
+	 *
+	 * @return array
+	 */
+	public function allow_svg( array $file_types ): array {
+		$new_filetypes = array();
+		$new_filetypes['svg'] = 'image/svg+xml';
+		return array_merge( $file_types, $new_filetypes );
 	}
 }

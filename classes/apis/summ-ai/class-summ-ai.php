@@ -261,7 +261,7 @@ class Summ_AI extends Base implements Api_Base {
 				'url'         => 'de_el',
 				'api_value'   => 'plain',
 				'icon'        => 'icon-de-el',
-				'img'         => 'de_EL.png',
+				'img'         => 'de_EL.svg',
 				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
 			),
 			'de_LS' => array(
@@ -271,7 +271,7 @@ class Summ_AI extends Base implements Api_Base {
 				'url'         => 'de_ls',
 				'api_value'   => 'easy',
 				'icon'        => 'icon-de-ls',
-				'img'         => 'de_LS.png',
+				'img'         => 'de_LS.svg',
 				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
 			),
 		);
@@ -1072,6 +1072,9 @@ class Summ_AI extends Base implements Api_Base {
 		// transform it to an array and return it.
 		$results = json_decode($response, true);
 		if( is_array($results) ) {
+			if( is_null($results['character_limit']) ) {
+				$results['character_limit'] = 1000000;
+			}
 			return $results;
 		}
 

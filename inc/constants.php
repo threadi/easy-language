@@ -92,10 +92,5 @@ const EASY_LANGUAGE_HASH = 'easy_language_hash';
  * Quota for SUMM AI in free plugin.
  * Changes will not work as this is also checked by API.
  */
-const EASY_LANGUAGE_SUMM_AI_QUOTA = 18000;
+const EASY_LANGUAGE_SUMM_AI_QUOTA = 9000;
 
-/**
- * Quota for capito API.
- * Changes will not work as this is also checked by API.
- */
-const EASY_LANGUAGE_CAPITO_QUOTA = 1000000;

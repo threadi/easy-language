@@ -222,7 +222,7 @@ class Capito extends Base implements Api_Base {
 				'url'         => 'de_a1',
 				'api_value'   => 'a1',
 				'icon'        => 'icon-de-ls',
-				'img'         => 'de_LS.png',
+				'img'         => 'de_LS.svg',
 				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a1' ) : '',
 			),
 			'de_a2' => array(
@@ -232,7 +232,7 @@ class Capito extends Base implements Api_Base {
 				'url'         => 'de_a2',
 				'api_value'   => 'a2',
 				'icon'        => 'icon-de-ls',
-				'img'         => 'de_LS.png',
+				'img'         => 'de_LS.svg',
 				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a2' ) : '',
 			),
 			'de_b1' => array(
@@ -242,7 +242,7 @@ class Capito extends Base implements Api_Base {
 				'url'         => 'de_a2',
 				'api_value'   => 'b1',
 				'icon'        => 'icon-de-el',
-				'img'         => 'de_EL.png',
+				'img'         => 'de_EL.svg',
 				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_b1' ) : '',
 			),
 		);
