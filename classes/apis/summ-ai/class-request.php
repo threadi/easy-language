@@ -235,7 +235,7 @@ class Request {
 		if ( 'POST' === $this->get_method() ) {
 			$data['input_text']            = $this->get_text();
 			$data['input_text_type']       = $this->get_text_type();
-			$data['user']                  = $summ_ai_obj->get_contact_email();
+			$data['user']                  = get_option( 'home' ).'|'.$summ_ai_obj->get_contact_email();
 			$data['is_test']               = $this->is_test();
 			$data['separator']             = $this->get_separator();
 			$data['output_language_level'] = $request_target_language;
