@@ -20,7 +20,7 @@
 		},
 		{
 			"step":"writeFile",
-			"path":"/wordpress/wp-content/languages/ja_JA.mo",
+			"path":"/wordpress/wp-content/languages/de_DE.mo",
 			"data":{
 				"resource":"url",
 				"caption":"Downloading de_DE.mo",
