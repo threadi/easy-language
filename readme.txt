@@ -6,7 +6,7 @@ Tested up to: 6.4.2
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 
 == Description ==
 
@@ -22,13 +22,15 @@ To auto-translate your text, you can use the service (API) from
 - [capito](https://www.capito.eu)
 - [OpenAI (ChatGPT)](https://chat.openai.com)
 
-Free Quota: There is a free quota of 9.000 characters for the service of SUMM AI. For capito and OpenAI you need to create your personal API-Token.
+#### Requirements####
 
-#### Highlights in Light Version ####
+If you want to use [SUMM AI](https://summ-ai.com), [capito](https://www.capito.eu) or [ChatGpt](https://chat.openai.com) you need an API key for their respective API. Please contact their websites for more information.
 
-The [SUMM AI](https://summ-ai.com) API is usable to simplify up to 9000 characters FOR FREE.
+#### Highlights ####
 
-#### Features in Light Version ####
+The [SUMM AI](https://summ-ai.com) API is usable to simplify up to 9000 characters FOR FREE without personal API-Key.
+
+#### Features ####
 
 - Simplify German pages and blog posts into German easy or plain language (Supports German formal too)
 - Simplify selected pages or post one by one
@@ -38,15 +40,14 @@ The [SUMM AI](https://summ-ai.com) API is usable to simplify up to 9000 characte
 - Multisite support
 - Own role for users to only simplify texts
 
-
-#### Tested with other language plugins ####
+#### Compatible with multilingual-plugins ####
 
 - WPML
 - Polylang
 - Sublanguage
 - TranslatePress
 
-#### Compatible with major Page Builders ####
+#### Compatible with major page builders ####
 
 - Block Editor (Gutenberg)
 - Avada
@@ -55,13 +56,9 @@ The [SUMM AI](https://summ-ai.com) API is usable to simplify up to 9000 characte
 - WPBakery
 - Themify
 
-Please Note: The plugin was tested in a broad variety of WordPress-pages, but it we highly recommend to install and test the plugin in a development environment first.
+Please Note: The plugin was tested in a broad variety of WordPress-pages, but we highly recommend to install and test the plugin in a development environment first.
 
 The development repository is on [GitHub](https://github.com/threadi/easy-language).
-
-#### Requirements####
-
-If you want to use [SUMM AI](https://summ-ai.com), [capito](https://www.capito.eu) or [ChatGpt](https://chat.openai.com) you need an API key for their respective API. Please contact their websites for more information.
 
 #### the Pro license includes:
 
@@ -72,8 +69,13 @@ If you want to use [SUMM AI](https://summ-ai.com), [capito](https://www.capito.e
 * Simplification of single texts
 * Show where any simplified text is used in your website
 
+More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://laolaweb.com/en/plugins/easy-language-for-wordpress/)
+
 == Screenshots ==
 
+1. Choose your API
+2. Configure your SUMM AI API Key
+3. Request simplification of a text
 
 == Changelog ==
 
@@ -89,3 +91,7 @@ If you want to use [SUMM AI](https://summ-ai.com), [capito](https://www.capito.e
 * Added multiple hooks
 * Extended support for simplifications with TranslatePress
 * WordPress Coding Standard 3.0 compatible
+
+= 2.0.1 =
+* Removed language files from release
+* Fixed usage of language-columns in post-types (was only a problem if Pro-plugin is used with other languages)

@@ -67,11 +67,14 @@ class Languages {
 		// if no API with own settings is active, get the list from plugin-settings.
 		$list              = array();
 		$settings_language = array();
+		$target_languages = $this->get_possible_target_languages();
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
 			$settings_language = $settings_language + $plugin_obj->get_supported_languages();
 		}
 		foreach ( $settings_language as $language => $enabled ) {
-			$list[ $language ] = $this->get_possible_target_languages()[ $language ];
+			if( !empty($target_languages[ $language ]) ) {
+				$list[ $language ] = $target_languages[ $language ];
+			}
 		}
 
 		// return the list from setting it API is not active.

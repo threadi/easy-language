@@ -182,7 +182,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		}
 
 		// bail if actual WordPress-language is not in the supported source language list.
-		$source_languages = $api_obj->get_supported_source_languages();
+		$source_languages = Languages::get_instance()->get_possible_source_languages();
 		if ( empty( $source_languages[ Helper::get_wp_lang() ] ) ) {
 			return;
 		}

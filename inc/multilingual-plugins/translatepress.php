@@ -171,7 +171,6 @@ add_filter( 'trp_mt_available_supported_languages', 'easy_language_trp_get_suppo
  * @param array  $trp_published_languages The list of published languages.
  * @param string $trp_language The translatePress-language.
  * @return array
- * @noinspection PhpUnusedParameterInspection
  */
 function easy_language_trp_set_current_language_fields( array $current_language, array $trp_published_languages, string $trp_language ): array {
 	// get possible target-languages.
