@@ -38,11 +38,6 @@ function easy_language_add_styles_and_js_admin(): void {
 		true
 	);
 
-	if( function_exists( 'wp_set_script_translations' ) ) {
-		// enable internationalization of our script.
-		wp_set_script_translations('easy-language-admin', 'easy-language', trailingslashit(plugin_dir_path(EASY_LANGUAGE)) . 'languages/');
-	}
-
 	// add php-vars to our backend-js-script.
 	wp_localize_script(
 		'easy-language-admin',

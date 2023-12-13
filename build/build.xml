@@ -103,21 +103,6 @@
         <replace file="${src.dir}/${plugin.slug}-release.php">
             <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
         </replace>
-
-        <copy file="${src.dir}/languages/easy-language.pot" tofile="${log.dir}/languages/easy-language.pot"/>
-        <replace file="${src.dir}/languages/easy-language.pot">
-            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
-        </replace>
-
-        <copy file="${src.dir}/languages/easy-language-de_DE.po" tofile="${log.dir}/languages/easy-language-de_DE.po"/>
-        <replace file="${src.dir}/languages/easy-language-de_DE.po">
-            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
-        </replace>
-
-        <copy file="${src.dir}/languages/easy-language-de_DE_formal.po" tofile="${log.dir}/languages/easy-language-de_DE_formal.po"/>
-        <replace file="${src.dir}/languages/easy-language-de_DE_formal.po">
-            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
-        </replace>
     </target>
 
     <!-- init project -->
@@ -137,7 +122,6 @@
             <zipfileset dir="${src.dir}/inc" prefix="${plugin.slug}/inc">
 				<exclude name="**/apis/**" />
 			</zipfileset>
-            <zipfileset dir="${src.dir}/languages" prefix="${plugin.slug}/languages" />
 			<zipfileset dir="${src.dir}/libs" prefix="${plugin.slug}/libs" />
 			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
 			<zipfileset dir="${src.dir}/vendor/gettext" prefix="${plugin.slug}/vendor/gettext" />
@@ -170,9 +154,6 @@
 			</sequential>
 		</for>
 		<delete file="${src.dir}/${plugin.slug}-release.php"/>
-        <copy file="${log.dir}/languages/easy-language.pot" tofile="${src.dir}/languages/easy-language.pot" overwrite="true" />
-        <copy file="${log.dir}/languages/easy-language-de_DE.po" tofile="${src.dir}/languages/easy-language-de_DE.po" overwrite="true" />
-        <copy file="${log.dir}/languages/easy-language-de_DE_formal.po" tofile="${src.dir}/languages/easy-language-de_DE_formal.po" overwrite="true" />
     </target>
 
     <target name="help">

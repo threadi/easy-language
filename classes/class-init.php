@@ -90,8 +90,7 @@ class Init {
 	 * @return void
 	 */
 	public function plugin_init(): void {
-		// TODO remove if languages are in WP-repo.
-		load_plugin_textdomain( 'easy-language', false, dirname( plugin_basename( EASY_LANGUAGE ) ) . '/languages' );
+		/* nothing to do */
 	}
 
 	/**
