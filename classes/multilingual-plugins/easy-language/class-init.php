@@ -850,10 +850,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			update_option( 'easy_language_icons', array() );
 		}
 
-		// load language file.
-		// TODO entfernen sobald sprachen im repo sind.
-		load_plugin_textdomain( 'easy-language', false, dirname( plugin_basename( EASY_LANGUAGE ) ) . '/languages' );
-
 		// Log event.
 		Log::get_instance()->add_log( 'Plugin activated', 'success' );
 
@@ -1797,11 +1793,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			)
 		);
 
-		if( function_exists( 'wp_set_script_translations' ) ) {
-			// enable internationalization of our script.
-			wp_set_script_translations('easy-language-simplifications', 'easy-language', trailingslashit(plugin_dir_path(EASY_LANGUAGE)) . 'languages/');
-		}
-
 		// add jquery-dirty script.
 		wp_enqueue_script(
 			'easy-language-admin-dirty-js',
@@ -1842,11 +1833,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'intro_step_2'        => sprintf( __( '<p><img src="%1$s" alt="Easy Language Logo"><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
 			)
 		);
-
-		if( function_exists( 'wp_set_script_translations' ) ) {
-			// enable internationalization of our script.
-			wp_set_script_translations('easy-language-plugin-admin', 'easy-language', trailingslashit(plugin_dir_path(EASY_LANGUAGE)) . 'languages/');
-		}
 
 		// embed the wp-easy-dialog-component.
 		$script_asset_path = Helper::get_plugin_path() . 'vendor/threadi/wp-easy-dialog/build/index.asset.php';
