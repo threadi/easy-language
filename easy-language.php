@@ -14,8 +14,6 @@
  * @package easy-language
  */
 
-use easyLanguage\Init;
-
 // do nothing if PHP-version is not 8.0 or newer.
 if ( version_compare( PHP_VERSION, '8.0', '<' ) ) {
 	return;
@@ -38,5 +36,4 @@ if ( is_admin() ) {
 }
 
 // initialize the plugin.
-Init::get_instance()->init();
-
+easyLanguage\Init::get_instance()->init();

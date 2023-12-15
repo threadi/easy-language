@@ -375,7 +375,7 @@ class Helper {
 		$attachment = self::get_attachment_by_language_code( $language_code );
 		if ( false !== $attachment ) {
 			// get image.
-			$image = wp_get_attachment_image( $attachment->ID );
+			$image = wp_get_attachment_image( $attachment->ID, array( 18, 18 ) );
 
 			// add it to list in DB.
 			$images[ $language_code ] = $image;
@@ -528,7 +528,7 @@ class Helper {
 		if( empty($source_languages[$language]) ) {
 			// create list of languages this API supports as HTML-list.
 			$language_list = '<ul>';
-			foreach( $api->get_supported_source_languages() as $settings ) {
+			foreach( $source_languages as $settings ) {
 				$language_list .= '<li>'.esc_html($settings['label']).'</li>';
 			}
 			$language_list .= '</ul>';

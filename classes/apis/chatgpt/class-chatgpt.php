@@ -157,44 +157,45 @@ class ChatGpt extends Base implements Api_Base {
 		return Helper::get_plugin_url() . 'classes/apis/chatgpt/gfx/logo.png';
 	}
 
-
 	/**
 	 * Return list of supported source-languages.
 	 *
 	 * @return array
 	 */
 	public function get_supported_source_languages(): array {
-		return array(
-			'de_DE' => array(
-				'label'       => __( 'German', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Informal german spoken in germany.', 'easy-language' ),
-				'api_value'   => 'de',
-			),
-			'de_DE_formal' => array(
-				'label'       => __( 'German (Formal)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Formal german spoken in germany.', 'easy-language' ),
-				'api_value'   => 'de',
-			),
-			'de_CH' => array(
-				'label'       => __( 'German (CH)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
-				'api_value'   => 'de',
-			),
-			'de_CH_informal' => array(
-				'label'       => __( 'German (CH, informal)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
-				'api_value'   => 'de',
-			),
-			'de_AT' => array(
-				'label'       => __( 'German (AT)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Informal german spoken in austria.', 'easy-language' ),
-				'api_value'   => 'de',
-			),
+		return apply_filters( 'easy_language_chatgpt_source_languages',
+			array(
+				'de_DE' => array(
+					'label'       => __( 'German', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Informal german spoken in germany.', 'easy-language' ),
+					'api_value'   => 'de',
+				),
+				'de_DE_formal' => array(
+					'label'       => __( 'German (Formal)', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Formal german spoken in germany.', 'easy-language' ),
+					'api_value'   => 'de',
+				),
+				'de_CH' => array(
+					'label'       => __( 'German (CH)', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
+					'api_value'   => 'de',
+				),
+				'de_CH_informal' => array(
+					'label'       => __( 'German (CH, informal)', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
+					'api_value'   => 'de',
+				),
+				'de_AT' => array(
+					'label'       => __( 'German (AT)', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Informal german spoken in austria.', 'easy-language' ),
+					'api_value'   => 'de',
+				),
+			)
 		);
 	}
 
@@ -205,27 +206,29 @@ class ChatGpt extends Base implements Api_Base {
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_target_languages(): array {
-		return array(
-			'de_EL' => array(
-				'label'       => __( 'Einfache Sprache', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
-				'url'         => 'de_el',
-				'api_value'   => 'plain',
-				'icon'        => 'icon-de-el',
-				'img'         => 'de_EL.svg',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
-			),
-			'de_LS' => array(
-				'label'       => __( 'Leichte Sprache', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
-				'url'         => 'de_ls',
-				'api_value'   => 'easy',
-				'icon'        => 'icon-de-ls',
-				'img'         => 'de_LS.svg',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
-			),
+		return apply_filters( 'easy_language_chatgpt_target_languages',#
+			array(
+				'de_EL' => array(
+					'label'       => __( 'Einfache Sprache', 'easy-language' ),
+					'enabled'     => true,
+					'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+					'url'         => 'de_el',
+					'api_value'   => 'plain',
+					'icon'        => 'icon-de-el',
+					'img'         => 'de_EL.svg',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
+				),
+				'de_LS' => array(
+					'label'       => __( 'Leichte Sprache', 'easy-language' ),
+					'enabled'     => true,
+					'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+					'url'         => 'de_ls',
+					'api_value'   => 'easy',
+					'icon'        => 'icon-de-ls',
+					'img'         => 'de_LS.svg',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
+				),
+			)
 		);
 	}
 
@@ -262,12 +265,14 @@ class ChatGpt extends Base implements Api_Base {
 	 * @return array
 	 */
 	public function get_mapping_languages(): array {
-		return array(
-			'de_DE' => array( 'de_LS', 'de_EL' ),
-			'de_DE_formal' => array( 'de_LS', 'de_EL' ),
-			'de_CH' => array( 'de_LS', 'de_EL' ),
-			'de_CH_informal' => array( 'de_LS', 'de_EL' ),
-			'de_AT' => array( 'de_LS', 'de_EL' ),
+		return apply_filters( 'easy_language_chatgpt_mapping_languages',
+			array(
+				'de_DE' => array( 'de_LS', 'de_EL' ),
+				'de_DE_formal' => array( 'de_LS', 'de_EL' ),
+				'de_CH' => array( 'de_LS', 'de_EL' ),
+				'de_CH_informal' => array( 'de_LS', 'de_EL' ),
+				'de_AT' => array( 'de_LS', 'de_EL' ),
+			)
 		);
 	}
 
@@ -736,7 +741,7 @@ class ChatGpt extends Base implements Api_Base {
 		if ( empty( $values ) ) {
 			add_settings_error( 'easy_language_chatgpt_target_languages', 'easy_language_chatgpt_target_languages', __( 'You have to set a target-language for simplifications.', 'easy-language' ) );
 		} elseif ( false === $this->is_language_set( $values ) ) {
-			add_settings_error( 'easy_language_chatgpt_target_languages', 'easy_language_chatgpt_target_languages', __( 'At least one language cannot (currently) be translated into the selected target languages by the API.', 'easy-language' ) );
+			add_settings_error( 'easy_language_chatgpt_target_languages', 'easy_language_chatgpt_target_languages', __( 'At least one language cannot (currently) be simplified into the selected target languages by the API.', 'easy-language' ) );
 		}
 
 		// return value.
