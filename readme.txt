@@ -6,7 +6,7 @@ Tested up to: 6.4.2
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 
 == Description ==
 
@@ -95,3 +95,12 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 = 2.0.1 =
 * Removed language files from release
 * Fixed usage of language-columns in post-types (was only a problem if Pro-plugin is used with other languages)
+
+= 2.0.2 =
+* Added more hooks
+* Optimized output of flags
+* Optimized some codes
+* Fixed missing language mappings for SUMM AI simplifications for austria and suisse
+* Fixed missing flag-icons for capito languages
+* Fixed missing API-value for target language on capito
+* Fixed some typos

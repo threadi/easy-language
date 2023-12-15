@@ -202,47 +202,49 @@ class Summ_AI extends Base implements Api_Base {
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_source_languages(): array {
-		return array(
-			'de_DE'          => array(
-				'label'       => __( 'German', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Informal german spoken in Germany.', 'easy-language' ),
-				'icon'        => 'icon-de-de',
-				'img'         => 'de_de.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
-			),
-			'de_DE_formal'   => array(
-				'label'       => __( 'German (Formal)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Formal german spoken in Germany.', 'easy-language' ),
-				'icon'        => 'icon-de-de',
-				'img'         => 'de_de.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_DE_formal' ) : '',
-			),
-			'de_CH'          => array(
-				'label'       => __( 'Suisse german', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Formal german spoken in Suisse.', 'easy-language' ),
-				'icon'        => 'icon-de-ch',
-				'img'         => 'de_ch.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_CH' ) : '',
-			),
-			'de_CH_informal' => array(
-				'label'       => __( 'Suisse german (Informal)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Informal german spoken in Suisse.', 'easy-language' ),
-				'icon'        => 'icon-de-ch',
-				'img'         => 'de_ch.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_CH_informal' ) : '',
-			),
-			'de_AT'          => array(
-				'label'       => __( 'Austria German', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'German spoken in Austria.', 'easy-language' ),
-				'icon'        => 'icon-de-at',
-				'img'         => 'de_at.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_AT' ) : '',
-			),
+		return apply_filters( 'easy_language_summ_ai_source_languages',
+			array(
+				'de_DE'          => array(
+					'label'       => __( 'German', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Informal german spoken in Germany.', 'easy-language' ),
+					'icon'        => 'icon-de-de',
+					'img'         => 'de_de.png',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
+				),
+				'de_DE_formal'   => array(
+					'label'       => __( 'German (Formal)', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Formal german spoken in Germany.', 'easy-language' ),
+					'icon'        => 'icon-de-de',
+					'img'         => 'de_de.png',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_DE_formal' ) : '',
+				),
+				'de_CH'          => array(
+					'label'       => __( 'Suisse german', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Formal german spoken in Suisse.', 'easy-language' ),
+					'icon'        => 'icon-de-ch',
+					'img'         => 'de_ch.png',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_CH' ) : '',
+				),
+				'de_CH_informal' => array(
+					'label'       => __( 'Suisse german (Informal)', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Informal german spoken in Suisse.', 'easy-language' ),
+					'icon'        => 'icon-de-ch',
+					'img'         => 'de_ch.png',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_CH_informal' ) : '',
+				),
+				'de_AT'          => array(
+					'label'       => __( 'Austria German', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'German spoken in Austria.', 'easy-language' ),
+					'icon'        => 'icon-de-at',
+					'img'         => 'de_at.png',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_AT' ) : '',
+				),
+			)
 		);
 	}
 
@@ -253,27 +255,29 @@ class Summ_AI extends Base implements Api_Base {
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_target_languages(): array {
-		return array(
-			'de_EL' => array(
-				'label'       => __( 'Einfache Sprache', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
-				'url'         => 'de_el',
-				'api_value'   => 'plain',
-				'icon'        => 'icon-de-el',
-				'img'         => 'de_EL.svg',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
-			),
-			'de_LS' => array(
-				'label'       => __( 'Leichte Sprache', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
-				'url'         => 'de_ls',
-				'api_value'   => 'easy',
-				'icon'        => 'icon-de-ls',
-				'img'         => 'de_LS.svg',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
-			),
+		return apply_filters( 'easy_language_summ_ai_target_languages',
+			array(
+				'de_EL' => array(
+					'label'       => __( 'Einfache Sprache', 'easy-language' ),
+					'enabled'     => true,
+					'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+					'url'         => 'de_el',
+					'api_value'   => 'plain',
+					'icon'        => 'icon-de-el',
+					'img'         => 'de_EL.svg',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
+				),
+				'de_LS' => array(
+					'label'       => __( 'Leichte Sprache', 'easy-language' ),
+					'enabled'     => true,
+					'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+					'url'         => 'de_ls',
+					'api_value'   => 'easy',
+					'icon'        => 'icon-de-ls',
+					'img'         => 'de_LS.svg',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
+				),
+			)
 		);
 	}
 
@@ -285,9 +289,14 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return array
 	 */
 	public function get_mapping_languages(): array {
-		return array(
-			'de_DE' => array( 'de_LS', 'de_EL' ),
-			'de_DE_formal' => array( 'de_LS', 'de_EL' ),
+		return apply_filters( 'easy_language_summ_ai_mapping_languages',
+			array(
+				'de_DE' => array( 'de_LS', 'de_EL' ),
+				'de_DE_formal' => array( 'de_LS', 'de_EL' ),
+				'de_CH' => array( 'de_LS', 'de_EL' ),
+				'de_CH_informal' => array( 'de_LS', 'de_EL' ),
+				'de_AT' => array( 'de_LS', 'de_EL' ),
+			)
 		);
 	}
 
@@ -968,10 +977,10 @@ class Summ_AI extends Base implements Api_Base {
 	public function validate_language_settings( $values ): ?array {
 		$values = Helper::settings_validate_multiple_checkboxes( $values );
 		if( empty($values) ) {
-			add_settings_error( 'easy_language_target_languages', 'easy_language_target_languages', __('You have to set a target-language for simplifications.', 'easy-language') );
+			add_settings_error( 'easy_language_summ_ai_target_languages', 'easy_language_summ_ai_target_languages', __('You have to set a target-language for simplifications.', 'easy-language') );
 		}
 		elseif( false === $this->is_language_set( $values ) ) {
-			add_settings_error( 'easy_language_target_languages', 'easy_language_target_languages', __('At least one language cannot (currently) be translated into the selected target languages by the API.', 'easy-language') );
+			add_settings_error( 'easy_language_summ_ai_target_languages', 'easy_language_summ_ai_target_languages', __('At least one language cannot (currently) be simplified into the selected target languages by the API.', 'easy-language') );
 		}
 
 		// return value.

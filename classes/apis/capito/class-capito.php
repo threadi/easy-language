@@ -173,37 +173,54 @@ class Capito extends Base implements Api_Base {
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_source_languages(): array {
-		return array(
-			'de_DE' => array(
-				'label'       => __( 'German', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Informal german spoken in germany.', 'easy-language' ),
-				'api_value'   => 'de',
-			),
-			'de_DE_formal' => array(
-				'label'       => __( 'German (Formal)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Formal german spoken in germany.', 'easy-language' ),
-				'api_value'   => 'de',
-			),
-			'de_CH' => array(
-				'label'       => __( 'German (CH)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Formal german spoken in suisse.', 'easy-language' ),
-				'api_value'   => 'de',
-			),
-			'de_CH_informal' => array(
-				'label'       => __( 'German (CH, informal)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
-				'api_value'   => 'de',
-			),
-			'de_AT' => array(
-				'label'       => __( 'German (AT)', 'easy-language' ),
-				'enable'      => true,
-				'description' => __( 'Informal german spoken in austria.', 'easy-language' ),
-				'api_value'   => 'de',
-			),
+		return apply_filters( 'easy_language_capito_source_languages',
+			array(
+				'de_DE' => array(
+					'label'       => __( 'German', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Informal german spoken in germany.', 'easy-language' ),
+					'icon'        => 'icon-de-de',
+					'img'         => 'de_de.png',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
+					'api_value'   => 'de',
+				),
+				'de_DE_formal' => array(
+					'label'       => __( 'German (Formal)', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Formal german spoken in germany.', 'easy-language' ),
+					'icon'        => 'icon-de-de',
+					'img'         => 'de_de.png',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
+					'api_value'   => 'de',
+				),
+				'de_CH' => array(
+					'label'       => __( 'German (CH)', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Formal german spoken in suisse.', 'easy-language' ),
+					'icon'        => 'icon-de-ch',
+					'img'         => 'de_ch.png',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_ch' ) : '',
+					'api_value'   => 'de',
+				),
+				'de_CH_informal' => array(
+					'label'       => __( 'German (CH, informal)', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
+					'icon'        => 'icon-de-ch',
+					'img'         => 'de_ch.png',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_ch' ) : '',
+					'api_value'   => 'de',
+				),
+				'de_AT' => array(
+					'label'       => __( 'German (AT)', 'easy-language' ),
+					'enable'      => true,
+					'description' => __( 'Informal german spoken in austria.', 'easy-language' ),
+					'icon'        => 'icon-de-at',
+					'img'         => 'de_at.png',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_at' ) : '',
+					'api_value'   => 'de',
+				),
+			)
 		);
 	}
 
@@ -214,37 +231,39 @@ class Capito extends Base implements Api_Base {
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_target_languages(): array {
-		return array(
-			'de_a1' => array(
-				'label'       => __( 'German A1', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'The easiest level of german language.', 'easy-language' ),
-				'url'         => 'de_a1',
-				'api_value'   => 'a1',
-				'icon'        => 'icon-de-ls',
-				'img'         => 'de_LS.svg',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a1' ) : '',
-			),
-			'de_a2' => array(
-				'label'       => __( 'German A2', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'capito compares this with Leichte Sprache', 'easy-language' ),
-				'url'         => 'de_a2',
-				'api_value'   => 'a2',
-				'icon'        => 'icon-de-ls',
-				'img'         => 'de_LS.svg',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a2' ) : '',
-			),
-			'de_b1' => array(
-				'label'       => __( 'German B1', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'capito compares this with Einfache Sprache', 'easy-language' ),
-				'url'         => 'de_a2',
-				'api_value'   => 'b1',
-				'icon'        => 'icon-de-el',
-				'img'         => 'de_EL.svg',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_b1' ) : '',
-			),
+		return apply_filters( 'easy_language_capito_target_languages',
+			array(
+				'de_a1' => array(
+					'label'       => __( 'German A1', 'easy-language' ),
+					'enabled'     => true,
+					'description' => __( 'The easiest level of german language.', 'easy-language' ),
+					'url'         => 'de_a1',
+					'api_value'   => 'a1',
+					'icon'        => 'icon-de-ls',
+					'img'         => 'de_LS.svg',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a1' ) : '',
+				),
+				'de_a2' => array(
+					'label'       => __( 'German A2', 'easy-language' ),
+					'enabled'     => true,
+					'description' => __( 'capito compares this with Leichte Sprache', 'easy-language' ),
+					'url'         => 'de_a2',
+					'api_value'   => 'a2',
+					'icon'        => 'icon-de-ls',
+					'img'         => 'de_LS.svg',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a2' ) : '',
+				),
+				'de_b1' => array(
+					'label'       => __( 'German B1', 'easy-language' ),
+					'enabled'     => true,
+					'description' => __( 'capito compares this with Einfache Sprache', 'easy-language' ),
+					'url'         => 'de_a2',
+					'api_value'   => 'b1',
+					'icon'        => 'icon-de-el',
+					'img'         => 'de_EL.svg',
+					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_b1' ) : '',
+				),
+			)
 		);
 	}
 
@@ -256,12 +275,14 @@ class Capito extends Base implements Api_Base {
 	 * @return array
 	 */
 	public function get_mapping_languages(): array {
-		return array(
-			'de_DE' => array( 'de_a1', 'de_a2', 'de_b1' ),
-			'de_DE_formal' => array( 'de_a1', 'de_a2', 'de_b1' ),
-			'de_AT' => array( 'de_a1', 'de_a2', 'de_b1' ),
-			'de_CH' => array( 'de_a1', 'de_a2', 'de_b1' ),
-			'de_CH_informal' => array( 'de_a1', 'de_a2', 'de_b1' ),
+		return apply_filters( 'easy_language_capito_mapping_languages',
+			array(
+				'de_DE' => array( 'de_a1', 'de_a2', 'de_b1' ),
+				'de_DE_formal' => array( 'de_a1', 'de_a2', 'de_b1' ),
+				'de_AT' => array( 'de_a1', 'de_a2', 'de_b1' ),
+				'de_CH' => array( 'de_a1', 'de_a2', 'de_b1' ),
+				'de_CH_informal' => array( 'de_a1', 'de_a2', 'de_b1' ),
+			)
 		);
 	}
 
@@ -836,7 +857,7 @@ class Capito extends Base implements Api_Base {
 		if ( empty( $values ) ) {
 			add_settings_error( 'easy_language_capito_target_languages', 'easy_language_capito_target_languages', __( 'You have to set a target-language for simplifications.', 'easy-language' ) );
 		} elseif ( false === $this->is_language_set( $values ) ) {
-			add_settings_error( 'easy_language_capito_target_languages', 'easy_language_capito_target_languages', __( 'At least one language cannot (currently) be translated into the selected target languages by the API.', 'easy-language' ) );
+			add_settings_error( 'easy_language_capito_target_languages', 'easy_language_capito_target_languages', __( 'At least one language cannot (currently) be simplified into the selected target languages by the API.', 'easy-language' ) );
 		}
 
 		// return value.
