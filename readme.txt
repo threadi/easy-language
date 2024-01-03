@@ -71,6 +71,13 @@ The development repository is on [GitHub](https://github.com/threadi/easy-langua
 
 More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://laolaweb.com/en/plugins/easy-language-for-wordpress/)
 
+== Installation ==
+
+1. Upload "easy-language" to the "/wp-content/plugins/" directory.
+2. Activate the plugin through the "Plugins" menu in WordPress.
+3. Go to the plugins settings and choose the API you want to use.
+4. Start to simplify your website.
+
 == Screenshots ==
 
 1. Choose your API
