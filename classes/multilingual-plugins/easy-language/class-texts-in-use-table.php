@@ -29,14 +29,14 @@ class Texts_In_Use_Table extends WP_List_Table {
 	public function get_columns(): array {
 		return array(
 			'options'         => '',
-			'date'            => __( 'date', 'easy-language' ),
-			'used_api'        => __( 'used API', 'easy-language' ),
-			'user'            => __( 'requesting user', 'easy-language' ),
-			'used_in'         => __( 'used in', 'easy-language' ),
-			'source_language' => __( 'source language', 'easy-language' ),
-			'target_language' => __( 'target language', 'easy-language' ),
-			'original'        => __( 'original', 'easy-language' ),
-			'simplification'  => __( 'simplification', 'easy-language' ),
+			'date'            => __( 'Date', 'easy-language' ),
+			'used_api'        => __( 'Used API', 'easy-language' ),
+			'user'            => __( 'Requesting user', 'easy-language' ),
+			'used_in'         => __( 'Used in', 'easy-language' ),
+			'source_language' => __( 'Source language', 'easy-language' ),
+			'target_language' => __( 'Target language', 'easy-language' ),
+			'original'        => __( 'Original', 'easy-language' ),
+			'simplification'  => __( 'Simplification', 'easy-language' ),
 		);
 	}
 
@@ -129,7 +129,14 @@ class Texts_In_Use_Table extends WP_List_Table {
 		// get object of the used api.
 		$api_obj = $item->get_api();
 
-		// filter column name.
+		/**
+		 * Filter the column name.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param string $column_name The column name.
+		 * @param Text $item The object.
+		 */
 		$column_name = apply_filters( 'easy_language_simplification_table_used_in', $column_name, $item );
 
 		// bail if column-name is not set.
@@ -182,7 +189,17 @@ class Texts_In_Use_Table extends WP_List_Table {
 					'<span class="dashicons dashicons-trash" title="' . __( 'Delete entry only with Easy Language Pro.', 'easy-language' ) . '">&nbsp;</span>',
 				);
 
-				$filtered_options = apply_filters( 'easy_language_simplification_table_options', $options, $item->get_id() );
+				$item_id = $item->get_id();
+
+				/**
+				 * Filter additional options.
+				 *
+				 * @since 2.0.0 Available since 2.0.0.
+				 *
+				 * @param array $options List of options.
+				 * @param int $item_id The ID of the object.
+				 */
+				$filtered_options = apply_filters( 'easy_language_simplification_table_options', $options, $item_id );
 
 				// return html-output.
 				return implode( '', $filtered_options );

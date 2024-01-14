@@ -8,6 +8,7 @@
 namespace easyLanguage\Multilingual_plugins\TranslatePress;
 
 use easyLanguage\Apis;
+use easyLanguage\Apis\Capito\Request;
 use TRP_Machine_Translator;
 use WP_Error;
 
@@ -45,6 +46,13 @@ class Translatepress_Capito_Machine_Translator extends TRP_Machine_Translator {
 		$request_obj->set_text( $string_to_translate );
 		$request_obj->set_source_language( $source_language );
 		$request_obj->set_target_language( $language_code );
+		/**
+		 * Filter the capito request object.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param Request $request_obj The capito request object.
+		 */
 		$request_obj = apply_filters( 'easy_language_capito_request_object', $request_obj );
 		$request_obj->send();
 

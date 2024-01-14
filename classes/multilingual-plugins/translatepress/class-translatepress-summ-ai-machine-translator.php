@@ -8,6 +8,7 @@
 namespace easyLanguage\Multilingual_plugins\TranslatePress;
 
 use easyLanguage\Apis;
+use easyLanguage\Apis\Summ_Ai\Request;
 use TRP_Machine_Translator;
 use WP_Error;
 
@@ -53,6 +54,13 @@ class Translatepress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 		$request_obj->set_url( $api_object->get_api_url() );
 		$request_obj->set_is_test( $this->is_test );
 		$request_obj->set_text( $string_to_translate );
+		/**
+		 * Filter the SUMM AI request object.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param Request $request_obj The SUMM AI request object.
+		 */
 		$request_obj = apply_filters( 'easy_language_summ_ai_request_object', $request_obj );
 		$request_obj->send();
 

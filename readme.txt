@@ -6,7 +6,7 @@ Tested up to: 6.4.2
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 
 == Description ==
 
@@ -111,3 +111,9 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Fixed missing flag-icons for capito languages
 * Fixed missing API-value for target language on capito
 * Fixed some typos
+
+= 2.0.3 =
+* Added automatic generated hook documentation
+* Optimized same text-descriptions
+* Fixed missing translation output
+* Fixed wrong defined WP Bakery hook for HTML-widgets

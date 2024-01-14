@@ -563,7 +563,8 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 * @noinspection PhpUnusedPrivateMethodInspection
 	 */
 	private function process_simplification_trigger_on_end(): void {
+		$type = $this->get_type();
 		// trigger object-update.
-		do_action( 'save_post_' . $this->get_type(), $this->get_id(), $this->get_object_as_object(), true );
+		do_action( 'save_post_' . $type, $this->get_id(), $this->get_object_as_object(), true );
 	}
 }

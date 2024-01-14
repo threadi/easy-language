@@ -55,6 +55,15 @@ class Multilingual_Plugins {
 	 * @return array
 	 */
 	public function get_available_plugins(): array {
-		return apply_filters( 'easy_language_register_plugin', array() );
+		$plugin_list = array();
+
+		/**
+		 * Filter the available plugins.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $plugin_list List of plugins.
+		 */
+		return apply_filters( 'easy_language_register_plugin', $plugin_list );
 	}
 }

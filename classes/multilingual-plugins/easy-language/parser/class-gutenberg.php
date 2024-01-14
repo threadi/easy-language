@@ -63,20 +63,26 @@ class Gutenberg extends Parser_Base implements Parser {
 	 * @return array
 	 */
 	private function get_flow_text_blocks(): array {
-		return apply_filters(
-			'easy_language_gutenberg_blocks',
-			array(
-				'core/paragraph' => array(
-					'html' => true
-				),
-				'core/heading'   => array(
-					'html' => true
-				),
-				'core/list-item' => array(
-					'html' => true
-				),
-			)
+		$blocks = array(
+			'core/paragraph' => array(
+				'html' => true
+			),
+			'core/heading'   => array(
+				'html' => true
+			),
+			'core/list-item' => array(
+				'html' => true
+			),
 		);
+
+		/**
+		 * Filter the possible Gutenberg Blocks.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $blocks List of Blocks.
+		 */
+		return apply_filters( 'easy_language_gutenberg_blocks', $blocks );
 	}
 
 	/**

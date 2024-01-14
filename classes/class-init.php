@@ -198,12 +198,19 @@ class Init {
 	 * @return array
 	 */
 	public function get_post_type_names(): array {
-		return apply_filters(
-			'easy_language_post_type_names', array(
-				'post' => 'posts',
-				'page' => 'pages',
-			)
+		$post_type_names = array(
+			'post' => 'posts',
+			'page' => 'pages',
 		);
+
+		/**
+		 * Filter the post type names.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $post_type_names List of post type names.
+		 */
+		return apply_filters( 'easy_language_post_type_names', $post_type_names );
 	}
 
 	/**
@@ -212,29 +219,35 @@ class Init {
 	 * @return array
 	 */
 	public function get_post_type_settings(): array {
-		return apply_filters(
-			'easy_language_post_type_settings',
-				array(
-				'post' => array(
-					'label_singular' => __( 'post', 'easy-language' ),
-					'label_plural'   => __( 'posts', 'easy-language' ),
-					'admin_edit_url' => add_query_arg(
-						array(),
-						admin_url() . 'edit.php'
-					),
+		$post_type_settings = array(
+			'post' => array(
+				'label_singular' => __( 'Post', 'easy-language' ),
+				'label_plural'   => __( 'Posts', 'easy-language' ),
+				'admin_edit_url' => add_query_arg(
+					array(),
+					admin_url() . 'edit.php'
 				),
-				'page' => array(
-					'label_singular' => __( 'page', 'easy-language' ),
-					'label_plural'   => __( 'pages', 'easy-language' ),
-					'admin_edit_url' => add_query_arg(
-						array(
-							'post_type' => 'page',
-						),
-						admin_url() . 'edit.php'
+			),
+			'page' => array(
+				'label_singular' => __( 'Page', 'easy-language' ),
+				'label_plural'   => __( 'Pages', 'easy-language' ),
+				'admin_edit_url' => add_query_arg(
+					array(
+						'post_type' => 'page',
 					),
+					admin_url() . 'edit.php'
 				),
-			)
+			),
 		);
+
+		/**
+		 * Filter the post type names.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $post_type_settings List of post type settings.
+		 */
+		return apply_filters( 'easy_language_post_type_settings', $post_type_settings );
 	}
 
 	/**

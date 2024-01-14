@@ -47,8 +47,17 @@ class Language_Icon {
 	public function save( string $language_code ): void {
 		global $wp_filesystem;
 		if ( ! empty( $this->file ) ) {
-			// get path.
-			$img_path = apply_filters( 'easy_language_icon_path', trailingslashit( Helper::get_plugin_path() ) . 'gfx/' . $this->file, $this->file );
+			$path = trailingslashit( Helper::get_plugin_path() ) . 'gfx/' . $this->file;
+			$file = $this->file;
+			/**
+			 * Get path where the icon files are located.
+			 *
+			 * @since 2.0.0 Available since 2.0.0.
+			 *
+			 * @param string $path The path.
+			 * @param string $file The actual icon file.
+			 */
+			$img_path = apply_filters( 'easy_language_icon_path', $path, $file );
 
 			// check if file exists there.
 			if ( false !== $img_path && file_exists( $img_path ) ) {
@@ -110,7 +119,13 @@ class Language_Icon {
 						update_post_meta( $attachment->ID, 'easy_language_code', $language_list );
 					}
 
-					// hook for further infos for the icon.
+					/**
+					 * Hook for further infos for the icon.
+					 *
+					 * @since 2.0.0 Available since 2.0.0.
+					 *
+					 * @param array $this The language icon object.
+					 */
 					do_action( 'easy_language_update_icon', $this );
 
 					// delete icon cache in DB.

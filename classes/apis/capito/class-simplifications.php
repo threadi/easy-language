@@ -7,6 +7,7 @@
 
 namespace easyLanguage\Apis\Capito;
 
+use easyLanguage\Apis\Summ_Ai\Request;
 use easyLanguage\Base;
 use easyLanguage\Multilingual_plugins\Easy_Language\Init;
 
@@ -88,6 +89,13 @@ class Simplifications {
 		$request_obj->set_text( $text_to_translate );
 		$request_obj->set_source_language( $source_language );
 		$request_obj->set_target_language( $target_language );
+		/**
+		 * Filter the capito request object.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param Request $request_obj The capito request object.
+		 */
 		$request_obj = apply_filters( 'easy_language_capito_request_object', $request_obj );
 		$request_obj->send();
 
@@ -99,12 +107,23 @@ class Simplifications {
 			// transform it to array.
 			$request_array = json_decode( $response, true );
 
-			// get simplified text.
-			$translated_text = apply_filters( 'easy_language_simplified_text', $request_array['content'], $request_array, $this );
+			// get the simplified text.
+			$simplified_text = $request_array['content'];
+
+			/**
+			 * Filter the simplified text.
+			 *
+			 * @since 2.0.0 Available since 2.0.0.
+			 *
+			 * @param string $simplified_text The simplified text.
+			 * @param array $request_array The complete response array from the API.
+			 * @param Simplifications $this The simplification object.
+			 */
+			$simplified_text = apply_filters( 'easy_language_simplified_text', $simplified_text, $request_array, $this );
 
 			// return simplification to plugin which will save it.
 			return array(
-				'translated_text' => $translated_text,
+				'translated_text' => $simplified_text,
 				'jobid'           => 0,
 			);
 		}

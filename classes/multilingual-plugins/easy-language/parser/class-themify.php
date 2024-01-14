@@ -65,39 +65,51 @@ class Themify extends Parser_Base implements Parser {
 	 * @return array
 	 */
 	private function get_flow_text_widgets(): array {
-		return apply_filters(
-			'easy_language_themify_text_widgets',
-			array(
-				'fancy-heading' => array(
-					'heading',
-					'sub_heading',
+		$widgets = array(
+			'fancy-heading' => array(
+				'heading',
+				'sub_heading',
+			),
+			'text'          => array(
+				'content_text',
+			),
+			'buttons'       => array(
+				'content_button' => array(
+					'label',
 				),
-				'text'          => array(
-					'content_text',
-				),
-				'buttons'       => array(
-					'content_button' => array(
-						'label',
-					),
-				),
-			)
+			),
 		);
+
+		/**
+		 * Filter the possible themify widgets.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $widgets List of widgets.
+		 */
+		return apply_filters( 'easy_language_themify_text_widgets', $widgets );
 	}
 
 	/**
 	 * Return whether a given widget used HTML or not for its texts.
 	 *
-	 * @param string $widget_name
+	 * @param string $widget_name The requested widget.
 	 *
 	 * @return bool
 	 */
 	private function is_flow_text_widget_html( string $widget_name ): bool {
-		// list of widget which use html-code.
-		$html_widgets = apply_filters(
-			'easy_language_themify_html_widgets', array(
-				'text' => true
-			)
+		$html_support_widgets = array(
+			'text' => true
 		);
+
+		/**
+		 * Filter the possible themify widgets with HTML-support.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $html_support_widgets List of widgets with HTML-support.
+		 */
+		$html_widgets = apply_filters( 'easy_language_themify_html_widgets', $html_support_widgets );
 
 		return isset($html_widgets[$widget_name]);
 	}

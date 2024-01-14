@@ -173,55 +173,62 @@ class Capito extends Base implements Api_Base {
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_source_languages(): array {
-		return apply_filters( 'easy_language_capito_source_languages',
-			array(
-				'de_DE' => array(
-					'label'       => __( 'German', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Informal german spoken in germany.', 'easy-language' ),
-					'icon'        => 'icon-de-de',
-					'img'         => 'de_de.png',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
-					'api_value'   => 'de',
-				),
-				'de_DE_formal' => array(
-					'label'       => __( 'German (Formal)', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Formal german spoken in germany.', 'easy-language' ),
-					'icon'        => 'icon-de-de',
-					'img'         => 'de_de.png',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
-					'api_value'   => 'de',
-				),
-				'de_CH' => array(
-					'label'       => __( 'German (CH)', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Formal german spoken in suisse.', 'easy-language' ),
-					'icon'        => 'icon-de-ch',
-					'img'         => 'de_ch.png',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_ch' ) : '',
-					'api_value'   => 'de',
-				),
-				'de_CH_informal' => array(
-					'label'       => __( 'German (CH, informal)', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
-					'icon'        => 'icon-de-ch',
-					'img'         => 'de_ch.png',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_ch' ) : '',
-					'api_value'   => 'de',
-				),
-				'de_AT' => array(
-					'label'       => __( 'German (AT)', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Informal german spoken in austria.', 'easy-language' ),
-					'icon'        => 'icon-de-at',
-					'img'         => 'de_at.png',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_at' ) : '',
-					'api_value'   => 'de',
-				),
-			)
+		$source_languages = array(
+			'de_DE' => array(
+				'label'       => __( 'German', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in germany.', 'easy-language' ),
+				'icon'        => 'icon-de-de',
+				'img'         => 'de_de.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
+				'api_value'   => 'de',
+			),
+			'de_DE_formal' => array(
+				'label'       => __( 'German (Formal)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Formal german spoken in germany.', 'easy-language' ),
+				'icon'        => 'icon-de-de',
+				'img'         => 'de_de.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
+				'api_value'   => 'de',
+			),
+			'de_CH' => array(
+				'label'       => __( 'German (CH)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Formal german spoken in suisse.', 'easy-language' ),
+				'icon'        => 'icon-de-ch',
+				'img'         => 'de_ch.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_ch' ) : '',
+				'api_value'   => 'de',
+			),
+			'de_CH_informal' => array(
+				'label'       => __( 'German (CH, informal)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
+				'icon'        => 'icon-de-ch',
+				'img'         => 'de_ch.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_ch' ) : '',
+				'api_value'   => 'de',
+			),
+			'de_AT' => array(
+				'label'       => __( 'German (AT)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in austria.', 'easy-language' ),
+				'icon'        => 'icon-de-at',
+				'img'         => 'de_at.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_at' ) : '',
+				'api_value'   => 'de',
+			),
 		);
+
+		/**
+		 * Filter capito source languages.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $source_languages List of source languages.
+		 */
+		return apply_filters( 'easy_language_capito_source_languages', $source_languages );
 	}
 
 	/**
@@ -231,40 +238,47 @@ class Capito extends Base implements Api_Base {
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_target_languages(): array {
-		return apply_filters( 'easy_language_capito_target_languages',
-			array(
-				'de_a1' => array(
-					'label'       => __( 'German A1', 'easy-language' ),
-					'enabled'     => true,
-					'description' => __( 'The easiest level of german language.', 'easy-language' ),
-					'url'         => 'de_a1',
-					'api_value'   => 'a1',
-					'icon'        => 'icon-de-ls',
-					'img'         => 'de_LS.svg',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a1' ) : '',
-				),
-				'de_a2' => array(
-					'label'       => __( 'German A2', 'easy-language' ),
-					'enabled'     => true,
-					'description' => __( 'capito compares this with Leichte Sprache', 'easy-language' ),
-					'url'         => 'de_a2',
-					'api_value'   => 'a2',
-					'icon'        => 'icon-de-ls',
-					'img'         => 'de_LS.svg',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a2' ) : '',
-				),
-				'de_b1' => array(
-					'label'       => __( 'German B1', 'easy-language' ),
-					'enabled'     => true,
-					'description' => __( 'capito compares this with Einfache Sprache', 'easy-language' ),
-					'url'         => 'de_a2',
-					'api_value'   => 'b1',
-					'icon'        => 'icon-de-el',
-					'img'         => 'de_EL.svg',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_b1' ) : '',
-				),
-			)
+		$target_languages = array(
+			'de_a1' => array(
+				'label'       => __( 'German A1', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'The easiest level of german language.', 'easy-language' ),
+				'url'         => 'de_a1',
+				'api_value'   => 'a1',
+				'icon'        => 'icon-de-ls',
+				'img'         => 'de_LS.svg',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a1' ) : '',
+			),
+			'de_a2' => array(
+				'label'       => __( 'German A2', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'capito compares this with Leichte Sprache', 'easy-language' ),
+				'url'         => 'de_a2',
+				'api_value'   => 'a2',
+				'icon'        => 'icon-de-ls',
+				'img'         => 'de_LS.svg',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_a2' ) : '',
+			),
+			'de_b1' => array(
+				'label'       => __( 'German B1', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'capito compares this with Einfache Sprache', 'easy-language' ),
+				'url'         => 'de_a2',
+				'api_value'   => 'b1',
+				'icon'        => 'icon-de-el',
+				'img'         => 'de_EL.svg',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_b1' ) : '',
+			),
 		);
+
+		/**
+		 * Filter capito target languages.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $target_languages List of target languages.
+		 */
+		return apply_filters( 'easy_language_capito_target_languages', $target_languages );
 	}
 
 	/**
@@ -275,15 +289,22 @@ class Capito extends Base implements Api_Base {
 	 * @return array
 	 */
 	public function get_mapping_languages(): array {
-		return apply_filters( 'easy_language_capito_mapping_languages',
-			array(
-				'de_DE' => array( 'de_a1', 'de_a2', 'de_b1' ),
-				'de_DE_formal' => array( 'de_a1', 'de_a2', 'de_b1' ),
-				'de_AT' => array( 'de_a1', 'de_a2', 'de_b1' ),
-				'de_CH' => array( 'de_a1', 'de_a2', 'de_b1' ),
-				'de_CH_informal' => array( 'de_a1', 'de_a2', 'de_b1' ),
-			)
+		$language_mappings = array(
+			'de_DE' => array( 'de_a1', 'de_a2', 'de_b1' ),
+			'de_DE_formal' => array( 'de_a1', 'de_a2', 'de_b1' ),
+			'de_AT' => array( 'de_a1', 'de_a2', 'de_b1' ),
+			'de_CH' => array( 'de_a1', 'de_a2', 'de_b1' ),
+			'de_CH_informal' => array( 'de_a1', 'de_a2', 'de_b1' ),
 		);
+
+		/**
+		 * Filter mapping of capito languages.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $language_mappings List of mappings.
+		 */
+		return apply_filters( 'easy_language_capito_mapping_languages', $language_mappings );
 	}
 
 	/**
@@ -701,6 +722,14 @@ class Capito extends Base implements Api_Base {
 			$intervals[ $name ] = $schedule['display'];
 		}
 
+		/**
+		 * Hook for capito automatic interval settings.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $intervals The possible intervals.
+		 * @param bool $foreign_translation_plugin_with_api_support Whether we support third-party-plugins.
+		 */
 		do_action( 'easy_language_capito_automatic_interval', $intervals, $foreign_translation_plugin_with_api_support );
 
 		// Interval for quota-request.
@@ -955,6 +984,16 @@ class Capito extends Base implements Api_Base {
 
 			// check if key is limited.
 			if ( ! empty( $quota['simplification'] ) && absint( $quota['simplification']['subscription']['available'] ) > 0 ) {
+				$min_percent = 0.8;
+				/**
+				 * Hook for minimal quota percent.
+				 *
+				 * @since 2.0.0 Available since 2.0.0.
+				 *
+				 * @param float $min_percent Minimal percent for quota warning.
+				 */
+				$min_percent = apply_filters( 'easy_language_quota_percent', $min_percent );
+
 				// show hint of 80% of limit is used.
 				$percent = absint( $quota['simplification']['subscription']['remaining'] ) / absint( $quota['simplification']['subscription']['available'] );
 				if ( 1 === $percent ) {
@@ -966,7 +1005,7 @@ class Capito extends Base implements Api_Base {
 					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the capito API is completely depleted.</strong> You will not be able to use any simplifications from capito. Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 					$transient_obj->set_type( 'error' );
 					$transient_obj->save();
-				} elseif ( $percent > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
+				} elseif ( $percent > $min_percent ) {
 					// get the transients-object to add the new one.
 					$transient_obj = $transients_obj->add();
 					$transient_obj->set_dismissible_days( 2 );
