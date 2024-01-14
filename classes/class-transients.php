@@ -147,7 +147,16 @@ class Transients {
 	 * @return void
 	 */
 	public function check_transients(): void {
-		foreach ( apply_filters( 'easy_language_get_transients_for_display', $this->get_transients() ) as $transient_obj ) {
+		$transients = $this->get_transients();
+
+		/**
+		 * Filter the list of transients.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $transients List of transients.
+		 */
+		foreach ( apply_filters( 'easy_language_get_transients_for_display', $transients ) as $transient_obj ) {
 			if ( $transient_obj->is_set() ) {
 				$transient_obj->display();
 			}

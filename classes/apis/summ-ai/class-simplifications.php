@@ -87,6 +87,13 @@ class Simplifications {
 		$request_obj->set_is_test( $this->init->is_test_mode_active() );
 		$request_obj->set_source_language( $source_language );
 		$request_obj->set_target_language( $target_language );
+		/**
+		 * Filter the SUMM AI request object.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param Request $request_obj The SUMM AI request object.
+		 */
 		$request_obj = apply_filters( 'easy_language_summ_ai_request_object', $request_obj );
 		$request_obj->send();
 
@@ -98,8 +105,19 @@ class Simplifications {
 			// transform it to array.
 			$response_array = json_decode( $response, true );
 
-			// get simplified text.
-			$simplified_text = apply_filters( 'easy_language_simplified_text', $response_array['translated_text'], $response_array, $this );
+			// get the simplified text.
+			$simplified_text = $response_array['translated_text'];
+
+			/**
+			 * Filter the simplified text.
+			 *
+			 * @since 2.0.0 Available since 2.0.0.
+			 *
+			 * @param string $simplified_text The simplified text.
+			 * @param array $response_array The complete response array from the API.
+			 * @param Simplifications $this The simplification object.
+			 */
+			$simplified_text = apply_filters( 'easy_language_simplified_text', $simplified_text, $response_array, $this );
 
 			// if request-array contains 'disabled', disable all free requests.
 			if( !empty($response_array['disabled']) ) {

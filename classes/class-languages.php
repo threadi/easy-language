@@ -87,36 +87,42 @@ class Languages {
 	 * @return array
 	 */
 	public function get_possible_source_languages(): array {
-		return apply_filters(
-			'easy_language_possible_source_languages',
-			array(
-				'de_DE'          => array(
-					'label'   => __( 'German', 'easy-language' ),
-					'enabled' => true,
-					'icon'    => 'de_icon_url',
-				),
-				'de_DE_formal'   => array(
-					'label'   => __( 'German (formal)', 'easy-language' ),
-					'enabled' => true,
-					'icon'    => 'de_icon_url',
-				),
-				'de_AT'          => array(
-					'label'   => __( 'German (Austria)', 'easy-language' ),
-					'enabled' => true,
-					'icon'    => 'at_icon_url',
-				),
-				'de_CH'          => array(
-					'label'   => __( 'German (Suisse)', 'easy-language' ),
-					'enabled' => true,
-					'icon'    => 'ch_icon_url',
-				),
-				'de_CH_informal' => array(
-					'label'   => __( 'German (Suisse, informal)', 'easy-language' ),
-					'enabled' => true,
-					'icon'    => 'ch_icon_url',
-				),
-			)
+		$source_languages = array(
+			'de_DE'          => array(
+				'label'   => __( 'German', 'easy-language' ),
+				'enabled' => true,
+				'icon'    => 'de_icon_url',
+			),
+			'de_DE_formal'   => array(
+				'label'   => __( 'German (formal)', 'easy-language' ),
+				'enabled' => true,
+				'icon'    => 'de_icon_url',
+			),
+			'de_AT'          => array(
+				'label'   => __( 'German (Austria)', 'easy-language' ),
+				'enabled' => true,
+				'icon'    => 'at_icon_url',
+			),
+			'de_CH'          => array(
+				'label'   => __( 'German (Suisse)', 'easy-language' ),
+				'enabled' => true,
+				'icon'    => 'ch_icon_url',
+			),
+			'de_CH_informal' => array(
+				'label'   => __( 'German (Suisse, informal)', 'easy-language' ),
+				'enabled' => true,
+				'icon'    => 'ch_icon_url',
+			),
 		);
+
+		/**
+		 * Filter general source languages.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $source_languages List of source languages.
+		 */
+		return apply_filters( 'easy_language_possible_source_languages', $source_languages );
 	}
 
 	/**
@@ -125,28 +131,34 @@ class Languages {
 	 * @return array
 	 */
 	public function get_possible_target_languages(): array {
-		return apply_filters(
-			'easy_language_supported_target_languages',
-			array(
-				'de_EL' => array(
-					'label'       => __( 'Einfache Sprache', 'easy-language' ),
-					'enabled'     => true,
-					'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
-					'url'         => 'de_el',
-					'icon'        => 'icon-de-el',
-					'img'         => 'de_EL.png',
-					'img_icon'    => Helper::get_icon_img_for_language_code( 'de_EL' ),
-				),
-				'de_LS' => array(
-					'label'       => __( 'Leichte Sprache', 'easy-language' ),
-					'enabled'     => true,
-					'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
-					'url'         => 'de_ls',
-					'icon'        => 'icon-de-ls',
-					'img'         => 'de_LS.png',
-					'img_icon'    => Helper::get_icon_img_for_language_code( 'de_LS' ),
-				),
-			)
+		$target_languages = array(
+			'de_EL' => array(
+				'label'       => __( 'Einfache Sprache', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+				'url'         => 'de_el',
+				'icon'        => 'icon-de-el',
+				'img'         => 'de_EL.png',
+				'img_icon'    => Helper::get_icon_img_for_language_code( 'de_EL' ),
+			),
+			'de_LS' => array(
+				'label'       => __( 'Leichte Sprache', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+				'url'         => 'de_ls',
+				'icon'        => 'icon-de-ls',
+				'img'         => 'de_LS.png',
+				'img_icon'    => Helper::get_icon_img_for_language_code( 'de_LS' ),
+			),
 		);
+
+		/**
+		 * Filter general target languages.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $target_languages List of target languages.
+		 */
+		return apply_filters( 'easy_language_supported_target_languages', $target_languages );
 	}
 }

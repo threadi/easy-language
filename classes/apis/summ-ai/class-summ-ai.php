@@ -155,6 +155,16 @@ class Summ_AI extends Base implements Api_Base {
 		// get quota.
 		$quota = $this->get_quota();
 
+		$min_percent = 0.8;
+		/**
+		 * Hook for minimal quota percent.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param float $min_percent Minimal percent for quota warning.
+		 */
+		$min_percent = apply_filters( 'easy_language_quota_percent', $min_percent );
+
 		/* translators: %1$s will be replaced by the URL for SUMM AI-product-info */
 		$text = sprintf( __( '<p>Create any complicated text barrier-free and understandable with the <a href="%1$s" target="_blank"><strong>SUMM AI</strong> (opens new window)</a> AI-based tool.<br>Create simple and easy-to-understand texts on your website.</p><p>This API simplifies texts according to the official rules of the <i>Leichte Sprache e.V.</i>.<br>This specifies how texts must be written in easy language.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 		if( $this->is_free_mode() ) {
@@ -163,7 +173,7 @@ class Summ_AI extends Base implements Api_Base {
 				/* translators: %1$s will be replaced by the URL where the SUMM AI API key could be requested */
 				$text .= sprintf(__( '<p><strong>You have completely depleted the free quota available with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%2$s">here</a> to get more.</p>', 'easy-language' ), esc_url($this->get_settings_url()) );
 			}
-			elseif( $percent > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
+			elseif( $percent > $min_percent ) {
 				/* translators: %1$s will be replaced by the URL where the SUMM AI API key could be requested */
 				$text .= sprintf(__( '<p><strong>You have almost used up your free quota available with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%2$s">here</a> to get more.</p>', 'easy-language' ), esc_url($this->get_settings_url()) );
 			}
@@ -202,50 +212,57 @@ class Summ_AI extends Base implements Api_Base {
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_source_languages(): array {
-		return apply_filters( 'easy_language_summ_ai_source_languages',
-			array(
-				'de_DE'          => array(
-					'label'       => __( 'German', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Informal german spoken in Germany.', 'easy-language' ),
-					'icon'        => 'icon-de-de',
-					'img'         => 'de_de.png',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
-				),
-				'de_DE_formal'   => array(
-					'label'       => __( 'German (Formal)', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Formal german spoken in Germany.', 'easy-language' ),
-					'icon'        => 'icon-de-de',
-					'img'         => 'de_de.png',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_DE_formal' ) : '',
-				),
-				'de_CH'          => array(
-					'label'       => __( 'Suisse german', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Formal german spoken in Suisse.', 'easy-language' ),
-					'icon'        => 'icon-de-ch',
-					'img'         => 'de_ch.png',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_CH' ) : '',
-				),
-				'de_CH_informal' => array(
-					'label'       => __( 'Suisse german (Informal)', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Informal german spoken in Suisse.', 'easy-language' ),
-					'icon'        => 'icon-de-ch',
-					'img'         => 'de_ch.png',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_CH_informal' ) : '',
-				),
-				'de_AT'          => array(
-					'label'       => __( 'Austria German', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'German spoken in Austria.', 'easy-language' ),
-					'icon'        => 'icon-de-at',
-					'img'         => 'de_at.png',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_AT' ) : '',
-				),
-			)
+		$source_languages = array(
+			'de_DE'          => array(
+				'label'       => __( 'German', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in Germany.', 'easy-language' ),
+				'icon'        => 'icon-de-de',
+				'img'         => 'de_de.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
+			),
+			'de_DE_formal'   => array(
+				'label'       => __( 'German (Formal)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Formal german spoken in Germany.', 'easy-language' ),
+				'icon'        => 'icon-de-de',
+				'img'         => 'de_de.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_DE_formal' ) : '',
+			),
+			'de_CH'          => array(
+				'label'       => __( 'Suisse german', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Formal german spoken in Suisse.', 'easy-language' ),
+				'icon'        => 'icon-de-ch',
+				'img'         => 'de_ch.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_CH' ) : '',
+			),
+			'de_CH_informal' => array(
+				'label'       => __( 'Suisse german (Informal)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in Suisse.', 'easy-language' ),
+				'icon'        => 'icon-de-ch',
+				'img'         => 'de_ch.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_CH_informal' ) : '',
+			),
+			'de_AT'          => array(
+				'label'       => __( 'Austria German', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'German spoken in Austria.', 'easy-language' ),
+				'icon'        => 'icon-de-at',
+				'img'         => 'de_at.png',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_AT' ) : '',
+			),
 		);
+
+		/**
+		 * Filter SUMM AI source languages.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $source_languages List of source languages.
+		 */
+		return apply_filters( 'easy_language_summ_ai_source_languages', $source_languages );
 	}
 
 	/**
@@ -255,30 +272,37 @@ class Summ_AI extends Base implements Api_Base {
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_target_languages(): array {
-		return apply_filters( 'easy_language_summ_ai_target_languages',
-			array(
-				'de_EL' => array(
-					'label'       => __( 'Einfache Sprache', 'easy-language' ),
-					'enabled'     => true,
-					'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
-					'url'         => 'de_el',
-					'api_value'   => 'plain',
-					'icon'        => 'icon-de-el',
-					'img'         => 'de_EL.svg',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
-				),
-				'de_LS' => array(
-					'label'       => __( 'Leichte Sprache', 'easy-language' ),
-					'enabled'     => true,
-					'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
-					'url'         => 'de_ls',
-					'api_value'   => 'easy',
-					'icon'        => 'icon-de-ls',
-					'img'         => 'de_LS.svg',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
-				),
-			)
+		$target_languages = array(
+			'de_EL' => array(
+				'label'       => __( 'Einfache Sprache', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+				'url'         => 'de_el',
+				'api_value'   => 'plain',
+				'icon'        => 'icon-de-el',
+				'img'         => 'de_EL.svg',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
+			),
+			'de_LS' => array(
+				'label'       => __( 'Leichte Sprache', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+				'url'         => 'de_ls',
+				'api_value'   => 'easy',
+				'icon'        => 'icon-de-ls',
+				'img'         => 'de_LS.svg',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
+			),
 		);
+
+		/**
+		 * Filter SUMM AI target languages.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $target_languages List of target languages.
+		 */
+		return apply_filters( 'easy_language_summ_ai_target_languages', $target_languages );
 	}
 
 	/**
@@ -289,15 +313,22 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return array
 	 */
 	public function get_mapping_languages(): array {
-		return apply_filters( 'easy_language_summ_ai_mapping_languages',
-			array(
-				'de_DE' => array( 'de_LS', 'de_EL' ),
-				'de_DE_formal' => array( 'de_LS', 'de_EL' ),
-				'de_CH' => array( 'de_LS', 'de_EL' ),
-				'de_CH_informal' => array( 'de_LS', 'de_EL' ),
-				'de_AT' => array( 'de_LS', 'de_EL' ),
-			)
+		$languages_mapping = array(
+			'de_DE' => array( 'de_LS', 'de_EL' ),
+			'de_DE_formal' => array( 'de_LS', 'de_EL' ),
+			'de_CH' => array( 'de_LS', 'de_EL' ),
+			'de_CH_informal' => array( 'de_LS', 'de_EL' ),
+			'de_AT' => array( 'de_LS', 'de_EL' ),
 		);
+
+		/**
+		 * Filter SUMM AI mappings of languages.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $languages_mapping List of mappings.
+		 */
+		return apply_filters( 'easy_language_summ_ai_mapping_languages', $languages_mapping );
 	}
 
 	/**
@@ -667,7 +698,7 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function add_settings(): void {
 		/**
-		 * SUMM AI Section
+		 * SUMM AI Section.
 		 */
 		add_settings_section(
 			'settings_section_summ_ai',
@@ -1005,6 +1036,16 @@ class Summ_AI extends Base implements Api_Base {
 		if( !empty($quota) ) {
 			update_option( 'easy_language_summ_ai_paid_quota', $quota );
 
+			$min_percent = 0.8;
+			/**
+			 * Hook for minimal quota percent.
+			 *
+			 * @since 2.0.0 Available since 2.0.0.
+			 *
+			 * @param float $min_percent Minimal percent for quota warning.
+			 */
+			$min_percent = apply_filters( 'easy_language_quota_percent', $min_percent );
+
 			// show hint of 80% of limit is used.
 			$percent = absint($quota['character_spent']) / absint($quota['character_limit']);
 			if( 1 === $percent ) {
@@ -1017,7 +1058,7 @@ class Summ_AI extends Base implements Api_Base {
 				$transient_obj->set_type( 'error' );
 				$transient_obj->save();
 			}
-			elseif( $percent > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
+			elseif( $percent > $min_percent ) {
 				// get the transients-object to add the new one.
 				$transient_obj  = $transients_obj->add();
 				$transient_obj->set_dismissible_days( 2 );

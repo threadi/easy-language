@@ -25,11 +25,11 @@ class Log_Api_Table extends WP_List_Table {
 	 */
 	public function get_columns(): array {
 		return array(
-			'state'    => __( 'state', 'easy-language' ),
-			'date'     => __( 'date', 'easy-language' ),
+			'state'    => __( 'State', 'easy-language' ),
+			'date'     => __( 'Date', 'easy-language' ),
 			'api'      => __( 'API', 'easy-language' ),
-			'request'  => __( 'request', 'easy-language' ),
-			'response' => __( 'response', 'easy-language' ),
+			'request'  => __( 'Request', 'easy-language' ),
+			'response' => __( 'Response', 'easy-language' ),
 		);
 	}
 

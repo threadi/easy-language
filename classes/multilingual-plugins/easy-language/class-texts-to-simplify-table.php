@@ -36,11 +36,11 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	public function get_columns(): array {
 		return array(
 			'options'         => '',
-			'date'            => __( 'date', 'easy-language' ),
-			'used_in'         => __( 'used in', 'easy-language' ),
-			'source_language' => __( 'source language', 'easy-language' ),
-			'target_language' => __( 'target language', 'easy-language' ),
-			'original'        => __( 'original', 'easy-language' ),
+			'date'            => __( 'Date', 'easy-language' ),
+			'used_in'         => __( 'Used in', 'easy-language' ),
+			'source_language' => __( 'Source language', 'easy-language' ),
+			'target_language' => __( 'Target language', 'easy-language' ),
+			'original'        => __( 'Original', 'easy-language' ),
 		);
 	}
 
@@ -113,7 +113,14 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 		// get languages-object.
 		$languages_obj = Languages::get_instance();
 
-		// filter column name.
+		/**
+		 * Filter the column name.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param string $column_name The column name.
+		 * @param Text $item The item object.
+		 */
 		$column_name = apply_filters( 'easy_language_simplification_table_to_simplify', $column_name, $item );
 
 		// bail if column-name is not set.
@@ -159,8 +166,17 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 					'<a href="' . esc_url( $delete_link ) . '" class="dashicons dashicons-trash wp-easy-dialog" data-dialog="' . esc_attr( wp_json_encode( $dialog_simplification ) ) . '" title="' . __( 'Delete this text.', 'easy-language' ) . '">&nbsp;</a>',
 				);
 
-				// get additional options.
-				$options = apply_filters( 'easy_language_simplification_to_simplify_table_options', $options, $item->get_id() );
+				$item_id = $item->get_id();
+
+				/**
+				 * Filter additional options.
+				 *
+				 * @since 2.0.0 Available since 2.0.0.
+				 *
+				 * @param array $options List of options.
+				 * @param int $item_id The ID of the object.
+				 */
+				$options = apply_filters( 'easy_language_simplification_to_simplify_table_options', $options, $item_id );
 
 				// return html-output.
 				return implode( '', $options );

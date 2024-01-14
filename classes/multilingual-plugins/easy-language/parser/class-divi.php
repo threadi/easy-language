@@ -64,30 +64,44 @@ class Divi extends Parser_Base implements Parser {
 	 * @return array
 	 */
 	private function get_flow_text_shortcodes(): array {
-		return apply_filters(
-			'easy_language_divi_text_widgets',
-			array(
-				'et_pb_text'   => array(),
-				'et_pb_button' => array(
-					'button_text',
-				),
-				'et_pb_blurb'  => array(),
-			)
+		$shortcodes = array(
+			'et_pb_text'   => array(),
+			'et_pb_button' => array(
+				'button_text',
+			),
+			'et_pb_blurb'  => array(),
 		);
+
+		/**
+		 * Filter the possible Divi shortcodes.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $shortcodes List of shortcodes.
+		 */
+		return apply_filters( 'easy_language_divi_text_widgets', $shortcodes );
 	}
 
 	/**
 	 * Return whether a given widget used HTML or not for its texts.
 	 *
-	 * @param string $widget_name
+	 * @param string $widget_name The requested widget.
 	 *
 	 * @return bool
 	 */
 	private function is_flow_text_widget_html( string $widget_name ): bool {
-		// list of widget which use html-code.
-		$html_widgets = apply_filters( 'easy_language_divi_html_widgets', array(
+		$html_support_widgets = array(
 			'et_pb_text' => true
-		));
+		);
+
+		/**
+		 * Filter the possible Divi widgets with HTML-support.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $html_support_widgets List of widgets with HTML-support.
+		 */
+		$html_widgets = apply_filters( 'easy_language_divi_html_widgets', $html_support_widgets );
 
 		return isset($html_widgets[$widget_name]);
 	}

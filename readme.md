@@ -76,3 +76,7 @@ Hint: will be called by ant-command mentioned above.
 ### Repair
 
 `vendor/bin/phpcbf --standard=WordPress file`
+
+## Generate documentation
+
+`vendor/bin/wp-documentor parse classes --format=markdown --output=doc/hooks.md --prefix=easy_language`

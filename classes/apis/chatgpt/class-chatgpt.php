@@ -163,40 +163,47 @@ class ChatGpt extends Base implements Api_Base {
 	 * @return array
 	 */
 	public function get_supported_source_languages(): array {
-		return apply_filters( 'easy_language_chatgpt_source_languages',
-			array(
-				'de_DE' => array(
-					'label'       => __( 'German', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Informal german spoken in germany.', 'easy-language' ),
-					'api_value'   => 'de',
-				),
-				'de_DE_formal' => array(
-					'label'       => __( 'German (Formal)', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Formal german spoken in germany.', 'easy-language' ),
-					'api_value'   => 'de',
-				),
-				'de_CH' => array(
-					'label'       => __( 'German (CH)', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
-					'api_value'   => 'de',
-				),
-				'de_CH_informal' => array(
-					'label'       => __( 'German (CH, informal)', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
-					'api_value'   => 'de',
-				),
-				'de_AT' => array(
-					'label'       => __( 'German (AT)', 'easy-language' ),
-					'enable'      => true,
-					'description' => __( 'Informal german spoken in austria.', 'easy-language' ),
-					'api_value'   => 'de',
-				),
-			)
+		$list_of_languages = array(
+			'de_DE' => array(
+				'label'       => __( 'German', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in germany.', 'easy-language' ),
+				'api_value'   => 'de',
+			),
+			'de_DE_formal' => array(
+				'label'       => __( 'German (Formal)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Formal german spoken in germany.', 'easy-language' ),
+				'api_value'   => 'de',
+			),
+			'de_CH' => array(
+				'label'       => __( 'German (CH)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
+				'api_value'   => 'de',
+			),
+			'de_CH_informal' => array(
+				'label'       => __( 'German (CH, informal)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in suisse.', 'easy-language' ),
+				'api_value'   => 'de',
+			),
+			'de_AT' => array(
+				'label'       => __( 'German (AT)', 'easy-language' ),
+				'enable'      => true,
+				'description' => __( 'Informal german spoken in austria.', 'easy-language' ),
+				'api_value'   => 'de',
+			),
 		);
+
+		/**
+		 * Filter ChatGpt source languages.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $list_of_languages List of source languages.
+		 */
+		return apply_filters( 'easy_language_chatgpt_source_languages', $list_of_languages );
 	}
 
 	/**
@@ -206,30 +213,37 @@ class ChatGpt extends Base implements Api_Base {
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_target_languages(): array {
-		return apply_filters( 'easy_language_chatgpt_target_languages',#
-			array(
-				'de_EL' => array(
-					'label'       => __( 'Einfache Sprache', 'easy-language' ),
-					'enabled'     => true,
-					'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
-					'url'         => 'de_el',
-					'api_value'   => 'plain',
-					'icon'        => 'icon-de-el',
-					'img'         => 'de_EL.svg',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
-				),
-				'de_LS' => array(
-					'label'       => __( 'Leichte Sprache', 'easy-language' ),
-					'enabled'     => true,
-					'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
-					'url'         => 'de_ls',
-					'api_value'   => 'easy',
-					'icon'        => 'icon-de-ls',
-					'img'         => 'de_LS.svg',
-					'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
-				),
-			)
+		$target_languages = array(
+			'de_EL' => array(
+				'label'       => __( 'Einfache Sprache', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+				'url'         => 'de_el',
+				'api_value'   => 'plain',
+				'icon'        => 'icon-de-el',
+				'img'         => 'de_EL.svg',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
+			),
+			'de_LS' => array(
+				'label'       => __( 'Leichte Sprache', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+				'url'         => 'de_ls',
+				'api_value'   => 'easy',
+				'icon'        => 'icon-de-ls',
+				'img'         => 'de_LS.svg',
+				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
+			),
 		);
+
+		/**
+		 * Filter ChatGpt target languages.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $target_languages List of target languages.
+		 */
+		return apply_filters( 'easy_language_chatgpt_target_languages', $target_languages );
 	}
 
 	/**
@@ -265,15 +279,22 @@ class ChatGpt extends Base implements Api_Base {
 	 * @return array
 	 */
 	public function get_mapping_languages(): array {
-		return apply_filters( 'easy_language_chatgpt_mapping_languages',
-			array(
-				'de_DE' => array( 'de_LS', 'de_EL' ),
-				'de_DE_formal' => array( 'de_LS', 'de_EL' ),
-				'de_CH' => array( 'de_LS', 'de_EL' ),
-				'de_CH_informal' => array( 'de_LS', 'de_EL' ),
-				'de_AT' => array( 'de_LS', 'de_EL' ),
-			)
+		$language_mappings = array(
+			'de_DE' => array( 'de_LS', 'de_EL' ),
+			'de_DE_formal' => array( 'de_LS', 'de_EL' ),
+			'de_CH' => array( 'de_LS', 'de_EL' ),
+			'de_CH_informal' => array( 'de_LS', 'de_EL' ),
+			'de_AT' => array( 'de_LS', 'de_EL' ),
 		);
+
+		/**
+		 * Filter ChatGpt language mappings.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $language_mappings List of mappings.
+		 */
+		return apply_filters( 'easy_language_chatgpt_mapping_languages', $language_mappings );
 	}
 
 	/**
@@ -404,6 +425,21 @@ class ChatGpt extends Base implements Api_Base {
 		);
 		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_api_key', array( 'sanitize_callback' => array( $this, 'validate_api_key' ) ) );
 
+		// Define list of models this plugin supports atm.
+		$models = array(
+			'gpt-4'         => 'gpt-4',
+			'gpt-3.5-turbo' => 'gpt-3.5-turbo',
+		);
+
+		/**
+		 * Filter the available ChatGpt-models.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $models List of ChatGpt models.
+		 */
+		$models = apply_filters( 'easy_language_chatgpt_models', $models );
+
 		// Choose language model.
 		add_settings_field(
 			'easy_language_chatgpt_model',
@@ -414,13 +450,7 @@ class ChatGpt extends Base implements Api_Base {
 			array(
 				'label_for'     => 'easy_language_chatgpt_model',
 				'fieldId'       => 'easy_language_chatgpt_model',
-				'values'        => apply_filters(
-					'easy_language_chatgpt_models',
-					array(
-						'gpt-4'         => 'gpt-4',
-						'gpt-3.5-turbo' => 'gpt-3.5-turbo',
-					)
-				),
+				'values'        => $models,
 				'disable_empty' => true,
 				'readonly'      => ! $this->is_chatgpt_token_set(),
 				'description'   => __( 'The choice of language model determines the quality of the texts generated by ChatGpt.', 'easy-language' ),
@@ -488,6 +518,14 @@ class ChatGpt extends Base implements Api_Base {
 			$intervals[ $name ] = $schedule['display'];
 		}
 
+		/**
+		 * Hook for ChatGpt automatic interval settings.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $intervals The possible intervals.
+		 * @param bool $foreign_translation_plugin_with_api_support Whether we support third-party-plugins.
+		 */
 		do_action( 'easy_language_chatgpt_automatic_interval', $intervals, $foreign_translation_plugin_with_api_support );
 	}
 

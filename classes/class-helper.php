@@ -471,7 +471,18 @@ class Helper {
 	 * @return object|false
 	 */
 	public static function get_object( int $object_id, string $object_type = '' ): object|false {
-		return apply_filters( 'easy_language_get_object', false, $object_id, $object_type );
+		$false = false;
+
+		/**
+		 * Filter the object.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param bool $false Return false as default.
+		 * @param int $object_id The ID of the object.
+		 * @param string $object_type The type of the object.
+		 */
+		return apply_filters( 'easy_language_get_object', $false, $object_id, $object_type );
 	}
 
 	/**

@@ -55,7 +55,16 @@ class Apis {
 	 * @return array
 	 */
 	public function get_available_apis(): array {
-		return apply_filters( 'easy_language_register_api', array() );
+		$apis = array();
+
+		/**
+		 * Filter the list of APIs.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $apis List of APIs
+		 */
+		return apply_filters( 'easy_language_register_api', $apis );
 	}
 
 	/**

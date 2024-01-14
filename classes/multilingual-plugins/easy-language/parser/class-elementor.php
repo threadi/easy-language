@@ -66,44 +66,58 @@ class Elementor extends Parser_Base implements Parser {
 	 * @return array
 	 */
 	private function get_flow_text_widgets(): array {
-		return apply_filters(
-			'easy_language_elementor_text_widgets',
-			array(
-				'text-editor'          => array(
-					'editor',
+		$widgets = array(
+			'text-editor'          => array(
+				'editor',
+			),
+			'heading'              => array(
+				'title',
+			),
+			'testimonial-carousel' => array(
+				'slides' => array(
+					'content',
 				),
-				'heading'              => array(
-					'title',
-				),
-				'testimonial-carousel' => array(
-					'slides' => array(
-						'content',
-					),
-				),
-				'icon-list'            => array(
-					'icon_list' => array(
-						'text',
-					),
-				),
-				'button'               => array(
+			),
+			'icon-list'            => array(
+				'icon_list' => array(
 					'text',
 				),
-			)
+			),
+			'button'               => array(
+				'text',
+			),
 		);
+
+		/**
+		 * Filter the possible Elementor widgets.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $widgets List of widgets.
+		 */
+		return apply_filters( 'easy_language_elementor_text_widgets', $widgets );
 	}
 
 	/**
 	 * Return whether a given widget used HTML or not for its texts.
 	 *
-	 * @param string $widget_name
+	 * @param string $widget_name The requested widget.
 	 *
 	 * @return bool
 	 */
 	private function is_flow_text_widget_html( string $widget_name ): bool {
-		// list of widget which use html-code.
-		$html_widgets = apply_filters( 'easy_language_elementor_html_widgets', array(
+		$html_support_widgets = array(
 			'text-editor' => true
-		));
+		);
+
+		/**
+		 * Filter the possible Elementor widgets with HTML-support.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $html_support_widgets List of widgets with HTML-support.
+		 */
+		$html_widgets = apply_filters( 'easy_language_elementor_html_widgets', $html_support_widgets );
 
 		return isset($html_widgets[$widget_name]);
 	}

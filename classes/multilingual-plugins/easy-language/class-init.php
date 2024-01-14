@@ -424,7 +424,15 @@ class Init extends Base implements Multilingual_Plugins_Base {
 							),
 						);
 
-						// change the dialog via hook.
+						/**
+						 * Filter the dialog.
+						 *
+						 * @since 2.0.0 Available since 2.0.0.
+						 *
+						 * @param array $dialog The dialog configuration.
+						 * @param Api_Base $api_obj The used API as object.
+						 * @param Post_Object $post_object The Post as object.
+						 */
 						$dialog = apply_filters( 'easy_language_first_simplify_dialog', $dialog, $api_obj, $post_object );
 
 						// show link to add simplification for this language.
@@ -1018,6 +1026,15 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			}
 		}
 
+		/**
+		 * Filter possible post types.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array $post_types The list of possible post types.
+		 */
+		$options = apply_filters( 'easy_language_possible_post_types', $post_types );
+
 		// Choose supported post-types.
 		add_settings_field(
 			'easy_language_post_types',
@@ -1028,7 +1045,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			array(
 				'label_for' => 'easy_language_post_types',
 				'fieldId'   => 'easy_language_post_types',
-				'options'   => apply_filters( 'easy_language_possible_post_types', $post_types ),
+				'options'   => $options
 			)
 		);
 		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_post_types', array( 'sanitize_callback' => array( $this, 'validate_post_types' ) ) );
@@ -1355,7 +1372,15 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					),
 				);
 
-				// change the dialog via hook.
+				/**
+				 * Filter the dialog.
+				 *
+				 * @since 2.0.0 Available since 2.0.0.
+				 *
+				 * @param array $dialog The dialog configuration.
+				 * @param Api_Base $api_obj The used API as object.
+				 * @param Post_Object $post_object The Post as object.
+				 */
 				$dialog = apply_filters( 'easy_language_first_simplify_dialog', $dialog, $api_obj, $post_object );
 
 				// show link to add simplification for this language.
@@ -1377,15 +1402,22 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		if ( is_null( $wp_object ) ) {
 			return false;
 		}
-		return apply_filters(
-			'easy_language_get_object_by_wp_object',
-			match ( get_class( $wp_object ) ) {
-				'WP_Post' => new Post_Object( $id ),
-				default => false,
-			},
-			$wp_object,
-			$id
-		);
+
+		$object = match ( get_class( $wp_object ) ) {
+			'WP_Post' => new Post_Object( $id ),
+			default => false,
+		};
+
+		/**
+		 * Filter the resulting easy language object.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param object $object The easy language object to filter (e.g. WP_Post).
+		 * @param object $wp_object The original WP object.
+		 * @param int $id The ID of the object.
+		 */
+		return apply_filters( 'easy_language_get_object_by_wp_object', $object, $wp_object, $id );
 	}
 
 	/**
@@ -1793,6 +1825,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			)
 		);
 
+		if ( function_exists( 'wp_set_script_translations' ) ) {
+			wp_set_script_translations(
+				'easy-language-simplifications',
+				'easy-language',
+				plugin_dir_path( EASY_LANGUAGE ) . '/languages/'
+			);
+		}
+
 		// add jquery-dirty script.
 		wp_enqueue_script(
 			'easy-language-admin-dirty-js',
@@ -1833,6 +1873,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'intro_step_2'        => sprintf( __( '<p><img src="%1$s" alt="Easy Language Logo"><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
 			)
 		);
+
+		if ( function_exists( 'wp_set_script_translations' ) ) {
+			wp_set_script_translations(
+				'easy-language-plugin-admin',
+				'easy-language',
+				plugin_dir_path( EASY_LANGUAGE ) . '/languages/'
+			);
+		}
 
 		// embed the wp-easy-dialog-component.
 		$script_asset_path = Helper::get_plugin_path() . 'vendor/threadi/wp-easy-dialog/build/index.asset.php';
@@ -1895,7 +1943,18 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		if ( ! empty( $quota_array['character_limit'] ) && $quota_array['character_limit'] > 0 ) {
 			$quota_percent = absint( $quota_array['character_spent'] ) / absint( $quota_array['character_limit'] );
 		}
-		if ( $quota_percent > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
+
+		$min_percent = 0.8;
+		/**
+		 * Hook for minimal quota percent.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param float $min_percent Minimal percent for quota warning.
+		 */
+		$min_percent = apply_filters( 'easy_language_quota_percent', $min_percent );
+
+		if ( $quota_percent > $min_percent ) {
 			/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
 			echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), round( (float) $quota_percent * 100 ) ) ) . '"></span>';
 		}

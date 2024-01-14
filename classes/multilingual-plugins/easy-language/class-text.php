@@ -299,6 +299,16 @@ class Text {
 					wp_update_post( $array );
 					break;
 				default:
+					/**
+					 * Hook for alternatives to replace texts with its simplified forms.
+					 *
+					 * @since 2.0.0 Available since 2.0.0.
+					 *
+					 * @param Text $this The text icon object.
+					 * @param string $target_language The target language.
+					 * @param int $object_id The ID of the object.
+					 * @param array $simplification_objects List of simplification objects.
+					 */
 					do_action( 'easy_language_replace_texts', $this, $target_language, $object_id, $simplification_objects );
 			}
 		}

@@ -260,12 +260,23 @@ class Parser_Base {
 					?>
 					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary wp-easy-dialog elementor-button" data-dialog="<?php echo esc_attr( wp_json_encode( $dialog_config ) ); ?>" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( $title ); ?>">
 						<?php
+							$min_percent = 0.8;
+							/**
+							 * Hook for minimal quota percent.
+							 *
+							 * @since 2.0.0 Available since 2.0.0.
+							 *
+							 * @param float $min_percent Minimal percent for quota warning.
+							 */
+							$min_percent = apply_filters( 'easy_language_quota_percent', $min_percent );
+
 							/* translators: %1$s will be replaced by the API-title */
 							printf( esc_html__( 'Simplify with %1$s.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
-						if ( $quota_state['quota_percent'] > apply_filters( 'easy_language_quota_percent', 0.8 ) ) {
-							/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
-							echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';
-						}
+
+							if ( $quota_state['quota_percent'] > $min_percent ) {
+								/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
+								echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';
+							}
 						?>
 						</a>
 					</p>
