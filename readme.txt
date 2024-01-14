@@ -6,7 +6,7 @@ Tested up to: 6.4.2
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 2.0.3
+Stable tag: 2.0.4
 
 == Description ==
 
@@ -117,3 +117,6 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Optimized same text-descriptions
 * Fixed missing translation output
 * Fixed wrong defined WP Bakery hook for HTML-widgets
+
+= 2.0.4 =
+* Fixed autoloader-generation
