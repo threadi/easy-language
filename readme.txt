@@ -2,7 +2,7 @@
 Contributors: laolaweb, threadi
 Tags: easy language, leichte sprache, simplify, summ ai, capito
 Requires at least: 6.0
-Tested up to: 6.4.2
+Tested up to: 6.5
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -28,7 +28,7 @@ If you want to use [SUMM AI](https://summ-ai.com), [capito](https://www.capito.e
 
 #### Highlights ####
 
-The [SUMM AI](https://summ-ai.com) API is usable to simplify up to 9000 characters FOR FREE without personal API-Key.
+With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is possible to simplify up to 9000 characters FREE OF CHARGE. An API key is required for Capito.
 
 #### Features ####
 
@@ -120,3 +120,6 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 
 = 2.0.4 =
 * Fixed autoloader-generation
+
+= 2.0.5 =
+* Compatibility with WordPress 6.5
