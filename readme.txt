@@ -6,7 +6,7 @@ Tested up to: 6.5
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 
 == Description ==
 
@@ -123,3 +123,4 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 
 = 2.0.5 =
 * Compatibility with WordPress 6.5
+* Updated dependencies for Gutenberg-scripts

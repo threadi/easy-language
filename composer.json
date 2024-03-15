@@ -34,7 +34,7 @@
 		"threadi/react-dialog": "dev-master"
 	},
 	"require-dev": {
-		"wp-coding-standards/wpcs": "^3.0.0",
+		"wp-coding-standards/wpcs": "^3.0.1",
 		"pronamic/wp-documentor": "^1.3"
 	}
 }
