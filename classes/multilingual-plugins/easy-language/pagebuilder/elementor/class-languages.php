@@ -69,7 +69,7 @@ class Languages extends Base_Data_Control {
 	 * @return void
 	 */
 	public function content_template(): void {
-		$post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+		$post_id = absint( filter_input( INPUT_GET, 'post', FILTER_SANITIZE_NUMBER_INT ) );
 
 		if ( $post_id > 0 ) {
 			// get the ID of the original post.

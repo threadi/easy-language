@@ -488,7 +488,7 @@ class Helper {
 	/**
 	 * Get language of given object depending on third-party-plugins.
 	 *
-	 * @param int $object_id The ID of the object.
+	 * @param int    $object_id The ID of the object.
 	 * @param string $object_type The type of object.
 	 *
 	 * @return string
@@ -502,7 +502,7 @@ class Helper {
 		 */
 		if ( self::is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' ) ) {
 			$language_details = apply_filters( 'wpml_post_language_details', null, $object->get_id() );
-			if( !empty($language_details) ) {
+			if ( ! empty( $language_details ) ) {
 				return $language_details['locale'];
 			}
 		}
@@ -517,7 +517,7 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_wp_settings_url(): string {
-		return admin_url().'options-general.php';
+		return admin_url() . 'options-general.php';
 	}
 
 	/**
@@ -532,26 +532,26 @@ class Helper {
 		$transients_obj = Transients::get_instance();
 
 		// get the actual language in WordPress.
-		$language = Helper::get_wp_lang();
+		$language = self::get_wp_lang();
 
 		// if actual language is not supported as possible source language, show hint.
 		$source_languages = $api->get_supported_source_languages();
-		if( empty($source_languages[$language]) ) {
+		if ( empty( $source_languages[ $language ] ) ) {
 			// create list of languages this API supports as HTML-list.
 			$language_list = '<ul>';
-			foreach( $source_languages as $settings ) {
-				$language_list .= '<li>'.esc_html($settings['label']).'</li>';
+			foreach ( $source_languages as $settings ) {
+				$language_list .= '<li>' . esc_html( $settings['label'] ) . '</li>';
 			}
 			$language_list .= '</ul>';
 
 			// get language-name.
 			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
-			$translations = wp_get_available_translations();
+			$translations  = wp_get_available_translations();
 			$language_name = $language;
-			if( !empty($translations[$language]) ) {
-				$language_name = $translations[$language]['native_name'];
+			if ( ! empty( $translations[ $language ] ) ) {
+				$language_name = $translations[ $language ]['native_name'];
 			}
-			if( 'en_US' === $language_name ) {
+			if ( 'en_US' === $language_name ) {
 				$language_name = 'English (United States)';
 			}
 
@@ -560,7 +560,7 @@ class Helper {
 			$transient_obj->set_dismissible_days( 2 );
 			$transient_obj->set_name( 'easy_language_source_language_not_supported' );
 			/* translators: %1$s will be replaced by name of the actual language, %2$s will be replaced by the API-title, %3$s will be replaced by the URL for WordPress-settings, %5$s will be replaced by a list of languages, %6$s will be replaced by the URL for the API-settings. */
-			$transient_obj->set_message( sprintf( __( '<strong>The language of your website (%1$s) is not supported as source language for simplifications via %2$s!</strong><br>You will not be able to use %3$s.<br>You will not be able to simplify any texts.<br>You have to <a href="%4$s">switch the language</a> in WordPress to one of the following supported source languages: %5$s Or <a href="%6$s">choose another API</a> which supports the language.', 'easy-language' ), esc_html($language_name), esc_html( $api->get_title() ), esc_html( $api->get_title() ), esc_url( Helper::get_wp_settings_url() ), wp_kses_post( $language_list ), esc_url( Helper::get_settings_page_url() ) ) );
+			$transient_obj->set_message( sprintf( __( '<strong>The language of your website (%1$s) is not supported as source language for simplifications via %2$s!</strong><br>You will not be able to use %3$s.<br>You will not be able to simplify any texts.<br>You have to <a href="%4$s">switch the language</a> in WordPress to one of the following supported source languages: %5$s Or <a href="%6$s">choose another API</a> which supports the language.', 'easy-language' ), esc_html( $language_name ), esc_html( $api->get_title() ), esc_html( $api->get_title() ), esc_url( self::get_wp_settings_url() ), wp_kses_post( $language_list ), esc_url( self::get_settings_page_url() ) ) );
 			$transient_obj->set_type( 'error' );
 			$transient_obj->save();
 
@@ -569,8 +569,7 @@ class Helper {
 
 			// remove intro.
 			delete_option( 'easy_language_intro_step_2' );
-		}
-		else {
+		} else {
 			$transients_obj->get_transient_by_name( 'easy_language_source_language_not_supported' )->delete();
 		}
 	}

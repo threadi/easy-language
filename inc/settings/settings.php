@@ -37,7 +37,10 @@ function easy_language_admin_add_settings_content(): void {
 	}
 
 	// get the active tab from the $_GET param.
-	$tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'api';
+	$tab = filter_input( INPUT_GET, 'tab', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+	if ( is_null( $tab ) ) {
+		$tab = 'api';
+	}
 
 	// output.
 	?>
@@ -114,8 +117,9 @@ function easy_language_admin_text_field( array $attr ): void {
 		$value = get_option( $attr['fieldId'], '' );
 
 		// get value from request.
-		if ( isset( $_POST[ $attr['fieldId'] ] ) ) {
-			$value = sanitize_text_field( wp_unslash( $_POST[ $attr['fieldId'] ] ) );
+		$post_value = filter_input( INPUT_POST, $attr['fieldId'], FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( ! is_null( $post_value ) ) {
+			$value = $post_value;
 		}
 
 		// get title.
@@ -176,8 +180,9 @@ function easy_language_admin_number_field( array $attr ): void {
 		$value = get_option( $attr['fieldId'], '' );
 
 		// get value from request.
-		if ( isset( $_POST[ $attr['fieldId'] ] ) ) {
-			$value = sanitize_text_field( wp_unslash( $_POST[ $attr['fieldId'] ] ) );
+		$post_value = filter_input( INPUT_POST, $attr['fieldId'], FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( ! is_null( $post_value ) ) {
+			$value = $post_value;
 		}
 
 		// get title.
@@ -223,8 +228,9 @@ function easy_language_admin_email_field( array $attr ): void {
 		$value = get_option( $attr['fieldId'], '' );
 
 		// get value from request.
-		if ( isset( $_POST[ $attr['fieldId'] ] ) ) {
-			$value = sanitize_text_field( wp_unslash( $_POST[ $attr['fieldId'] ] ) );
+		$post_value = filter_input( INPUT_POST, $attr['fieldId'], FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( ! is_null( $post_value ) ) {
+			$value = $post_value;
 		}
 
 		// get title.
@@ -285,12 +291,15 @@ function easy_language_admin_checkbox_field( array $attr ): void {
 			$title = $attr['title'];
 		}
 
+		// get value from request.
+		$post_value = filter_input( INPUT_POST, $attr['fieldId'], FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
 		// set readonly attribute.
 		$readonly = '';
 		if ( isset( $attr['readonly'] ) && false !== $attr['readonly'] ) {
 			$readonly = ' disabled="disabled"';
 			?>
-			<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro" value="<?php echo ( 1 === absint( get_option( $attr['fieldId'], 0 ) ) || ( isset( $_POST[ $attr['fieldId'] ] ) && 1 === absint( $_POST[ $attr['fieldId'] ] ) ) ) ? '1' : '0'; ?>">
+			<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro" value="<?php echo ( 1 === absint( get_option( $attr['fieldId'], 0 ) ) || ( ! is_null( $post_value ) && 1 === absint( $post_value ) ) ) ? '1' : '0'; ?>">
 			<?php
 		}
 
@@ -299,7 +308,7 @@ function easy_language_admin_checkbox_field( array $attr ): void {
 				name="<?php echo esc_attr( $attr['fieldId'] ); ?>"
 				value="1"
 			<?php
-			echo ( 1 === absint( get_option( $attr['fieldId'], 0 ) ) || ( isset( $_POST[ $attr['fieldId'] ] ) && 1 === absint( $_POST[ $attr['fieldId'] ] ) ) ) ? ' checked="checked"' : '';
+			echo ( 1 === absint( get_option( $attr['fieldId'], 0 ) ) || ( ! is_null( $post_value ) && 1 === absint( $post_value ) ) ) ? ' checked="checked"' : '';
 			echo esc_attr( $readonly );
 			?>
 				class="easy-language-field-width"
@@ -331,9 +340,10 @@ function easy_language_admin_select_field( array $attr ): void {
 		// get value from config.
 		$value = get_option( $attr['fieldId'], '' );
 
-		// or get it from request.
-		if ( isset( $_POST[ $attr['fieldId'] ] ) ) {
-			$value = sanitize_text_field( wp_unslash( $_POST[ $attr['fieldId'] ] ) );
+		// get value from request.
+		$post_value = filter_input( INPUT_POST, $attr['fieldId'], FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( ! is_null( $post_value ) ) {
+			$value = $post_value;
 		}
 
 		// get title.

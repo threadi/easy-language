@@ -108,7 +108,7 @@ class Log {
 		 * Get active user.
 		 */
 		$user_id = 0;
-		if( $user = wp_get_current_user() ) {
+		if ( $user = wp_get_current_user() ) {
 			$user_id = $user->ID;
 		}
 
@@ -118,10 +118,10 @@ class Log {
 		$wpdb->insert(
 			$this->get_table_name(),
 			array(
-				'time'       => gmdate( 'Y-m-d H:i:s' ),
-				'log'        => $entry,
-				'state'      => $state,
-				'user_id'    => $user_id
+				'time'    => gmdate( 'Y-m-d H:i:s' ),
+				'log'     => $entry,
+				'state'   => $state,
+				'user_id' => $user_id,
 			)
 		);
 

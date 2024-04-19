@@ -87,7 +87,7 @@ class Avada extends Parser_Base implements Parser {
 	 */
 	private function is_flow_text_widget_html( string $widget_name ): bool {
 		$html_support_widgets = array(
-			'fusion_text' => true
+			'fusion_text' => true,
 		);
 
 		/**
@@ -99,7 +99,7 @@ class Avada extends Parser_Base implements Parser {
 		 */
 		$html_widgets = apply_filters( 'easy_language_avada_html_widgets', $html_support_widgets );
 
-		return isset($html_widgets[$widget_name]);
+		return isset( $html_widgets[ $widget_name ] );
 	}
 
 	/**
@@ -126,7 +126,7 @@ class Avada extends Parser_Base implements Parser {
 					if ( ! empty( $texts ) ) {
 						$resulting_texts[] = array(
 							'text' => $texts,
-							'html' => $this->is_flow_text_widget_html( $shortcode )
+							'html' => $this->is_flow_text_widget_html( $shortcode ),
 						);
 					}
 				}
@@ -136,7 +136,7 @@ class Avada extends Parser_Base implements Parser {
 						if ( in_array( $attribute, $attributes, true ) && ! empty( $attribute_value ) ) {
 							$resulting_texts[] = array(
 								'text' => $attribute_value,
-								'html' => $this->is_flow_text_widget_html( $shortcode )
+								'html' => $this->is_flow_text_widget_html( $shortcode ),
 							);
 						}
 					}

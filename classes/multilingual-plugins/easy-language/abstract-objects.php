@@ -99,7 +99,7 @@ abstract class Objects {
 	/**
 	 * Set marker during simplification.
 	 *
-	 * @param string $option The option to change.
+	 * @param string           $option The option to change.
 	 * @param string|int|array $value The value to set.
 	 *
 	 * @return void
@@ -128,7 +128,7 @@ abstract class Objects {
 	/**
 	 * Return whether this object has a specific state.
 	 *
-	 * @param string $state
+	 * @param string $state The state to set.
 	 * @return bool
 	 * @noinspection PhpUnused
 	 */
@@ -166,18 +166,18 @@ abstract class Objects {
 				// set result.
 				$dialog = array(
 					'className' => 'wp-dialog-error',
-					'title' => __( 'Simplification canceled', 'easy-language' ),
-					'texts' => array(
+					'title'     => __( 'Simplification canceled', 'easy-language' ),
+					'texts'     => array(
 						/* translators: %1$s will be replaced by the object-title */
-						'<p>'.sprintf( __( 'Simplification for <i>%1$s</i> is already running.', 'easy-language' ), esc_html( $this->get_title() ) ).'</p>'
+						'<p>' . sprintf( __( 'Simplification for <i>%1$s</i> is already running.', 'easy-language' ), esc_html( $this->get_title() ) ) . '</p>',
 					),
-					'buttons' => array(
+					'buttons'   => array(
 						array(
-							'action' => 'location.reload();',
+							'action'  => 'location.reload();',
 							'variant' => 'primary',
-							'text' => __(  'OK', 'easy-language' )
-						)
-					)
+							'text'    => __( 'OK', 'easy-language' ),
+						),
+					),
 				);
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
@@ -196,9 +196,9 @@ abstract class Objects {
 			 */
 			// define filter for entry-loading to check max count of entries for this object.
 			$filter = array(
-				'object_id' => $this->get_id(),
+				'object_id'   => $this->get_id(),
 				'object_type' => $this->get_type(),
-				'state'     => 'processing',
+				'state'       => 'processing',
 			);
 
 			// get entries which are in process and show error if there are any.
@@ -207,27 +207,27 @@ abstract class Objects {
 				// set result.
 				$dialog = array(
 					'className' => 'wp-dialog-error',
-					'title' => __( 'Simplification canceled', 'easy-language' ),
-					'texts' => array(
+					'title'     => __( 'Simplification canceled', 'easy-language' ),
+					'texts'     => array(
 						/* translators: %1$s will be replaced by the object-title */
-						'<p>'.sprintf( __( 'A previously running simplification of texts of this %1$s failed. How do you want to deal with it?', 'easy-language' ), esc_html( $this->get_type_name() ) ).'</p>'
+						'<p>' . sprintf( __( 'A previously running simplification of texts of this %1$s failed. How do you want to deal with it?', 'easy-language' ), esc_html( $this->get_type_name() ) ) . '</p>',
 					),
-					'buttons' => array(
+					'buttons'   => array(
 						array(
-							'action' => 'easy_language_reset_processing_simplification("' . $this->get_id() . '", "'.$this->get_type().'");',
+							'action'  => 'easy_language_reset_processing_simplification("' . $this->get_id() . '", "' . $this->get_type() . '");',
 							'variant' => 'primary',
-							'text' => __(  'Run simplification again', 'easy-language' )
+							'text'    => __( 'Run simplification again', 'easy-language' ),
 						),
 						array(
-							'action' => 'easy_language_ignore_processing_simplification("' . $this->get_id() . '", "'.$this->get_type().'");',
+							'action'  => 'easy_language_ignore_processing_simplification("' . $this->get_id() . '", "' . $this->get_type() . '");',
 							'variant' => 'primary',
-							'text' => __(  'Ignore the failed simplifications', 'easy-language' )
+							'text'    => __( 'Ignore the failed simplifications', 'easy-language' ),
 						),
 						array(
 							'action' => 'location.reload();',
-							'text' => __(  'Cancel', 'easy-language' )
-						)
-					)
+							'text'   => __( 'Cancel', 'easy-language' ),
+						),
+					),
 				);
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
@@ -240,7 +240,7 @@ abstract class Objects {
 
 			// define filter for entry-loading to check max count of entries for this object.
 			$filter = array(
-				'object_id' => $this->get_id(),
+				'object_id'   => $this->get_id(),
 				'object_type' => $this->get_type(),
 			);
 
@@ -252,35 +252,35 @@ abstract class Objects {
 
 			// do not run simplification if the requested object contains more than the text-limit of the API allow.
 			$api_obj = Apis::get_instance()->get_active_api();
-			if( false !== $api_obj && $max_entry_count > $api_obj->get_max_requests_per_minute() ) {
+			if ( false !== $api_obj && $max_entry_count > $api_obj->get_max_requests_per_minute() ) {
 				// set result.
 				$dialog = array(
 					'className' => 'wp-dialog-hint',
-					'title' => __( 'Simplification canceled', 'easy-language' ),
-					'texts' => array(
+					'title'     => __( 'Simplification canceled', 'easy-language' ),
+					'texts'     => array(
 						/* translators: %1$s will be replaced by the object-title (like page or post), %2$s will be replaced by the API-title */
-						'<p>'.sprintf(__( 'The %1$s contains more text widgets than the API %2$s could handle in a short time.<br>The texts will be automatically simplified in the background.', 'easy-language' ), esc_html($this->get_type_name()), esc_html($api_obj->get_title())).'</p>'
+						'<p>' . sprintf( __( 'The %1$s contains more text widgets than the API %2$s could handle in a short time.<br>The texts will be automatically simplified in the background.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $api_obj->get_title() ) ) . '</p>',
 					),
-					'buttons' => array(
+					'buttons'   => array(
 						array(
-							'action' => 'top.location.href="'.get_permalink($this->get_id()).'";',
+							'action'  => 'top.location.href="' . get_permalink( $this->get_id() ) . '";',
 							'variant' => 'primary',
-							'text' => __( 'Show in frontend', 'easy-language' )
+							'text'    => __( 'Show in frontend', 'easy-language' ),
 						),
 						array(
-							'action' => 'top.location.href="'.$this->get_edit_link().'";',
+							'action'  => 'top.location.href="' . $this->get_edit_link() . '";',
 							'variant' => 'secondary',
-							'text' => __( 'Edit', 'easy-language' )
+							'text'    => __( 'Edit', 'easy-language' ),
 						),
 						array(
 							'action' => 'location.reload();',
-							'text' => __(  'Cancel', 'easy-language' )
-						)
-					)
+							'text'   => __( 'Cancel', 'easy-language' ),
+						),
+					),
 				);
-				if( $this->is_automatic_mode_prevented() ) {
+				if ( $this->is_automatic_mode_prevented() ) {
 					/* translators: %1$s will be replaced by the object-title (like page or post), %2$s will be replaced by the API-title */
-					$dialog['texts'][0] = '<p>'.sprintf(__( 'The %1$s contains more text widgets than the API %2$s could handle in a short time.<br>The texts could be automatically simplified in the background if you enable this on the page settings.', 'easy-language' ), esc_html($this->get_type_name()), esc_html($api_obj->get_title())).'</p>';
+					$dialog['texts'][0] = '<p>' . sprintf( __( 'The %1$s contains more text widgets than the API %2$s could handle in a short time.<br>The texts could be automatically simplified in the background if you enable this on the page settings.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $api_obj->get_title() ) ) . '</p>';
 				}
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
@@ -306,9 +306,9 @@ abstract class Objects {
 
 		// define filter to get all entries for this object which should be simplified.
 		$filter = array(
-			'object_id' => $this->get_id(),
+			'object_id'   => $this->get_id(),
 			'object_type' => $this->get_type(),
-			'state'     => 'to_simplify',
+			'state'       => 'to_simplify',
 		);
 
 		// get limited entries.
@@ -326,53 +326,53 @@ abstract class Objects {
 			if ( isset( $simplification_counts[ $hash ] ) && 0 === absint( $simplification_counts[ $hash ] ) ) {
 				$dialog = array(
 					'className' => 'wp-dialog-hint',
-					'title' => __( 'Simplification canceled', 'easy-language' ),
-					'texts' => array(
+					'title'     => __( 'Simplification canceled', 'easy-language' ),
+					'texts'     => array(
 						/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
-						'<p>'.sprintf( __( '<strong>The texts in this %1$s are already simplified.</strong><br>%2$s was not used. Nothing has been changed.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->init->get_title() ) ).'</p>'
+						'<p>' . sprintf( __( '<strong>The texts in this %1$s are already simplified.</strong><br>%2$s was not used. Nothing has been changed.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->init->get_title() ) ) . '</p>',
 					),
-					'buttons' => array(
+					'buttons'   => array(
 						array(
-							'action' => 'top.location.href="'.get_permalink($this->get_id()).'";',
+							'action'  => 'top.location.href="' . get_permalink( $this->get_id() ) . '";',
 							'variant' => 'primary',
-							'text' => __( 'Show in frontend', 'easy-language' )
+							'text'    => __( 'Show in frontend', 'easy-language' ),
 						),
 						array(
-							'action' => 'top.location.href="'.$this->get_edit_link().'";',
+							'action'  => 'top.location.href="' . $this->get_edit_link() . '";',
 							'variant' => 'secondary',
-							'text' => __( 'Edit', 'easy-language' )
+							'text'    => __( 'Edit', 'easy-language' ),
 						),
 						array(
 							'action' => 'top.location.reload();',
-							'text' => __(  'Cancel', 'easy-language' )
-						)
-					)
+							'text'   => __( 'Cancel', 'easy-language' ),
+						),
+					),
 				);
 			} else {
 				// otherwise show hint that some texts are already optimized.
 				$dialog = array(
 					'className' => 'wp-dialog-hint',
-					'title' => __( 'Simplification canceled', 'easy-language' ),
-					'texts' => array(
+					'title'     => __( 'Simplification canceled', 'easy-language' ),
+					'texts'     => array(
 						/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
-						'<p>'.sprintf( __( '<strong>Some texts in this %1$s are already simplified.</strong><br>Other missing simplifications has been run via %2$s and are insert into the text.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->init->get_title() ) ).'</p>'
+						'<p>' . sprintf( __( '<strong>Some texts in this %1$s are already simplified.</strong><br>Other missing simplifications has been run via %2$s and are insert into the text.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->init->get_title() ) ) . '</p>',
 					),
-					'buttons' => array(
+					'buttons'   => array(
 						array(
-							'action' => 'top.location.href="'.get_permalink($this->get_id()).'";',
+							'action'  => 'top.location.href="' . get_permalink( $this->get_id() ) . '";',
 							'variant' => 'primary',
-							'text' => __( 'Show in frontend', 'easy-language' )
+							'text'    => __( 'Show in frontend', 'easy-language' ),
 						),
 						array(
-							'action' => 'top.location.href="'.$this->get_edit_link().'";',
+							'action'  => 'top.location.href="' . $this->get_edit_link() . '";',
 							'variant' => 'secondary',
-							'text' => __( 'Edit', 'easy-language' )
+							'text'    => __( 'Edit', 'easy-language' ),
 						),
 						array(
 							'action' => 'top.location.reload();',
-							'text' => __(  'Cancel', 'easy-language' )
-						)
-					)
+							'text'   => __( 'Cancel', 'easy-language' ),
+						),
+					),
 				);
 			}
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
@@ -399,39 +399,39 @@ abstract class Objects {
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, ++$simplification_count_in_loop[ $hash ] );
 
 			// show progress on CLI.
-			! $progress ?: $progress->tick();
+			! $progress ? $progress->tick() : false;
 		}
 
 		// end progress on CLI.
-		! $progress ?: $progress->finish();
+		! $progress ? $progress->finish() : false;
 
 		// save result for this simplification if we used an API.
 		if ( $c > 0 ) {
 			// set result.
 			$dialog = array(
 				'className' => 'wp-dialog-green',
-				'title' => __( 'Simplification processed', 'easy-language' ),
-				'texts' => array(
+				'title'     => __( 'Simplification processed', 'easy-language' ),
+				'texts'     => array(
 					/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
-					'<p>'.sprintf( __( '<strong>Simplifications have been returned from %2$s.</strong><br>They were inserted into the %1$s.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->init->get_title() ) ).'</p>'
+					'<p>' . sprintf( __( '<strong>Simplifications have been returned from %2$s.</strong><br>They were inserted into the %1$s.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->init->get_title() ) ) . '</p>',
 				),
-				'buttons' => array(
+				'buttons'   => array(
 					array(
-						'action' => 'top.location.href="'.get_permalink($this->get_id()).'";',
+						'action'  => 'top.location.href="' . get_permalink( $this->get_id() ) . '";',
 						'variant' => 'primary',
-						'text' => __( 'Show in frontend', 'easy-language' )
+						'text'    => __( 'Show in frontend', 'easy-language' ),
 					),
 					array(
-						'action' => 'top.location.href="'.$this->get_edit_link().'";',
+						'action'  => 'top.location.href="' . $this->get_edit_link() . '";',
 						'variant' => 'primary',
-						'text' => __( 'Edit', 'easy-language' )
+						'text'    => __( 'Edit', 'easy-language' ),
 					),
 					array(
-						'action' => 'top.location.reload();',
+						'action'  => 'top.location.reload();',
 						'variant' => 'secondary',
-						'text' => __(  'Cancel', 'easy-language' )
-					)
-				)
+						'text'    => __( 'Cancel', 'easy-language' ),
+					),
+				),
 			);
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 		}
@@ -488,8 +488,7 @@ abstract class Objects {
 					if ( ! empty( $results ) ) {
 						$entry->set_simplification( $results['translated_text'], $target_language, $simplification_obj->init->get_name(), absint( $results['jobid'] ) );
 						++$c;
-					}
-					else {
+					} else {
 						$api_errors = true;
 					}
 				}
@@ -500,18 +499,18 @@ abstract class Objects {
 		if ( false !== $api_errors && 0 === $c ) {
 			$dialog = array(
 				'className' => 'wp-dialog-error',
-				'title' => __( 'Simplification canceled', 'easy-language' ),
-				'texts' => array(
+				'title'     => __( 'Simplification canceled', 'easy-language' ),
+				'texts'     => array(
 					/* translators: %1$s will be replaced by the URL for the API-log in plugin-settings */
-					'<p>'.sprintf( __( '<strong>No simplifications get from API.</strong><br>Please check the <a href="%1$s">API-log</a> for errors.', 'easy-language' ), esc_url( Helper::get_api_logs_page_url() ) ).'</p>'
+					'<p>' . sprintf( __( '<strong>No simplifications get from API.</strong><br>Please check the <a href="%1$s">API-log</a> for errors.', 'easy-language' ), esc_url( Helper::get_api_logs_page_url() ) ) . '</p>',
 				),
-				'buttons' => array(
+				'buttons'   => array(
 					array(
-						'action' => 'location.reload();',
+						'action'  => 'location.reload();',
 						'variant' => 'primary',
-						'text' => __(  'OK', 'easy-language' )
-					)
-				)
+						'text'    => __( 'OK', 'easy-language' ),
+					),
+				),
 			);
 			if ( ! current_user_can( 'manage_options' ) ) {
 				$dialog['texts'][0] = __( '<strong>No simplifications get from API.</strong><br>Please consult an administrator to check the API-log.', 'easy-language' );
@@ -532,34 +531,34 @@ abstract class Objects {
 		}
 
 		// set state to "in_use" to mark text as simplified and inserted.
-		if( 0 === $c && $replaced_count > 0 ) {
+		if ( 0 === $c && $replaced_count > 0 ) {
 			$entry->set_state( 'in_use' );
 
 			// create dialog.
 			$dialog = array(
 				'className' => 'wp-dialog-success',
-				'title' => __( 'Simplification processed', 'easy-language' ),
-				'texts' => array(
+				'title'     => __( 'Simplification processed', 'easy-language' ),
+				'texts'     => array(
 					/* translators: %1$s will be replaced by the object-title (like post or page) */
-					'<p>'.sprintf( __( 'The texts are already simplified local.<br><strong>We did not use the API to simplify them again.</strong><br>The texts in this %1$s are replaced with its local available simplification.', 'easy-language' ), esc_html($this->get_type_name())).'</p>'
+					'<p>' . sprintf( __( 'The texts are already simplified local.<br><strong>We did not use the API to simplify them again.</strong><br>The texts in this %1$s are replaced with its local available simplification.', 'easy-language' ), esc_html( $this->get_type_name() ) ) . '</p>',
 				),
-				'buttons' => array(
+				'buttons'   => array(
 					array(
-						'action' => 'top.location.href="'.get_permalink($this->get_id()).'";',
+						'action'  => 'top.location.href="' . get_permalink( $this->get_id() ) . '";',
 						'variant' => 'primary',
-						'text' => __( 'Show in frontend', 'easy-language' )
+						'text'    => __( 'Show in frontend', 'easy-language' ),
 					),
 					array(
-						'action' => 'top.location.href="'.$this->get_edit_link().'";',
+						'action'  => 'top.location.href="' . $this->get_edit_link() . '";',
 						'variant' => 'primary',
-						'text' => __( 'Edit', 'easy-language' )
+						'text'    => __( 'Edit', 'easy-language' ),
 					),
 					array(
-						'action' => 'top.location.reload();',
+						'action'  => 'top.location.reload();',
 						'variant' => 'secondary',
-						'text' => __(  'Cancel', 'easy-language' )
-					)
-				)
+						'text'    => __( 'Cancel', 'easy-language' ),
+					),
+				),
 			);
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 		}
@@ -568,17 +567,17 @@ abstract class Objects {
 		if ( $c > 0 && 0 === $replaced_count ) {
 			$dialog = array(
 				'className' => 'wp-dialog-error',
-				'title' => __( 'Simplification canceled', 'easy-language' ),
-				'texts' => array(
-					'<p>'.__( 'We got simplified texts from API but does not replace any texts. This might be an error with the pagebuilder-support of the Easy Language plugin.', 'easy-language' ).'</p>'
+				'title'     => __( 'Simplification canceled', 'easy-language' ),
+				'texts'     => array(
+					'<p>' . __( 'We got simplified texts from API but does not replace any texts. This might be an error with the pagebuilder-support of the Easy Language plugin.', 'easy-language' ) . '</p>',
 				),
-				'buttons' => array(
+				'buttons'   => array(
 					array(
-						'action' => 'location.reload();',
+						'action'  => 'location.reload();',
 						'variant' => 'primary',
-						'text' => __(  'OK', 'easy-language' )
-					)
-				)
+						'text'    => __( 'OK', 'easy-language' ),
+					),
+				),
 			);
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 

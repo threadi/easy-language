@@ -7,6 +7,11 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
+// prevent direct access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use easyLanguage\Api_Base;
 use easyLanguage\Apis;
 use easyLanguage\Base;
@@ -22,11 +27,6 @@ use WP_Query;
 use WP_Screen;
 use WP_Term;
 use WP_User;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Initializer for this plugin.
@@ -289,7 +289,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					// do not show anything if the used page builder plugin is not available.
 					if ( false === $page_builder->is_active() ) {
 						/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-						echo '<span class="dashicons dashicons-warning wp-easy-dialog" data-dialog="'.esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ).'" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
+						echo '<span class="dashicons dashicons-warning wp-easy-dialog" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
 
 						// get link to delete this simplification.
 						$delete_simplification = get_delete_post_link( $simplified_post_id );
@@ -323,7 +323,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 							/* translators: %1$s is the name of the language, %2$s is the name of the used API, %3$s will be the API-title */
 							echo '<a href="' . esc_url( $do_simplification ) . '" class="dashicons dashicons-translation easy-language-translate-object" data-id="' . absint( $simplified_post_obj->get_id() ) . '" data-link="' . esc_url( get_permalink( $simplified_post_id ) ) . '" data-object-type="' . esc_attr( $simplified_post_obj->get_type() ) . '" title="' . esc_attr( sprintf( __( 'Simplify this %1$s in %2$s with %3$s.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</a>';
 						} elseif ( 'above_entry_limit' === $quota_status['status'] && $api_obj->is_configured() ) {
-							// show simple not clickable icon if API is configured but limit for texts is exceeded
+							// show simple not clickable icon if API is configured but limit for texts is exceeded.
 							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
 							echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'To many text-widgets in this %1$s for simplification with %2$s. The %3$s will be simplified in background automatically.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $api_obj->get_title() ), esc_html( $post_object->get_type_name() ) ) ) . '">&nbsp;</span>';
 						} elseif ( $api_obj->is_configured() ) {
@@ -458,12 +458,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 							);
 
 							/* translators: %1$s is the name of the object (e.g. page or post) */
-							echo '<span class="dashicons dashicons-warning wp-easy-dialog"  data-dialog="'.esc_attr( wp_json_encode( $dialog ) ). '" title="' . esc_attr( sprintf( __( 'This %1$s has been edited with an unknown page builder or the classic editor', 'easy-language' ), esc_html( $post_object->get_type_name() ) ) ) . '"></span>';
+							echo '<span class="dashicons dashicons-warning wp-easy-dialog"  data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_attr( sprintf( __( 'This %1$s has been edited with an unknown page builder or the classic editor', 'easy-language' ), esc_html( $post_object->get_type_name() ) ) ) . '"></span>';
 						}
 					} else {
 						// otherwise should warning that the for this object used page builder is not active or not supported.
 						/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-						echo '<span class="dashicons dashicons-warning wp-easy-dialog" data-dialog="'.esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) )).'" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
+						echo '<span class="dashicons dashicons-warning wp-easy-dialog" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
 					}
 				}
 			}
@@ -504,29 +504,30 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					)
 				);
 
-				if ( isset( $_GET['lang'] ) ) {
-					// get language from request.
-					$language = sanitize_text_field( wp_unslash( $_GET['lang'] ) );
+				// get language from request.
+				$language = filter_input( INPUT_GET, 'lang', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+				if ( is_null( $language ) ) {
+					return;
+				}
 
-					// check if requested language is supported by our plugin.
-					$languages = Languages::get_instance()->get_possible_target_languages();
-					if ( ! empty( $languages[ $language ] ) ) {
-						$query->set(
-							'meta_query',
+				// check if requested language is supported by our plugin.
+				$languages = Languages::get_instance()->get_possible_target_languages();
+				if ( ! empty( $languages[ $language ] ) ) {
+					$query->set(
+						'meta_query',
+						array(
+							'relation' => 'AND',
 							array(
-								'relation' => 'AND',
-								array(
-									'key'     => 'easy_language_simplified_in',
-									'value'   => $language,
-									'compare' => 'LIKE',
-								),
-								array(
-									'key'     => 'easy_language_simplification_original_id',
-									'compare' => 'NOT EXISTS',
-								),
-							)
-						);
-					}
+								'key'     => 'easy_language_simplified_in',
+								'value'   => $language,
+								'compare' => 'LIKE',
+							),
+							array(
+								'key'     => 'easy_language_simplification_original_id',
+								'compare' => 'NOT EXISTS',
+							),
+						)
+					);
 				}
 			}
 		}
@@ -588,7 +589,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		update_option( 'easy_language_summ_ai_source_languages', $languages );
 
 		// Log event.
-		Log::get_instance()->add_log( 'Locale in WordPress changed from '.$old_value.' to '.$new_value, 'success' );
+		Log::get_instance()->add_log( 'Locale in WordPress changed from ' . $old_value . ' to ' . $new_value, 'success' );
 	}
 
 	/**
@@ -988,7 +989,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			EASY_LANGUAGE_OPTION_DELETION_COUNT,
 			EASY_LANGUAGE_OPTION_DELETION_MAX,
 			EASY_LANGUAGE_OPTION_DELETION_RUNNING,
-			'easy_language_source_languages'
+			'easy_language_source_languages',
 		);
 		foreach ( $options as $option ) {
 			delete_option( $option );
@@ -1045,7 +1046,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			array(
 				'label_for' => 'easy_language_post_types',
 				'fieldId'   => 'easy_language_post_types',
-				'options'   => $options
+				'options'   => $options,
 			)
 		);
 		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_post_types', array( 'sanitize_callback' => array( $this, 'validate_post_types' ) ) );
@@ -1332,7 +1333,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				// do not show anything if the used page builder plugin is not available.
 				if ( false === $page_builder->is_active() ) {
 					/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-					echo '<span class="dashicons dashicons-warning wp-easy-dialog" data-dialog="'.esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ).'" title="' . esc_attr( sprintf( esc_html__( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
+					echo '<span class="dashicons dashicons-warning wp-easy-dialog" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( esc_html__( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
 				} else {
 					// create link to edit the simplification post.
 					$edit_translation = $page_builder->get_edit_link();
@@ -1427,13 +1428,19 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	public function add_posts_filter(): void {
 		// get called post_type.
-		$called_post_type = ( isset( $_GET['post_type'] ) ) ? sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) : 'post';
+		$called_post_type = filter_input( INPUT_GET, 'post_type', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $called_post_type ) ) {
+			$called_post_type = 'post';
+		}
 
 		// get supported post-types.
 		$post_types = $this->get_supported_post_types();
 		foreach ( $post_types as $post_type => $enabled ) {
 			if ( 1 === absint( $enabled ) && $post_type === $called_post_type ) {
-				$selected_option = isset( $_GET['admin_filter_easy_language_changed'] ) ? sanitize_text_field( wp_unslash( $_GET['admin_filter_easy_language_changed'] ) ) : '';
+				$selected_option = filter_input( INPUT_GET, 'admin_filter_easy_language_changed', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+				if ( is_null( $selected_option ) ) {
+					$selected_option = '';
+				}
 				?>
 				<!--suppress HtmlFormInputWithoutLabel -->
 				<select name="admin_filter_easy_language_changed">
@@ -1458,20 +1465,28 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	public function posts_filter( WP_Query $query ): void {
 		global $pagenow;
 
+		$selected_option = filter_input( INPUT_GET, 'admin_filter_easy_language_changed', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $selected_option ) ) {
+			$selected_option = '';
+		}
+
 		// do not change anything if this is not the main query, our filter-var is not set or this is not edit.php.
-		if ( empty( $_GET['admin_filter_easy_language_changed'] ) || false === $query->is_main_query() || 'edit.php' !== $pagenow ) {
+		if ( empty( $selected_option ) || false === $query->is_main_query() || 'edit.php' !== $pagenow ) {
 			return;
 		}
 
 		// get called post-type.
-		$called_post_type = ( isset( $_GET['post_type'] ) ) ? sanitize_text_field( wp_unslash( $_GET['post_type'] ) ) : 'post';
+		$called_post_type = filter_input( INPUT_GET, 'post_type', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $called_post_type ) ) {
+			$called_post_type = 'post';
+		}
 
 		// get supported post-types.
 		$post_types = $this->get_supported_post_types();
 		foreach ( $post_types as $post_type => $enabled ) {
 			if ( 1 === absint( $enabled ) && $post_type === $called_post_type ) {
 				remove_action( 'pre_get_posts', array( $this, 'hide_translated_objects' ) );
-				switch ( sanitize_text_field( wp_unslash( $_GET['admin_filter_easy_language_changed'] ) ) ) {
+				switch ( $selected_option ) {
 					case 'translated':
 						// get all objects WITH translation-objects.
 						$query->set(
@@ -1560,6 +1575,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// get called post_type.
 		$post_type = $screen->post_type;
 
+		// get called post-type.
+		$requested_lang = filter_input( INPUT_GET, 'lang', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $requested_lang ) ) {
+			$requested_lang = '';
+		}
+
 		// loop through active languages and add them to the filter.
 		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
 			// define filter-url.
@@ -1573,12 +1594,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 			// mark the filter as active if it is used.
 			$class = '';
-			if( isset($_GET['lang']) && $language_code === sanitize_text_field( wp_unslash( $_GET['lang'] ) ) ) {
+			if ( $language_code === $requested_lang ) {
 				$class = 'current';
 			}
 
 			// add the filter to the list.
-			$views[ 'easy-language-' . $language_code ] = '<a href="' . esc_url( $url ) . '" class="'.esc_attr($class).'">' . esc_html( $settings['label'] ) . '</a>';
+			$views[ 'easy-language-' . $language_code ] = '<a href="' . esc_url( $url ) . '" class="' . esc_attr( $class ) . '">' . esc_html( $settings['label'] ) . '</a>';
 		}
 		return $views;
 	}
@@ -1608,7 +1629,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			// bail if object is not a simplified object.
 			if ( ! $object || ! $object->is_simplified() ) {
 				// Log event.
-				Log::get_instance()->add_log( 'Requested object '.$object_id.' ('.$object_type.') is not intended to be simplified.', 'error' );
+				Log::get_instance()->add_log( 'Requested object ' . $object_id . ' (' . $object_type . ') is not intended to be simplified.', 'error' );
 
 				// collect return array.
 				$return = array(
@@ -1705,7 +1726,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				}
 
 				// Log event.
-				Log::get_instance()->add_log( 'Simplification of '.$object_id.' ('.$object_type.') run in an error: '.$error_message, 'error' );
+				Log::get_instance()->add_log( 'Simplification of ' . $object_id . ' (' . $object_type . ') run in an error: ' . $error_message, 'error' );
 
 				// collect return array for this error.
 				$return = array(
@@ -2082,8 +2103,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			// update counter.
 			update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, absint( get_option( update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, 0 ) ) ) + 1 );
 
-			// Log event
-			Log::get_instance()->add_log( 'Text '.$entry->get_id().' deleted', 'success' );
+			// log this event.
+			Log::get_instance()->add_log( 'Text ' . $entry->get_id() . ' deleted', 'success' );
 		}
 
 		// remove running marker.
@@ -2279,26 +2300,27 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					$languages = Languages::get_instance()->get_active_languages();
 
 					// get simplification-list-url.
-					$simplification_list_url = add_query_arg( array(
-							'page' => 'easy_language_settings',
-							'tab' => 'simplifications',
-							'subtab' => 'to_simplify'
+					$simplification_list_url = add_query_arg(
+						array(
+							'page'   => 'easy_language_settings',
+							'tab'    => 'simplifications',
+							'subtab' => 'to_simplify',
 						),
 						'options-general.php'
 					);
 
 					// collect return values.
-					$return['status']           = 'ok';
-					$return['object_id']        = $copy_obj->get_id();
-					$return['link']             = get_permalink( $copy_obj->get_id() );
-					$return['language']         = $languages[ $target_language ]['label'];
-					$return['object_type']      = $copy_obj->get_type();
-					$return['object_type_name'] = $copy_obj->get_type_name();
-					$return['title']            = $copy_obj->get_title();
-					$return['api_title']        = $api_object->get_title();
-					$return['edit_link']        = $copy_obj->get_edit_link();
-					$return['simplification_list_link']        = $simplification_list_url;
-					$return['quota_state']      = $copy_obj->get_quota_state( $api_object );
+					$return['status']                   = 'ok';
+					$return['object_id']                = $copy_obj->get_id();
+					$return['link']                     = get_permalink( $copy_obj->get_id() );
+					$return['language']                 = $languages[ $target_language ]['label'];
+					$return['object_type']              = $copy_obj->get_type();
+					$return['object_type_name']         = $copy_obj->get_type_name();
+					$return['title']                    = $copy_obj->get_title();
+					$return['api_title']                = $api_object->get_title();
+					$return['edit_link']                = $copy_obj->get_edit_link();
+					$return['simplification_list_link'] = $simplification_list_url;
+					$return['quota_state']              = $copy_obj->get_quota_state( $api_object );
 				}
 			}
 		}
@@ -2595,7 +2617,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			$transients_obj = Transients::get_instance();
 			$transient_obj  = $transients_obj->add();
 			$transient_obj->set_name( 'easy_language_text_deleted' );
-			$transient_obj->set_message( __( '<strong>The chosen text is deleted.</strong>', 'easy-language' ) );
+			$transient_obj->set_message( '<strong>' . __( 'The chosen text is deleted.', 'easy-language' ) . '</strong>' );
 			$transient_obj->set_type( 'success' );
 			$transient_obj->save();
 		}
@@ -2616,10 +2638,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		check_ajax_referer( 'easy-language-delete-all-to-simplified_texts', 'nonce' );
 
 		// get all texts which should be simplified.
-		$entries = DB::get_instance()->get_entries( Init::get_instance()->get_filter_for_entries_to_simplify() );
+		$entries = DB::get_instance()->get_entries( self::get_instance()->get_filter_for_entries_to_simplify() );
 
 		// delete them.
-		foreach( $entries as $entry ) {
+		foreach ( $entries as $entry ) {
 			$entry->delete();
 		}
 
@@ -2627,7 +2649,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$transients_obj = Transients::get_instance();
 		$transient_obj  = $transients_obj->add();
 		$transient_obj->set_name( 'easy_language_text_deleted' );
-		$transient_obj->set_message( __( '<strong>All to simplified texts has been deleted.</strong>', 'easy-language' ) );
+		$transient_obj->set_message( '<strong>' . __( 'All to simplified texts has been deleted.', 'easy-language' ) . '</strong>' );
 		$transient_obj->set_type( 'success' );
 		$transient_obj->save();
 

@@ -51,8 +51,14 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	 */
 	private function table_data(): array {
 		// order table.
-		$order_by = ( isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], array_keys( $this->get_sortable_columns() ), true ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) : 'date';
-		$order    = ( isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], array( 'asc', 'desc' ), true ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) : 'desc';
+		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( ! in_array( $order_by, array_keys( $this->get_sortable_columns() ), true ) ) {
+			$order_by = 'date';
+		}
+		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( in_array( $order, array( 'asc', 'desc' ), true ) ) {
+			$order = 'desc';
+		}
 
 		// get results.
 		return DB::get_instance()->get_entries(
@@ -205,10 +211,6 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 			// show hint for pro in used in column.
 			case 'used_in':
 				return '<span class="pro-marker">' . __( 'Only in Pro', 'easy-language' ) . '</span>';
-
-			// fallback if no column has been matched.
-			default:
-				return print_r( $item, true );
 		}
 	}
 
@@ -220,7 +222,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	 */
 	public function extra_tablenav( $which ): void {
 		if ( 'top' === $which ) {
-			if( !empty($this->items) ) {
+			if ( ! empty( $this->items ) ) {
 				// define delete all URL.
 				$url = add_query_arg(
 					array(
@@ -231,9 +233,10 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 				);
 				?><a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Delete all', 'easy-language' ); ?></a>
 				<?php
-			}
-			else {
-				?><span class="button disabled"><?php echo esc_html__( 'Delete all', 'easy-language' ); ?></span><?php
+			} else {
+				?>
+				<span class="button disabled"><?php echo esc_html__( 'Delete all', 'easy-language' ); ?></span>
+														<?php
 			}
 		}
 	}

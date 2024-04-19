@@ -328,8 +328,8 @@ class Request {
 		$wpdb->insert( $this->table_requests, $query );
 
 		// log error.
-		if( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during adding API log entry: '.$wpdb->last_error, 'error' );
+		if ( $wpdb->last_error ) {
+			Log::get_instance()->add_log( 'Error during adding API log entry: ' . $wpdb->last_error, 'error' );
 		}
 	}
 

@@ -71,11 +71,11 @@ Hint: will be called by ant-command mentioned above.
 
 ### Run
 
-`vendor/bin/phpcs --standard=WordPress file`
+`vendor/bin/phpcs --extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/ --standard=ruleset.xml .`
 
 ### Repair
 
-`vendor/bin/phpcbf --standard=WordPress file`
+`vendor/bin/phpcbf --extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/ --standard=ruleset.xml .`
 
 ## Generate documentation
 

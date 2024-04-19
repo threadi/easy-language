@@ -2,11 +2,11 @@
 Contributors: laolaweb, threadi
 Tags: easy language, leichte sprache, simplify, summ ai, capito
 Requires at least: 6.0
-Tested up to: 6.5
+Tested up to: 6.5.2
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 2.0.5
+Stable tag: 2.1.0
 
 == Description ==
 
@@ -124,3 +124,7 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 = 2.0.5 =
 * Compatibility with WordPress 6.5
 * Updated dependencies for Gutenberg-scripts
+
+= 2.1.0 =
+* WordPress Coding Standard 3.1 compatible and each release must pass this
+*

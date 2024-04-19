@@ -75,7 +75,7 @@ class Language_Icon {
 					$import_path = trailingslashit( get_temp_dir() ) . $this->file;
 
 					// allow SVG-files.
-					add_filter('upload_mimes', array( $this, 'allow_svg' ) );
+					add_filter( 'upload_mimes', array( $this, 'allow_svg' ) );
 
 					// copy the original to the import_path.
 					WP_Filesystem();
@@ -93,11 +93,10 @@ class Language_Icon {
 						if ( absint( $attachment_id ) > 0 ) {
 							$attachment = get_post( $attachment_id );
 						}
-
 					}
 
 					// remove SVG as allowed files.
-					remove_filter('upload_mimes', array( $this, 'allow_svg' ) );
+					remove_filter( 'upload_mimes', array( $this, 'allow_svg' ) );
 				}
 
 				if ( false !== $attachment ) {
@@ -162,7 +161,7 @@ class Language_Icon {
 	 * @return array
 	 */
 	public function allow_svg( array $file_types ): array {
-		$new_filetypes = array();
+		$new_filetypes        = array();
 		$new_filetypes['svg'] = 'image/svg+xml';
 		return array_merge( $file_types, $new_filetypes );
 	}

@@ -73,7 +73,7 @@ class Simplifications {
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.
 	 * @param string $target_language The target language of the text.
-	 * @param bool $is_html Marker if the text contains HTML-Code.
+	 * @param bool   $is_html Marker if the text contains HTML-Code.
 	 * @return array The result as array.
 	 * @noinspection PhpUnused
 	 */

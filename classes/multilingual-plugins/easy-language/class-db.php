@@ -180,7 +180,7 @@ class Db {
 	 * @param string $text The original text.
 	 * @param string $source_language The language of this text.
 	 * @param string $field The field.
-	 * @param bool $html True if this text contains html-code.
+	 * @param bool   $html True if this text contains html-code.
 	 *
 	 * @return false|Text
 	 */
@@ -210,8 +210,8 @@ class Db {
 		$wpdb->insert( $this->get_table_name_originals(), $query );
 
 		// log error.
-		if( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during adding entry in DB: '.$wpdb->last_error, 'error' );
+		if ( $wpdb->last_error ) {
+			Log::get_instance()->add_log( 'Error during adding entry in DB: ' . $wpdb->last_error, 'error' );
 		}
 
 		// get DB-id.
@@ -358,25 +358,25 @@ class Db {
 			$add = true;
 			if ( ! empty( $filter['not_locked'] ) ) {
 				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
-				if( $object ) {
+				if ( $object ) {
 					$add = ! $object->is_locked();
 				}
 			}
 			if ( ! empty( $filter['not_prevented'] ) && false !== $add ) {
 				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
-				if( $object ) {
+				if ( $object ) {
 					$add = ! $object->is_automatic_mode_prevented();
 				}
 			}
 			if ( ! empty( $filter['object_state'] ) && false !== $add ) {
 				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
-				if( $object ) {
+				if ( $object ) {
 					$add = $object->has_state( $filter['object_state'] );
 				}
 			}
 			if ( ! empty( $filter['object_not_state'] ) && false !== $add ) {
 				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
-				if( $object ) {
+				if ( $object ) {
 					$add = ! $object->has_state( $filter['object_not_state'] );
 				}
 			}

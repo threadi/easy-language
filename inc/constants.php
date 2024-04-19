@@ -26,17 +26,17 @@ const EASY_LANGUAGE_SUMM_AI_FREE_API_URL = 'https://api.laolaweb.com/summaiproxy
 const EASY_LANGUAGE_SUMM_AI_API_URL_QUOTA = 'https://backend.summ-ai.com/translate/v1/usage/';
 
 /**
- * capito API URL for simplifications.
+ * The capito API URL for simplifications.
  */
 const EASY_LANGUAGE_CAPITO_API_URL = 'https://api.capito.ai/simplification';
 
 /**
- * capito API URL for quotas.
+ * The capito API URL for quotas.
  */
 const EASY_LANGUAGE_CAPITO_API_URL_QUOTA = 'https://api.capito.ai/shop/me/quotas';
 
 /**
- * capito API URL to get info about subscription.
+ * The capito API URL to get info about subscription.
  */
 const EASY_LANGUAGE_CAPITO_SUBSCRIPTION_URL = 'https://api.capito.ai/shop/me/subscription';
 
@@ -93,4 +93,3 @@ const EASY_LANGUAGE_HASH = 'easy_language_hash';
  * Changes will not work as this is also checked by API.
  */
 const EASY_LANGUAGE_SUMM_AI_QUOTA = 9000;
-

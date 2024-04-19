@@ -204,10 +204,9 @@ class Text {
 		$wpdb->insert( DB::get_instance()->get_table_name_simplifications(), $query );
 
 		// log error.
-		if( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during adding simplification of text in DB: '.$wpdb->last_error, 'error' );
-		}
-		else {
+		if ( $wpdb->last_error ) {
+			Log::get_instance()->add_log( 'Error during adding simplification of text in DB: ' . $wpdb->last_error, 'error' );
+		} else {
 			// change state of text to "simplified".
 			$this->set_state( 'simplified' );
 
@@ -340,8 +339,8 @@ class Text {
 		$wpdb->update( DB::get_instance()->get_table_name_originals(), array( 'state' => $state ), array( 'id' => $this->get_id() ) );
 
 		// log error.
-		if( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during updating state of entry in DB: '.$wpdb->last_error, 'error' );
+		if ( $wpdb->last_error ) {
+			Log::get_instance()->add_log( 'Error during updating state of entry in DB: ' . $wpdb->last_error, 'error' );
 		}
 	}
 
@@ -413,8 +412,8 @@ class Text {
 	 * Set given ID and type as object which is using this text.
 	 *
 	 * @param string $type The object-type (e.g. post, page, category).
-	 * @param int $item_id The object-ID from WP.
-	 * @param int $order The order of this text in this object.
+	 * @param int    $item_id The object-ID from WP.
+	 * @param int    $order The order of this text in this object.
 	 * @param string $page_builder The used pagebuilder.
 	 *
 	 * @return void
@@ -433,8 +432,8 @@ class Text {
 		$wpdb->insert( DB::get_instance()->get_table_name_originals_objects(), $query );
 
 		// log error.
-		if( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during adding object to original in DB: '.$wpdb->last_error, 'error' );
+		if ( $wpdb->last_error ) {
+			Log::get_instance()->add_log( 'Error during adding object to original in DB: ' . $wpdb->last_error, 'error' );
 		}
 	}
 
@@ -498,7 +497,7 @@ class Text {
 		// loop through the objects of this text.
 		foreach ( $this->get_objects() as $object_array ) {
 			$object = Helper::get_object( $object_array['object_id'], $object_array['object_type'] );
-			if( false !== $object ) {
+			if ( false !== $object ) {
 				$language = array_key_first( $object->get_language() );
 				if ( ! empty( $languages[ $language ] ) ) {
 					$item_languages[ $language ] = $languages[ $language ]['label'];
@@ -527,7 +526,7 @@ class Text {
 			array( $this->get_id() )
 		);
 
-		// get result
+		// get result.
 		$result = (array) $wpdb->get_results( $prepared_sql, ARRAY_A );
 
 		// get API-object if its name could be read.
@@ -581,5 +580,4 @@ class Text {
 		// return the result.
 		return 1 === $result[0]['html'];
 	}
-
 }

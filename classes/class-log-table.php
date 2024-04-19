@@ -25,10 +25,10 @@ class Log_Table extends WP_List_Table {
 	 */
 	public function get_columns(): array {
 		return array(
-			'state'    => __( 'State', 'easy-language' ),
-			'date'     => __( 'Date', 'easy-language' ),
-			'user_id'  => __( 'User', 'easy-language' ),
-			'log'      => __( 'Entry', 'easy-language' ),
+			'state'   => __( 'State', 'easy-language' ),
+			'date'    => __( 'Date', 'easy-language' ),
+			'user_id' => __( 'User', 'easy-language' ),
+			'log'     => __( 'Entry', 'easy-language' ),
 		);
 	}
 
@@ -39,7 +39,7 @@ class Log_Table extends WP_List_Table {
 	 */
 	private function table_data(): array {
 		// check nonce.
-		if( isset($_REQUEST['nonce']) && !wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-table-log' ) ) {
+		if ( isset( $_REQUEST['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-table-log' ) ) {
 			// redirect user back.
 			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 			exit;
@@ -113,11 +113,11 @@ class Log_Table extends WP_List_Table {
 
 			// return the user who requested this event.
 			case 'user_id':
-				$user = new \WP_User( absint($item[ $column_name ]) );
-				if( $user->ID > 0 ) {
+				$user = new \WP_User( absint( $item[ $column_name ] ) );
+				if ( $user->ID > 0 ) {
 					// link to user-profile if actual user has the capability for it.
-					if( current_user_can( 'manage_options' ) ) {
-						return '<a href="'.get_edit_user_link( $user->ID).'">'.esc_html( $user->display_name ).'</a>';
+					if ( current_user_can( 'manage_options' ) ) {
+						return '<a href="' . get_edit_user_link( $user->ID ) . '">' . esc_html( $user->display_name ) . '</a>';
 					}
 					return esc_html( $user->display_name );
 				}
@@ -132,10 +132,9 @@ class Log_Table extends WP_List_Table {
 			// return the log-entry.
 			case 'log':
 				return wp_kses_post( nl2br( $item[ $column_name ] ) );
-
-			default:
-				return wp_kses_post( print_r( $item, true ) );
 		}
+
+		return '';
 	}
 
 	/**

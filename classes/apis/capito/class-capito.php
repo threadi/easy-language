@@ -174,7 +174,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_supported_source_languages(): array {
 		$source_languages = array(
-			'de_DE' => array(
+			'de_DE'          => array(
 				'label'       => __( 'German', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Informal german spoken in germany.', 'easy-language' ),
@@ -183,7 +183,7 @@ class Capito extends Base implements Api_Base {
 				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
 				'api_value'   => 'de',
 			),
-			'de_DE_formal' => array(
+			'de_DE_formal'   => array(
 				'label'       => __( 'German (Formal)', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Formal german spoken in germany.', 'easy-language' ),
@@ -192,7 +192,7 @@ class Capito extends Base implements Api_Base {
 				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
 				'api_value'   => 'de',
 			),
-			'de_CH' => array(
+			'de_CH'          => array(
 				'label'       => __( 'German (CH)', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Formal german spoken in suisse.', 'easy-language' ),
@@ -210,7 +210,7 @@ class Capito extends Base implements Api_Base {
 				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_ch' ) : '',
 				'api_value'   => 'de',
 			),
-			'de_AT' => array(
+			'de_AT'          => array(
 				'label'       => __( 'German (AT)', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Informal german spoken in austria.', 'easy-language' ),
@@ -290,10 +290,10 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_mapping_languages(): array {
 		$language_mappings = array(
-			'de_DE' => array( 'de_a1', 'de_a2', 'de_b1' ),
-			'de_DE_formal' => array( 'de_a1', 'de_a2', 'de_b1' ),
-			'de_AT' => array( 'de_a1', 'de_a2', 'de_b1' ),
-			'de_CH' => array( 'de_a1', 'de_a2', 'de_b1' ),
+			'de_DE'          => array( 'de_a1', 'de_a2', 'de_b1' ),
+			'de_DE_formal'   => array( 'de_a1', 'de_a2', 'de_b1' ),
+			'de_AT'          => array( 'de_a1', 'de_a2', 'de_b1' ),
+			'de_CH'          => array( 'de_a1', 'de_a2', 'de_b1' ),
 			'de_CH_informal' => array( 'de_a1', 'de_a2', 'de_b1' ),
 		);
 
@@ -626,7 +626,7 @@ class Capito extends Base implements Api_Base {
 
 		// Set description for token field if it has not been set.
 		/* translators: %1$s will be replaced by the capito URL */
-		$description = sprintf( __( 'Get your capito API Token <a href="%1$s" target="_blank">here (opens new window)</a> (copy "Access Token").<br>If you have any questions about the token provided by capito, please contact their support: <a href="%2$s" target="_blank">%2$s (opens new window)</a>', 'easy-language' ), esc_url($this->get_token_url()), esc_url( $this->get_language_specific_support_page() ) );
+		$description = sprintf( __( 'Get your capito API Token <a href="%1$s" target="_blank">here (opens new window)</a> (copy "Access Token").<br>If you have any questions about the token provided by capito, please contact their support: <a href="%2$s" target="_blank">%2$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_token_url() ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_capito_token_set() ) {
 			// Set link to test the entered token.
 			$url = add_query_arg(
@@ -693,7 +693,7 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'These are the possible source languages for capito-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
 				'options'     => $this->get_supported_source_languages(),
 				'readonly'    => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
-				'pro_hint' => $this->get_pro_hint()
+				'pro_hint'    => $this->get_pro_hint(),
 			)
 		);
 		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_source_languages', array( 'sanitize_callback' => 'easyLanguage\Helper::settings_validate_multiple_checkboxes' ) );
@@ -711,7 +711,7 @@ class Capito extends Base implements Api_Base {
 				'description' => __( 'These are the possible target languages for capito-simplifications.', 'easy-language' ),
 				'options'     => $this->get_supported_target_languages(),
 				'readonly'    => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
-				'pro_hint' => $this->get_pro_hint()
+				'pro_hint'    => $this->get_pro_hint(),
 			)
 		);
 		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_target_languages', array( 'sanitize_callback' => array( $this, 'validate_language_settings' ) ) );
@@ -852,7 +852,7 @@ class Capito extends Base implements Api_Base {
 				add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', sprintf( __( '<strong>Token could not be verified.</strong> Please take a look <a href="%1$s">in the log</a> to check the reason.', 'easy-language' ), esc_url( Helper::get_api_logs_page_url() ) ) );
 
 				// Log event.
-				Log::get_instance()->add_log( sprintf( 'Token for capito has been changed, but we get an error from API by validation of the key. Please <a href="%1$s">check API log</a>.', esc_url(Helper::get_api_logs_page_url()) ), 'error' );
+				Log::get_instance()->add_log( sprintf( 'Token for capito has been changed, but we get an error from API by validation of the key. Please <a href="%1$s">check API log</a>.', esc_url( Helper::get_api_logs_page_url() ) ), 'error' );
 
 				// remove token.
 				$value = '';

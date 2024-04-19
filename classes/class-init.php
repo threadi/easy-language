@@ -151,7 +151,7 @@ class Init {
 				$message = sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional language.', 'easy-language' ), $plugin_obj->get_title() );
 				if ( false === $plugin_obj->is_supporting_apis() ) {
 					/* translators: %1$s will be replaced by the name of the multilingual-plugin */
-					$message .= '<br><br>' . sprintf( __( 'Due to limitations of %1$s, it is unfortunately not possible for us to provide automatic simplification for easy or plain language. If you want to use this, you could use the <i>Easy Language</i> plugin alongside %1$s.', 'easy-language' ), esc_html($plugin_obj->get_title()), esc_html($plugin_obj->get_title()) );
+					$message .= '<br><br>' . sprintf( __( 'Due to limitations of %1$s, it is unfortunately not possible for us to provide automatic simplification for easy or plain language. If you want to use this, you could use the <i>Easy Language</i> plugin alongside %1$s.', 'easy-language' ), esc_html( $plugin_obj->get_title() ), esc_html( $plugin_obj->get_title() ) );
 				}
 				$transient_obj->set_message( $message );
 				$transient_obj->save();
@@ -277,10 +277,9 @@ class Init {
 		}
 
 		// Log event.
-		if( empty($old_value) ) {
+		if ( empty( $old_value ) ) {
 			Log::get_instance()->add_log( 'API initialized with ' . $new_value, 'success' );
-		}
-		else {
+		} else {
 			Log::get_instance()->add_log( 'API changed from ' . $old_value . ' to ' . $new_value, 'success' );
 		}
 	}
@@ -356,7 +355,7 @@ class Init {
 			delete_option( 'easy_language_icons' );
 
 			// Log event.
-			Log::get_instance()->add_log( 'New icon set for '.$language_code, 'success' );
+			Log::get_instance()->add_log( 'New icon set for ' . $language_code, 'success' );
 		}
 
 		// return nothing.

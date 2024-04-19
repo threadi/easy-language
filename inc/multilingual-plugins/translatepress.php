@@ -79,8 +79,8 @@ add_filter( 'trp_wp_languages', 'easy_language_trp_add_to_wp_list' );
 function easy_language_trp_add_automatic_machine( array $api_list ): array {
 	// get active API and add it if they support this plugin.
 	$api_obj = Apis::get_instance()->get_active_api();
-	if( $api_obj->is_supporting_translatepress() ) {
-		$api_list[$api_obj->get_name()] = $api_obj->get_translatepress_machine_class();
+	if ( $api_obj->is_supporting_translatepress() ) {
+		$api_list[ $api_obj->get_name() ] = $api_obj->get_translatepress_machine_class();
 	}
 	return $api_list;
 }
@@ -95,7 +95,7 @@ add_filter( 'trp_automatic_translation_engines_classes', 'easy_language_trp_add_
 function easy_language_trp_add_automatic_engine( array $engines ): array {
 	// get active API and add it if they support this plugin.
 	$api_obj = Apis::get_instance()->get_active_api();
-	if( $api_obj->is_supporting_translatepress() ) {
+	if ( $api_obj->is_supporting_translatepress() ) {
 		$engines[] = array(
 			'value' => $api_obj->get_name(),
 			'label' => $api_obj->get_title(),
@@ -123,8 +123,8 @@ function easy_language_trp_reset_simplifications(): void {
 		// check if table exist.
 		if ( ! empty( $wpdb->get_results( $wpdb->prepare( 'SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = %s', array( $trp_query->get_table_name( strtolower( $language_code ) ) ) ) ) ) ) {
 			// truncate tables.
-			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', $trp_query->get_table_name( strtolower( $language_code ) ) ) );
-			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', $trp_query->get_gettext_table_name( strtolower( $language_code ) ) ) );
+			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $trp_query->get_table_name( strtolower( $language_code ) ) ) ) );
+			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $trp_query->get_gettext_table_name( strtolower( $language_code ) ) ) ) );
 		}
 	}
 }
@@ -136,10 +136,9 @@ function easy_language_trp_reset_simplifications(): void {
  * @param array $trp_languages List of languages in translatepress.
  * @param array $settings List of settings.
  * @return bool
- * @noinspection PhpUnusedParameterInspection
  */
 function easy_language_trp_get_supported_languages( bool $all_are_available, array $trp_languages, array $settings ): bool {
-	if ( in_array( $settings['trp_machine_translation_settings']['translation-engine'], array( 'summ-ai', 'capito'), true ) ) {
+	if ( in_array( $settings['trp_machine_translation_settings']['translation-engine'], array( 'summ-ai', 'capito' ), true ) ) {
 		// remove our own filter to prevent loop.
 		remove_filter( 'trp_mt_available_supported_languages', 'easy_language_trp_get_supported_languages' );
 
@@ -205,7 +204,7 @@ function easy_language_set_flag( string $flags_path, string $searched_language_c
 	// add them to the list.
 	foreach ( $languages as $language_code => $language ) {
 		if ( $language_code === $searched_language_code ) {
-			$flags_path = trailingslashit(dirname(Helper::get_icon_path_for_language_code( $language_code )));
+			$flags_path = trailingslashit( dirname( Helper::get_icon_path_for_language_code( $language_code ) ) );
 		}
 	}
 

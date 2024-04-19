@@ -72,7 +72,7 @@ class Simplifications {
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.
 	 * @param string $target_language The target language of the text.
-	 * @param bool $is_html Marker if the text contains HTML-Code. TODO until SUMM AI HTML is better supported
+	 * @param bool   $is_html Marker if the text contains HTML-Code. TODO until SUMM AI HTML is better supported
 	 * @return array The result as array.
 	 * @noinspection PhpUnused
 	 */
@@ -120,7 +120,7 @@ class Simplifications {
 			$simplified_text = apply_filters( 'easy_language_simplified_text', $simplified_text, $response_array, $this );
 
 			// if request-array contains 'disabled', disable all free requests.
-			if( !empty($response_array['disabled']) ) {
+			if ( ! empty( $response_array['disabled'] ) ) {
 				$this->init->disable_free_requests();
 			}
 
