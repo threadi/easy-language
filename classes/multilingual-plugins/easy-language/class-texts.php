@@ -8,6 +8,11 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
+// prevent direct access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
@@ -17,16 +22,10 @@ use Gettext\Translations;
 use WP_Post;
 use Gettext\Generator\PoGenerator;
 
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 /**
  * Helper for any text-handling.
  */
 class Texts {
-
 
 	/**
 	 * Instance of this object.
@@ -606,7 +605,7 @@ class Texts {
 			header( 'Content-Type: application/octet-stream' );
 			header( 'Content-Disposition: inline; filename="' . sanitize_file_name( gmdate( 'YmdHi' ) . '_' . get_option( 'blogname' ) . '.po"' ) );
 			header( 'Content-Length: ' . strlen( $po ) );
-			echo $wp_filesystem->get_contents( $po );
+			echo $wp_filesystem->get_contents( $po ); // phpcs:ignore WordPress.Security.EscapeOutput
 			exit;
 		}
 

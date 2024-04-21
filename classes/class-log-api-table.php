@@ -7,12 +7,12 @@
 
 namespace easyLanguage;
 
-use WP_List_Table;
-
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use WP_List_Table;
 
 /**
  * Handler for api-log-output in backend.
@@ -49,8 +49,14 @@ class Log_Api_Table extends WP_List_Table {
 		global $wpdb;
 
 		// order table.
-		$order_by = ( isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], array_keys( $this->get_sortable_columns() ), true ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) : 'date';
-		$order    = ( isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], array( 'asc', 'desc' ), true ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) : 'desc';
+		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( ! in_array( $order_by, array_keys( $this->get_sortable_columns() ), true ) ) {
+			$order_by = 'date';
+		}
+		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( in_array( $order, array( 'asc', 'desc' ), true ) ) {
+			$order = 'desc';
+		}
 
 		// define vars for prepared statement.
 		$vars = array(
@@ -132,10 +138,8 @@ class Log_Api_Table extends WP_List_Table {
 			case 'request':
 			case 'response':
 				return wp_kses_post( nl2br( $item[ $column_name ] ) );
-
-			default:
-				return wp_kses_post( print_r( $item, true ) );
 		}
+		return '';
 	}
 
 	/**
@@ -151,7 +155,7 @@ class Log_Api_Table extends WP_List_Table {
 
 		// define initial list.
 		$list = array(
-			'all' => '<a href="' . esc_url( $url ) . '">' . __( 'All', 'easy-language' ) . '</a>',
+			'all' => '<a href="' . esc_url( $url ) . '">' . esc_html__( 'All', 'easy-language' ) . '</a>',
 		);
 
 		// get all apis from entries and add them to the list.
@@ -213,7 +217,11 @@ class Log_Api_Table extends WP_List_Table {
 	 * @return string
 	 */
 	private function get_api_filter(): string {
-		return isset( $_GET['api'] ) ? sanitize_text_field( wp_unslash( $_GET['api'] ) ) : '';
+		$api = filter_input( INPUT_GET, 'api', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $api ) ) {
+			return '';
+		}
+		return $api;
 	}
 
 	/**

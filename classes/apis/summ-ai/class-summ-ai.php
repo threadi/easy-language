@@ -910,11 +910,11 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Validate the SUMM API Token.
 	 *
-	 * @param $value
+	 * @param ?string $value The key to validate.
+	 *
 	 * @return ?string
-	 * @noinspection PhpUnused
 	 */
-	public function validate_api_key( $value ): ?string {
+	public function validate_api_key( ?string $value ): ?string {
 		$errors = get_settings_errors();
 
 		/**
@@ -933,9 +933,8 @@ class Summ_AI extends Base implements Api_Base {
 
 			// show error.
 			add_settings_error( 'easy_language_summ_ai_api_key', 'easy_language_summ_ai_api_key', __( 'You did not enter an API key. You will now use the free quota, if available.', 'easy-language' ) );
-		}
-		// if token has been changed, run tests with it.
-		elseif ( 0 !== strcmp( $value, get_option( 'easy_language_summ_ai_api_key', '' ) ) ) {
+		} elseif ( 0 !== strcmp( $value, get_option( 'easy_language_summ_ai_api_key', '' ) ) ) {
+			// if token has been changed, run tests with it.
 			// switch mode to paid for test.
 			$mode = $this->mode;
 			$this->set_mode( 'paid' );
@@ -971,11 +970,11 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Validate the insert email regarding its format.
 	 *
-	 * @param $value
+	 * @param ?string $value The email to validate.
+	 *
 	 * @return ?string
-	 * @noinspection PhpUnused
 	 */
-	public function validate_api_email( $value ): ?string {
+	public function validate_api_email( ?string $value ): ?string {
 		if ( ! empty( $value ) && false === is_email( $value ) ) {
 			add_settings_error( 'easy_language_summ_api_email', 'easy_language_summ_api_email', __( 'The given email is not a valid email-address.', 'easy-language' ) );
 		}
@@ -985,11 +984,11 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Validate multiple radios.
 	 *
-	 * @param $value
+	 * @param ?string $value The radios to validate.
 	 *
 	 * @return ?string
 	 */
-	public function validate_multiple_radios( $value ): ?string {
+	public function validate_multiple_radios( ?string $value ): ?string {
 		return Helper::settings_validate_multiple_radios( $value );
 	}
 
@@ -998,11 +997,11 @@ class Summ_AI extends Base implements Api_Base {
 	 *
 	 * The source-language must be possible to simplify in the target-language.
 	 *
-	 * @param $values
+	 * @param ?string $values The settings to check.
 	 *
 	 * @return array|null
 	 */
-	public function validate_language_settings( $values ): ?array {
+	public function validate_language_settings( ?string $values ): ?array {
 		$values = Helper::settings_validate_multiple_checkboxes( $values );
 		if ( empty( $values ) ) {
 			add_settings_error( 'easy_language_summ_ai_target_languages', 'easy_language_summ_ai_target_languages', __( 'You have to set a target-language for simplifications.', 'easy-language' ) );
@@ -1273,11 +1272,11 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Set the interval for the quota-schedule, if it is enabled.
 	 *
-	 * @param string $value The value to set.
+	 * @param ?string $value The value to set.
 	 *
 	 * @return ?string
 	 */
-	public function set_quota_interval( string $value ): ?string {
+	public function set_quota_interval( ?string $value ): ?string {
 		$value = Helper::settings_validate_select_field( $value );
 		if ( ! empty( $value ) ) {
 			wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );

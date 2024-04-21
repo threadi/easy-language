@@ -399,11 +399,11 @@ abstract class Objects {
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, ++$simplification_count_in_loop[ $hash ] );
 
 			// show progress on CLI.
-			! $progress ? $progress->tick() : false;
+			$progress ? $progress->tick() : false;
 		}
 
 		// end progress on CLI.
-		! $progress ? $progress->finish() : false;
+		$progress ? $progress->finish() : false;
 
 		// save result for this simplification if we used an API.
 		if ( $c > 0 ) {

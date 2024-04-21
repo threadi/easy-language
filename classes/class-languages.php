@@ -161,4 +161,23 @@ class Languages {
 		 */
 		return apply_filters( 'easy_language_supported_target_languages', $target_languages );
 	}
+
+	/**
+	 * Check whether the current language in this Wordpress-project is a german language.
+	 *
+	 * @return bool
+	 */
+	public function is_german_language(): bool {
+		$german_languages = array(
+			'de',
+			'de_DE',
+			'de_DE_formal',
+			'de_CH',
+			'de_ch-informal',
+			'de_AT',
+		);
+
+		// return result: true if the actual WP-language is a german language.
+		return in_array( Helper::get_current_language(), $german_languages, true );
+	}
 }

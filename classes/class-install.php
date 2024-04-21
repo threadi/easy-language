@@ -7,6 +7,11 @@
 
 namespace easyLanguage;
 
+// prevent direct access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 
 /**

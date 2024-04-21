@@ -54,6 +54,9 @@ class Init {
 	 * @return void
 	 */
 	public function init(): void {
+		// run updates.
+		Update::get_instance()->init();
+
 		// include all API-files.
 		foreach ( glob( plugin_dir_path( EASY_LANGUAGE ) . 'inc/apis/*.php' ) as $filename ) {
 			require_once $filename;
@@ -160,7 +163,8 @@ class Init {
 
 		// remove first step hint if API-settings are called.
 		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_intro_step_1' );
-		if ( 'options-general.php' === $pagenow && ! empty( $_GET['page'] ) && 'easy_language_settings' === $_GET['page'] && $transient_obj->is_set() ) {
+		$page          = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( 'options-general.php' === $pagenow && ! empty( $page ) && 'easy_language_settings' === $page && $transient_obj->is_set() ) {
 			$transient_obj->delete();
 		}
 	}

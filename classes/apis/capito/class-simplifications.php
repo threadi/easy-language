@@ -95,8 +95,9 @@ class Simplifications {
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
 		 * @param Request $request_obj The capito request object.
+		 * @param bool $is_html Whether to use HTML or not.
 		 */
-		$request_obj = apply_filters( 'easy_language_capito_request_object', $request_obj );
+		$request_obj = apply_filters( 'easy_language_capito_request_object', $request_obj, $is_html );
 		$request_obj->send();
 
 		// return result depending on http-status.

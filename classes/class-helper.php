@@ -8,15 +8,14 @@
 namespace easyLanguage;
 
 // prevent direct access.
-use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
-use PLL_Settings;
-use WP_Admin_Bar;
-use WP_Post;
-use WP_Query;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
+use WP_Admin_Bar;
+use WP_Post;
+use WP_Query;
 
 /**
  * Helper for this plugin.
@@ -221,8 +220,11 @@ class Helper {
 		$filter = current_filter();
 		if ( ! empty( $filter ) ) {
 			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) && ! empty( $_REQUEST[ $filter . '_ro' ] ) ) {
-				$values = (array) wp_unslash( $_REQUEST[ $filter . '_ro' ] );
+			if ( empty( $values ) ) {
+				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+				if ( ! empty( $pre_values ) ) {
+					$values = array_map( 'sanitize_text_field', $pre_values );
+				}
 			}
 		}
 		return $values;
@@ -240,8 +242,11 @@ class Helper {
 		$filter = current_filter();
 		if ( ! empty( $filter ) ) {
 			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) && ! empty( $_REQUEST[ $filter . '_ro' ] ) ) {
-				$values = (array) wp_unslash( $_REQUEST[ $filter . '_ro' ] );
+			if ( empty( $values ) ) {
+				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+				if ( ! empty( $pre_values ) ) {
+					$values = array_map( 'sanitize_text_field', $pre_values );
+				}
 			}
 		}
 
@@ -259,8 +264,11 @@ class Helper {
 		$filter = current_filter();
 		if ( ! empty( $filter ) ) {
 			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) && ! empty( $_REQUEST[ $filter . '_ro' ] ) ) {
-				$values = sanitize_text_field( wp_unslash( $_REQUEST[ $filter . '_ro' ] ) );
+			if ( empty( $values ) ) {
+				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+				if ( ! empty( $pre_values ) ) {
+					$values = sanitize_text_field( $pre_values );
+				}
 			}
 		}
 		return $values;
@@ -276,8 +284,11 @@ class Helper {
 		$filter = current_filter();
 		if ( ! empty( $filter ) ) {
 			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) && ! empty( $_REQUEST[ $filter . '_ro' ] ) ) {
-				$value = sanitize_text_field( wp_unslash( $_REQUEST[ $filter . '_ro' ] ) );
+			if ( empty( $values ) ) {
+				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+				if ( ! empty( $pre_values ) ) {
+					$value = sanitize_text_field( $pre_values );
+				}
 			}
 		}
 		return $value;
@@ -289,7 +300,10 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_support_url(): string {
-		return 'https://laolaweb.com/kontakt/';
+		if ( Languages::get_instance()->is_german_language() ) {
+			return 'https://laolaweb.com/kontakt/';
+		}
+		return 'https://laolaweb.com/en/contact/';
 	}
 
 	/**
@@ -298,7 +312,10 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_pro_url(): string {
-		return 'https://laolaweb.com/plugins/leichte-sprache-fuer-wordpress/';
+		if ( Languages::get_instance()->is_german_language() ) {
+			return 'https://laolaweb.com/plugins/leichte-sprache-fuer-wordpress/';
+		}
+		return 'https://laolaweb.com/en/plugins/easy-language-for-wordpress/';
 	}
 
 	/**
@@ -577,12 +594,12 @@ class Helper {
 	/**
 	 * Return dialog for not available page builder.
 	 *
-	 * @param $post_object
-	 * @param $page_builder
+	 * @param Post_Object $post_object The post object.
+	 * @param object      $page_builder The page builder object.
 	 *
 	 * @return array
 	 */
-	public static function get_dialog_for_unavailable_page_builder( $post_object, $page_builder ): array {
+	public static function get_dialog_for_unavailable_page_builder( Post_Object $post_object, object $page_builder ): array {
 		return array(
 			/* translators: %1$s will be replaced by the object-title */
 			'title'   => sprintf( __( 'Used page builder is not available', 'easy-language' ), esc_html( $post_object->get_title() ) ),

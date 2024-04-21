@@ -845,13 +845,13 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// set intervall for automatic simplifications.
 		if ( ! get_option( 'easy_language_automatic_simplification' ) ) {
-			update_option( 'easy_language_automatic_simplification', '5minutely' );
+			update_option( 'easy_language_automatic_simplification', '10minutely' );
 		}
 
 		// check if automatic interval exist, if not create it.
 		if ( ! wp_next_scheduled( 'easy_language_automatic_simplification' ) ) {
 			// add it.
-			wp_schedule_event( time(), get_option( 'easy_language_automatic_simplification', '5minutely' ), 'easy_language_automatic_simplification' );
+			wp_schedule_event( time(), get_option( 'easy_language_automatic_simplification', '10minutely' ), 'easy_language_automatic_simplification' );
 		}
 
 		// set db cache for icons.
@@ -2472,19 +2472,38 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Add some cron-intervals.
 	 *
-	 * @param array $schedules The list of all schedules in this project.
+	 * @param array $intervals List of intervals.
+	 *
 	 * @return array
 	 */
-	public function add_cron_intervals( array $schedules ): array {
-		$schedules['5minutely'] = array(
-			'interval' => 5 * 60,
-			'display'  => __( 'every 5th minute', 'easy-language' ),
+	public function add_cron_intervals( array $intervals ): array {
+		$intervals['4hourly']    = array(
+			'interval' => 60 * 60 * 4,
+			'display'  => __( 'every 4 hours', 'easy-language' ),
 		);
-		$schedules['minutely']  = array(
-			'interval' => 60,
-			'display'  => __( 'every minute', 'easy-language' ),
+		$intervals['3hourly']    = array(
+			'interval' => 60 * 60 * 3,
+			'display'  => __( 'every 3 hours', 'easy-language' ),
 		);
-		return $schedules;
+		$intervals['2hourly']    = array(
+			'interval' => 60 * 60 * 2,
+			'display'  => __( 'every 2 hours', 'easy-language' ),
+		);
+		$intervals['30minutely'] = array(
+			'interval' => 60 * 30,
+			'display'  => __( 'every 30 Minutes', 'easy-language' ),
+		);
+		$intervals['20minutely'] = array(
+			'interval' => 60 * 20,
+			'display'  => __( 'every 20 Minutes', 'easy-language' ),
+		);
+		$intervals['10minutely'] = array(
+			'interval' => 60 * 10,
+			'display'  => __( 'every 10 Minutes', 'easy-language' ),
+		);
+
+		// return resulting list of additional intervals.
+		return $intervals;
 	}
 
 	/**
@@ -2533,7 +2552,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// check if automatic interval exist, if not create it.
 		if ( ! wp_next_scheduled( 'easy_language_automatic_simplification' ) ) {
 			// add it.
-			wp_schedule_event( time(), get_option( 'easy_language_automatic_simplification', '5minutely' ), 'easy_language_automatic_simplification' );
+			wp_schedule_event( time(), get_option( 'easy_language_automatic_simplification', '10minutely' ), 'easy_language_automatic_simplification' );
 		}
 
 		// redirect user back to previous page.

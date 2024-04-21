@@ -21,6 +21,10 @@
 		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_tax_query"/>
 		<!-- Exclude override of globals -->
 		<exclude name="WordPress.WP.GlobalVariablesOverride"/>
+		<!-- Exclude base64 -->
+		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode"/>
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+		<exclude name="WordPress.WP.I18n.NonSingularStringLiteralText" />
 	</rule>
 	<rule ref="WordPress.WP.Capabilities">
 		<properties>

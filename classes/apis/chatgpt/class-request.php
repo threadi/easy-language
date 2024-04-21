@@ -228,7 +228,7 @@ class Request {
 
 		// log the request (with anonymized token).
 		$args['headers']['Authorization'] = 'anonymized';
-		Log_Api::get_instance()->add_log( $chatgpt_obj->get_name(), $this->http_status, print_r( $args, true ), print_r( 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response, true ) );
+		Log_Api::get_instance()->add_log( $chatgpt_obj->get_name(), $this->http_status, wp_json_encode( $args ), 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
 
 		// save request and result in db.
 		$this->save_in_db();

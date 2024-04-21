@@ -123,10 +123,10 @@
 	<!-- check WCS compatibility -->
 	<target name="check-wcs" depends="composer-install">
 		<exec dir="${src.dir}" failonerror="false" executable="vendor/bin/phpcbf">
-			<arg line="--extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/ --standard=ruleset.xml ."/>
+			<arg line="--extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/,*translatepress* --standard=ruleset.xml ."/>
 		</exec>
 		<exec dir="${src.dir}" failonerror="true" executable="vendor/bin/phpcs">
-			<arg line="--extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/ --standard=ruleset.xml ."/>
+			<arg line="--extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/,*translatepress* --standard=ruleset.xml ."/>
 		</exec>
 	</target>
 

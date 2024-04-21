@@ -264,6 +264,10 @@ body .text-translations-table #source_language, body .text-translations-table #t
 	padding: 4px 8px;
 }
 
+.settings_page_easy_language_settings div.wrap > .page-title-action.easy-language-pro-hint {
+	padding: 0 8px;
+}
+
 .easy-language-input-text, .form-table td p.easy-language-input-text { margin-bottom: 12px }
 
 .easy-language-input-text label {
@@ -366,3 +370,13 @@ body.wp-easy-dialog-on-body.wp-core-ui .wp-easy-dialog .wp-progressbar:after {
 
 #wp-admin-bar-easy-language-simplification-process progress::-moz-progress-bar { background-color: var(--wp-admin-theme-color-darker-20); }
 #wp-admin-bar-easy-language-simplification-process progress::-webkit-progress-value { background-color: var(--wp-admin-theme-color-darker-20); }
+
+body.settings_page_easy_language_settings h1 { display: inline-block }
+
+body .review-hint-button:after {
+	color: #d4af37;
+	content: "\f155 \f155 \f155 \f155 \f155";
+	display: inline-block;
+	font-family: "dashicons", sans-serif;
+	margin-left: 8px;
+}

@@ -7,13 +7,13 @@
 
 namespace easyLanguage;
 
-use easyLanguage\Multilingual_plugins\Easy_Language\Db;
-use WP_Query;
-
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use easyLanguage\Multilingual_plugins\Easy_Language\Db;
+use WP_Query;
 
 /**
  * Uninstall-object.
@@ -30,16 +30,14 @@ class Uninstall {
 	/**
 	 * Constructor for Init-Handler.
 	 */
-	private function __construct() {
-	}
+	private function __construct() {}
 
 	/**
 	 * Prevent cloning of this object.
 	 *
 	 * @return void
 	 */
-	private function __clone() {
-	}
+	private function __clone() {}
 
 	/**
 	 * Return the instance of this Singleton object.
@@ -220,6 +218,7 @@ class Uninstall {
 			'easy_language_api_text_limit_per_process',
 			'easy_language_delete_unused_simplifications',
 			EASY_LANGUAGE_TRANSIENT_LIST,
+			'easyLanguageVersion',
 		);
 	}
 }

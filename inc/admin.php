@@ -50,6 +50,10 @@ function easy_language_add_styles_and_js_admin(): void {
 			'run_delete_data_nonce'       => wp_create_nonce( 'easy-language-delete-data-nonce' ),
 			'get_delete_data_nonce'       => wp_create_nonce( 'easy-language-get-delete-data-nonce' ),
 			'set_icon_for_language_nonce' => wp_create_nonce( 'easy-language-set-icon-for-language' ),
+			'review_url' => 'https://wordpress.org/plugins/easy-language/#reviews',
+			'title_rate_us' => __( 'Rate us', 'easy-language' ),
+			'pro_url' => esc_url( Helper::get_pro_url() ),
+			'title_get_pro' => __( 'Get Pro', 'easy-language' )
 		)
 	);
 

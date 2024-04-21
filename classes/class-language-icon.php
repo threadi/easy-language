@@ -7,6 +7,11 @@
 
 namespace easyLanguage;
 
+// prevent direct access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Object to handle single icon.
  */
@@ -156,7 +161,7 @@ class Language_Icon {
 	/**
 	 * Allow SVG as file-type.
 	 *
-	 * @param array $file_types
+	 * @param array $file_types List of allowed file types.
 	 *
 	 * @return array
 	 */

@@ -615,7 +615,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function add_settings(): void {
 		/**
-		 * capito settings Section
+		 * The capito settings Section
 		 */
 		add_settings_section(
 			'settings_section_capito',

@@ -7,13 +7,13 @@
 
 namespace easyLanguage\Apis\Summ_Ai;
 
-use easyLanguage\Base;
-use easyLanguage\Multilingual_plugins\Easy_Language\Init;
-
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use easyLanguage\Base;
+use easyLanguage\Multilingual_plugins\Easy_Language\Init;
 
 /**
  * Simplifications-Handling for this plugin.
@@ -72,9 +72,8 @@ class Simplifications {
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.
 	 * @param string $target_language The target language of the text.
-	 * @param bool   $is_html Marker if the text contains HTML-Code. TODO until SUMM AI HTML is better supported
+	 * @param bool   $is_html Marker if the text contains HTML-Code. TODO until SUMM AI HTML is better supported.
 	 * @return array The result as array.
-	 * @noinspection PhpUnused
 	 */
 	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html ): array {
 		// build request.
@@ -93,8 +92,9 @@ class Simplifications {
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
 		 * @param Request $request_obj The SUMM AI request object.
+		 * @param bool $is_html Whether to use HTML or not.
 		 */
-		$request_obj = apply_filters( 'easy_language_summ_ai_request_object', $request_obj );
+		$request_obj = apply_filters( 'easy_language_summ_ai_request_object', $request_obj, $is_html );
 		$request_obj->send();
 
 		// return result depending on http-status.

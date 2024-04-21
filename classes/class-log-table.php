@@ -7,12 +7,12 @@
 
 namespace easyLanguage;
 
-use WP_List_Table;
-
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use WP_List_Table;
 
 /**
  * Handler for log-output in backend.
@@ -101,7 +101,7 @@ class Log_Table extends WP_List_Table {
 	 * Define what data to show on each column of the table.
 	 *
 	 * @param  array  $item        Data.
-	 * @param  String $column_name - Current column name.
+	 * @param  String $column_name Current column name.
 	 *
 	 * @return string
 	 */
@@ -117,7 +117,7 @@ class Log_Table extends WP_List_Table {
 				if ( $user->ID > 0 ) {
 					// link to user-profile if actual user has the capability for it.
 					if ( current_user_can( 'manage_options' ) ) {
-						return '<a href="' . get_edit_user_link( $user->ID ) . '">' . esc_html( $user->display_name ) . '</a>';
+						return '<a href="' . esc_url( get_edit_user_link( $user->ID ) ) . '">' . esc_html( $user->display_name ) . '</a>';
 					}
 					return esc_html( $user->display_name );
 				}

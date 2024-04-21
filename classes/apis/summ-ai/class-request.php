@@ -7,15 +7,15 @@
 
 namespace easyLanguage\Apis\Summ_Ai;
 
-use easyLanguage\Log;
-use easyLanguage\Log_Api;
-use easyLanguage\Multilingual_plugins\Easy_Language\Db;
-use WP_Error;
-
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use easyLanguage\Log;
+use easyLanguage\Log_Api;
+use easyLanguage\Multilingual_plugins\Easy_Language\Db;
+use WP_Error;
 
 /**
  * Create and send request to summ-ai API. Gets the response.
@@ -276,7 +276,7 @@ class Request {
 
 			// log the request (with anonymized token).
 			$args['headers']['Authorization'] = 'anonymized';
-			Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, print_r( $args, true ), print_r( 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response, true ) );
+			Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, wp_json_encode( $args ), 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
 
 			// save request and result in db.
 			$this->save_in_db();
@@ -453,7 +453,7 @@ class Request {
 	/**
 	 * Set SUMM AI API token.
 	 *
-	 * @param string $token
+	 * @param string $token The token to use.
 	 *
 	 * @return void
 	 */
@@ -462,14 +462,14 @@ class Request {
 	}
 
 	/**
-	 * Set request method (GET, POST, HEAD ..)
+	 * Set request method (GET or POST).
 	 *
-	 * @param string $string
+	 * @param string $method The method to use.
 	 * @return void
 	 */
-	public function set_method( string $string ): void {
-		if ( in_array( $string, array( 'GET', 'POST' ), true ) ) {
-			$this->method = $string;
+	public function set_method( string $method ): void {
+		if ( in_array( $method, array( 'GET', 'POST' ), true ) ) {
+			$this->method = $method;
 		}
 	}
 }

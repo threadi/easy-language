@@ -126,5 +126,11 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Updated dependencies for Gutenberg-scripts
 
 = 2.1.0 =
+* Added rate us hint on settings page
 * WordPress Coding Standard 3.1 compatible and each release must pass this
-*
+* Log-format for requests to SUMM AI and capito changed to JSON
+* Help and support pages are not linked language-dependent
+* Changed minimum interval from minutely to 10-minutely to match WordPress-requirements
+* Migrating interval from old to new value of 10-minutely
+* Compatibility with WordPress 6.5.2
+* Updated dependencies for Gutenberg-scripts
