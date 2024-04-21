@@ -180,6 +180,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			$active_languages[] = $old_active_language['code'];
 		}
 
+		// get WP Filesystem-handler.
+		require_once ABSPATH . '/wp-admin/includes/file.php';
+		WP_Filesystem();
+		global $wp_filesystem;
+
 		// check if our languages does already exist in wpml-db.
 		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
 			$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `id` FROM ' . DB::get_instance()->get_wpdb_prefix() . 'icl_languages WHERE code = %s', array( $language_code ) ) );
@@ -190,8 +195,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				$path          = 'flags/';
 				$flag_path     = $base_path . $path . $language_code . '.png';
 				if ( ! file_exists( $flag_path ) ) {
-					if( !file_exists( dirname($flag_path) ) ) {
-						mkdir(dirname($flag_path));
+					if ( ! file_exists( dirname( $flag_path ) ) ) {
+						$wp_filesystem->mkdir( dirname( $flag_path ) );
 					}
 					copy( Helper::get_icon_path_for_language_code( $language_code ), $flag_path );
 				}

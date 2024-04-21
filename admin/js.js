@@ -2,6 +2,17 @@ jQuery(document).ready(function($) {
 	// get internationalization tools of WordPress.
 	let { __ } = wp.i18n;
 
+	// add option near to list-headline.
+	$('body.settings_page_easy_language_settings h1').after('<a class="page-title-action easy-language-pro-hint" href="' + easyLanguageJsVars.pro_url + '" target="_blank">' + easyLanguageJsVars.title_get_pro + '</a>');
+	$('body.settings_page_easy_language_settings h1').each(function() {
+		let button = document.createElement('a');
+		button.className = 'review-hint-button page-title-action';
+		button.href = easyLanguageJsVars.review_url;
+		button.innerHTML = easyLanguageJsVars.title_rate_us;
+		button.target = '_blank';
+		this.after(button);
+	})
+
     // save to hide transient-messages via ajax-request.
     $('div[data-dismissible] button.notice-dismiss').on('click',
         function (event) {

@@ -99,7 +99,7 @@ class Themify extends Parser_Base implements Parser {
 	 */
 	private function is_flow_text_widget_html( string $widget_name ): bool {
 		$html_support_widgets = array(
-			'text' => true
+			'text' => true,
 		);
 
 		/**
@@ -111,7 +111,7 @@ class Themify extends Parser_Base implements Parser {
 		 */
 		$html_widgets = apply_filters( 'easy_language_themify_html_widgets', $html_support_widgets );
 
-		return isset($html_widgets[$widget_name]);
+		return isset( $html_widgets[ $widget_name ] );
 	}
 
 	/**
@@ -239,7 +239,7 @@ class Themify extends Parser_Base implements Parser {
 									if ( ! empty( $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ) ) {
 										$resulting_texts[ $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ] = array(
 											'text' => $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ],
-											'html' => $this->is_flow_text_widget_html( $flow_text_name )
+											'html' => $this->is_flow_text_widget_html( $flow_text_name ),
 										);
 									}
 								}
@@ -247,7 +247,7 @@ class Themify extends Parser_Base implements Parser {
 						} else {
 							$resulting_texts[ $container['mod_settings'][ $entry ] ] = array(
 								'text' => $container['mod_settings'][ $entry ],
-								'html' => $this->is_flow_text_widget_html( $flow_text_name )
+								'html' => $this->is_flow_text_widget_html( $flow_text_name ),
 							);
 						}
 					}

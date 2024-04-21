@@ -8,11 +8,11 @@
 namespace easyLanguage;
 
 // prevent direct access.
-use WP_Query;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use WP_Query;
 
 /**
  * Base-object for API- and plugin-main-classes.

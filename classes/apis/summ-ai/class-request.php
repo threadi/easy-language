@@ -7,15 +7,15 @@
 
 namespace easyLanguage\Apis\Summ_Ai;
 
-use easyLanguage\Log;
-use easyLanguage\Log_Api;
-use easyLanguage\Multilingual_plugins\Easy_Language\Db;
-use WP_Error;
-
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use easyLanguage\Log;
+use easyLanguage\Log_Api;
+use easyLanguage\Multilingual_plugins\Easy_Language\Db;
+use WP_Error;
 
 /**
  * Create and send request to summ-ai API. Gets the response.
@@ -186,7 +186,7 @@ class Request {
 		}
 
 		// bail of no token given.
-		if( empty($this->get_token()) ) {
+		if ( empty( $this->get_token() ) ) {
 			// Log event.
 			Log::get_instance()->add_log( 'SUMM AI: no API key given for simplification.', 'error' );
 
@@ -215,7 +215,7 @@ class Request {
 		$headers = array_merge(
 			$this->header,
 			array(
-				'Authorization' => ($summ_ai_obj->is_free_mode() ? 'Token: ' : 'Bearer ').$this->get_token(),
+				'Authorization' => ( $summ_ai_obj->is_free_mode() ? 'Token: ' : 'Bearer ' ) . $this->get_token(),
 			)
 		);
 
@@ -235,7 +235,7 @@ class Request {
 		if ( 'POST' === $this->get_method() ) {
 			$data['input_text']            = $this->get_text();
 			$data['input_text_type']       = $this->get_text_type();
-			$data['user']                  = get_option( 'home' ).'|'.$summ_ai_obj->get_contact_email();
+			$data['user']                  = get_option( 'home' ) . '|' . $summ_ai_obj->get_contact_email();
 			$data['is_test']               = $this->is_test();
 			$data['separator']             = $this->get_separator();
 			$data['output_language_level'] = $request_target_language;
@@ -249,7 +249,7 @@ class Request {
 		$start_time = microtime( true );
 
 		// send request and get the result-object depending on used request method.
-		switch( $this->get_method() ) {
+		switch ( $this->get_method() ) {
 			case 'POST':
 				$this->result = wp_safe_remote_post( $this->url, $args );
 				break;
@@ -266,9 +266,8 @@ class Request {
 
 		// log error if something happened.
 		if ( is_wp_error( $this->result ) ) {
-			Log::get_instance()->add_log( sprintf( 'Error during request on API %1$s: '.$this->result->get_error_message(), esc_html($summ_ai_obj->get_name()) ), 'error' );
-		}
-		else {
+			Log::get_instance()->add_log( sprintf( 'Error during request on API %1$s: ' . $this->result->get_error_message(), esc_html( $summ_ai_obj->get_name() ) ), 'error' );
+		} else {
 			// secure response.
 			$this->response = wp_remote_retrieve_body( $this->get_result() );
 
@@ -277,7 +276,7 @@ class Request {
 
 			// log the request (with anonymized token).
 			$args['headers']['Authorization'] = 'anonymized';
-			Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, print_r( $args, true ), print_r( 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response, true ) );
+			Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, wp_json_encode( $args ), 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
 
 			// save request and result in db.
 			$this->save_in_db();
@@ -417,8 +416,8 @@ class Request {
 		$wpdb->insert( $this->table_requests, $query );
 
 		// log error.
-		if( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during adding API log entry: '.$wpdb->last_error, 'error' );
+		if ( $wpdb->last_error ) {
+			Log::get_instance()->add_log( 'Error during adding API log entry: ' . $wpdb->last_error, 'error' );
 		}
 	}
 
@@ -454,7 +453,7 @@ class Request {
 	/**
 	 * Set SUMM AI API token.
 	 *
-	 * @param string $token
+	 * @param string $token The token to use.
 	 *
 	 * @return void
 	 */
@@ -463,14 +462,14 @@ class Request {
 	}
 
 	/**
-	 * Set request method (GET, POST, HEAD ..)
+	 * Set request method (GET or POST).
 	 *
-	 * @param string $string
+	 * @param string $method The method to use.
 	 * @return void
 	 */
-	public function set_method( string $string ): void {
-		if( in_array($string, array( 'GET', 'POST' ), true ) ) {
-			$this->method = $string;
+	public function set_method( string $method ): void {
+		if ( in_array( $method, array( 'GET', 'POST' ), true ) ) {
+			$this->method = $method;
 		}
 	}
 }

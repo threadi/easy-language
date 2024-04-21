@@ -7,14 +7,12 @@
 
 namespace easyLanguage;
 
-use easyLanguage\Multilingual_plugins\Easy_Language\Db;
-use WP_List_Table;
-use wpdb;
-
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use WP_List_Table;
 
 /**
  * Handler for log-output in backend.
@@ -98,10 +96,6 @@ class Language_Icons_Table extends WP_List_Table {
 				$output .= ' <a href="#" class="replace-icon">' . esc_html__( 'Replace', 'easy-language' ) . '</a>';
 				$output .= '<span data-language-code="' . esc_attr( $item['code'] ) . '"></span>';
 				return $output;
-
-			// default output for any unknown column.
-			default:
-				return wp_kses_post( print_r( $item, true ) );
 		}
 	}
 

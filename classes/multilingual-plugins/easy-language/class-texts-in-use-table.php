@@ -7,15 +7,15 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
-use easyLanguage\Helper;
-use easyLanguage\Languages;
-use WP_List_Table;
-use WP_User;
-
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use easyLanguage\Helper;
+use easyLanguage\Languages;
+use WP_List_Table;
+use WP_User;
 
 /**
  * Handler for log-output in backend.
@@ -47,8 +47,14 @@ class Texts_In_Use_Table extends WP_List_Table {
 	 */
 	private function table_data(): array {
 		// order table.
-		$order_by = ( isset( $_REQUEST['orderby'] ) && in_array( $_REQUEST['orderby'], array_keys( $this->get_sortable_columns() ), true ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['orderby'] ) ) : 'date';
-		$order    = ( isset( $_REQUEST['order'] ) && in_array( $_REQUEST['order'], array( 'asc', 'desc' ), true ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['order'] ) ) : 'desc';
+		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( ! in_array( $order_by, array_keys( $this->get_sortable_columns() ), true ) ) {
+			$order_by = 'date';
+		}
+		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( in_array( $order, array( 'asc', 'desc' ), true ) ) {
+			$order = 'desc';
+		}
 
 		// define query for entries.
 		$query = array(
@@ -231,10 +237,6 @@ class Texts_In_Use_Table extends WP_List_Table {
 			// show hint for pro in used in column.
 			case 'used_in':
 				return '<span class="pro-marker">' . __( 'Only in Pro', 'easy-language' ) . '</span>';
-
-			// fallback if no column has been matched.
-			default:
-				return print_r( $item, true );
 		}
 	}
 
@@ -266,7 +268,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 				// get source languages of this api.
 				$source_languages = $api_obj->get_active_source_languages();
 
-				if( !empty($source_languages[ $item->get_source_language() ]) ) {
+				if ( ! empty( $source_languages[ $item->get_source_language() ] ) ) {
 					// add the source language to list.
 					$languages_array[ $item->get_source_language() ] = $source_languages[ $item->get_source_language() ]['label'];
 				}
@@ -324,7 +326,8 @@ class Texts_In_Use_Table extends WP_List_Table {
 	 * @return string
 	 */
 	private function get_lang_filter(): string {
-		return isset( $_GET['lang'] ) ? sanitize_text_field( wp_unslash( $_GET['lang'] ) ) : '';
+		$lang = filter_input( INPUT_GET, 'lang', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		return ! is_null( $lang ) ? $lang : '';
 	}
 
 	/**

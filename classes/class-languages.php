@@ -67,12 +67,12 @@ class Languages {
 		// if no API with own settings is active, get the list from plugin-settings.
 		$list              = array();
 		$settings_language = array();
-		$target_languages = $this->get_possible_target_languages();
+		$target_languages  = $this->get_possible_target_languages();
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
 			$settings_language = $settings_language + $plugin_obj->get_supported_languages();
 		}
 		foreach ( $settings_language as $language => $enabled ) {
-			if( !empty($target_languages[ $language ]) ) {
+			if ( ! empty( $target_languages[ $language ] ) ) {
 				$list[ $language ] = $target_languages[ $language ];
 			}
 		}
@@ -160,5 +160,24 @@ class Languages {
 		 * @param array $target_languages List of target languages.
 		 */
 		return apply_filters( 'easy_language_supported_target_languages', $target_languages );
+	}
+
+	/**
+	 * Check whether the current language in this Wordpress-project is a german language.
+	 *
+	 * @return bool
+	 */
+	public function is_german_language(): bool {
+		$german_languages = array(
+			'de',
+			'de_DE',
+			'de_DE_formal',
+			'de_CH',
+			'de_ch-informal',
+			'de_AT',
+		);
+
+		// return result: true if the actual WP-language is a german language.
+		return in_array( Helper::get_current_language(), $german_languages, true );
 	}
 }

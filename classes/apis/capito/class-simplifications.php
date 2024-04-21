@@ -73,7 +73,7 @@ class Simplifications {
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.
 	 * @param string $target_language The target language of the text.
-	 * @param bool $is_html Marker if the text contains HTML-Code.
+	 * @param bool   $is_html Marker if the text contains HTML-Code.
 	 * @return array The result as array.
 	 * @noinspection PhpUnused
 	 */
@@ -95,8 +95,9 @@ class Simplifications {
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
 		 * @param Request $request_obj The capito request object.
+		 * @param bool $is_html Whether to use HTML or not.
 		 */
-		$request_obj = apply_filters( 'easy_language_capito_request_object', $request_obj );
+		$request_obj = apply_filters( 'easy_language_capito_request_object', $request_obj, $is_html );
 		$request_obj->send();
 
 		// return result depending on http-status.

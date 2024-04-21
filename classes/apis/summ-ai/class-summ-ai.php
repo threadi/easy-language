@@ -7,6 +7,11 @@
 
 namespace easyLanguage\Apis\Summ_Ai;
 
+// prevent direct access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use easyLanguage\Apis;
 use easyLanguage\Base;
 use easyLanguage\Api_Base;
@@ -16,12 +21,8 @@ use easyLanguage\Log;
 use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use easyLanguage\Transients;
+use WP_User;
 use wpdb;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Define what SUMM AI supports and what not.
@@ -108,13 +109,13 @@ class Summ_AI extends Base implements Api_Base {
 		$this->table_requests = DB::get_instance()->get_wpdb_prefix() . 'easy_language_summ_ai';
 
 		// add settings.
-		add_action( 'easy_language_settings_add_settings', array( $this, 'add_settings'), 30 );
+		add_action( 'easy_language_settings_add_settings', array( $this, 'add_settings' ), 30 );
 
 		// add settings tab.
-		add_action( 'easy_language_settings_add_tab', array( $this, 'add_settings_tab'), 30 );
+		add_action( 'easy_language_settings_add_tab', array( $this, 'add_settings_tab' ), 30 );
 
 		// add settings page.
-		add_action('easy_language_settings_summ_ai_page', array( $this, 'add_settings_page' ) );
+		add_action( 'easy_language_settings_summ_ai_page', array( $this, 'add_settings_page' ) );
 
 		// add hook für schedule.
 		add_action( 'easy_language_summ_ai_request_quota', array( $this, 'get_quota_from_api' ) );
@@ -167,23 +168,20 @@ class Summ_AI extends Base implements Api_Base {
 
 		/* translators: %1$s will be replaced by the URL for SUMM AI-product-info */
 		$text = sprintf( __( '<p>Create any complicated text barrier-free and understandable with the <a href="%1$s" target="_blank"><strong>SUMM AI</strong> (opens new window)</a> AI-based tool.<br>Create simple and easy-to-understand texts on your website.</p><p>This API simplifies texts according to the official rules of the <i>Leichte Sprache e.V.</i>.<br>This specifies how texts must be written in easy language.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
-		if( $this->is_free_mode() ) {
-			$percent = absint($quota['character_spent']) / absint($quota['character_limit']);
-			if( 1 === $percent ) {
+		if ( $this->is_free_mode() ) {
+			$percent = absint( $quota['character_spent'] ) / absint( $quota['character_limit'] );
+			if ( 1 === $percent ) {
 				/* translators: %1$s will be replaced by the URL where the SUMM AI API key could be requested */
-				$text .= sprintf(__( '<p><strong>You have completely depleted the free quota available with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%2$s">here</a> to get more.</p>', 'easy-language' ), esc_url($this->get_settings_url()) );
-			}
-			elseif( $percent > $min_percent ) {
+				$text .= sprintf( __( '<p><strong>You have completely depleted the free quota available with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%2$s">here</a> to get more.</p>', 'easy-language' ), esc_url( $this->get_settings_url() ) );
+			} elseif ( $percent > $min_percent ) {
 				/* translators: %1$s will be replaced by the URL where the SUMM AI API key could be requested */
-				$text .= sprintf(__( '<p><strong>You have almost used up your free quota available with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%2$s">here</a> to get more.</p>', 'easy-language' ), esc_url($this->get_settings_url()) );
-			}
-			else {
+				$text .= sprintf( __( '<p><strong>You have almost used up your free quota available with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%2$s">here</a> to get more.</p>', 'easy-language' ), esc_url( $this->get_settings_url() ) );
+			} else {
 				/* translators: %1$d will be a number, %2$s will be replaced by the URL where the SUMM AI API key could be requested */
 				$text .= sprintf( __( '<p><strong>You are currently using a free quota of %1$d characters available for text simplifications with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%2$s">here</a> to get more.</p>', 'easy-language' ), absint( $quota['character_limit'] ), esc_url( $this->get_settings_url() ) );
 			}
-		}
-		else {
-			$text .= __( '<p><strong>You are currently using your own paid SUMM AI API key.</strong></p>', 'easy-language' );
+		} else {
+			$text .= '<p><strong>' . __( 'You are currently using your own paid SUMM AI API key.', 'easy-language' ) . '</strong></p>';
 		}
 		if ( $quota['character_limit'] > 0 ) {
 			$text .= $this->get_quota_table();
@@ -314,11 +312,11 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_mapping_languages(): array {
 		$languages_mapping = array(
-			'de_DE' => array( 'de_LS', 'de_EL' ),
-			'de_DE_formal' => array( 'de_LS', 'de_EL' ),
-			'de_CH' => array( 'de_LS', 'de_EL' ),
+			'de_DE'          => array( 'de_LS', 'de_EL' ),
+			'de_DE_formal'   => array( 'de_LS', 'de_EL' ),
+			'de_CH'          => array( 'de_LS', 'de_EL' ),
 			'de_CH_informal' => array( 'de_LS', 'de_EL' ),
-			'de_AT' => array( 'de_LS', 'de_EL' ),
+			'de_AT'          => array( 'de_LS', 'de_EL' ),
 		);
 
 		/**
@@ -383,16 +381,16 @@ class Summ_AI extends Base implements Api_Base {
 		}
 
 		// set interval for quota request interval to daily.
-		if( !get_option('easy_language_summ_ai_quota_interval') ) {
-			update_option('easy_language_summ_ai_quota_interval', 'daily' );
+		if ( ! get_option( 'easy_language_summ_ai_quota_interval' ) ) {
+			update_option( 'easy_language_summ_ai_quota_interval', 'daily' );
 		}
 
 		// set schedule for quota request.
-		wp_schedule_event( time(), get_option('easy_language_summ_ai_quota_interval', 'daily'), 'easy_language_summ_ai_request_quota' );
+		wp_schedule_event( time(), get_option( 'easy_language_summ_ai_quota_interval', 'daily' ), 'easy_language_summ_ai_request_quota' );
 
 		// set translation mode to editor.
-		if( !get_option('easy_language_summ_ai_email_mode') ) {
-			update_option('easy_language_summ_ai_email_mode', 'editor');
+		if ( ! get_option( 'easy_language_summ_ai_email_mode' ) ) {
+			update_option( 'easy_language_summ_ai_email_mode', 'editor' );
 		}
 
 		// set summ ai api as default API.
@@ -475,7 +473,7 @@ class Summ_AI extends Base implements Api_Base {
 	private function get_transients(): array {
 		return array(
 			'easy_language_summ_ai_test_token',
-			'easy_language_summ_ai_quota'
+			'easy_language_summ_ai_quota',
 		);
 	}
 
@@ -548,7 +546,7 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_quota(): array {
 		// return free quota if used.
-		if( false !== $this->is_free_mode() ) {
+		if ( false !== $this->is_free_mode() ) {
 			return array(
 				'character_spent' => get_option( 'easy_language_summ_ai_quota', 0 ),
 				'character_limit' => EASY_LANGUAGE_SUMM_AI_QUOTA,
@@ -556,7 +554,7 @@ class Summ_AI extends Base implements Api_Base {
 		}
 
 		// return paid quota.
-		return (array)get_option( 'easy_language_summ_ai_paid_quota', 0 );
+		return (array) get_option( 'easy_language_summ_ai_paid_quota', 0 );
 	}
 
 	/**
@@ -709,18 +707,18 @@ class Summ_AI extends Base implements Api_Base {
 
 		// Set description for token field if it has not been set.
 		$description = '';
-		if( $this->is_free_mode() ) {
+		if ( $this->is_free_mode() ) {
 			/* translators: %1$d will be replaced by a number */
-			$description .= sprintf( __( 'You have a free quota of %1$d characters with the plugin Easy Language.', 'easy-language' ), absint($this->get_quota()['character_limit']) ).'<br>';
+			$description .= sprintf( __( 'You have a free quota of %1$d characters with the plugin Easy Language.', 'easy-language' ), absint( $this->get_quota()['character_limit'] ) ) . '<br>';
 		}
 		/* translators: %1$s will be replaced by the SUMM AI URL */
-		$description .= sprintf(__('<strong>If you want more <a href="%1$s" target="_blank">get your SUMM AI API key now (opens new window)</a></strong>.<br>If you have any questions about the key provided by SUMM AI, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language'), esc_url($this->get_language_specific_support_page()));
-		if( false !== $this->is_summ_api_token_set() ) {
+		$description .= sprintf( __( '<strong>If you want more <a href="%1$s" target="_blank">get your SUMM AI API key now (opens new window)</a></strong>.<br>If you have any questions about the key provided by SUMM AI, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+		if ( false !== $this->is_summ_api_token_set() ) {
 			// Set link to test the entered token.
 			$url = add_query_arg(
 				array(
 					'action' => 'easy_language_summ_ai_test_token',
-					'nonce' => wp_create_nonce( 'easy-language-summ-ai-test-token' )
+					'nonce'  => wp_create_nonce( 'easy-language-summ-ai-test-token' ),
 				),
 				get_admin_url() . 'admin.php'
 			);
@@ -729,21 +727,21 @@ class Summ_AI extends Base implements Api_Base {
 			$remove_token_url = add_query_arg(
 				array(
 					'action' => 'easy_language_summ_ai_remove_token',
-					'nonce' => wp_create_nonce( 'easy-language-summ-ai-remove-token' )
+					'nonce'  => wp_create_nonce( 'easy-language-summ-ai-remove-token' ),
 				),
 				get_admin_url() . 'admin.php'
 			);
 
 			// Show other description if token is set.
 			/* translators: %1$s will be replaced by the SUMM AI URL */
-			$description = sprintf(__('If you have any questions about the key provided by SUMM AI, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language'), esc_url($this->get_language_specific_support_page()));
-			$description .= '<br><a href="'.esc_url($url).'" class="button button-secondary easy-language-settings-button">'.__( 'Test token', 'easy-language').'</a><a href="'.esc_url($remove_token_url).'" class="button button-secondary easy-language-settings-button">'.__( 'Remove token', 'easy-language').'</a>';
+			$description  = sprintf( __( 'If you have any questions about the key provided by SUMM AI, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+			$description .= '<br><a href="' . esc_url( $url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Test token', 'easy-language' ) . '</a><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
 		}
 
 		// if foreign translation-plugin with API-support is used, hide the language-settings.
 		$foreign_translation_plugin_with_api_support = false;
-		foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if( $plugin_obj->is_foreign_plugin() && $plugin_obj->is_supporting_apis() ) {
+		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
+			if ( $plugin_obj->is_foreign_plugin() && $plugin_obj->is_supporting_apis() ) {
 				$foreign_translation_plugin_with_api_support = true;
 			}
 		}
@@ -756,14 +754,14 @@ class Summ_AI extends Base implements Api_Base {
 			'easyLanguageSummAIPage',
 			'settings_section_summ_ai',
 			array(
-				'label_for' => 'easy_language_summ_ai_api_key',
-				'fieldId' => 'easy_language_summ_ai_api_key',
+				'label_for'   => 'easy_language_summ_ai_api_key',
+				'fieldId'     => 'easy_language_summ_ai_api_key',
 				'description' => $description,
-				'placeholder' => __('Enter your key here', 'easy-language'),
-				'highlight' => false === $this->is_summ_api_token_set()
+				'placeholder' => __( 'Enter your key here', 'easy-language' ),
+				'highlight'   => false === $this->is_summ_api_token_set(),
 			)
 		);
-		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_api_key', array( 'sanitize_callback' => array( $this, 'validate_api_key') ) );
+		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_api_key', array( 'sanitize_callback' => array( $this, 'validate_api_key' ) ) );
 
 		// define url for general wp-settings.
 		$wp_settings_url = add_query_arg(
@@ -773,7 +771,7 @@ class Summ_AI extends Base implements Api_Base {
 
 		// create hint for admins only.
 		$hint = '';
-		if( current_user_can( 'manage_options' ) ) {
+		if ( current_user_can( 'manage_options' ) ) {
 			/* translators: %1$s will be replaced by the URL for general WordPress-settings */
 			$hint = sprintf( __( 'You can change the admin-email in <a href="%1$s">General Settings for your WordPress</a>.', 'easy-language' ), esc_url( $wp_settings_url ) );
 		}
@@ -786,29 +784,29 @@ class Summ_AI extends Base implements Api_Base {
 			'easyLanguageSummAIPage',
 			'settings_section_summ_ai',
 			array(
-				'label_for' => 'easy_language_summ_ai_email_mode',
-				'fieldId' => 'easy_language_summ_ai_email_mode',
-				'options' => array(
+				'label_for'         => 'easy_language_summ_ai_email_mode',
+				'fieldId'           => 'easy_language_summ_ai_email_mode',
+				'options'           => array(
 					'custom' => array(
-						'label' => __( 'Custom', 'easy-language'),
-						'enabled' => true,
-						'description' => __( 'Enter a custom email in the field bellow.', 'easy-language'),
+						'label'       => __( 'Custom', 'easy-language' ),
+						'enabled'     => true,
+						'description' => __( 'Enter a custom email in the field bellow.', 'easy-language' ),
 					),
-					'admin' => array(
-						'label' => __( 'Use the admin-email', 'easy-language'),
-						'enabled' => true,
+					'admin'  => array(
+						'label'       => __( 'Use the admin-email', 'easy-language' ),
+						'enabled'     => true,
 						/* translators: %1$s is replaced with a hint for admins only. */
-						'description' => sprintf( __( 'The WordPress-Admin-email will be used. %1$s', 'easy-language'), $hint ),
+						'description' => sprintf( __( 'The WordPress-Admin-email will be used. %1$s', 'easy-language' ), $hint ),
 					),
 					'editor' => array(
-						'label' => __( 'Use editor email', 'easy-language'),
-						'enabled' => true,
-						'description' => __( 'The email of the actual user, which requests the simplification, will be used.', 'easy-language'),
+						'label'       => __( 'Use editor email', 'easy-language' ),
+						'enabled'     => true,
+						'description' => __( 'The email of the actual user, which requests the simplification, will be used.', 'easy-language' ),
 					),
 				),
-				'readonly' => false === $this->is_summ_api_token_set(),
+				'readonly'          => false === $this->is_summ_api_token_set(),
 				'description_above' => true,
-				'description' => __( 'An email will be used for each request to the SUMM AI API. It is used as contact or identifier email for SUMM AI if question for simplifications arise.', 'easy-language' )
+				'description'       => __( 'An email will be used for each request to the SUMM AI API. It is used as contact or identifier email for SUMM AI if question for simplifications arise.', 'easy-language' ),
 			)
 		);
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_email_mode', array( 'sanitize_callback' => array( $this, 'validate_multiple_radios' ) ) );
@@ -821,11 +819,11 @@ class Summ_AI extends Base implements Api_Base {
 			'easyLanguageSummAIPage',
 			'settings_section_summ_ai',
 			array(
-				'label_for' => 'easy_language_summ_api_email',
-				'fieldId' => 'easy_language_summ_api_email',
-				'description' => __( 'This field is only enabled if the setting above is set to "Custom".', 'easy-language'),
-				'placeholder' => __('Enter contact email here', 'easy-language'),
-				'readonly' => 'custom' !== get_option( 'easy_language_summ_ai_email_mode', 'editor' )
+				'label_for'   => 'easy_language_summ_api_email',
+				'fieldId'     => 'easy_language_summ_api_email',
+				'description' => __( 'This field is only enabled if the setting above is set to "Custom".', 'easy-language' ),
+				'placeholder' => __( 'Enter contact email here', 'easy-language' ),
+				'readonly'    => 'custom' !== get_option( 'easy_language_summ_ai_email_mode', 'editor' ),
 			)
 		);
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_api_email', array( 'sanitize_callback' => array( $this, 'validate_api_email' ) ) );
@@ -833,7 +831,7 @@ class Summ_AI extends Base implements Api_Base {
 		// Enable source-languages
 		// -> defaults to WP-locale
 		// -> if WPML, Polylang or TranslatePress is available, show additional languages
-		// -> but restrict list to languages supported by SUMM AI
+		// -> but restrict list to languages supported by SUMM AI.
 		add_settings_field(
 			'easy_language_summ_ai_source_languages',
 			__( 'Choose source languages', 'easy-language' ),
@@ -841,12 +839,12 @@ class Summ_AI extends Base implements Api_Base {
 			'easyLanguageSummAIPage',
 			'settings_section_summ_ai',
 			array(
-				'label_for' => 'easy_language_summ_ai_source_languages',
-				'fieldId' => 'easy_language_summ_ai_source_languages',
-				'description' => __('These are the possible source languages for SUMM AI-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language'),
-				'options' => $this->get_supported_source_languages(),
-				'readonly' => false === $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
-				'pro_hint' => $this->get_pro_hint()
+				'label_for'   => 'easy_language_summ_ai_source_languages',
+				'fieldId'     => 'easy_language_summ_ai_source_languages',
+				'description' => __( 'These are the possible source languages for SUMM AI-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
+				'options'     => $this->get_supported_source_languages(),
+				'readonly'    => false === $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
+				'pro_hint'    => $this->get_pro_hint(),
 			)
 		);
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_source_languages', array( 'sanitize_callback' => 'easyLanguage\Helper::settings_validate_multiple_checkboxes' ) );
@@ -859,12 +857,12 @@ class Summ_AI extends Base implements Api_Base {
 			'easyLanguageSummAIPage',
 			'settings_section_summ_ai',
 			array(
-				'label_for' => 'easy_language_summ_ai_target_languages',
-				'fieldId' => 'easy_language_summ_ai_target_languages',
-				'description' => __('These are the possible target languages for SUMM AI-simplifications.', 'easy-language'),
-				'options' => $this->get_supported_target_languages(),
-				'readonly' => false === $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
-				'pro_hint' => $this->get_pro_hint()
+				'label_for'   => 'easy_language_summ_ai_target_languages',
+				'fieldId'     => 'easy_language_summ_ai_target_languages',
+				'description' => __( 'These are the possible target languages for SUMM AI-simplifications.', 'easy-language' ),
+				'options'     => $this->get_supported_target_languages(),
+				'readonly'    => false === $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
+				'pro_hint'    => $this->get_pro_hint(),
 			)
 		);
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages', array( 'sanitize_callback' => array( $this, 'validate_language_settings' ) ) );
@@ -883,11 +881,11 @@ class Summ_AI extends Base implements Api_Base {
 			'easyLanguageSummAIPage',
 			'settings_section_summ_ai',
 			array(
-				'label_for' => 'easy_language_summ_ai_quota_interval',
-				'fieldId' => 'easy_language_summ_ai_quota_interval',
-				'values' => $intervals,
-				'readonly' => !$this->is_summ_api_token_set(),
-				'description' => __( 'The actual API quota will be requested in this interval.', 'easy-language')
+				'label_for'   => 'easy_language_summ_ai_quota_interval',
+				'fieldId'     => 'easy_language_summ_ai_quota_interval',
+				'values'      => $intervals,
+				'readonly'    => ! $this->is_summ_api_token_set(),
+				'description' => __( 'The actual API quota will be requested in this interval.', 'easy-language' ),
 			)
 		);
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_quota_interval', array( 'sanitize_callback' => array( $this, 'set_quota_interval' ) ) );
@@ -900,10 +898,10 @@ class Summ_AI extends Base implements Api_Base {
 			'easyLanguageSummAIPage',
 			'settings_section_summ_ai',
 			array(
-				'label_for' => 'easy_language_summ_ai_test',
-				'fieldId' => 'easy_language_summ_ai_test',
-				'readonly' => !$this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
-				'description' => __( 'If this is enabled no really simplification will be run through the API. No characters will be counted on your quota. Each text will be "simplified" with a given default-text by SUMM AI API.', 'easy-language')
+				'label_for'   => 'easy_language_summ_ai_test',
+				'fieldId'     => 'easy_language_summ_ai_test',
+				'readonly'    => ! $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
+				'description' => __( 'If this is enabled no really simplification will be run through the API. No characters will be counted on your quota. Each text will be "simplified" with a given default-text by SUMM AI API.', 'easy-language' ),
 			)
 		);
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_test' );
@@ -912,11 +910,11 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Validate the SUMM API Token.
 	 *
-	 * @param $value
+	 * @param ?string $value The key to validate.
+	 *
 	 * @return ?string
-	 * @noinspection PhpUnused
 	 */
-	public function validate_api_key( $value ): ?string {
+	public function validate_api_key( ?string $value ): ?string {
 		$errors = get_settings_errors();
 
 		/**
@@ -924,45 +922,43 @@ class Summ_AI extends Base implements Api_Base {
 		 *
 		 * @see https://core.trac.wordpress.org/ticket/21989
 		 */
-		if( helper::check_if_setting_error_entry_exists_in_array('easy_language_summ_ai_api_key', $errors) ) {
+		if ( helper::check_if_setting_error_entry_exists_in_array( 'easy_language_summ_ai_api_key', $errors ) ) {
 			return $value;
 		}
 
 		// if no token has been entered, show hint.
-		if( empty($value) ) {
+		if ( empty( $value ) ) {
 			// set API-mode to 'free'.
 			$this->set_mode( 'free' );
 
-			// show error
-			add_settings_error( 'easy_language_summ_ai_api_key', 'easy_language_summ_ai_api_key', __('You did not enter an API key. You will now use the free quota, if available.', 'easy-language') );
-		}
-		// if token has been changed, run tests with it.
-		elseif( 0 !== strcmp($value, get_option( 'easy_language_summ_ai_api_key', '' ) ) ) {
+			// show error.
+			add_settings_error( 'easy_language_summ_ai_api_key', 'easy_language_summ_ai_api_key', __( 'You did not enter an API key. You will now use the free quota, if available.', 'easy-language' ) );
+		} elseif ( 0 !== strcmp( $value, get_option( 'easy_language_summ_ai_api_key', '' ) ) ) {
+			// if token has been changed, run tests with it.
 			// switch mode to paid for test.
 			$mode = $this->mode;
 			$this->set_mode( 'paid' );
 			$request = $this->get_test_request_response( $value );
-			if( 403 === $request->get_http_status() ) {
+			if ( 403 === $request->get_http_status() ) {
 				// show hint if token is not valid for API.
-				add_settings_error( 'easy_language_summ_ai_api_key', 'easy_language_summ_ai_api_key', __('The API key does not seem to be valid.', 'easy-language') );
+				add_settings_error( 'easy_language_summ_ai_api_key', 'easy_language_summ_ai_api_key', __( 'The API key does not seem to be valid.', 'easy-language' ) );
 
-				// Log event.
-				Log::get_instance()->add_log( sprintf( 'Token for SUMM AI has been changed, but we get an error from API by validation of the key. Please <a href="%1$s">check API log</a>.', esc_url(Helper::get_api_logs_page_url()) ), 'error' );
+				// log the event.
+				Log::get_instance()->add_log( sprintf( 'Token for SUMM AI has been changed, but we get an error from API by validation of the key. Please <a href="%1$s">check API log</a>.', esc_url( Helper::get_api_logs_page_url() ) ), 'error' );
 
 				// remove key.
 				$value = '';
 
 				// revert mode.
 				$this->set_mode( $mode );
-			}
-			else {
+			} else {
 				// get quota of the given key.
 				$this->get_quota_from_api( $value );
 
 				// set API-mode to 'paid'.
 				$this->set_mode( 'paid' );
 
-				// Log event.
+				// log the event.
 				Log::get_instance()->add_log( 'Token for SUMM AI has been changed.', 'success' );
 			}
 		}
@@ -974,13 +970,13 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Validate the insert email regarding its format.
 	 *
-	 * @param $value
+	 * @param ?string $value The email to validate.
+	 *
 	 * @return ?string
-	 * @noinspection PhpUnused
 	 */
-	public function validate_api_email( $value ): ?string {
-		if( !empty($value) && false === is_email( $value ) ) {
-			add_settings_error( 'easy_language_summ_api_email', 'easy_language_summ_api_email', __('The given email is not a valid email-address.', 'easy-language') );
+	public function validate_api_email( ?string $value ): ?string {
+		if ( ! empty( $value ) && false === is_email( $value ) ) {
+			add_settings_error( 'easy_language_summ_api_email', 'easy_language_summ_api_email', __( 'The given email is not a valid email-address.', 'easy-language' ) );
 		}
 		return $value;
 	}
@@ -988,11 +984,11 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Validate multiple radios.
 	 *
-	 * @param $value
+	 * @param ?string $value The radios to validate.
 	 *
 	 * @return ?string
 	 */
-	public function validate_multiple_radios( $value ): ?string {
+	public function validate_multiple_radios( ?string $value ): ?string {
 		return Helper::settings_validate_multiple_radios( $value );
 	}
 
@@ -1001,17 +997,16 @@ class Summ_AI extends Base implements Api_Base {
 	 *
 	 * The source-language must be possible to simplify in the target-language.
 	 *
-	 * @param $values
+	 * @param ?string $values The settings to check.
 	 *
 	 * @return array|null
 	 */
-	public function validate_language_settings( $values ): ?array {
+	public function validate_language_settings( ?string $values ): ?array {
 		$values = Helper::settings_validate_multiple_checkboxes( $values );
-		if( empty($values) ) {
-			add_settings_error( 'easy_language_summ_ai_target_languages', 'easy_language_summ_ai_target_languages', __('You have to set a target-language for simplifications.', 'easy-language') );
-		}
-		elseif( false === $this->is_language_set( $values ) ) {
-			add_settings_error( 'easy_language_summ_ai_target_languages', 'easy_language_summ_ai_target_languages', __('At least one language cannot (currently) be simplified into the selected target languages by the API.', 'easy-language') );
+		if ( empty( $values ) ) {
+			add_settings_error( 'easy_language_summ_ai_target_languages', 'easy_language_summ_ai_target_languages', __( 'You have to set a target-language for simplifications.', 'easy-language' ) );
+		} elseif ( false === $this->is_language_set( $values ) ) {
+			add_settings_error( 'easy_language_summ_ai_target_languages', 'easy_language_summ_ai_target_languages', __( 'At least one language cannot (currently) be simplified into the selected target languages by the API.', 'easy-language' ) );
 		}
 
 		// return value.
@@ -1033,7 +1028,7 @@ class Summ_AI extends Base implements Api_Base {
 		$transients_obj = Transients::get_instance();
 
 		// save value in db.
-		if( !empty($quota) ) {
+		if ( ! empty( $quota ) ) {
 			update_option( 'easy_language_summ_ai_paid_quota', $quota );
 
 			$min_percent = 0.8;
@@ -1047,29 +1042,27 @@ class Summ_AI extends Base implements Api_Base {
 			$min_percent = apply_filters( 'easy_language_quota_percent', $min_percent );
 
 			// show hint of 80% of limit is used.
-			$percent = absint($quota['character_spent']) / absint($quota['character_limit']);
-			if( 1 === $percent ) {
+			$percent = absint( $quota['character_spent'] ) / absint( $quota['character_limit'] );
+			if ( 1 === $percent ) {
 				// get the transients-object to add the new one.
-				$transient_obj  = $transients_obj->add();
+				$transient_obj = $transients_obj->add();
 				$transient_obj->set_dismissible_days( 2 );
 				$transient_obj->set_name( 'easy_language_summ_ai_quota' );
 				/* translators: %1%s will be replaced by the URL for SUMM AI support */
-				$transient_obj->set_message( sprintf(__( '<strong>Your quota for the SUMM AI API is completely depleted.</strong> You will not be able to request new simplifications from SUMM AI. Please contact the <a href="%1$s" target="_blank">SUMM AI support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url($this->get_language_specific_support_page()) ) );
+				$transient_obj->set_message( sprintf( __( '<strong>Your quota for the SUMM AI API is completely depleted.</strong> You will not be able to request new simplifications from SUMM AI. Please contact the <a href="%1$s" target="_blank">SUMM AI support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 				$transient_obj->set_type( 'error' );
 				$transient_obj->save();
-			}
-			elseif( $percent > $min_percent ) {
+			} elseif ( $percent > $min_percent ) {
 				// get the transients-object to add the new one.
-				$transient_obj  = $transients_obj->add();
+				$transient_obj = $transients_obj->add();
 				$transient_obj->set_dismissible_days( 2 );
 				$transient_obj->set_name( 'easy_language_summ_ai_quota' );
 				/* translators: %1%s will be replaced by the URL for SUMM AI support */
-				$transient_obj->set_message( sprintf(__( '<strong>More than 80 percent of your quota for the SUMM AI API has already been used.</strong> Please contact the <a href="%1$s" target="_blank">SUMM AI support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url($this->get_language_specific_support_page()) ) );
+				$transient_obj->set_message( sprintf( __( '<strong>More than 80 percent of your quota for the SUMM AI API has already been used.</strong> Please contact the <a href="%1$s" target="_blank">SUMM AI support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 				$transient_obj->set_type( 'error' );
 				$transient_obj->save();
 			}
-		}
-		else {
+		} else {
 			// delete quota-array in db.
 			delete_option( 'easy_language_summ_ai_paid_quota' );
 
@@ -1093,25 +1086,25 @@ class Summ_AI extends Base implements Api_Base {
 
 		// get quota in paid mode.
 		$mode = $this->get_mode();
-		$this->set_mode('paid');
+		$this->set_mode( 'paid' );
 		$this->get_quota_from_api();
-		$this->set_mode($mode );
+		$this->set_mode( $mode );
 
 		// redirect user.
-		wp_redirect($_SERVER['HTTP_REFERER']);
+		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 	}
 
 	/**
 	 * Get quota.
 	 *
-	 * @param string $token
+	 * @param string $token The token.
 	 *
 	 * @return array
 	 */
 	public function request_quota( string $token = '' ): array {
 		// send request.
 		$request = new Request();
-		$request->set_token( empty($token) ? $this->get_token() : $token );
+		$request->set_token( empty( $token ) ? $this->get_token() : $token );
 		$request->set_url( EASY_LANGUAGE_SUMM_AI_API_URL_QUOTA );
 		$request->set_method( 'GET' );
 		$request->send();
@@ -1120,9 +1113,9 @@ class Summ_AI extends Base implements Api_Base {
 		$response = $request->get_response();
 
 		// transform it to an array and return it.
-		$results = json_decode($response, true);
-		if( is_array($results) ) {
-			if( is_null($results['character_limit']) ) {
+		$results = json_decode( $response, true );
+		if ( is_array( $results ) ) {
+			if ( is_null( $results['character_limit'] ) ) {
 				$results['character_limit'] = 1000000;
 			}
 			return $results;
@@ -1140,52 +1133,54 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_contact_email(): string {
-		switch( get_option( 'easy_language_summ_ai_email_mode' ) ) {
+		switch ( get_option( 'easy_language_summ_ai_email_mode' ) ) {
 			case 'custom':
-				$email = get_option( 'easy_language_summ_api_email', '');
-				if( empty($email) ) {
-					return get_option( 'admin_email');
+				$email = get_option( 'easy_language_summ_api_email', '' );
+				if ( empty( $email ) ) {
+					return get_option( 'admin_email' );
 				}
 				return $email;
 			case 'editor':
 				$user = wp_get_current_user();
-				if( $user instanceof WP_User && !empty($user->user_email) ) {
+				if ( $user instanceof WP_User && ! empty( $user->user_email ) ) {
 					return $user->user_email;
 				}
-				return get_option( 'admin_email');
+				return get_option( 'admin_email' );
 			case 'admin':
 			default:
-				return get_option( 'admin_email');
+				return get_option( 'admin_email' );
 		}
 	}
 
 	/**
 	 * Add settings-tab.
 	 *
-	 * @param $tab
+	 * @param string $tab The tab to use.
 	 *
 	 * @return void
 	 */
-	public function add_settings_tab( $tab ): void {
+	public function add_settings_tab( string $tab ): void {
 		// get list of available plugins and check if they support APIs.
 		$supports_api = false;
-		foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if( $plugin_obj->is_supporting_apis() && false === $plugin_obj->has_own_api_config() ) {
+		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
+			if ( $plugin_obj->is_supporting_apis() && false === $plugin_obj->has_own_api_config() ) {
 				$supports_api = true;
 			}
 		}
 
 		// bail of plugin does not support api OR this API is not enabled.
-		if( false === $supports_api || $this->get_name() !== get_option('easy_language_api', '') ) {
+		if ( false === $supports_api || $this->get_name() !== get_option( 'easy_language_api', '' ) ) {
 			return;
 		}
 
-		// check active tab
-		$activeClass = '';
-		if( 'summ_ai' === $tab ) $activeClass = ' nav-tab-active';
+		// check active tab.
+		$active_class = '';
+		if ( 'summ_ai' === $tab ) {
+			$active_class = ' nav-tab-active';
+		}
 
-		// output tab
-		echo '<a href="'.esc_url(helper::get_settings_page_url()).'&tab=summ_ai" class="nav-tab'.esc_attr($activeClass).'">'.__('SUMM AI', 'easy-language').'</a>';
+		// output tab.
+		echo '<a href="' . esc_url( helper::get_settings_page_url() ) . '&tab=summ_ai" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'SUMM AI', 'easy-language' ) . '</a>';
 	}
 
 	/**
@@ -1195,14 +1190,14 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function add_settings_page(): void {
 		// bail if this API is not enabled.
-		if( Apis::get_instance()->get_active_api()->get_name() !== $this->get_name() ) {
+		if ( Apis::get_instance()->get_active_api()->get_name() !== $this->get_name() ) {
 			return;
 		}
 
 		// get list of available plugins and check if they support APIs.
 		$supports_api = false;
-		foreach( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if( $plugin_obj->is_supporting_apis() ) {
+		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
+			if ( $plugin_obj->is_supporting_apis() ) {
 				$supports_api = true;
 			}
 		}
@@ -1213,32 +1208,31 @@ class Summ_AI extends Base implements Api_Base {
 		}
 
 		?>
-		<form method="POST" action="<?php echo get_admin_url(); ?>options.php">
+		<form method="POST" action="<?php echo esc_url( get_admin_url() ); ?>options.php">
 			<?php
 			settings_fields( 'easyLanguageSummAiFields' );
 			do_settings_sections( 'easyLanguageSummAIPage' );
 			submit_button();
 			?>
 		</form>
-		<h2 id="statistics"><?php esc_html_e( 'SUMM AI Quota', 'easy-language'); ?></h2>
+		<h2 id="statistics"><?php esc_html_e( 'SUMM AI Quota', 'easy-language' ); ?></h2>
 		<?php
-		if( $this->is_summ_api_token_set() ) {
+		if ( $this->is_summ_api_token_set() ) {
 			/**
 			 * Get and show the quota we received from API.
 			 */
 			$api_quota = $this->get_quota();
-			if( empty($api_quota) ) {
+			if ( empty( $api_quota ) ) {
 				$quota_text = esc_html__( 'No quota consumed so far', 'easy-language' );
-			}
-			else {
-				$quota_text = $api_quota['character_spent'].' / '.$api_quota['character_limit'];
+			} else {
+				$quota_text = $api_quota['character_spent'] . ' / ' . $api_quota['character_limit'];
 			}
 
 			// get the update quota link.
 			$update_quota_url = add_query_arg(
 				array(
 					'action' => 'easy_language_summ_ai_get_quota',
-					'nonce' => wp_create_nonce( 'easy-language-summ-ai-get-quota' )
+					'nonce'  => wp_create_nonce( 'easy-language-summ-ai-get-quota' ),
 				),
 				get_admin_url() . 'admin.php'
 			);
@@ -1246,13 +1240,14 @@ class Summ_AI extends Base implements Api_Base {
 			// output.
 			?>
 			<p>
-				<strong><?php echo esc_html__( 'Quota', 'easy-language' ); ?>:</strong> <?php echo $quota_text; ?>
-				<a href="<?php echo esc_url($update_quota_url); ?>#statistics" class="button button-secondary"><?php echo esc_html__( 'Update now', 'easy-language' ); ?></a>
+				<strong><?php echo esc_html__( 'Quota', 'easy-language' ); ?>:</strong> <?php echo wp_kses_post( $quota_text ); ?>
+				<a href="<?php echo esc_url( $update_quota_url ); ?>#statistics" class="button button-secondary"><?php echo esc_html__( 'Update now', 'easy-language' ); ?></a>
 			</p>
 			<?php
-		}
-		else {
-			?><p><?php echo esc_html__( 'Info about quota will be available until the API token is set', 'easy-language' ); ?></p><?php
+		} else {
+			?>
+			<p><?php echo esc_html__( 'Info about quota will be available until the API token is set', 'easy-language' ); ?></p>
+			<?php
 		}
 	}
 
@@ -1262,7 +1257,7 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return bool
 	 */
 	private function is_summ_api_token_set(): bool {
-		return false === $this->is_free_mode() && !empty($this->get_token());
+		return false === $this->is_free_mode() && ! empty( $this->get_token() );
 	}
 
 	/**
@@ -1271,21 +1266,21 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return bool
 	 */
 	private function is_email_set(): bool {
-		return !empty($this->get_contact_email());
+		return ! empty( $this->get_contact_email() );
 	}
 
 	/**
 	 * Set the interval for the quota-schedule, if it is enabled.
 	 *
-	 * @param $value
+	 * @param ?string $value The value to set.
 	 *
 	 * @return ?string
 	 */
-	public function set_quota_interval( $value ): ?string {
+	public function set_quota_interval( ?string $value ): ?string {
 		$value = Helper::settings_validate_select_field( $value );
-		if( !empty($value) ) {
+		if ( ! empty( $value ) ) {
 			wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
-			wp_schedule_event(time(), $value, 'easy_language_summ_ai_request_quota');
+			wp_schedule_event( time(), $value, 'easy_language_summ_ai_request_quota' );
 		}
 
 		// return setting.
@@ -1305,25 +1300,23 @@ class Summ_AI extends Base implements Api_Base {
 		$transients_obj = Transients::get_instance();
 
 		// run test only is necessary values are set.
-		if( $this->is_summ_api_token_set() && $this->is_email_set() ) {
+		if ( $this->is_summ_api_token_set() && $this->is_email_set() ) {
 			// send request.
 			$request = $this->get_test_request_response();
 
 			// add new transient for response to user.
 			$transient_obj = $transients_obj->add();
 			$transient_obj->set_name( 'easy_language_summ_ai_test_token' );
-			if( 403 !== $request->get_http_status() ) {
+			if ( 403 !== $request->get_http_status() ) {
 				// show ok-message.
 				$transient_obj->set_message( __( 'Token could be successfully verified.', 'easy-language' ) );
 				$transient_obj->set_type( 'success' );
-			}
-			else {
+			} else {
 				// show error.
 				$transient_obj->set_message( __( 'Token could not be verified. Please take a look in the log to check the reason.', 'easy-language' ) );
 				$transient_obj->set_type( 'error' );
 			}
-		}
-		else {
+		} else {
 			// show error via new transients object.
 			$transient_obj = $transients_obj->add();
 			$transient_obj->set_message( __( 'Token or contact email missing.', 'easy-language' ) );
@@ -1332,22 +1325,22 @@ class Summ_AI extends Base implements Api_Base {
 		$transient_obj->save();
 
 		// redirect user.
-		wp_redirect($_SERVER['HTTP_REFERER']);
+		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 	}
 
 	/**
 	 * Send test request to API.
 	 *
-	 * @param string $token
+	 * @param string $token The token to use.
 	 *
 	 * @return Request
 	 */
 	private function get_test_request_response( string $token = '' ): Request {
 		$request = new Request();
-		$request->set_token( empty($token) ? $this->get_token() : $token );
+		$request->set_token( empty( $token ) ? $this->get_token() : $token );
 		$request->set_url( EASY_LANGUAGE_SUMM_AI_PAID_API_URL );
-		$request->set_is_test(1);
-		$request->set_text('Tokentest');
+		$request->set_is_test( 1 );
+		$request->set_text( 'Tokentest' );
 		$request->send();
 
 		// return object.
@@ -1369,14 +1362,14 @@ class Summ_AI extends Base implements Api_Base {
 
 		// delete quota-hint.
 		$transients_obj = Transients::get_instance();
-		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_summ_ai_quota' );
+		$transient_obj  = $transients_obj->get_transient_by_name( 'easy_language_summ_ai_quota' );
 		$transient_obj->delete();
 
 		// revert to free mode.
 		$this->set_mode( 'free' );
 
 		// redirect user.
-		wp_redirect($_SERVER['HTTP_REFERER']);
+		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 	}
 
 	/**
@@ -1395,7 +1388,7 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_mode(): string {
 		$mode = get_option( 'easy_language_summ_ai_mode' );
-		if( in_array( $mode, array( 'paid', 'free' ), true ) ) {
+		if ( in_array( $mode, array( 'paid', 'free' ), true ) ) {
 			return $mode;
 		}
 		return 'free';
@@ -1404,12 +1397,12 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Set mode for this API (paid or free).
 	 *
-	 * @param string $mode
+	 * @param string $mode The mode to set.
 	 *
 	 * @return void
 	 */
 	private function set_mode( string $mode ): void {
-		if( in_array( $mode, array( 'paid', 'free' ), true ) ) {
+		if ( in_array( $mode, array( 'paid', 'free' ), true ) ) {
 			// set in object.
 			$this->mode = $mode;
 

@@ -7,15 +7,15 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language\Parser;
 
-use easyLanguage\Helper;
-use easyLanguage\Multilingual_plugins\Easy_Language\Parser;
-use easyLanguage\Multilingual_plugins\Easy_Language\Parser_Base;
-use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
-
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use easyLanguage\Helper;
+use easyLanguage\Multilingual_plugins\Easy_Language\Parser;
+use easyLanguage\Multilingual_plugins\Easy_Language\Parser_Base;
+use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 
 /**
  * Handler for parsing wp bakery-content.
@@ -90,13 +90,13 @@ class WPBakery extends Parser_Base implements Parser {
 	/**
 	 * Return whether a given widget used HTML or not for its texts.
 	 *
-	 * @param string $widget_name
+	 * @param string $widget_name Name of the used widget.
 	 *
 	 * @return bool
 	 */
 	private function is_flow_text_widget_html( string $widget_name ): bool {
 		$html_support_widgets = array(
-			'vc_column_text' => true
+			'vc_column_text' => true,
 		);
 
 		/**
@@ -108,7 +108,7 @@ class WPBakery extends Parser_Base implements Parser {
 		 */
 		$html_widgets = apply_filters( 'easy_language_wpbakery_html_widgets', $html_support_widgets );
 
-		return isset($html_widgets[$widget_name]);
+		return isset( $html_widgets[ $widget_name ] );
 	}
 
 	/**
@@ -135,7 +135,7 @@ class WPBakery extends Parser_Base implements Parser {
 					if ( ! empty( $texts ) ) {
 						$resulting_texts[] = array(
 							'text' => $texts,
-							'html' => $this->is_flow_text_widget_html( $shortcode )
+							'html' => $this->is_flow_text_widget_html( $shortcode ),
 						);
 					}
 				}
@@ -145,7 +145,7 @@ class WPBakery extends Parser_Base implements Parser {
 						if ( ! empty( $texts ) ) {
 							$resulting_texts[] = array(
 								'text' => $texts,
-								'html' => $this->is_flow_text_widget_html( $shortcode )
+								'html' => $this->is_flow_text_widget_html( $shortcode ),
 							);
 						}
 					}
@@ -155,7 +155,7 @@ class WPBakery extends Parser_Base implements Parser {
 						if ( in_array( $attribute, $attributes, true ) && ! empty( $attribute_value ) ) {
 							$resulting_texts[] = array(
 								'text' => $attribute_value,
-								'html' => $this->is_flow_text_widget_html( $shortcode )
+								'html' => $this->is_flow_text_widget_html( $shortcode ),
 							);
 						}
 					}

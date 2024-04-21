@@ -273,10 +273,10 @@ class Parser_Base {
 							/* translators: %1$s will be replaced by the API-title */
 							printf( esc_html__( 'Simplify with %1$s.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
 
-							if ( $quota_state['quota_percent'] > $min_percent ) {
-								/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
-								echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';
-							}
+						if ( $quota_state['quota_percent'] > $min_percent ) {
+							/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
+							echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';
+						}
 						?>
 						</a>
 					</p>

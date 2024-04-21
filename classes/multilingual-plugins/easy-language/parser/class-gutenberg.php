@@ -65,13 +65,13 @@ class Gutenberg extends Parser_Base implements Parser {
 	private function get_flow_text_blocks(): array {
 		$blocks = array(
 			'core/paragraph' => array(
-				'html' => true
+				'html' => true,
 			),
 			'core/heading'   => array(
-				'html' => true
+				'html' => true,
 			),
 			'core/list-item' => array(
-				'html' => true
+				'html' => true,
 			),
 		);
 
@@ -116,7 +116,7 @@ class Gutenberg extends Parser_Base implements Parser {
 		// get content if it is a valid flow-text-block.
 		if ( isset( $flow_blocks[ $block['blockName'] ] ) ) {
 			$add_to_result = $flow_blocks[ $block['blockName'] ];
-			if ( !empty( $flow_blocks[ $block['blockName'] ]['callback'] ) && is_callable( $flow_blocks[ $block['blockName'] ]['callback'] ) ) {
+			if ( ! empty( $flow_blocks[ $block['blockName'] ]['callback'] ) && is_callable( $flow_blocks[ $block['blockName'] ]['callback'] ) ) {
 				$add_to_result['text'] = call_user_func( $flow_blocks[ $block['blockName'] ]['callback'], $block['blockName'] );
 			} else {
 				$add_to_result['text'] = trim( $block['innerHTML'] );

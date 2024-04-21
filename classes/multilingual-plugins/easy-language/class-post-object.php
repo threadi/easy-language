@@ -467,7 +467,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 				}
 
 				// set html-marker to true if not set.
-				if( !isset($text['html']) ) {
+				if ( ! isset( $text['html'] ) ) {
 					$text['html'] = true;
 				}
 

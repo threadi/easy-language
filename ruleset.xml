@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="EasyLanguage" namespace="EasyLanguage\EasyLanguage" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/squizlabs/PHP_CodeSniffer/master/phpcs.xsd">
+
+	<description>Easy Language Standards</description>
+
+    <config name="minimum_wp_version" value="6.2"/>
+
+	<!--
+	Included via WordPress-Extra.
+	<rule ref="WordPress-Core"/>
+	-->
+	<rule ref="WordPress-Docs"/>
+	<rule ref="WordPress-Extra"/>
+    <rule ref="WordPress">
+		<!-- Exclude direkt db query warnings -->
+		<exclude name="WordPress.DB.DirectDatabaseQuery"/>
+		<exclude name="WordPress.DB.PreparedSQL.NotPrepared"/>
+		<!-- Exclude slow query -->
+		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_meta_query"/>
+		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_meta_key"/>
+		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_tax_query"/>
+		<!-- Exclude override of globals -->
+		<exclude name="WordPress.WP.GlobalVariablesOverride"/>
+		<!-- Exclude base64 -->
+		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode"/>
+		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+		<exclude name="WordPress.WP.I18n.NonSingularStringLiteralText" />
+	</rule>
+	<rule ref="WordPress.WP.Capabilities">
+		<properties>
+			<property name="custom_capabilities" type="array">
+				<element value="edit_el_simplifier" />
+				<element value="delete_el_simplifier" />
+			</property>
+		</properties>
+	</rule>
+</ruleset>

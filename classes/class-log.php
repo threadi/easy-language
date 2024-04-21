@@ -7,7 +7,13 @@
 
 namespace easyLanguage;
 
+// prevent direct access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
+use WP_User;
 
 /**
  * Handler for logging in this plugin.
@@ -90,7 +96,7 @@ class Log {
 	 * Add a single log-entry.
 	 *
 	 * @param string $entry The entry-text.
-	 * @param string $state The state (error or success),
+	 * @param string $state The state (error or success).
 	 *
 	 * @return void
 	 */
@@ -108,7 +114,8 @@ class Log {
 		 * Get active user.
 		 */
 		$user_id = 0;
-		if( $user = wp_get_current_user() ) {
+		$user    = wp_get_current_user();
+		if ( $user instanceof WP_User ) {
 			$user_id = $user->ID;
 		}
 
@@ -118,10 +125,10 @@ class Log {
 		$wpdb->insert(
 			$this->get_table_name(),
 			array(
-				'time'       => gmdate( 'Y-m-d H:i:s' ),
-				'log'        => $entry,
-				'state'      => $state,
-				'user_id'    => $user_id
+				'time'    => gmdate( 'Y-m-d H:i:s' ),
+				'log'     => $entry,
+				'state'   => $state,
+				'user_id' => $user_id,
 			)
 		);
 

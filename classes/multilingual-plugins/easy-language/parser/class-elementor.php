@@ -107,7 +107,7 @@ class Elementor extends Parser_Base implements Parser {
 	 */
 	private function is_flow_text_widget_html( string $widget_name ): bool {
 		$html_support_widgets = array(
-			'text-editor' => true
+			'text-editor' => true,
 		);
 
 		/**
@@ -119,7 +119,7 @@ class Elementor extends Parser_Base implements Parser {
 		 */
 		$html_widgets = apply_filters( 'easy_language_elementor_html_widgets', $html_support_widgets );
 
-		return isset($html_widgets[$widget_name]);
+		return isset( $html_widgets[ $widget_name ] );
 	}
 
 	/**
@@ -205,7 +205,7 @@ class Elementor extends Parser_Base implements Parser {
 							if ( ! empty( $widget['settings'][ $name ][ $index ][ $content_key ] ) ) {
 								$resulting_texts[] = array(
 									'text' => $widget['settings'][ $name ][ $index ][ $content_key ],
-									'html' => $this->is_flow_text_widget_html($widget['widgetType'])
+									'html' => $this->is_flow_text_widget_html( $widget['widgetType'] ),
 								);
 							}
 						}
@@ -213,7 +213,7 @@ class Elementor extends Parser_Base implements Parser {
 				} elseif ( ! empty( $widget['settings'][ $text ] ) ) {
 						$resulting_texts[] = array(
 							'text' => $widget['settings'][ $text ],
-							'html' => $this->is_flow_text_widget_html($widget['widgetType'])
+							'html' => $this->is_flow_text_widget_html( $widget['widgetType'] ),
 						);
 				}
 			}

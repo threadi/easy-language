@@ -8,15 +8,14 @@
 namespace easyLanguage;
 
 // prevent direct access.
-use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
-use PLL_Settings;
-use WP_Admin_Bar;
-use WP_Post;
-use WP_Query;
-
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
+use WP_Admin_Bar;
+use WP_Post;
+use WP_Query;
 
 /**
  * Helper for this plugin.
@@ -221,8 +220,11 @@ class Helper {
 		$filter = current_filter();
 		if ( ! empty( $filter ) ) {
 			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) && ! empty( $_REQUEST[ $filter . '_ro' ] ) ) {
-				$values = (array) wp_unslash( $_REQUEST[ $filter . '_ro' ] );
+			if ( empty( $values ) ) {
+				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+				if ( ! empty( $pre_values ) ) {
+					$values = array_map( 'sanitize_text_field', $pre_values );
+				}
 			}
 		}
 		return $values;
@@ -240,8 +242,11 @@ class Helper {
 		$filter = current_filter();
 		if ( ! empty( $filter ) ) {
 			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) && ! empty( $_REQUEST[ $filter . '_ro' ] ) ) {
-				$values = (array) wp_unslash( $_REQUEST[ $filter . '_ro' ] );
+			if ( empty( $values ) ) {
+				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_DEFAULT, FILTER_FORCE_ARRAY );
+				if ( ! empty( $pre_values ) ) {
+					$values = array_map( 'sanitize_text_field', $pre_values );
+				}
 			}
 		}
 
@@ -259,8 +264,11 @@ class Helper {
 		$filter = current_filter();
 		if ( ! empty( $filter ) ) {
 			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) && ! empty( $_REQUEST[ $filter . '_ro' ] ) ) {
-				$values = sanitize_text_field( wp_unslash( $_REQUEST[ $filter . '_ro' ] ) );
+			if ( empty( $values ) ) {
+				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+				if ( ! empty( $pre_values ) ) {
+					$values = sanitize_text_field( $pre_values );
+				}
 			}
 		}
 		return $values;
@@ -276,8 +284,11 @@ class Helper {
 		$filter = current_filter();
 		if ( ! empty( $filter ) ) {
 			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) && ! empty( $_REQUEST[ $filter . '_ro' ] ) ) {
-				$value = sanitize_text_field( wp_unslash( $_REQUEST[ $filter . '_ro' ] ) );
+			if ( empty( $values ) ) {
+				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+				if ( ! empty( $pre_values ) ) {
+					$value = sanitize_text_field( $pre_values );
+				}
 			}
 		}
 		return $value;
@@ -289,7 +300,10 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_support_url(): string {
-		return 'https://laolaweb.com/kontakt/';
+		if ( Languages::get_instance()->is_german_language() ) {
+			return 'https://laolaweb.com/kontakt/';
+		}
+		return 'https://laolaweb.com/en/contact/';
 	}
 
 	/**
@@ -298,7 +312,10 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_pro_url(): string {
-		return 'https://laolaweb.com/plugins/leichte-sprache-fuer-wordpress/';
+		if ( Languages::get_instance()->is_german_language() ) {
+			return 'https://laolaweb.com/plugins/leichte-sprache-fuer-wordpress/';
+		}
+		return 'https://laolaweb.com/en/plugins/easy-language-for-wordpress/';
 	}
 
 	/**
@@ -488,7 +505,7 @@ class Helper {
 	/**
 	 * Get language of given object depending on third-party-plugins.
 	 *
-	 * @param int $object_id The ID of the object.
+	 * @param int    $object_id The ID of the object.
 	 * @param string $object_type The type of object.
 	 *
 	 * @return string
@@ -502,7 +519,7 @@ class Helper {
 		 */
 		if ( self::is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' ) ) {
 			$language_details = apply_filters( 'wpml_post_language_details', null, $object->get_id() );
-			if( !empty($language_details) ) {
+			if ( ! empty( $language_details ) ) {
 				return $language_details['locale'];
 			}
 		}
@@ -517,7 +534,7 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_wp_settings_url(): string {
-		return admin_url().'options-general.php';
+		return admin_url() . 'options-general.php';
 	}
 
 	/**
@@ -532,26 +549,26 @@ class Helper {
 		$transients_obj = Transients::get_instance();
 
 		// get the actual language in WordPress.
-		$language = Helper::get_wp_lang();
+		$language = self::get_wp_lang();
 
 		// if actual language is not supported as possible source language, show hint.
 		$source_languages = $api->get_supported_source_languages();
-		if( empty($source_languages[$language]) ) {
+		if ( empty( $source_languages[ $language ] ) ) {
 			// create list of languages this API supports as HTML-list.
 			$language_list = '<ul>';
-			foreach( $source_languages as $settings ) {
-				$language_list .= '<li>'.esc_html($settings['label']).'</li>';
+			foreach ( $source_languages as $settings ) {
+				$language_list .= '<li>' . esc_html( $settings['label'] ) . '</li>';
 			}
 			$language_list .= '</ul>';
 
 			// get language-name.
 			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
-			$translations = wp_get_available_translations();
+			$translations  = wp_get_available_translations();
 			$language_name = $language;
-			if( !empty($translations[$language]) ) {
-				$language_name = $translations[$language]['native_name'];
+			if ( ! empty( $translations[ $language ] ) ) {
+				$language_name = $translations[ $language ]['native_name'];
 			}
-			if( 'en_US' === $language_name ) {
+			if ( 'en_US' === $language_name ) {
 				$language_name = 'English (United States)';
 			}
 
@@ -560,7 +577,7 @@ class Helper {
 			$transient_obj->set_dismissible_days( 2 );
 			$transient_obj->set_name( 'easy_language_source_language_not_supported' );
 			/* translators: %1$s will be replaced by name of the actual language, %2$s will be replaced by the API-title, %3$s will be replaced by the URL for WordPress-settings, %5$s will be replaced by a list of languages, %6$s will be replaced by the URL for the API-settings. */
-			$transient_obj->set_message( sprintf( __( '<strong>The language of your website (%1$s) is not supported as source language for simplifications via %2$s!</strong><br>You will not be able to use %3$s.<br>You will not be able to simplify any texts.<br>You have to <a href="%4$s">switch the language</a> in WordPress to one of the following supported source languages: %5$s Or <a href="%6$s">choose another API</a> which supports the language.', 'easy-language' ), esc_html($language_name), esc_html( $api->get_title() ), esc_html( $api->get_title() ), esc_url( Helper::get_wp_settings_url() ), wp_kses_post( $language_list ), esc_url( Helper::get_settings_page_url() ) ) );
+			$transient_obj->set_message( sprintf( __( '<strong>The language of your website (%1$s) is not supported as source language for simplifications via %2$s!</strong><br>You will not be able to use %3$s.<br>You will not be able to simplify any texts.<br>You have to <a href="%4$s">switch the language</a> in WordPress to one of the following supported source languages: %5$s Or <a href="%6$s">choose another API</a> which supports the language.', 'easy-language' ), esc_html( $language_name ), esc_html( $api->get_title() ), esc_html( $api->get_title() ), esc_url( self::get_wp_settings_url() ), wp_kses_post( $language_list ), esc_url( self::get_settings_page_url() ) ) );
 			$transient_obj->set_type( 'error' );
 			$transient_obj->save();
 
@@ -569,8 +586,7 @@ class Helper {
 
 			// remove intro.
 			delete_option( 'easy_language_intro_step_2' );
-		}
-		else {
+		} else {
 			$transients_obj->get_transient_by_name( 'easy_language_source_language_not_supported' )->delete();
 		}
 	}
@@ -578,12 +594,12 @@ class Helper {
 	/**
 	 * Return dialog for not available page builder.
 	 *
-	 * @param $post_object
-	 * @param $page_builder
+	 * @param Post_Object $post_object The post object.
+	 * @param object      $page_builder The page builder object.
 	 *
 	 * @return array
 	 */
-	public static function get_dialog_for_unavailable_page_builder( $post_object, $page_builder ): array {
+	public static function get_dialog_for_unavailable_page_builder( Post_Object $post_object, object $page_builder ): array {
 		return array(
 			/* translators: %1$s will be replaced by the object-title */
 			'title'   => sprintf( __( 'Used page builder is not available', 'easy-language' ), esc_html( $post_object->get_title() ) ),
