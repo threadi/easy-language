@@ -8,6 +8,8 @@ License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Stable tag: 2.1.0
 
+Simplify your website into easy language - supported by AI.
+
 == Description ==
 
 Simplify your website into easy language - supported by AI.

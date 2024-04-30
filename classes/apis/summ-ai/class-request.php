@@ -266,7 +266,7 @@ class Request {
 
 		// log error if something happened.
 		if ( is_wp_error( $this->result ) ) {
-			Log::get_instance()->add_log( sprintf( 'Error during request on API %1$s: ' . $this->result->get_error_message(), esc_html( $summ_ai_obj->get_name() ) ), 'error' );
+			Log::get_instance()->add_log( sprintf( 'Error during request on API %1$s via %2$s: ' . $this->result->get_error_message(), esc_html( $summ_ai_obj->get_title() ), esc_html( $this->url ) ), 'error' );
 		} else {
 			// secure response.
 			$this->response = wp_remote_retrieve_body( $this->get_result() );
