@@ -4,6 +4,9 @@
 		"php": "8.2",
 		"wp": "latest"
 	},
+	"features": {
+		"networking": true
+	},
 	"steps": [
 		{
 			"step": "login",
