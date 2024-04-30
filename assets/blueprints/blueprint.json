@@ -1,8 +1,8 @@
 {
 	"landingPage": "\/wp-admin\/admin.php?page=easy_language_settings",
 	"preferredVersions": {
-		"php": "8.0",
-		"wp": "6.4.2"
+		"php": "8.2",
+		"wp": "latest"
 	},
 	"steps": [
 		{
