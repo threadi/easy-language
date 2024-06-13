@@ -138,4 +138,5 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Updated dependencies for Gutenberg-scripts
 
 = 2.1.1 =
+* Compatibility with WordPress 6.6
 * Fixed possible error with SUMM AI settings for languages with used API Key
