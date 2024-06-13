@@ -997,11 +997,11 @@ class Summ_AI extends Base implements Api_Base {
 	 *
 	 * The source-language must be possible to simplify in the target-language.
 	 *
-	 * @param ?string $values The settings to check.
+	 * @param ?array $values The settings to check.
 	 *
 	 * @return array|null
 	 */
-	public function validate_language_settings( ?string $values ): ?array {
+	public function validate_language_settings( ?array $values ): ?array {
 		$values = Helper::settings_validate_multiple_checkboxes( $values );
 		if ( empty( $values ) ) {
 			add_settings_error( 'easy_language_summ_ai_target_languages', 'easy_language_summ_ai_target_languages', __( 'You have to set a target-language for simplifications.', 'easy-language' ) );
