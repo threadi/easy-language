@@ -54,7 +54,7 @@ class Log_Api_Table extends WP_List_Table {
 			$order_by = 'date';
 		}
 		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( in_array( $order, array( 'asc', 'desc' ), true ) ) {
+		if ( ! in_array( $order, array( 'asc', 'desc' ), true ) ) {
 			$order = 'desc';
 		}
 
