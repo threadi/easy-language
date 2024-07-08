@@ -6,7 +6,7 @@ Tested up to: 6.6
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 2.1.1
+Stable tag: 2.1.2
 
 Simplify your website into easy language - supported by AI.
 
@@ -140,3 +140,7 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 = 2.1.1 =
 * Compatibility with WordPress 6.6
 * Fixed possible error with SUMM AI settings for languages with used API Key
+
+= 2.1.2 =
+* Fixed order of logs
+* Fixed test of SUMM AI token if plan does only contain easy language
