@@ -941,6 +941,7 @@ class Summ_AI extends Base implements Api_Base {
 			$request = $this->get_test_request_response( $value );
 			if ( 403 === $request->get_http_status() ) {
 				// show hint if token is not valid for API.
+				/* translators: %1$s will be replaced by the URL for the API logs. */
 				add_settings_error( 'easy_language_summ_ai_api_key', 'easy_language_summ_ai_api_key', sprintf( __( 'The API key does not seem to be valid. Take a look in <a href="%1$s">the API log for more details</a>.', 'easy-language' ), esc_url( Helper::get_api_logs_page_url() ) ) );
 
 				// log the event.
