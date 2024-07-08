@@ -143,3 +143,4 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 
 = 2.1.2 =
 * Fixed order of logs
+* Fixed test of SUMM AI token if plan does only contain easy language
