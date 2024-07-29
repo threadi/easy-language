@@ -153,3 +153,21 @@ function easy_language_divi_add_scripts(): void {
 	);
 }
 add_action( 'et_fb_enqueue_assets', 'easy_language_divi_add_scripts' );
+
+/**
+ * Add JS-top for scripts if Divi is enabled.
+ *
+ * @param string $js_top The top marker for JS.
+ *
+ * @return string
+ */
+function easy_language_js_top_for_divi( string $js_top ): string {
+	// bail if Divi is not enabled.
+	if( ! Divi::get_instance()->is_active() ) {
+		return $js_top;
+	}
+
+	// return the top-marker.
+	return 'top.';
+}
+add_filter( 'easy_language_js_top', 'easy_language_js_top_for_divi' );

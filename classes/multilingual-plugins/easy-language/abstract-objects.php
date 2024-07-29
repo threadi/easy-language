@@ -11,6 +11,7 @@ namespace easyLanguage\Multilingual_plugins\Easy_Language;
 use easyLanguage\Apis;
 use easyLanguage\Base;
 use easyLanguage\Helper;
+use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Divi;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -151,6 +152,15 @@ abstract class Objects {
 		// get object-hash.
 		$hash = $this->get_md5();
 
+		$js_top = '';
+		/**
+		 * Set top for JS-location if page builder which makes it necessary is actually used.
+		 *
+		 * @since 2.2.0 Available since 2.2.0.
+		 * @param string $js_top The top-string.
+		 */
+		$js_top = apply_filters( 'easy_language_js_top', $js_top );
+
 		// initialize the simplification.
 		if ( false !== $initialization ) {
 			$simplification_results = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, array() );
@@ -263,17 +273,17 @@ abstract class Objects {
 					),
 					'buttons'   => array(
 						array(
-							'action'  => 'top.location.href="' . get_permalink( $this->get_id() ) . '";',
+							'action'  => $js_top.'location.href="' . get_permalink( $this->get_id() ) . '";',
 							'variant' => 'primary',
 							'text'    => __( 'Show in frontend', 'easy-language' ),
 						),
 						array(
-							'action'  => 'top.location.href="' . $this->get_edit_link() . '";',
+							'action'  => $js_top.'location.href="' . $this->get_edit_link() . '";',
 							'variant' => 'secondary',
 							'text'    => __( 'Edit', 'easy-language' ),
 						),
 						array(
-							'action' => 'location.reload();',
+							'action' => $js_top.'location.reload();',
 							'text'   => __( 'Cancel', 'easy-language' ),
 						),
 					),
@@ -333,17 +343,17 @@ abstract class Objects {
 					),
 					'buttons'   => array(
 						array(
-							'action'  => 'top.location.href="' . get_permalink( $this->get_id() ) . '";',
+							'action'  => $js_top.'location.href="' . get_permalink( $this->get_id() ) . '";',
 							'variant' => 'primary',
 							'text'    => __( 'Show in frontend', 'easy-language' ),
 						),
 						array(
-							'action'  => 'top.location.href="' . $this->get_edit_link() . '";',
+							'action'  => $js_top.'location.href="' . $this->get_edit_link() . '";',
 							'variant' => 'secondary',
 							'text'    => __( 'Edit', 'easy-language' ),
 						),
 						array(
-							'action' => 'top.location.reload();',
+							'action' => $js_top.'location.reload();',
 							'text'   => __( 'Cancel', 'easy-language' ),
 						),
 					),
@@ -359,17 +369,17 @@ abstract class Objects {
 					),
 					'buttons'   => array(
 						array(
-							'action'  => 'top.location.href="' . get_permalink( $this->get_id() ) . '";',
+							'action'  => $js_top.'location.href="' . get_permalink( $this->get_id() ) . '";',
 							'variant' => 'primary',
 							'text'    => __( 'Show in frontend', 'easy-language' ),
 						),
 						array(
-							'action'  => 'top.location.href="' . $this->get_edit_link() . '";',
+							'action'  => $js_top.'location.href="' . $this->get_edit_link() . '";',
 							'variant' => 'secondary',
 							'text'    => __( 'Edit', 'easy-language' ),
 						),
 						array(
-							'action' => 'top.location.reload();',
+							'action' => $js_top.'location.reload();',
 							'text'   => __( 'Cancel', 'easy-language' ),
 						),
 					),
@@ -417,17 +427,17 @@ abstract class Objects {
 				),
 				'buttons'   => array(
 					array(
-						'action'  => 'top.location.href="' . get_permalink( $this->get_id() ) . '";',
+						'action'  => $js_top.'location.href="' . get_permalink( $this->get_id() ) . '";',
 						'variant' => 'primary',
 						'text'    => __( 'Show in frontend', 'easy-language' ),
 					),
 					array(
-						'action'  => 'top.location.href="' . $this->get_edit_link() . '";',
+						'action'  => $js_top.'location.href="' . $this->get_edit_link() . '";',
 						'variant' => 'primary',
 						'text'    => __( 'Edit', 'easy-language' ),
 					),
 					array(
-						'action'  => 'top.location.reload();',
+						'action'  => $js_top.'location.reload();',
 						'variant' => 'secondary',
 						'text'    => __( 'Cancel', 'easy-language' ),
 					),
@@ -530,6 +540,15 @@ abstract class Objects {
 			}
 		}
 
+		$js_top = '';
+		/**
+		 * Set top for JS-location if page builder which makes it necessary is actually used.
+		 *
+		 * @since 2.2.0 Available since 2.2.0.
+		 * @param string $js_top The top-string.
+		 */
+		$js_top = apply_filters( 'easy_language_js_top', $js_top );
+
 		// set state to "in_use" to mark text as simplified and inserted.
 		if ( 0 === $c && $replaced_count > 0 ) {
 			$entry->set_state( 'in_use' );
@@ -544,17 +563,17 @@ abstract class Objects {
 				),
 				'buttons'   => array(
 					array(
-						'action'  => 'top.location.href="' . get_permalink( $this->get_id() ) . '";',
+						'action'  => $js_top.'location.href="' . get_permalink( $this->get_id() ) . '";',
 						'variant' => 'primary',
 						'text'    => __( 'Show in frontend', 'easy-language' ),
 					),
 					array(
-						'action'  => 'top.location.href="' . $this->get_edit_link() . '";',
+						'action'  => $js_top.'location.href="' . $this->get_edit_link() . '";',
 						'variant' => 'primary',
 						'text'    => __( 'Edit', 'easy-language' ),
 					),
 					array(
-						'action'  => 'top.location.reload();',
+						'action'  => $js_top.'location.reload();',
 						'variant' => 'secondary',
 						'text'    => __( 'Cancel', 'easy-language' ),
 					),
