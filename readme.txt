@@ -6,13 +6,13 @@ Tested up to: 6.6
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 2.1.2
+Stable tag: 2.2.0
 
-Simplify your website into easy language - supported by AI.
+Simplify your website into easy or plain language - supported by AI.
 
 == Description ==
 
-Simplify your website into easy language - supported by AI.
+Simplify your website into easy ir plain language - supported by AI.
 
 The Plugin Easy Language adds the functionality to simplify and display your pages and posts into easy or plain language. The translation process can be manually or support by an AI-engine.
 
@@ -144,3 +144,7 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 = 2.1.2 =
 * Fixed order of logs
 * Fixed test of SUMM AI token if plan does only contain easy language
+
+= 2.2.0 =
+* Optimized first SUMM AI API key check
+* Updates dependencies

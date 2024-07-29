@@ -939,7 +939,7 @@ class Summ_AI extends Base implements Api_Base {
 			$mode = $this->mode;
 			$this->set_mode( 'paid' );
 			$request = $this->get_test_request_response( $value );
-			if ( 403 === $request->get_http_status() ) {
+			if ( 200 !== $request->get_http_status() ) {
 				// show hint if token is not valid for API.
 				/* translators: %1$s will be replaced by the URL for the API logs. */
 				add_settings_error( 'easy_language_summ_ai_api_key', 'easy_language_summ_ai_api_key', sprintf( __( 'The API key does not seem to be valid. Take a look in <a href="%1$s">the API log for more details</a>.', 'easy-language' ), esc_url( Helper::get_api_logs_page_url() ) ) );
@@ -1308,7 +1308,7 @@ class Summ_AI extends Base implements Api_Base {
 			// add new transient for response to user.
 			$transient_obj = $transients_obj->add();
 			$transient_obj->set_name( 'easy_language_summ_ai_test_token' );
-			if ( 403 !== $request->get_http_status() ) {
+			if ( 200 === $request->get_http_status() ) {
 				// show ok-message.
 				$transient_obj->set_message( __( 'Token could be successfully verified.', 'easy-language' ) );
 				$transient_obj->set_type( 'success' );
@@ -1339,10 +1339,8 @@ class Summ_AI extends Base implements Api_Base {
 	private function get_test_request_response( string $token = '' ): Request {
 		$request = new Request();
 		$request->set_token( empty( $token ) ? $this->get_token() : $token );
-		$request->set_url( EASY_LANGUAGE_SUMM_AI_PAID_API_URL );
-		$request->set_is_test( 1 );
-		$request->set_target_language( 'de_EL' );
-		$request->set_text( 'Tokentest' );
+		$request->set_url( EASY_LANGUAGE_SUMM_AI_API_URL_QUOTA );
+		$request->set_method( 'GET' );
 		$request->send();
 
 		// return object.
