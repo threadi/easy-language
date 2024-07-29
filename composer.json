@@ -1,6 +1,7 @@
 {
 	"name": "threadi/easy-language",
-	"description": "THis plugin adds easy language support to WordPress.",
+	"version": "2.2.0",
+	"description": "This plugin adds easy language support to WordPress.",
 	"authors": [
 		{
 			"name": "Thomas Zwirner",
