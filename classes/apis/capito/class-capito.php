@@ -471,10 +471,10 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_active_target_languages(): array {
 		// get actual enabled target-languages, if token is given.
-		$target_languages = get_option('easy_language_languages', array());
-		if( $this->is_capito_token_set() ) {
-			$target_languages = get_option('easy_language_capito_target_languages', array());
-			if( ! is_array( $target_languages ) ) {
+		$target_languages = get_option( 'easy_language_languages', array() );
+		if ( $this->is_capito_token_set() ) {
+			$target_languages = get_option( 'easy_language_capito_target_languages', array() );
+			if ( ! is_array( $target_languages ) ) {
 				$target_languages = array();
 			}
 		}
@@ -678,7 +678,14 @@ class Capito extends Base implements Api_Base {
 				'highlight'   => false === $this->is_capito_token_set(),
 			)
 		);
-		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_api_key', array( 'sanitize_callback' => array( $this, 'validate_api_key' ), 'show_in_rest' => true ) );
+		register_setting(
+			'easyLanguageCapitoFields',
+			'easy_language_capito_api_key',
+			array(
+				'sanitize_callback' => array( $this, 'validate_api_key' ),
+				'show_in_rest'      => true,
+			)
+		);
 
 		// Enable source-languages.
 		// -> defaults to WP-locale.
@@ -1101,7 +1108,7 @@ class Capito extends Base implements Api_Base {
 		}
 
 		// bail if this is run via REST API.
-		if( ! Helper::is_admin_api_request() ) {
+		if ( ! Helper::is_admin_api_request() ) {
 			return;
 		}
 

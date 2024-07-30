@@ -15,7 +15,7 @@ use easyLanguage\Setup;
  */
 function easy_language_admin_add_settings_menu(): void {
 	// bail without completed setup.
-	if( ! Setup::get_instance()->is_completed() ) {
+	if ( ! Setup::get_instance()->is_completed() ) {
 		return;
 	}
 
@@ -579,14 +579,12 @@ function easy_language_admin_multiple_text_field( array $attr ): void {
 /**
  * Add tab in settings for logs.
  *
- * @param string $tab The called tab.
- *
  * @return void
  * @noinspection PhpUnused
  */
-function easy_language_settings_add_helper_tab( string $tab ): void {
+function easy_language_settings_add_helper_tab(): void {
 	// output tab.
 	echo '<a href="' . esc_url( Helper::get_plugin_support_url() ) . '" class="nav-tab easy-language-help-tab" target="_blank"><span class="dashicons dashicons-editor-help"></span> ' . esc_html__( 'Need help?', 'easy-language' ) . '</a>';
 }
 
-add_action( 'easy_language_settings_add_tab', 'easy_language_settings_add_helper_tab', 200 );
+add_action( 'easy_language_settings_add_tab', 'easy_language_settings_add_helper_tab', 200, 0 );

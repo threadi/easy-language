@@ -514,10 +514,10 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_active_target_languages(): array {
 		// get actual enabled target-languages, if token is given.
-		$target_languages = get_option('easy_language_languages', array());
-		if( $this->is_summ_api_token_set() ) {
-			$target_languages = get_option('easy_language_summ_ai_target_languages', array());
-			if( ! is_array( $target_languages ) ) {
+		$target_languages = get_option( 'easy_language_languages', array() );
+		if ( $this->is_summ_api_token_set() ) {
+			$target_languages = get_option( 'easy_language_summ_ai_target_languages', array() );
+			if ( ! is_array( $target_languages ) ) {
 				$target_languages = array();
 			}
 		}
@@ -770,7 +770,14 @@ class Summ_AI extends Base implements Api_Base {
 				'highlight'   => false === $this->is_summ_api_token_set(),
 			)
 		);
-		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_api_key', array( 'sanitize_callback' => array( $this, 'validate_api_key' ), 'show_in_rest' => true ) );
+		register_setting(
+			'easyLanguageSummAiFields',
+			'easy_language_summ_ai_api_key',
+			array(
+				'sanitize_callback' => array( $this, 'validate_api_key' ),
+				'show_in_rest'      => true,
+			)
+		);
 
 		// define url for general wp-settings.
 		$wp_settings_url = add_query_arg(
@@ -925,7 +932,7 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function validate_api_key( ?string $value ): ?string {
 		$errors = array();
-		if( function_exists( 'get_settings_errors' ) ) {
+		if ( function_exists( 'get_settings_errors' ) ) {
 			$errors = get_settings_errors();
 		}
 
