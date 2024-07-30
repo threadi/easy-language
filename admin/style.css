@@ -380,3 +380,8 @@ body .review-hint-button:after {
 	font-family: "dashicons", sans-serif;
 	margin-left: 8px;
 }
+
+.easy-language-help-tab {
+	float: right;
+	font-weight: bold;
+}
