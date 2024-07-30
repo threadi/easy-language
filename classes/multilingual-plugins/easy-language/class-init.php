@@ -862,6 +862,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// Log event.
 		Log::get_instance()->add_log( 'Plugin activated', 'success' );
 
+		// validate language support on API.
+		$api_obj = Apis::get_instance()->get_active_api();
+		if ( $api_obj instanceof Api_Base ) {
+			Helper::validate_language_support_on_api( $api_obj );
+		}
+
 		// set transient for intro step 1 with hint where to start.
 		Helper::set_intro_step1();
 	}
