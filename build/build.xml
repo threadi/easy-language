@@ -152,6 +152,8 @@
 			<zipfileset dir="${src.dir}/vendor/gettext" prefix="${plugin.slug}/vendor/gettext" />
 			<zipfileset dir="${src.dir}/vendor/composer" prefix="${plugin.slug}/vendor/composer" />
 			<zipfileset dir="${src.dir}/vendor/threadi/wp-easy-dialog/build/" prefix="${plugin.slug}/vendor/threadi/wp-easy-dialog/build/" />
+			<zipfileset dir="${src.dir}/vendor/threadi/wp-easy-setup/build/" prefix="${plugin.slug}/vendor/threadi/wp-easy-setup/build/" />
+			<zipfileset dir="${src.dir}/vendor/threadi/wp-easy-setup/lib/" prefix="${plugin.slug}/vendor/threadi/wp-easy-setup/lib/" />
 			<zipfileset dir="${src.dir}/vendor/threadi/react-dialog/build/" prefix="${plugin.slug}/vendor/threadi/react-dialog/build/" />
             <zipfileset dir="${src.dir}" includes="uninstall.php,readme.txt" prefix="${plugin.slug}" />
             <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
