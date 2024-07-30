@@ -146,6 +146,7 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Fixed test of SUMM AI token if plan does only contain easy language
 
 = 2.2.0 =
+* Added setup after installation
 * Optimized first SUMM AI API key check
 * Optimized usage of JS-links in dialogs of Divi
 * Optimized hint on supported languages

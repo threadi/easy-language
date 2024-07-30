@@ -76,6 +76,9 @@ class Init {
 			$plugin_obj->init();
 		}
 
+		// initialize the setup.
+		Setup::get_instance()->init();
+
 		// general hooks.
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'init', array( $this, 'plugin_init' ) );
@@ -306,9 +309,6 @@ class Init {
 
 		// delete option for step 2.
 		delete_option( 'easy_language_intro_step_2' );
-
-		// set intro step 1.
-		Helper::set_intro_step1();
 
 		// Log event.
 		Log::get_instance()->add_log( 'Intro resetted', 'success' );

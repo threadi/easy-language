@@ -44,6 +44,13 @@ class Summ_AI extends Base implements Api_Base {
 	protected string $title = 'SUMM AI';
 
 	/**
+	 * Set the token field name.
+	 *
+	 * @var string
+	 */
+	protected string $token_field_name = 'easy_language_summ_ai_api_key';
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?Summ_AI
@@ -763,7 +770,7 @@ class Summ_AI extends Base implements Api_Base {
 				'highlight'   => false === $this->is_summ_api_token_set(),
 			)
 		);
-		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_api_key', array( 'sanitize_callback' => array( $this, 'validate_api_key' ) ) );
+		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_api_key', array( 'sanitize_callback' => array( $this, 'validate_api_key' ), 'show_in_rest' => true ) );
 
 		// define url for general wp-settings.
 		$wp_settings_url = add_query_arg(
@@ -917,14 +924,17 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return ?string
 	 */
 	public function validate_api_key( ?string $value ): ?string {
-		$errors = get_settings_errors();
+		$errors = array();
+		if( function_exists( 'get_settings_errors' ) ) {
+			$errors = get_settings_errors();
+		}
 
 		/**
 		 * If a result-entry already exists, do nothing here.
 		 *
 		 * @see https://core.trac.wordpress.org/ticket/21989
 		 */
-		if ( helper::check_if_setting_error_entry_exists_in_array( 'easy_language_summ_ai_api_key', $errors ) ) {
+		if ( Helper::check_if_setting_error_entry_exists_in_array( 'easy_language_summ_ai_api_key', $errors ) ) {
 			return $value;
 		}
 

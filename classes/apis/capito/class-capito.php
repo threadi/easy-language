@@ -678,7 +678,7 @@ class Capito extends Base implements Api_Base {
 				'highlight'   => false === $this->is_capito_token_set(),
 			)
 		);
-		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_api_key', array( 'sanitize_callback' => array( $this, 'validate_api_key' ) ) );
+		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_api_key', array( 'sanitize_callback' => array( $this, 'validate_api_key' ), 'show_in_rest' => true ) );
 
 		// Enable source-languages.
 		// -> defaults to WP-locale.
@@ -1098,6 +1098,11 @@ class Capito extends Base implements Api_Base {
 		if ( ! wp_next_scheduled( 'easy_language_capito_request_quota' ) ) {
 			// add it.
 			wp_schedule_event( time(), get_option( 'easy_language_capito_quota_interval', 'daily' ), 'easy_language_capito_request_quota' );
+		}
+
+		// bail if this is run via REST API.
+		if( ! Helper::is_admin_api_request() ) {
+			return;
 		}
 
 		// save language-icons in db.
