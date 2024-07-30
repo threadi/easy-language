@@ -54,6 +54,13 @@ abstract class Base {
 	protected string $title = '';
 
 	/**
+	 * Set the token field name.
+	 *
+	 * @var string
+	 */
+	protected string $token_field_name = '';
+
+	/**
 	 * Set max text length for single entry for this API.
 	 *
 	 * @var int
@@ -474,5 +481,14 @@ abstract class Base {
 	 */
 	public function get_translatepress_machine_class(): string {
 		return '';
+	}
+
+	/**
+	 * Return the token field name.
+	 *
+	 * @return string
+	 */
+	public function get_token_field_name(): string {
+		return $this->token_field_name;
 	}
 }

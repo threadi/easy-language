@@ -15,7 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 use WP_Admin_Bar;
 use WP_Post;
+use WP_Post_Type;
 use WP_Query;
+use WP_Rewrite;
 
 /**
  * Helper for this plugin.
@@ -406,21 +408,6 @@ class Helper {
 	}
 
 	/**
-	 * Set intro step 1.
-	 *
-	 * @return void
-	 */
-	public static function set_intro_step1(): void {
-		$transient_obj = Transients::get_instance()->add();
-		$transient_obj->set_dismissible_days( 2 );
-		$transient_obj->set_name( 'easy_language_intro_step_1' );
-		/* translators: %1$s will be replaced by the URL for api settings-URL. */
-		$transient_obj->set_message( sprintf( __( '<strong>You have installed Easy Language - nice and thank you!</strong> Now check the <a href="%1$s">API-settings</a>, select one and start simplifying the texts in your website in easy or plain language.', 'easy-language' ), esc_url( self::get_settings_page_url() ) ) );
-		$transient_obj->set_type( 'hint' );
-		$transient_obj->save();
-	}
-
-	/**
 	 * Generate the admin menu bar for supported languages.
 	 *
 	 * @param string       $id The ID of the object.
@@ -615,5 +602,75 @@ class Helper {
 				),
 			),
 		);
+	}
+
+	/**
+	 * Return the support forum URL.
+	 *
+	 * @return string
+	 */
+	public static function get_plugin_support_url(): string {
+		return 'https://wordpress.org/support/plugin/easy-language/';
+	}
+
+	/**
+	 * Get the current URL.
+	 *
+	 * @return string
+	 */
+	public static function get_current_url(): string {
+		if ( is_admin() && ! empty( $_SERVER['REQUEST_URI'] ) ) {
+			return admin_url( basename( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) );
+		}
+
+		// set return value for page url.
+		$page_url = '';
+
+		// get actual object.
+		$object = get_queried_object();
+		if ( $object instanceof WP_Post_Type ) {
+			$page_url = get_post_type_archive_link( $object->name );
+		}
+		if ( $object instanceof WP_Post ) {
+			$page_url = get_permalink( $object->ID );
+		}
+
+		// return result.
+		return $page_url;
+	}
+
+	/**
+	 * Checks if the current request is a WP REST API request.
+	 *
+	 * Case #1: After WP_REST_Request initialisation
+	 * Case #2: Support "plain" permalink settings and check if `rest_route` starts with `/`
+	 * Case #3: It can happen that WP_Rewrite is not yet initialized,
+	 *          so do this (wp-settings.php)
+	 * Case #4: URL Path begins with wp-json/ (your REST prefix)
+	 *          Also supports WP installations in sub-folders
+	 *
+	 * @returns boolean
+	 * @author matzeeable
+	 */
+	public static function is_admin_api_request(): bool {
+		if ( ( defined( 'REST_REQUEST' ) && REST_REQUEST ) // Case #1.
+		     || ( isset( $GLOBALS['wp']->query_vars['rest_route'] ) // (#2)
+		          && str_starts_with( $GLOBALS['wp']->query_vars['rest_route'], '/' ) ) ) {
+			return true;
+		}
+
+		// Case #3.
+		global $wp_rewrite;
+		if ( is_null( $wp_rewrite ) ) {
+			$wp_rewrite = new WP_Rewrite();
+		}
+
+		// Case #4.
+		$rest_url    = wp_parse_url( trailingslashit( rest_url() ) );
+		$current_url = wp_parse_url( add_query_arg( array() ) );
+		if ( is_array( $current_url ) && isset( $current_url['path'] ) ) {
+			return str_starts_with( $current_url['path'], $rest_url['path'] );
+		}
+		return false;
 	}
 }

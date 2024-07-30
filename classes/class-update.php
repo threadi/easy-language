@@ -8,6 +8,8 @@
 namespace easyLanguage;
 
 // prevent direct access.
+use easyLanguage\Multilingual_plugins\Easy_Language\Texts;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -102,5 +104,32 @@ class Update {
 				wp_schedule_event( time(), '10minutely', 'easy_language_automatic_simplification' );
 			}
 		}
+
+		// set setup to complete if an API key is set or texts are simplified.
+		$setup_completed = false;
+
+		// check active API.
+		$api_obj = APIs::get_instance()->get_active_api();
+		if( $api_obj ) {
+			$token_field_name = $api_obj->get_token_field_name();
+			if( ! empty( $token_field_name ) && ! empty( get_option( $token_field_name ) ) ) {
+				$setup_completed = true;
+			}
+		}
+
+		//
+		$texts = Texts::get_instance()->get_texts();
+		if( ! empty( $texts ) ) {
+			$setup_completed = true;
+		}
+
+		// set setup to complete.
+		if( $setup_completed ) {
+			$setup_obj = Setup::get_instance();
+			$setup_obj->set_completed( $setup_obj->get_setup_name() );
+		}
+
+		// remote now unused transients.
+		Transients::get_instance()->delete_transient( Transients::get_instance()->get_transient_by_name( 'easy_language_intro_step_1' ) );
 	}
 }

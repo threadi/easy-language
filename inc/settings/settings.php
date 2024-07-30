@@ -6,6 +6,7 @@
  */
 
 use easyLanguage\Helper;
+use easyLanguage\Setup;
 
 /**
  * Add settings in options menu.
@@ -13,6 +14,11 @@ use easyLanguage\Helper;
  * @return void
  */
 function easy_language_admin_add_settings_menu(): void {
+	// bail without completed setup.
+	if( ! Setup::get_instance()->is_completed() ) {
+		return;
+	}
+
 	// add our settings-page in menu.
 	add_options_page(
 		__( 'Settings', 'easy-language' ),
