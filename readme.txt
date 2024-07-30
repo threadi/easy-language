@@ -149,3 +149,4 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Optimized first SUMM AI API key check
 * Optimized usage of JS-links in dialogs of Divi
 * Updates dependencies
+* Fixed potential loading of wrong target languages for each API
