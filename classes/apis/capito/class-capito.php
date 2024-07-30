@@ -7,6 +7,11 @@
 
 namespace easyLanguage\Apis\Capito;
 
+// prevent direct access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 use easyLanguage\Api_Base;
 use easyLanguage\Base;
 use easyLanguage\Apis;
@@ -17,11 +22,6 @@ use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use easyLanguage\Transients;
 use wpdb;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Define what Capito supports and what not.
@@ -470,10 +470,13 @@ class Capito extends Base implements Api_Base {
 	 * @return array
 	 */
 	public function get_active_target_languages(): array {
-		// get actual enabled target-languages.
-		$target_languages = get_option( 'easy_language_capito_target_languages', array() );
-		if ( ! is_array( $target_languages ) ) {
-			$target_languages = array();
+		// get actual enabled target-languages, if token is given.
+		$target_languages = get_option('easy_language_languages', array());
+		if( $this->is_capito_token_set() ) {
+			$target_languages = get_option('easy_language_capito_target_languages', array());
+			if( ! is_array( $target_languages ) ) {
+				$target_languages = array();
+			}
 		}
 
 		// define resulting list.
