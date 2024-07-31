@@ -424,6 +424,15 @@ class Init extends Base implements Multilingual_Plugins_Base {
 							),
 						);
 
+						// add settings-button.
+						if( current_user_can( 'manage_options' ) ) {
+							$dialog['buttons'][] = array(
+								'href' => esc_url( Helper::get_settings_page_url() ),
+								'className' => 'dashicons dashicons-admin-generic',
+								'text'   => '&nbsp;',
+							);
+						}
+
 						/**
 						 * Filter the dialog.
 						 *

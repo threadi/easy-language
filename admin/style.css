@@ -385,3 +385,8 @@ body .review-hint-button:after {
 	float: right;
 	font-weight: bold;
 }
+
+#wp-easy-setup .components-panel__body p {
+	color: #000;
+	font-size: 1em
+}
