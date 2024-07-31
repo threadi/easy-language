@@ -8,10 +8,10 @@
 namespace easyLanguage;
 
 // prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Apis\Capito\Capito;
 use easyLanguage\Apis\Summ_Ai\Summ_AI;
-
-defined( 'ABSPATH' ) || exit;
 
 /**
  * Initialize the setup.
@@ -285,8 +285,8 @@ class Setup {
 			1 => array(
 				'easy_language_api'              => array(
 					'type'                => 'RadioControl',
-					'label'               => __( 'Choose API to simply your texts', 'easy-language' ),
-					'help'                => __( 'Please choose the API you want to use to simplify texts your website.<br>Please note that some APIs require additional settings.<br>Some APIs are also associated with costs.<br>You can change the API to use any time after this setup.', 'easy-language' ),
+					'label'               => __( 'Select API to simply your texts', 'easy-language' ),
+					'help'                => __( 'Please select the API you want to use to simplify texts your website.<br>Please note that some APIs require additional settings.<br>Some APIs are also associated with costs.<br>You can change the API to use any time after this setup.', 'easy-language' ),
 					'required'            => true,
 					'options'             => $this->convert_options_for_react( $apis ),
 				),
@@ -407,7 +407,7 @@ class Setup {
 			// Return JSON with forward-URL.
 			wp_send_json(
 				array(
-					'forward' => add_query_arg( array( 'post_page' => 'page' ), get_admin_url() . 'edit.php' )
+					'forward' => add_query_arg( array( 'post_type' => 'page' ), get_admin_url() . 'edit.php' )
 				)
 			);
 		}

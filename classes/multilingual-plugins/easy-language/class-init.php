@@ -192,6 +192,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			// get the post type as object to get additional settings of it.
 			$post_type_obj = get_post_type_object( $post_type );
 
+			// bail if post type does not exist.
+			if( is_null( $post_type_obj ) ) {
+				continue;
+			}
+
 			// go only further if the post-type is visible in backend.
 			if ( false !== $post_type_obj->show_in_menu ) {
 				add_filter( 'manage_' . $post_type . '_posts_columns', array( $this, 'add_post_type_columns' ) );
@@ -423,6 +428,15 @@ class Init extends Base implements Multilingual_Plugins_Base {
 								),
 							),
 						);
+
+						// add settings-button.
+						if( current_user_can( 'manage_options' ) ) {
+							$dialog['buttons'][] = array(
+								'href' => esc_url( Helper::get_settings_page_url() ),
+								'className' => 'dashicons dashicons-admin-generic',
+								'text'   => '&nbsp;',
+							);
+						}
 
 						/**
 						 * Filter the dialog.

@@ -46,7 +46,7 @@ function easy_language_admin_add_settings_api(): void {
 	 */
 	add_settings_section(
 		'settings_section_main',
-		__( 'Choose API for simplifications of your website-texts', 'easy-language' ),
+		__( 'Select API for simplifications of your website-texts', 'easy-language' ),
 		'__return_true',
 		'easyLanguageApiPage',
 		array(
@@ -66,7 +66,7 @@ function easy_language_admin_add_settings_api(): void {
 	if ( ! empty( $apis ) ) {
 		add_settings_field(
 			'easy_language_api',
-			__( 'Choose API', 'easy-language' ),
+			__( 'Select API', 'easy-language' ),
 			'easy_language_admin_choose_api',
 			'easyLanguageApiPage',
 			'settings_section_main',
