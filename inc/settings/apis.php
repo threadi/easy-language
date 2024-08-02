@@ -78,7 +78,16 @@ function easy_language_admin_add_settings_api(): void {
 				'disable_empty' => true,
 			)
 		);
-		register_setting( 'easyLanguageApiFields', 'easy_language_api', array( 'default' => '', 'sanitize_callback' => 'easy_language_admin_validate_chosen_api', 'show_in_rest' => true, 'type' => 'string' ) );
+		register_setting(
+			'easyLanguageApiFields',
+			'easy_language_api',
+			array(
+				'default'           => '',
+				'sanitize_callback' => 'easy_language_admin_validate_chosen_api',
+				'show_in_rest'      => true,
+				'type'              => 'string',
+			)
+		);
 	}
 }
 add_action( 'easy_language_settings_add_settings', 'easy_language_admin_add_settings_api' );

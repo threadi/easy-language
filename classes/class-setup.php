@@ -152,7 +152,7 @@ class Setup {
 			$transient_obj->set_hide_on(
 				array(
 					Helper::get_settings_page_url(),
-					$this->get_setup_link()
+					$this->get_setup_link(),
 				)
 			);
 			$transient_obj->save();
@@ -283,14 +283,14 @@ class Setup {
 		// define setup.
 		$this->setup = array(
 			1 => array(
-				'easy_language_api'              => array(
-					'type'                => 'RadioControl',
-					'label'               => __( 'Select API to simply your texts', 'easy-language' ),
-					'help'                => __( 'Please select the API you want to use to simplify texts your website.<br>Please note that some APIs require additional settings.<br>Some APIs are also associated with costs.<br>You can change the API to use any time after this setup.', 'easy-language' ),
-					'required'            => true,
-					'options'             => $this->convert_options_for_react( $apis ),
+				'easy_language_api' => array(
+					'type'     => 'RadioControl',
+					'label'    => __( 'Select API to simply your texts', 'easy-language' ),
+					'help'     => __( 'Please select the API you want to use to simplify texts your website.<br>Please note that some APIs require additional settings.<br>Some APIs are also associated with costs.<br>You can change the API to use any time after this setup.', 'easy-language' ),
+					'required' => true,
+					'options'  => $this->convert_options_for_react( $apis ),
 				),
-				'help'                                => array(
+				'help'              => array(
 					'type' => 'Text',
 					/* translators: %1$s will be replaced by our support-forum-URL. */
 					'text' => '<p><span class="dashicons dashicons-editor-help"></span> ' . sprintf( __( '<strong>Need help?</strong> Ask in <a href="%1$s" target="_blank">our forum (opens new window)</a>.', 'easy-language' ), esc_url( Helper::get_plugin_support_url() ) ) . '</p>',
@@ -407,7 +407,7 @@ class Setup {
 			// Return JSON with forward-URL.
 			wp_send_json(
 				array(
-					'forward' => add_query_arg( array( 'post_type' => 'page' ), get_admin_url() . 'edit.php' )
+					'forward' => add_query_arg( array( 'post_type' => 'page' ), get_admin_url() . 'edit.php' ),
 				)
 			);
 		}
@@ -449,9 +449,35 @@ class Setup {
 	 * @return void
 	 */
 	public function add_settings(): void {
-		register_setting( 'easyLanguageApiFields', 'easy_language_api', array( 'default' => '', 'show_in_rest' => true, 'type' => 'string' ) );
-		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_api_key', array( 'sanitize_callback' => array( Capito::get_instance(), 'validate_api_key' ), 'default' => '', 'show_in_rest' => true, 'type' => 'string' ) );
-		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_api_key', array( 'sanitize_callback' => array( Summ_AI::get_instance(), 'validate_api_key' ), 'default' => '', 'show_in_rest' => true, 'type' => 'string' ) );
+		register_setting(
+			'easyLanguageApiFields',
+			'easy_language_api',
+			array(
+				'default'      => '',
+				'show_in_rest' => true,
+				'type'         => 'string',
+			)
+		);
+		register_setting(
+			'easyLanguageCapitoFields',
+			'easy_language_capito_api_key',
+			array(
+				'sanitize_callback' => array( Capito::get_instance(), 'validate_api_key' ),
+				'default'           => '',
+				'show_in_rest'      => true,
+				'type'              => 'string',
+			)
+		);
+		register_setting(
+			'easyLanguageSummAiFields',
+			'easy_language_summ_ai_api_key',
+			array(
+				'sanitize_callback' => array( Summ_AI::get_instance(), 'validate_api_key' ),
+				'default'           => '',
+				'show_in_rest'      => true,
+				'type'              => 'string',
+			)
+		);
 	}
 
 	/**
@@ -464,16 +490,16 @@ class Setup {
 	public function update_steps( array $steps ): array {
 		// if API is configured, add the API key configuration field for this API as second step.
 		$api_obj = APIs::get_instance()->get_active_api();
-		if( $api_obj ) {
+		if ( $api_obj ) {
 			$token_field_name = $api_obj->get_token_field_name();
-			if( ! empty( $token_field_name ) ) {
+			if ( ! empty( $token_field_name ) ) {
 				$steps[3] = $steps[2];
 				$steps[2] = array(
 					$token_field_name => array(
-						'type'     => 'TextControl',
-						'label'    => __( 'Enter API Token (optional)', 'easy-language' ),
+						'type'  => 'TextControl',
+						'label' => __( 'Enter API Token (optional)', 'easy-language' ),
 					),
-					'help'                                => array(
+					'help'            => array(
 						'type' => 'Text',
 						/* translators: %1$s will be replaced by our support-forum-URL. */
 						'text' => '<p><span class="dashicons dashicons-editor-help"></span> ' . __( 'If you do not have an API Token yet, just go to next step.', 'easy-language' ) . '</p>',

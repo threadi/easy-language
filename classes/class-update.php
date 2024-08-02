@@ -107,7 +107,7 @@ class Update {
 
 		// set setup to complete if an API key is set or texts are simplified.
 		$setup_obj = Setup::get_instance();
-		if( ! $setup_obj->is_completed() ) {
+		if ( ! $setup_obj->is_completed() ) {
 			$setup_completed = false;
 
 			// check active API.
