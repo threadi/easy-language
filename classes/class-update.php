@@ -97,7 +97,7 @@ class Update {
 		if ( ! wp_next_scheduled( 'easy_language_automatic_simplification' ) ) {
 			// add it.
 			wp_schedule_event( time(), '10minutely', 'easy_language_automatic_simplification' );
-		} else {
+		} else if( function_exists( 'wp_get_scheduled_event' ) ) {
 			$scheduled_event = wp_get_scheduled_event( 'easy_language_automatic_simplification' );
 			if ( in_array( $scheduled_event->schedule, array( '5minutely', 'minutely' ), true ) ) {
 				wp_clear_scheduled_hook( 'easy_language_automatic_simplification' );

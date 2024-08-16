@@ -1,6 +1,6 @@
 {
 	"name": "threadi/easy-language",
-	"version": "2.2.0",
+	"version": "2.2.1",
 	"description": "This plugin adds easy language support to WordPress.",
 	"authors": [
 		{
@@ -31,11 +31,12 @@
 	"require": {
 		"php": "^8.0",
 		"gettext/gettext": "^5.7",
-		"threadi/wp-easy-dialog": "dev-master",
+		"threadi/wp-easy-dialog": "^1.0.6",
+		"threadi/wp-easy-setup": "dev-master",
 		"threadi/react-dialog": "dev-master"
 	},
 	"require-dev": {
-		"wp-coding-standards/wpcs": "^3.0.1",
+		"wp-coding-standards/wpcs": "^3.1.0",
 		"pronamic/wp-documentor": "^1.3"
 	}
 }

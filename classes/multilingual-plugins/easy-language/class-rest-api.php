@@ -81,18 +81,21 @@ class REST_Api {
 			)
 		);
 
-		// endpoint to check the automatic cronjob.
-		register_rest_route(
-			'easy-language/v1',
-			'/automatic_cron_checks/',
-			array(
-				'methods'             => WP_REST_SERVER::READABLE,
-				'callback'            => array( $this, 'check_automatic_cron' ),
-				'permission_callback' => function () {
-					return current_user_can( 'manage_options' );
-				},
-			)
-		);
+		// bail if necessary function does not exist.
+		if ( function_exists( 'wp_get_scheduled_event' ) ) {
+			// endpoint to check the automatic cronjob.
+			register_rest_route(
+				'easy-language/v1',
+				'/automatic_cron_checks/',
+				array(
+					'methods'             => WP_REST_SERVER::READABLE,
+					'callback'            => array( $this, 'check_automatic_cron' ),
+					'permission_callback' => function () {
+						return current_user_can( 'manage_options' );
+					},
+				)
+			);
+		}
 
 		// endpoint to check for API.
 		register_rest_route(

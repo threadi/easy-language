@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Easy Language
  * Description:       Provides possibility to simplify texts to easy and plain language.
- * Requires at least: 6.0
+ * Requires at least: 4.9.24
  * Requires PHP:      8.0
  * Version:           @@VersionNumber@@
  * Author:            laOlaWeb

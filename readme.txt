@@ -1,12 +1,12 @@
 === Easy Language ===
 Contributors: laolaweb, threadi
 Tags: easy language, leichte sprache, simplify, summ ai, capito
-Requires at least: 6.0
+Requires at least: 4.9.24
 Tested up to: 6.6
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 2.2.0
+Stable tag: 2.2.1
 
 Simplify your website into easy or plain language - supported by AI.
 
@@ -72,6 +72,10 @@ The development repository is on [GitHub](https://github.com/threadi/easy-langua
 * Show where any simplified text is used in your website
 
 More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://laolaweb.com/en/plugins/easy-language-for-wordpress/)
+
+== ClassicPress ==
+
+This plugin is compatible with [ClassicPress](https://www.classicpress.net/).
 
 == Installation ==
 
@@ -154,3 +158,9 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Optimized hint on supported languages
 * Updates dependencies
 * Fixed potential loading of wrong target languages for each API
+
+= 2.2.1 =
+* Now compatible with WordPress since 4.9.24 (also usable with ClassicPress)
+* Downgrading wordpress-scripts for compatibility for our own Block-Additions with WordPress < 6.6
+* Updates dependencies
+* Fixed missing libraries for Divi support
