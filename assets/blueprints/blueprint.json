@@ -1,5 +1,5 @@
 {
-	"landingPage": "\/wp-admin\/admin.php?page=easy_language_settings",
+	"landingPage": "\/wp-admin\/admin.php?page=easyLanguageSetup",
 	"preferredVersions": {
 		"php": "8.2",
 		"wp": "latest"
@@ -40,9 +40,28 @@
 			}
 		},
 		{
+			"step":"writeFile",
+			"path":"/wordpress/wp-content/languages/plugins/easy-language-de_DE.mo",
+			"data":{
+				"resource":"url",
+				"caption":"Downloading easy-language-de_DE.mo",
+				"url":"https://translate.wordpress.org/projects/wp-plugins/easy-language/stable/de/default/export-translations?format=mo"
+			}
+		},
+		{
 			"step":"setSiteOptions",
 			"options":{
 				"WPLANG":"de_DE"
+			}
+		},
+		{
+			"step": "installPlugin",
+			"pluginZipFile": {
+				"resource": "wordpress.org/plugins",
+				"slug": "easy-language"
+			},
+			"options": {
+				"activate": true
 			}
 		}
 	]
