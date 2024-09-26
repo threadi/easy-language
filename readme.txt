@@ -6,7 +6,7 @@ Tested up to: 6.6
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 2.2.0
+Stable tag: 2.2.2
 
 Simplify your website into easy or plain language - supported by AI.
 
@@ -154,3 +154,11 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Optimized hint on supported languages
 * Updates dependencies
 * Fixed potential loading of wrong target languages for each API
+
+= 2.2.1 =
+* Test-Release
+
+= 2.2.2 =
+* Hide language hint in setup page
+* Updated blueprint.json
+* Optimized build of release
