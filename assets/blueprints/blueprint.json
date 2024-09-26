@@ -1,5 +1,5 @@
 {
-	"landingPage": "\/wp-admin\/admin.php?page=easy_language_settings",
+	"landingPage": "\/wp-admin\/admin.php?page=easyLanguageSetup",
 	"preferredVersions": {
 		"php": "8.2",
 		"wp": "latest"
@@ -12,38 +12,6 @@
 			"step": "login",
 			"username": "admin",
 			"password": "password"
-		},
-		{
-			"step":"mkdir",
-			"path":"/wordpress/wp-content/languages/plugins"
-		},
-		{
-			"step":"mkdir",
-			"path":"/wordpress/wp-content/languages/themes"
-		},
-		{
-			"step":"writeFile",
-			"path":"/wordpress/wp-content/languages/de_DE.mo",
-			"data":{
-				"resource":"url",
-				"caption":"Downloading de_DE.mo",
-				"url":"https://translate.wordpress.org/projects/wp/dev/de/default/export-translations?format=mo"
-			}
-		},
-		{
-			"step":"writeFile",
-			"path":"/wordpress/wp-content/languages/admin-de_DE.mo",
-			"data":{
-				"resource":"url",
-				"caption":"Downloading admin-de_DE.mo",
-				"url":"https://translate.wordpress.org/projects/wp/dev/admin/de/default/export-translations?format=mo"
-			}
-		},
-		{
-			"step":"setSiteOptions",
-			"options":{
-				"WPLANG":"de_DE"
-			}
 		}
 	]
 }
