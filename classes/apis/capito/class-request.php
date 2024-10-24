@@ -7,15 +7,15 @@
 
 namespace easyLanguage\Apis\Capito;
 
-use easyLanguage\Log;
-use easyLanguage\Log_Api;
-use easyLanguage\Multilingual_plugins\Easy_Language\Db;
-use WP_Error;
-
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use easyLanguage\Log;
+use easyLanguage\Log_Api;
+use easyLanguage\Multilingual_plugins\Easy_Language\Db;
+use WP_Error;
 
 /**
  * Create and send request to capito API. Gets the response.
@@ -177,7 +177,7 @@ class Request {
 		$headers = array_merge(
 			$this->header,
 			array(
-				'Authorization' => 'Bearer ' . $this->token,
+				'Authorization' => 'Token ' . $this->token,
 			)
 		);
 

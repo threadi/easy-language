@@ -1173,7 +1173,7 @@ class Capito extends Base implements Api_Base {
 		$request = new Request();
 		$request->set_token( empty( $token ) ? $this->get_token() : $token );
 		$request->set_url( EASY_LANGUAGE_CAPITO_SUBSCRIPTION_URL );
-		$request->set_method( 'GET' );
+		$request->set_method( 'POST' );
 		$request->send();
 
 		// return object.

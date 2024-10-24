@@ -6,7 +6,7 @@ Tested up to: 6.6
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 2.2.2
+Stable tag: 2.3.0
 
 Simplify your website into easy or plain language - supported by AI.
 
@@ -162,3 +162,6 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Hide language hint in setup page
 * Updated blueprint.json
 * Optimized build of release
+
+= 2.3.0 =
+* Update Capito API to support of v2
