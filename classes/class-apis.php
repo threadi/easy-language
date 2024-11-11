@@ -107,7 +107,7 @@ class Apis {
 		// check nonce.
 		if ( ( isset( $_REQUEST['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-export-api-log' ) ) || empty( $_REQUEST['nonce'] ) ) {
 			// redirect user back.
-			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}
 
@@ -146,7 +146,7 @@ class Apis {
 		}
 
 		// redirect user back.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( wp_get_referer() );
 		exit;
 	}
 }

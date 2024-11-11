@@ -1049,7 +1049,7 @@ class Capito extends Base implements Api_Base {
 		}
 
 		// redirect user.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( wp_get_referer() );
 		exit;
 	}
 
@@ -1067,7 +1067,7 @@ class Capito extends Base implements Api_Base {
 		$this->get_quota_from_api();
 
 		// redirect user.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( wp_get_referer() );
 		exit;
 	}
 
@@ -1144,7 +1144,7 @@ class Capito extends Base implements Api_Base {
 		$transient_obj->save();
 
 		// redirect user.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( wp_get_referer() );
 	}
 
 	/**

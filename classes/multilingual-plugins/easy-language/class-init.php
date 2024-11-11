@@ -2573,7 +2573,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		}
 
 		// redirect user back to previous page.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( wp_get_referer() );
 		exit;
 	}
 
@@ -2659,7 +2659,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		}
 
 		// redirect user back to list.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( wp_get_referer() );
 		exit;
 	}
 
@@ -2693,7 +2693,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		Log::get_instance()->add_log( 'All to simplify texts has been deleted', 'success' );
 
 		// redirect user back to list.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( wp_get_referer() );
 		exit;
 	}
 }

@@ -165,3 +165,4 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 
 = 2.3.0 =
 * Update Capito API to support of v2
+* Optimized some code
