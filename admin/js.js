@@ -3,8 +3,8 @@ jQuery(document).ready(function($) {
 	let { __ } = wp.i18n;
 
 	// add option near to list-headline.
-	$('body.settings_page_easy_language_settings h1').after('<a class="page-title-action easy-language-pro-hint" href="' + easyLanguageJsVars.pro_url + '" target="_blank">' + easyLanguageJsVars.title_get_pro + '</a>');
-	$('body.settings_page_easy_language_settings h1').each(function() {
+	$('body.settings_page_easy_language_settings .wrap > h1').after('<a class="page-title-action easy-language-pro-hint" href="' + easyLanguageJsVars.pro_url + '" target="_blank">' + easyLanguageJsVars.title_get_pro + '</a>');
+	$('body.settings_page_easy_language_settings .wrap > h1').each(function() {
 		let button = document.createElement('a');
 		button.className = 'review-hint-button page-title-action';
 		button.href = easyLanguageJsVars.review_url;

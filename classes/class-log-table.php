@@ -41,7 +41,7 @@ class Log_Table extends WP_List_Table {
 		// check nonce.
 		if ( isset( $_REQUEST['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-table-log' ) ) {
 			// redirect user back.
-			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}
 

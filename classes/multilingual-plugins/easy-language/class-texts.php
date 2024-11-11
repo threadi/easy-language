@@ -145,7 +145,7 @@ class Texts {
 		Log::get_instance()->add_log( 'Faulty request to create new simplified object.', 'error' );
 
 		// redirect user.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( wp_get_referer() );
 		exit;
 	}
 
@@ -206,7 +206,7 @@ class Texts {
 		$api_obj = Apis::get_instance()->get_active_api();
 		if ( false === $api_obj ) {
 			// no api active => do nothing and forward user.
-			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}
 
@@ -226,7 +226,7 @@ class Texts {
 		}
 
 		// redirect user back to editor.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( wp_get_referer() );
 		exit;
 	}
 
@@ -244,7 +244,7 @@ class Texts {
 		$api_obj = Apis::get_instance()->get_active_api();
 		if ( false === $api_obj ) {
 			// no api active => do nothing and forward user.
-			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}
 
@@ -264,7 +264,7 @@ class Texts {
 				// Log event.
 				Log::get_instance()->add_log( 'Requested object ' . $entry_id . ' could not be found for simplification.', 'error' );
 
-				wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+				wp_safe_redirect( wp_get_referer() );
 				exit;
 			}
 
@@ -279,7 +279,7 @@ class Texts {
 				// Log event.
 				Log::get_instance()->add_log( 'Requested object ' . $entry_id . ' could not be found for simplification. #2', 'error' );
 
-				wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+				wp_safe_redirect( wp_get_referer() );
 				exit;
 			}
 
@@ -291,7 +291,7 @@ class Texts {
 				// Log event.
 				Log::get_instance()->add_log( 'Requested object ' . $entry_id . ' could not be found for simplification. #3', 'error' );
 
-				wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+				wp_safe_redirect( wp_get_referer() );
 				exit;
 			}
 
@@ -300,7 +300,7 @@ class Texts {
 		}
 
 		// redirect user back to editor.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( wp_get_referer() );
 		exit;
 	}
 
@@ -549,7 +549,7 @@ class Texts {
 		// check nonce.
 		if ( ( isset( $_REQUEST['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-export-simplifications' ) ) || empty( $_REQUEST['nonce'] ) ) {
 			// redirect user back.
-			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}
 
@@ -610,7 +610,7 @@ class Texts {
 		}
 
 		// redirect user back.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( wp_get_referer() );
 		exit;
 	}
 }
