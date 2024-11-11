@@ -199,7 +199,7 @@ class Request {
 					'content' => $this->get_text(),
 				),
 			);
-			$data['model']                     = get_option( 'easy_language_chatgpt_model', 'gpt-3.5-turbo' );
+			$data['model']                     = get_option( 'easy_language_chatgpt_model', 'gpt-4o' );
 			$payload                           = wp_json_encode( $data );
 			$args['body']                      = $payload;
 			$args['headers']['Content-Length'] = strlen( $payload );

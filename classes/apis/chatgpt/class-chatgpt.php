@@ -2,6 +2,8 @@
 /**
  * File for handler for things the ChatGpt supports.
  *
+ * @source https://platform.openai.com/docs/api-reference/chat/create
+ *
  * @package easy-language
  */
 
@@ -386,7 +388,7 @@ class ChatGpt extends Base implements Api_Base {
 
 		// Set description for token field if it has not been set.
 		/* translators: %1$s will be replaced by the Chatgpt URL */
-		$description = sprintf( __( 'Get your ChatGpt API Token <a href="%1$s" target="_blank">here (opens new window)</a>.<br>If you have any questions about the token provided by ChatGpt, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+		$description = sprintf( __( 'Get your ChatGpt API Token <a href="%1$s" target="_blank">here (opens new window)</a>.<br>If you have any questions about the token provided by ChatGpt, please contact their support: <a href="%2$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_api_management_url() ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_chatgpt_token_set() ) {
 			// set link to remove the token.
 			$remove_token_url = add_query_arg(
@@ -430,6 +432,7 @@ class ChatGpt extends Base implements Api_Base {
 
 		// Define list of models this plugin supports atm.
 		$models = array(
+			'gpt-4o'         => 'gpt-4o',
 			'gpt-4'         => 'gpt-4',
 			'gpt-3.5-turbo' => 'gpt-3.5-turbo',
 		);
@@ -936,5 +939,14 @@ class ChatGpt extends Base implements Api_Base {
 	public function get_pro_hint(): string {
 		/* translators: %1$s will be replaced by the link to laolaweb.com */
 		return sprintf( __( 'More languages and Options with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a>', 'easy-language' ), esc_url( Helper::get_pro_url() ) );
+	}
+
+	/**
+	 * Return the API management URL.
+	 *
+	 * @return string
+	 */
+	private function get_api_management_url(): string {
+		return 'https://platform.openai.com/api-keys';
 	}
 }

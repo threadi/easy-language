@@ -2,6 +2,8 @@
 /**
  * File for simplifications-handling of the ChatGpt API.
  *
+ * @source https://platform.openai.com/docs/api-reference/chat/create
+ *
  * @package easy-language
  */
 
