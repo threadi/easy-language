@@ -28,17 +28,17 @@ const EASY_LANGUAGE_SUMM_AI_API_URL_QUOTA = 'https://backend.summ-ai.com/transla
 /**
  * The capito API URL for simplifications.
  */
-const EASY_LANGUAGE_CAPITO_API_URL = 'https://api.capito.ai/simplification';
+const EASY_LANGUAGE_CAPITO_API_URL = 'https://api.capito.ai/v2/translation/me';
 
 /**
  * The capito API URL for quotas.
  */
-const EASY_LANGUAGE_CAPITO_API_URL_QUOTA = 'https://api.capito.ai/shop/me/quotas';
+const EASY_LANGUAGE_CAPITO_API_URL_QUOTA = 'https://api.capito.ai/v2/shop/me/quotas';
 
 /**
  * The capito API URL to get info about subscription.
  */
-const EASY_LANGUAGE_CAPITO_SUBSCRIPTION_URL = 'https://api.capito.ai/v2/account/verify';
+const EASY_LANGUAGE_CAPITO_SUBSCRIPTION_URL = 'https://api.capito.ai/v2/account/me/profile';
 
 /**
  * CHATGPT API URL for simplifications.

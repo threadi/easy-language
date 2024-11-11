@@ -2,7 +2,7 @@
 Contributors: laolaweb, threadi
 Tags: easy language, leichte sprache, simplify, summ ai, capito
 Requires at least: 6.0
-Tested up to: 6.6
+Tested up to: 6.7
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html

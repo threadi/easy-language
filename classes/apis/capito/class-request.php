@@ -159,6 +159,7 @@ class Request {
 	 * @noinspection DuplicatedCode
 	 */
 	public function send(): void {
+		// bail if URL is missing.
 		if ( empty( $this->url ) ) {
 			return;
 		}

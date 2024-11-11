@@ -767,15 +767,12 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_quota(): array {
 		$quota = get_option( 'easy_language_capito_quota', array() );
-		if ( ! empty( $quota['simplification'] ) ) {
-			$return = array(
-				'character_spent' => absint( $quota['simplification']['subscription']['available'] ) - absint( $quota['simplification']['subscription']['remaining'] ),
-				'character_limit' => absint( $quota['simplification']['subscription']['available'] ),
+		if ( ! empty( $quota['assistance']['subscription']['remaining'] ) ) {
+			return array(
+				'character_spent' => $quota['assistance']['subscription']['remaining'],
+				'character_limit' => 0,
+				'unlimited'       => true, // we use unlimited marker as we cannot get any info about the booked quota.
 			);
-			if ( 0 === absint( $quota['simplification']['subscription']['available'] ) ) {
-				$return['unlimited'] = true;
-			}
-			return $return;
 		}
 
 		// return initial values.
@@ -993,35 +990,24 @@ class Capito extends Base implements Api_Base {
 			update_option( 'easy_language_capito_quota', $quota );
 
 			// check if key is limited.
-			if ( ! empty( $quota['simplification'] ) && absint( $quota['simplification']['subscription']['available'] ) > 0 ) {
-				$min_percent = 0.8;
-				/**
-				 * Hook for minimal quota percent.
-				 *
-				 * @since 2.0.0 Available since 2.0.0.
-				 *
-				 * @param float $min_percent Minimal percent for quota warning.
-				 */
-				$min_percent = apply_filters( 'easy_language_quota_percent', $min_percent );
-
-				// show hint of 80% of limit is used.
-				$percent = absint( $quota['simplification']['subscription']['remaining'] ) / absint( $quota['simplification']['subscription']['available'] );
-				if ( 1 === $percent ) {
+			if ( ! empty( $quota['assistance']['subscription']['remaining'] ) ) {
+				if( absint( $quota['assistance']['subscription']['remaining'] ) > 0 && absint( $quota['assistance']['subscription']['remaining'] ) < 1000 ) {
+					// get the transients-object to add the new one.
+					$transient_obj = $transients_obj->add();
+					$transient_obj->set_dismissible_days( 2 );
+					$transient_obj->set_name( 'easy_language_capito_quota' );
+					/* translators: %1$s will be replaced by the URL for capito support. */
+					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the capito API is nearly depleted.</strong> You will soon not be able to use any simplifications from capito. Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
+					$transient_obj->set_type( 'error' );
+					$transient_obj->save();
+				}
+				elseif( 0 === absint( $quota['assistance']['subscription']['remaining'] ) ) {
 					// get the transients-object to add the new one.
 					$transient_obj = $transients_obj->add();
 					$transient_obj->set_dismissible_days( 2 );
 					$transient_obj->set_name( 'easy_language_capito_quota' );
 					/* translators: %1$s will be replaced by the URL for capito support. */
 					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the capito API is completely depleted.</strong> You will not be able to use any simplifications from capito. Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
-					$transient_obj->set_type( 'error' );
-					$transient_obj->save();
-				} elseif ( $percent > $min_percent ) {
-					// get the transients-object to add the new one.
-					$transient_obj = $transients_obj->add();
-					$transient_obj->set_dismissible_days( 2 );
-					$transient_obj->set_name( 'easy_language_capito_quota' );
-					/* translators: %1$s will be replaced by the URL for capito support. */
-					$transient_obj->set_message( sprintf( __( '<strong>More than 80%% of your quota for the capito API has already been used.</strong> Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 					$transient_obj->set_type( 'error' );
 					$transient_obj->save();
 				}
@@ -1031,8 +1017,7 @@ class Capito extends Base implements Api_Base {
 			delete_option( 'easy_language_capito_ai_quota' );
 
 			// delete hint.
-			$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_capito_ai_quota' );
-			$transient_obj->delete();
+			$transients_obj->get_transient_by_name( 'easy_language_capito_ai_quota' )->delete();
 		}
 
 		// return quota.
@@ -1173,7 +1158,7 @@ class Capito extends Base implements Api_Base {
 		$request = new Request();
 		$request->set_token( empty( $token ) ? $this->get_token() : $token );
 		$request->set_url( EASY_LANGUAGE_CAPITO_SUBSCRIPTION_URL );
-		$request->set_method( 'POST' );
+		$request->set_method( 'GET' );
 		$request->send();
 
 		// return object.
