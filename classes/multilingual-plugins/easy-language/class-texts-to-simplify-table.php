@@ -169,7 +169,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 			case 'options':
 				$options = array(
 					'<span class="dashicons dashicons-translation" title="' . __( 'Simplify now only with Easy Language Pro.', 'easy-language' ) . '">&nbsp;</span>',
-					'<a href="' . esc_url( $delete_link ) . '" class="dashicons dashicons-trash wp-easy-dialog" data-dialog="' . esc_attr( wp_json_encode( $dialog_simplification ) ) . '" title="' . __( 'Delete this text.', 'easy-language' ) . '">&nbsp;</a>',
+					'<a href="' . esc_url( $delete_link ) . '" class="dashicons dashicons-trash easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( $dialog_simplification ) ) . '" title="' . __( 'Delete this text.', 'easy-language' ) . '">&nbsp;</a>',
 				);
 
 				$item_id = $item->get_id();

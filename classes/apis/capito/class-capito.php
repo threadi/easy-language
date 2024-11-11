@@ -991,7 +991,7 @@ class Capito extends Base implements Api_Base {
 
 			// check if key is limited.
 			if ( ! empty( $quota['assistance']['subscription']['remaining'] ) ) {
-				if( absint( $quota['assistance']['subscription']['remaining'] ) > 0 && absint( $quota['assistance']['subscription']['remaining'] ) < 1000 ) {
+				if ( absint( $quota['assistance']['subscription']['remaining'] ) > 0 && absint( $quota['assistance']['subscription']['remaining'] ) < 1000 ) {
 					// get the transients-object to add the new one.
 					$transient_obj = $transients_obj->add();
 					$transient_obj->set_dismissible_days( 2 );
@@ -1000,8 +1000,7 @@ class Capito extends Base implements Api_Base {
 					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the capito API is nearly depleted.</strong> You will soon not be able to use any simplifications from capito. Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 					$transient_obj->set_type( 'error' );
 					$transient_obj->save();
-				}
-				elseif( 0 === absint( $quota['assistance']['subscription']['remaining'] ) ) {
+				} elseif ( 0 === absint( $quota['assistance']['subscription']['remaining'] ) ) {
 					// get the transients-object to add the new one.
 					$transient_obj = $transients_obj->add();
 					$transient_obj->set_dismissible_days( 2 );

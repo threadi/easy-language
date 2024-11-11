@@ -164,5 +164,9 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Optimized build of release
 
 = 2.3.0 =
+* Added new hooks
 * Update Capito API to support of v2
+* Compatibility with WordPress 6.7
 * Optimized some code
+* Replace dialog- and setup-library with new one
+* Fixed update script

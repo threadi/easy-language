@@ -146,6 +146,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// embed files.
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), PHP_INT_MAX );
+		add_action( 'admin_enqueue_scripts', array( $this, 'add_dialog' ), PHP_INT_MAX );
 		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), PHP_INT_MAX );
 
 		// schedule hook.
@@ -193,7 +194,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			$post_type_obj = get_post_type_object( $post_type );
 
 			// bail if post type does not exist.
-			if( is_null( $post_type_obj ) ) {
+			if ( is_null( $post_type_obj ) ) {
 				continue;
 			}
 
@@ -294,7 +295,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					// do not show anything if the used page builder plugin is not available.
 					if ( false === $page_builder->is_active() ) {
 						/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-						echo '<span class="dashicons dashicons-warning wp-easy-dialog" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
+						echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
 
 						// get link to delete this simplification.
 						$delete_simplification = get_delete_post_link( $simplified_post_id );
@@ -379,7 +380,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 								),
 							),
 						);
-						echo '<span class="dashicons dashicons-admin-generic easy-language-automatic-simplification-prevented wp-easy-dialog" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_html__( 'Automatic simplification is prevented', 'easy-language' ) . '"></span>';
+						echo '<span class="dashicons dashicons-admin-generic easy-language-automatic-simplification-prevented easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_html__( 'Automatic simplification is prevented', 'easy-language' ) . '"></span>';
 					}
 
 					// show mark if content of original object has been changed.
@@ -394,7 +395,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						$create_simplification_link = $post_object->get_simplification_link( $language_code );
 
 						// add warning before adding simplified object if used pagebuilder is unknown.
-						$add_class                 = 'wp-easy-dialog';
+						$add_class                 = 'easy-dialog-for-wordpress';
 						$show_page_builder_warning = false;
 						if ( 'Undetected' === $page_builder->get_name() ) {
 							$show_page_builder_warning = true;
@@ -430,11 +431,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						);
 
 						// add settings-button.
-						if( current_user_can( 'manage_options' ) ) {
+						if ( current_user_can( 'manage_options' ) ) {
 							$dialog['buttons'][] = array(
-								'href' => esc_url( Helper::get_settings_page_url() ),
+								'href'      => esc_url( Helper::get_settings_page_url() ),
 								'className' => 'dashicons dashicons-admin-generic',
-								'text'   => '&nbsp;',
+								'text'      => '&nbsp;',
 							);
 						}
 
@@ -472,12 +473,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 							);
 
 							/* translators: %1$s is the name of the object (e.g. page or post) */
-							echo '<span class="dashicons dashicons-warning wp-easy-dialog"  data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_attr( sprintf( __( 'This %1$s has been edited with an unknown page builder or the classic editor', 'easy-language' ), esc_html( $post_object->get_type_name() ) ) ) . '"></span>';
+							echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress"  data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_attr( sprintf( __( 'This %1$s has been edited with an unknown page builder or the classic editor', 'easy-language' ), esc_html( $post_object->get_type_name() ) ) ) . '"></span>';
 						}
 					} else {
 						// otherwise should warning that the for this object used page builder is not active or not supported.
 						/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-						echo '<span class="dashicons dashicons-warning wp-easy-dialog" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
+						echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
 					}
 				}
 			}
@@ -1350,7 +1351,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				// do not show anything if the used page builder plugin is not available.
 				if ( false === $page_builder->is_active() ) {
 					/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-					echo '<span class="dashicons dashicons-warning wp-easy-dialog" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( esc_html__( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
+					echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( esc_html__( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
 				} else {
 					// create link to edit the simplification post.
 					$edit_translation = $page_builder->get_edit_link();
@@ -1402,7 +1403,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				$dialog = apply_filters( 'easy_language_first_simplify_dialog', $dialog, $api_obj, $post_object );
 
 				// show link to add simplification for this language.
-				$actions[ 'easy-language-' . $language_code ] = '<a href="' . esc_url( $create_translation ) . '" class="wp-easy-dialog" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '"><i class="dashicons dashicons-plus"></i> ' . esc_html( $settings['label'] ) . '</a>';
+				$actions[ 'easy-language-' . $language_code ] = '<a href="' . esc_url( $create_translation ) . '" class="easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '"><i class="dashicons dashicons-plus"></i> ' . esc_html( $settings['label'] ) . '</a>';
 			}
 		}
 		return $actions;
@@ -1624,7 +1625,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Run simplification via AJAX.
 	 *
-	 * Output-Format: count-of-simplifications;count-of-total-simplifications;running-marker;result-as-wp-easy-dialog-array
+	 * Output-Format: count-of-simplifications;count-of-total-simplifications;running-marker;result-as-easy-dialog-for-wordpress-array
 	 *
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
@@ -1844,7 +1845,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		wp_enqueue_script(
 			'easy-language-simplifications',
 			plugins_url( '/classes/multilingual-plugins/easy-language/admin/simplifications.js', EASY_LANGUAGE ),
-			array( 'jquery', 'wp-easy-dialog', 'wp-i18n' ),
+			array( 'jquery', 'easy-dialog', 'wp-i18n' ),
 			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/simplifications.js' ),
 			true
 		);
@@ -1895,7 +1896,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		wp_enqueue_script(
 			'easy-language-plugin-admin',
 			plugins_url( '/classes/multilingual-plugins/easy-language/admin/js.js', EASY_LANGUAGE ),
-			array( 'jquery', 'wp-easy-dialog', 'wp-i18n' ),
+			array( 'jquery', 'easy-dialog', 'wp-i18n' ),
 			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/js.js' ),
 			true
 		);
@@ -1919,24 +1920,49 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				plugin_dir_path( EASY_LANGUAGE ) . '/languages/'
 			);
 		}
+	}
 
-		// embed the wp-easy-dialog-component.
-		$script_asset_path = Helper::get_plugin_path() . 'vendor/threadi/wp-easy-dialog/build/index.asset.php';
-		$script_asset      = require $script_asset_path;
+	/**
+	 * Add the dialog-scripts and -styles.
+	 *
+	 * @return void
+	 */
+	public function add_dialog(): void {
+		// embed necessary scripts for dialog.
+		$path = Helper::get_plugin_path() . 'vendor/threadi/easy-dialog-for-wordpress/';
+		$url  = Helper::get_plugin_url() . 'vendor/threadi/easy-dialog-for-wordpress/';
+
+		// bail if path does not exist.
+		if ( ! file_exists( $path ) ) {
+			return;
+		}
+
+		// embed the dialog-components JS-script.
+		$script_asset_path = $path . 'build/index.asset.php';
+
+		// bail if script does not exist.
+		if ( ! file_exists( $script_asset_path ) ) {
+			return;
+		}
+
+		// embed script.
+		$script_asset = require $script_asset_path;
 		wp_enqueue_script(
-			'wp-easy-dialog',
-			Helper::get_plugin_url() . 'vendor/threadi/wp-easy-dialog/build/index.js',
+			'easy-dialog',
+			$url . 'build/index.js',
 			$script_asset['dependencies'],
 			$script_asset['version'],
 			true
 		);
-		$admin_css      = Helper::get_plugin_url() . 'vendor/threadi/wp-easy-dialog/build/style-index.css';
-		$admin_css_path = Helper::get_plugin_path() . 'vendor/threadi/wp-easy-dialog/build/style-index.css';
+
+		// embed the dialog-components CSS-file.
+		$admin_css      = $url . 'build/style-index.css';
+		$admin_css_path = $path . 'build/style-index.css';
 		wp_enqueue_style(
-			'wp-easy-dialog',
+			'easy-dialog',
 			$admin_css,
 			array( 'wp-components' ),
-			filemtime( $admin_css_path )
+			Helper::get_file_version( $admin_css_path )
 		);
 	}
 

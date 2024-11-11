@@ -15,16 +15,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 
 /**
- * Uninstall-object.
+ * Installer-object.
  */
-class Install {
+class Installer {
 
 	/**
 	 * Instance of this object.
 	 *
-	 * @var ?Install
+	 * @var ?Installer
 	 */
-	private static ?Install $instance = null;
+	private static ?Installer $instance = null;
 
 	/**
 	 * Constructor for Init-Handler.
@@ -41,7 +41,7 @@ class Install {
 	/**
 	 * Return the instance of this Singleton object.
 	 */
-	public static function get_instance(): Install {
+	public static function get_instance(): Installer {
 		if ( ! static::$instance instanceof static ) {
 			static::$instance = new static();
 		}

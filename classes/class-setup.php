@@ -32,29 +32,9 @@ class Setup {
 	private array $setup = array();
 
 	/**
-	 * The object of the setup.
-	 *
-	 * @var \wpEasySetup\Setup
-	 */
-	private \wpEasySetup\Setup $setup_obj;
-
-	/**
 	 * Constructor for this handler.
 	 */
-	private function __construct() {
-		// get the setup-object.
-		$this->setup_obj = \wpEasySetup\Setup::get_instance();
-		$this->setup_obj->set_url( Helper::get_plugin_url() );
-		$this->setup_obj->set_path( Helper::get_plugin_path() );
-		$this->setup_obj->set_texts(
-			array(
-				'title_error' => __( 'Error', 'easy-language' ),
-				'txt_error_1' => __( 'The following error occurred:', 'easy-language' ),
-				/* translators: %1$s will be replaced with the URL of the plugin-forum on wp.org */
-				'txt_error_2' => sprintf( __( '<strong>If reason is unclear</strong> please contact our <a href="%1$s" target="_blank">support-forum (opens new window)</a> with as much detail as possible.', 'easy-language' ), esc_url( Helper::get_plugin_support_url() ) ),
-			)
-		);
-	}
+	private function __construct() {}
 
 	/**
 	 * Prevent cloning of this object.
@@ -75,25 +55,49 @@ class Setup {
 	}
 
 	/**
-	 * Initialize the setup-object.
+	 * Initialize this object.
 	 *
 	 * @return void
 	 */
 	public function init(): void {
+		add_action( 'init', array( $this, 'init_setup' ) );
+		add_action( 'init', array( $this, 'add_settings' ) );
+	}
+
+	/**
+	 * Initialize the setup-object.
+	 *
+	 * @return void
+	 */
+	public function init_setup(): void {
 		// check to show hint if setup should be run.
 		$this->show_hint();
 
 		// only load setup if it is not completed.
 		if ( ! $this->is_completed() ) {
-			add_action( 'init', array( $this, 'add_settings' ) );
+			// get the setup-object.
+			$setup_obj = \easySetupForWordPress\Setup::get_instance();
+			$setup_obj->init();
 
-			add_action( 'wp_easy_setup_set_completed', array( $this, 'set_completed' ) );
-			add_action( 'wp_easy_setup_process', array( $this, 'run_process' ) );
-			add_action( 'wp_easy_setup_process', array( $this, 'show_process_end' ), PHP_INT_MAX );
-			add_filter( 'wp_easy_setup_steps', array( $this, 'update_steps' ) );
+			// get the setup-object.
+			$setup_obj->set_url( Helper::get_plugin_url() );
+			$setup_obj->set_path( Helper::get_plugin_path() );
+			$setup_obj->set_texts(
+				array(
+					'title_error' => __( 'Error', 'easy-language' ),
+					'txt_error_1' => __( 'The following error occurred:', 'easy-language' ),
+					/* translators: %1$s will be replaced with the URL of the plugin-forum on wp.org */
+					'txt_error_2' => sprintf( __( '<strong>If reason is unclear</strong> please contact our <a href="%1$s" target="_blank">support-forum (opens new window)</a> with as much detail as possible.', 'easy-language' ), esc_url( Helper::get_plugin_support_url() ) ),
+				)
+			);
 
-			// set configuration for the setup.
-			$this->setup_obj->set_config( $this->get_config() );
+			// set configuration for setup.
+			$setup_obj->set_config( $this->get_config() );
+
+			add_action( 'esfw_set_completed', array( $this, 'set_completed' ) );
+			add_action( 'esfw_process', array( $this, 'run_process' ) );
+			add_action( 'esfw_process', array( $this, 'show_process_end' ), PHP_INT_MAX );
+			add_filter( 'esfw_steps', array( $this, 'update_steps' ) );
 
 			// add hooks to enable the setup of this plugin.
 			add_action( 'admin_menu', array( $this, 'add_setup_menu' ) );
@@ -110,7 +114,7 @@ class Setup {
 	 * @return bool
 	 */
 	public function is_completed(): bool {
-		return $this->setup_obj->is_completed( $this->get_setup_name() );
+		return \easySetupForWordPress\Setup::get_instance()->is_completed( $this->get_setup_name() );
 	}
 
 	/**
@@ -152,7 +156,7 @@ class Setup {
 			$transient_obj->set_hide_on(
 				array(
 					Helper::get_settings_page_url(),
-					$this->get_setup_link()
+					$this->get_setup_link(),
 				)
 			);
 			$transient_obj->save();
@@ -189,7 +193,14 @@ class Setup {
 	 * @return void
 	 */
 	public function display(): void {
-		echo wp_kses_post( $this->setup_obj->display( $this->get_setup_name() ) );
+		// create help in case of error during loading of the setup.
+		$error_help = '<div class="easy-language-transient notice notice-success"><h3>' . esc_html( apply_filters( 'easy_language_transient_title', Helper::get_plugin_name() ) ) . '</h3><p><strong>' . __( 'Setup is loading', 'easy-language' ) . '</strong><br>' . __( 'Please wait while we load the setup.', 'easy-language' ) . '<br>' . __( 'However, you can also skip the setup and configure the plugin manually.', 'easy-language' ) . '</p><p><a href="' . esc_url( \easySetupForWordPress\Setup::get_instance()->get_skip_url( $this->get_setup_name(), Helper::get_settings_page_url() ) ) . '" class="button button-primary">' . __( 'Skip setup', 'easy-language' ) . '</a></p></div>';
+
+		// add error text.
+		\easySetupForWordPress\Setup::get_instance()->set_error_help( $error_help );
+
+		// output.
+		echo wp_kses_post( \easySetupForWordPress\Setup::get_instance()->display( $this->get_setup_name() ) );
 	}
 
 	/**
@@ -218,7 +229,7 @@ class Setup {
 	/**
 	 * Return configuration for setup.
 	 *
-	 * Here we define which steps and texts are used by wp-easy-setup.
+	 * Here we define which steps and texts are used by easy-setup-for-wordpress.
 	 *
 	 * @return array
 	 */
@@ -254,18 +265,7 @@ class Setup {
 	 * @return void
 	 */
 	public function set_process_label( string $label ): void {
-		update_option( 'wp_easy_setup_step_label', $label );
-	}
-
-	/**
-	 * Updates the process step.
-	 *
-	 * @param int $step Steps to add.
-	 *
-	 * @return void
-	 */
-	public function update_process_step( int $step = 1 ): void {
-		update_option( 'wp_easy_setup_step', absint( get_option( 'wp_easy_setup_step', 0 ) + $step ) );
+		update_option( 'esfw_step_label', $label );
 	}
 
 	/**
@@ -283,14 +283,14 @@ class Setup {
 		// define setup.
 		$this->setup = array(
 			1 => array(
-				'easy_language_api'              => array(
-					'type'                => 'RadioControl',
-					'label'               => __( 'Select API to simply your texts', 'easy-language' ),
-					'help'                => __( 'Please select the API you want to use to simplify texts your website.<br>Please note that some APIs require additional settings.<br>Some APIs are also associated with costs.<br>You can change the API to use any time after this setup.', 'easy-language' ),
-					'required'            => true,
-					'options'             => $this->convert_options_for_react( $apis ),
+				'easy_language_api' => array(
+					'type'     => 'RadioControl',
+					'label'    => __( 'Select API to simply your texts', 'easy-language' ),
+					'help'     => __( 'Please select the API you want to use to simplify texts your website.<br>Please note that some APIs require additional settings.<br>Some APIs are also associated with costs.<br>You can change the API to use any time after this setup.', 'easy-language' ),
+					'required' => true,
+					'options'  => $this->convert_options_for_react( $apis ),
 				),
-				'help'                                => array(
+				'help'              => array(
 					'type' => 'Text',
 					/* translators: %1$s will be replaced by our support-forum-URL. */
 					'text' => '<p><span class="dashicons dashicons-editor-help"></span> ' . sprintf( __( '<strong>Need help?</strong> Ask in <a href="%1$s" target="_blank">our forum (opens new window)</a>.', 'easy-language' ), esc_url( Helper::get_plugin_support_url() ) ) . '</p>',
@@ -313,7 +313,7 @@ class Setup {
 	 * @return void
 	 */
 	public function update_max_step( int $max_count ): void {
-		update_option( 'wp_easy_setup_max_steps', absint( get_option( 'wp_easy_setup_max_steps' ) ) + $max_count );
+		update_option( 'esfw_max_steps', absint( get_option( 'esfw_max_steps' ) ) + $max_count );
 	}
 
 	/**
@@ -324,7 +324,7 @@ class Setup {
 	 * @return void
 	 */
 	public function update_step( int $count ): void {
-		update_option( 'wp_easy_setup_step', absint( get_option( 'wp_easy_setup_step' ) ) + $count );
+		update_option( 'esfw_steps', absint( get_option( 'esfw_steps ' ) ) + $count );
 	}
 
 	/**
@@ -344,7 +344,7 @@ class Setup {
 		$max_steps = 1;
 
 		// set max step count.
-		update_option( 'wp_easy_setup_max_steps', $max_steps );
+		update_option( 'esfw_max_steps', $max_steps );
 
 		// 1. Run step 1
 		$this->set_process_label( 'run step 1' );
@@ -354,7 +354,7 @@ class Setup {
 		$this->set_process_label( 'run step 2' );
 
 		// set steps to max steps to end the process.
-		update_option( 'wp_easy_setup_step', $max_steps );
+		update_option( 'esfw_steps', $max_steps );
 	}
 
 	/**
@@ -395,19 +395,19 @@ class Setup {
 		}
 
 		// get actual list of completed setups.
-		$actual_completed = get_option( 'wp_easy_setup_completed', array() );
+		$actual_completed = get_option( 'esfw_completed', array() );
 
 		// add this setup to the list.
 		$actual_completed[] = $this->get_setup_name();
 
 		// add the actual setup to the list of completed setups.
-		update_option( 'wp_easy_setup_completed', $actual_completed );
+		update_option( 'esfw_completed', $actual_completed );
 
 		if ( Helper::is_admin_api_request() ) {
 			// Return JSON with forward-URL.
 			wp_send_json(
 				array(
-					'forward' => add_query_arg( array( 'post_type' => 'page' ), get_admin_url() . 'edit.php' )
+					'forward' => add_query_arg( array( 'post_type' => 'page' ), get_admin_url() . 'edit.php' ),
 				)
 			);
 		}
@@ -449,9 +449,35 @@ class Setup {
 	 * @return void
 	 */
 	public function add_settings(): void {
-		register_setting( 'easyLanguageApiFields', 'easy_language_api', array( 'default' => '', 'show_in_rest' => true, 'type' => 'string' ) );
-		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_api_key', array( 'sanitize_callback' => array( Capito::get_instance(), 'validate_api_key' ), 'default' => '', 'show_in_rest' => true, 'type' => 'string' ) );
-		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_api_key', array( 'sanitize_callback' => array( Summ_AI::get_instance(), 'validate_api_key' ), 'default' => '', 'show_in_rest' => true, 'type' => 'string' ) );
+		register_setting(
+			'easyLanguageApiFields',
+			'easy_language_api',
+			array(
+				'default'      => '',
+				'show_in_rest' => true,
+				'type'         => 'string',
+			)
+		);
+		register_setting(
+			'easyLanguageCapitoFields',
+			'easy_language_capito_api_key',
+			array(
+				'sanitize_callback' => array( Capito::get_instance(), 'validate_api_key' ),
+				'default'           => '',
+				'show_in_rest'      => true,
+				'type'              => 'string',
+			)
+		);
+		register_setting(
+			'easyLanguageSummAiFields',
+			'easy_language_summ_ai_api_key',
+			array(
+				'sanitize_callback' => array( Summ_AI::get_instance(), 'validate_api_key' ),
+				'default'           => '',
+				'show_in_rest'      => true,
+				'type'              => 'string',
+			)
+		);
 	}
 
 	/**
@@ -464,16 +490,16 @@ class Setup {
 	public function update_steps( array $steps ): array {
 		// if API is configured, add the API key configuration field for this API as second step.
 		$api_obj = APIs::get_instance()->get_active_api();
-		if( $api_obj ) {
+		if ( $api_obj ) {
 			$token_field_name = $api_obj->get_token_field_name();
-			if( ! empty( $token_field_name ) ) {
+			if ( ! empty( $token_field_name ) ) {
 				$steps[3] = $steps[2];
 				$steps[2] = array(
 					$token_field_name => array(
-						'type'     => 'TextControl',
-						'label'    => __( 'Enter API Token (optional)', 'easy-language' ),
+						'type'  => 'TextControl',
+						'label' => __( 'Enter API Token (optional)', 'easy-language' ),
 					),
-					'help'                                => array(
+					'help'            => array(
 						'type' => 'Text',
 						/* translators: %1$s will be replaced by our support-forum-URL. */
 						'text' => '<p><span class="dashicons dashicons-editor-help"></span> ' . __( 'If you do not have an API Token yet, just go to next step.', 'easy-language' ) . '</p>',
@@ -484,5 +510,14 @@ class Setup {
 
 		// return resulting steps.
 		return $steps;
+	}
+
+	/**
+	 * Ron on uninstallation of the plugin.
+	 *
+	 * @return void
+	 */
+	public function uninstall(): void {
+		\easySetupForWordPress\Setup::get_instance()->uninstall( $this->get_setup_name() );
 	}
 }

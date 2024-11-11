@@ -68,8 +68,7 @@ class Init {
 		}
 
 		// get our own installer-handler.
-		$installer_obj = Install::get_instance();
-		$installer_obj->init();
+		Installer::get_instance()->init();
 
 		// initialize the multilingual-plugins.
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {

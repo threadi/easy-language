@@ -2,9 +2,11 @@ jQuery(document).ready(function($) {
 	// get internationalization tools of WordPress.
 	let { __ } = wp.i18n;
 
+	let settings_body = $('body.settings_page_easy_language_settings .wrap > h1');
+
 	// add option near to list-headline.
-	$('body.settings_page_easy_language_settings .wrap > h1').after('<a class="page-title-action easy-language-pro-hint" href="' + easyLanguageJsVars.pro_url + '" target="_blank">' + easyLanguageJsVars.title_get_pro + '</a>');
-	$('body.settings_page_easy_language_settings .wrap > h1').each(function() {
+	settings_body.after('<a class="page-title-action easy-language-pro-hint" href="' + easyLanguageJsVars.pro_url + '" target="_blank">' + easyLanguageJsVars.title_get_pro + '</a>');
+	settings_body.each(function() {
 		let button = document.createElement('a');
 		button.className = 'review-hint-button page-title-action';
 		button.href = easyLanguageJsVars.review_url;

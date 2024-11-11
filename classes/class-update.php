@@ -79,12 +79,13 @@ class Update {
 			if ( version_compare( $installed_plugin_version, '2.1.0', '>=' ) ) {
 				$this->version210();
 			}
+
+			$this->version210();
+			$this->version230();
+
+			// save new plugin-version in DB.
+			update_option( 'easyLanguageVersion', $installed_plugin_version );
 		}
-
-		$this->version210();
-
-		// save new plugin-version in DB.
-		update_option( 'easyLanguageVersion', $installed_plugin_version );
 	}
 
 	/**
@@ -134,5 +135,17 @@ class Update {
 
 		// remote now unused transients.
 		Transients::get_instance()->delete_transient( Transients::get_instance()->get_transient_by_name( 'easy_language_intro_step_1' ) );
+	}
+
+	/**
+	 * On update to version 2.3.0 or newer.
+	 *
+	 * @return void
+	 */
+	public function version230(): void {
+		// get actual value for setup and save it in new field, if not already set.
+		if ( ! get_option( 'esfw_completed' ) ) {
+			update_option( 'esfw_completed', get_option( 'wp_easy_setup_completed' ) );
+		}
 	}
 }

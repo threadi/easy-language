@@ -33,7 +33,7 @@ function easy_language_add_styles_and_js_admin(): void {
 	wp_enqueue_script(
 		'easy-language-admin',
 		plugins_url( '/admin/js.js', EASY_LANGUAGE ),
-		array( 'jquery', 'wp-easy-dialog', 'wp-i18n' ),
+		array( 'jquery', 'easy-dialog', 'wp-i18n' ),
 		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/admin/js.js' ),
 		true
 	);

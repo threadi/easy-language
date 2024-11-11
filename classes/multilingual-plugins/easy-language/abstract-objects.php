@@ -273,17 +273,17 @@ abstract class Objects {
 					),
 					'buttons'   => array(
 						array(
-							'action'  => $js_top.'location.href="' . get_permalink( $this->get_id() ) . '";',
+							'action'  => $js_top . 'location.href="' . get_permalink( $this->get_id() ) . '";',
 							'variant' => 'primary',
 							'text'    => __( 'Show in frontend', 'easy-language' ),
 						),
 						array(
-							'action'  => $js_top.'location.href="' . $this->get_edit_link() . '";',
+							'action'  => $js_top . 'location.href="' . $this->get_edit_link() . '";',
 							'variant' => 'secondary',
 							'text'    => __( 'Edit', 'easy-language' ),
 						),
 						array(
-							'action' => $js_top.'location.reload();',
+							'action' => $js_top . 'location.reload();',
 							'text'   => __( 'Cancel', 'easy-language' ),
 						),
 					),
@@ -343,17 +343,17 @@ abstract class Objects {
 					),
 					'buttons'   => array(
 						array(
-							'action'  => $js_top.'location.href="' . get_permalink( $this->get_id() ) . '";',
+							'action'  => $js_top . 'location.href="' . get_permalink( $this->get_id() ) . '";',
 							'variant' => 'primary',
 							'text'    => __( 'Show in frontend', 'easy-language' ),
 						),
 						array(
-							'action'  => $js_top.'location.href="' . $this->get_edit_link() . '";',
+							'action'  => $js_top . 'location.href="' . $this->get_edit_link() . '";',
 							'variant' => 'secondary',
 							'text'    => __( 'Edit', 'easy-language' ),
 						),
 						array(
-							'action' => $js_top.'location.reload();',
+							'action' => $js_top . 'location.reload();',
 							'text'   => __( 'Cancel', 'easy-language' ),
 						),
 					),
@@ -369,17 +369,17 @@ abstract class Objects {
 					),
 					'buttons'   => array(
 						array(
-							'action'  => $js_top.'location.href="' . get_permalink( $this->get_id() ) . '";',
+							'action'  => $js_top . 'location.href="' . get_permalink( $this->get_id() ) . '";',
 							'variant' => 'primary',
 							'text'    => __( 'Show in frontend', 'easy-language' ),
 						),
 						array(
-							'action'  => $js_top.'location.href="' . $this->get_edit_link() . '";',
+							'action'  => $js_top . 'location.href="' . $this->get_edit_link() . '";',
 							'variant' => 'secondary',
 							'text'    => __( 'Edit', 'easy-language' ),
 						),
 						array(
-							'action' => $js_top.'location.reload();',
+							'action' => $js_top . 'location.reload();',
 							'text'   => __( 'Cancel', 'easy-language' ),
 						),
 					),
@@ -427,17 +427,17 @@ abstract class Objects {
 				),
 				'buttons'   => array(
 					array(
-						'action'  => $js_top.'location.href="' . get_permalink( $this->get_id() ) . '";',
+						'action'  => $js_top . 'location.href="' . get_permalink( $this->get_id() ) . '";',
 						'variant' => 'primary',
 						'text'    => __( 'Show in frontend', 'easy-language' ),
 					),
 					array(
-						'action'  => $js_top.'location.href="' . $this->get_edit_link() . '";',
+						'action'  => $js_top . 'location.href="' . $this->get_edit_link() . '";',
 						'variant' => 'primary',
 						'text'    => __( 'Edit', 'easy-language' ),
 					),
 					array(
-						'action'  => $js_top.'location.reload();',
+						'action'  => $js_top . 'location.reload();',
 						'variant' => 'secondary',
 						'text'    => __( 'Cancel', 'easy-language' ),
 					),
@@ -563,17 +563,17 @@ abstract class Objects {
 				),
 				'buttons'   => array(
 					array(
-						'action'  => $js_top.'location.href="' . get_permalink( $this->get_id() ) . '";',
+						'action'  => $js_top . 'location.href="' . get_permalink( $this->get_id() ) . '";',
 						'variant' => 'primary',
 						'text'    => __( 'Show in frontend', 'easy-language' ),
 					),
 					array(
-						'action'  => $js_top.'location.href="' . $this->get_edit_link() . '";',
+						'action'  => $js_top . 'location.href="' . $this->get_edit_link() . '";',
 						'variant' => 'primary',
 						'text'    => __( 'Edit', 'easy-language' ),
 					),
 					array(
-						'action'  => $js_top.'location.reload();',
+						'action'  => $js_top . 'location.reload();',
 						'variant' => 'secondary',
 						'text'    => __( 'Cancel', 'easy-language' ),
 					),

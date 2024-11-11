@@ -6,6 +6,7 @@
  */
 
 use easyLanguage\Helper;
+use easyLanguage\Multilingual_plugins\Easy_Language\Init;
 use easyLanguage\Multilingual_plugins\Easy_Language\PageBuilder\Elementor\Switcher_Widget;
 use Elementor\Controls_Manager;
 use Elementor\Core\DocumentTypes\Page;
@@ -186,30 +187,14 @@ function easy_language_pagebuilder_elementor_styles(): void {
 		wp_register_script(
 			'easy-language-elementor-admin',
 			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'classes/multilingual-plugins/easy-language/admin/elementor.js',
-			array( 'jquery', 'wp-easy-dialog' ),
+			array( 'jquery', 'easy-dialog' ),
 			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/elementor.js' ),
 			true
 		);
 		wp_enqueue_script( 'easy-language-elementor-admin' );
 
-		// embed the wp-easy-dialog-component.
-		$script_asset_path = Helper::get_plugin_path() . 'vendor/threadi/wp-easy-dialog/build/index.asset.php';
-		$script_asset      = require $script_asset_path;
-		wp_enqueue_script(
-			'wp-easy-dialog',
-			Helper::get_plugin_url() . 'vendor/threadi/wp-easy-dialog/build/index.js',
-			$script_asset['dependencies'],
-			$script_asset['version'],
-			true
-		);
-		$admin_css      = Helper::get_plugin_url() . 'vendor/threadi/wp-easy-dialog/build/style-index.css';
-		$admin_css_path = Helper::get_plugin_path() . 'vendor/threadi/wp-easy-dialog/build/style-index.css';
-		wp_enqueue_style(
-			'wp-easy-dialog',
-			$admin_css,
-			array( 'wp-components' ),
-			filemtime( $admin_css_path )
-		);
+		// add dialog scripts.
+		Init::get_instance()->add_dialog();
 
 		// embed simplification scripts.
 		$multilingual_plugin->get_simplifications_scripts();
