@@ -74,9 +74,18 @@ class Apis {
 	 */
 	public function get_active_api(): false|Base {
 		foreach ( $this->get_available_apis() as $api_obj ) {
-			if ( $api_obj->is_active() ) {
-				return $api_obj;
+			// bail if this is not a Base object.
+			if( ! $api_obj instanceof Base ) {
+				continue;
 			}
+
+			// bail if this API is not active.
+			if ( ! $api_obj->is_active() ) {
+				continue;
+			}
+
+			// return this object as active API.
+			return $api_obj;
 		}
 		return false;
 	}
@@ -90,9 +99,18 @@ class Apis {
 	 */
 	public function get_api_by_name( string $name ): false|Base {
 		foreach ( $this->get_available_apis() as $api_obj ) {
-			if ( $name === $api_obj->get_name() ) {
-				return $api_obj;
+			// bail if this is not a Base object.
+			if( ! $api_obj instanceof Base ) {
+				continue;
 			}
+
+			// bail if names do not match.
+			if ( $name !== $api_obj->get_name() ) {
+				continue;
+			}
+
+			// return this object as matching object.
+			return $api_obj;
 		}
 		return false;
 	}

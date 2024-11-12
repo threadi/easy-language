@@ -150,7 +150,7 @@ class Init {
 				$transient_obj->set_dismissible_days( 180 );
 
 				/**
-				 * Show hint if the foreign plugin does NOT support apis.
+				 * Show hint if the foreign plugin does NOT support APIs.
 				 */
 				/* translators: %1$s will be replaced by the name of the multilingual-plugin */
 				$message = sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional language.', 'easy-language' ), $plugin_obj->get_title() );

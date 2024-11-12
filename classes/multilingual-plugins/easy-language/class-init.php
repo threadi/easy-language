@@ -178,7 +178,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$api_obj = Apis::get_instance()->get_active_api();
 
 		// bail if no API is set.
-		if ( ! ( $api_obj instanceof Api_Base ) ) {
+		if ( ! $api_obj instanceof Api_Base ) {
 			return;
 		}
 
@@ -198,12 +198,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				continue;
 			}
 
-			// go only further if the post-type is visible in backend.
-			if ( false !== $post_type_obj->show_in_menu ) {
-				add_filter( 'manage_' . $post_type . '_posts_columns', array( $this, 'add_post_type_columns' ) );
-				add_action( 'manage_' . $post_type . '_posts_custom_column', array( $this, 'add_post_type_column_content' ), 10, 2 );
-				add_filter( 'views_edit-' . $post_type, array( $this, 'add_post_type_view' ) );
+			// bail if the post-type is not visible in backend.
+			if ( false === $post_type_obj->show_in_menu ) {
+				continue;
 			}
+
+			add_filter( 'manage_' . $post_type . '_posts_columns', array( $this, 'add_post_type_columns' ) );
+			add_action( 'manage_' . $post_type . '_posts_custom_column', array( $this, 'add_post_type_column_content' ), 10, 2 );
+			add_filter( 'views_edit-' . $post_type, array( $this, 'add_post_type_view' ) );
 		}
 
 		// add filter for changed posts.
@@ -277,209 +279,212 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// get actual supported languages.
 		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
-			if ( 'easy-language-' . strtolower( $language_code ) === $column ) {
-				// check if this object is already simplified in this language.
-				if ( false !== $post_object->is_simplified_in_language( $language_code ) ) {
-					// yes, it is simplified.
+			// bail if this is not our column.
+			if ( 'easy-language-' . strtolower( $language_code ) !== $column ) {
+				continue;
+			}
 
-					// get the post-ID of the simplified object.
-					$simplified_post_id = $post_object->get_simplification_in_language( $language_code );
+			// check if this object is already simplified in this language.
+			if ( false !== $post_object->is_simplified_in_language( $language_code ) ) {
+				// yes, it is simplified.
 
-					// get page-builder of this object.
-					$simplified_post_obj = new Post_Object( $simplified_post_id );
-					$page_builder        = $simplified_post_obj->get_page_builder();
+				// get the post-ID of the simplified object.
+				$simplified_post_id = $post_object->get_simplification_in_language( $language_code );
 
-					// get link to view object in frontend.
-					$show_link = get_permalink( $simplified_post_obj->get_id() );
+				// get page-builder of this object.
+				$simplified_post_obj = new Post_Object( $simplified_post_id );
+				$page_builder        = $simplified_post_obj->get_page_builder();
 
-					// do not show anything if the used page builder plugin is not available.
-					if ( false === $page_builder->is_active() ) {
-						/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-						echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
+				// get link to view object in frontend.
+				$show_link = get_permalink( $simplified_post_obj->get_id() );
 
-						// get link to delete this simplification.
-						$delete_simplification = get_delete_post_link( $simplified_post_id );
+				// do not show anything if the used page builder plugin is not available.
+				if ( false === $page_builder->is_active() ) {
+					/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
+					echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
 
-						// show link to delete the simplified object.
-						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $delete_simplification ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '" data-object-type-name="' . esc_attr( $post_object->get_type_name() ) . '" data-title="' . esc_attr( $post_object->get_title() ) . '">&nbsp;</a>';
-						continue;
+					// get link to delete this simplification.
+					$delete_simplification = get_delete_post_link( $simplified_post_id );
+
+					// show link to delete the simplified object.
+					/* translators: %1$s is the name of the language */
+					echo '<a href="' . esc_url( $delete_simplification ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '" data-object-type-name="' . esc_attr( $post_object->get_type_name() ) . '" data-title="' . esc_attr( $post_object->get_title() ) . '">&nbsp;</a>';
+					continue;
+				}
+
+				// get page-builder-specific edit-link if user has capability for it.
+				if ( current_user_can( 'edit_el_simplifier' ) ) {
+					$edit_simplification = $page_builder->get_edit_link();
+
+					// show link to add simplification for this language.
+					/* translators: %1$s is the name of the language */
+					echo '<a href="' . esc_url( $edit_simplification ) . '" class="dashicons dashicons-edit" title="' . esc_attr( sprintf( __( 'Edit simplification in %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+				}
+
+				// create link to run simplification of this object via API (if available).
+				if ( false !== $api_obj && current_user_can( 'edit_el_simplifier' ) ) {
+					// get quota-state of this object.
+					$quota_status = $simplified_post_obj->get_quota_state( $api_obj );
+
+					// only if it is ok and API is configured show simplify-icon.
+					if ( 'ok' === $quota_status['status'] && $api_obj->is_configured() ) {
+						// get link to add simplification.
+						$do_simplification = $simplified_post_obj->get_simplification_via_api_link();
+
+						// show link to simplify this object via api.
+						/* translators: %1$s is the name of the language, %2$s is the name of the used API, %3$s will be the API-title */
+						echo '<a href="' . esc_url( $do_simplification ) . '" class="dashicons dashicons-translation easy-language-translate-object" data-id="' . absint( $simplified_post_obj->get_id() ) . '" data-link="' . esc_url( get_permalink( $simplified_post_id ) ) . '" data-object-type="' . esc_attr( $simplified_post_obj->get_type() ) . '" title="' . esc_attr( sprintf( __( 'Simplify this %1$s in %2$s with %3$s.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</a>';
+					} elseif ( 'above_entry_limit' === $quota_status['status'] && $api_obj->is_configured() ) {
+						// show simple not clickable icon if API is configured but limit for texts is exceeded.
+						/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
+						echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'To many text-widgets in this %1$s for simplification with %2$s. The %3$s will be simplified in background automatically.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $api_obj->get_title() ), esc_html( $post_object->get_type_name() ) ) ) . '">&nbsp;</span>';
+					} elseif ( $api_obj->is_configured() ) {
+						// show simple not clickable icon if API is configured but no quota available.
+						/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
+						echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'Not enough quota to simplify this %1$s in %2$s with %3$s.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</span>';
+					} elseif ( $api_obj->has_settings() ) {
+						// show simple not clickable icon if API is not configured.
+						/* translators: %1$s will be replaced by the API-title */
+						echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'API %1$s not configured.', 'easy-language' ), $api_obj->get_title() ) ) . '">&nbsp;</span>';
 					}
 
-					// get page-builder-specific edit-link if user has capability for it.
-					if ( current_user_can( 'edit_el_simplifier' ) ) {
-						$edit_simplification = $page_builder->get_edit_link();
+					// show quota hint.
+					$this->show_quota_hint( $api_obj );
+				}
 
-						// show link to add simplification for this language.
-						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $edit_simplification ) . '" class="dashicons dashicons-edit" title="' . esc_attr( sprintf( __( 'Edit simplification in %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
-					}
+				// show link to view object in frontend.
+				echo '<a href="' . esc_url( $show_link ) . '" class="dashicons dashicons-admin-site-alt3" target="_blank" title="' . esc_attr( __( 'Show in fronted (opens new window)', 'easy-language' ) ) . '">&nbsp;</a>';
 
-					// create link to run simplification of this object via API (if available).
-					if ( false !== $api_obj && current_user_can( 'edit_el_simplifier' ) ) {
-						// get quota-state of this object.
-						$quota_status = $simplified_post_obj->get_quota_state( $api_obj );
+				// get link to delete this simplification if user has capability for it.
+				if ( current_user_can( 'delete_el_simplifier' ) ) {
+					$delete_simplification = get_delete_post_link( $simplified_post_id );
 
-						// only if it is ok and API is configured show simplify-icon.
-						if ( 'ok' === $quota_status['status'] && $api_obj->is_configured() ) {
-							// get link to add simplification.
-							$do_simplification = $simplified_post_obj->get_simplification_via_api_link();
+					// show link to delete the simplified post.
+					/* translators: %1$s is the name of the language */
+					echo '<a href="' . esc_url( $delete_simplification ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s.', 'easy-language' ), $settings['label'] ) ) . '" data-object-type-name="' . esc_attr( $post_object->get_type_name() ) . '" data-title="' . esc_attr( $post_object->get_title() ) . '">&nbsp;</a>';
+				}
 
-							// show link to simplify this object via api.
-							/* translators: %1$s is the name of the language, %2$s is the name of the used API, %3$s will be the API-title */
-							echo '<a href="' . esc_url( $do_simplification ) . '" class="dashicons dashicons-translation easy-language-translate-object" data-id="' . absint( $simplified_post_obj->get_id() ) . '" data-link="' . esc_url( get_permalink( $simplified_post_id ) ) . '" data-object-type="' . esc_attr( $simplified_post_obj->get_type() ) . '" title="' . esc_attr( sprintf( __( 'Simplify this %1$s in %2$s with %3$s.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</a>';
-						} elseif ( 'above_entry_limit' === $quota_status['status'] && $api_obj->is_configured() ) {
-							// show simple not clickable icon if API is configured but limit for texts is exceeded.
-							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
-							echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'To many text-widgets in this %1$s for simplification with %2$s. The %3$s will be simplified in background automatically.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $api_obj->get_title() ), esc_html( $post_object->get_type_name() ) ) ) . '">&nbsp;</span>';
-						} elseif ( $api_obj->is_configured() ) {
-							// show simple not clickable icon if API is configured but no quota available.
-							/* translators: %1$s will be replaced by the object name (like "page"), %2$s will be replaced by the API name (like SUMM AI), %3$s will be replaced by the API-title */
-							echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'Not enough quota to simplify this %1$s in %2$s with %3$s.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</span>';
-						} elseif ( $api_obj->has_settings() ) {
-							// show simple not clickable icon if API is not configured.
+				// show mark if automatic simplification for this object is prevented.
+				if ( $simplified_post_obj->is_automatic_mode_prevented() && 1 === absint( get_option( 'easy_language_automatic_simplification_enabled', 1 ) ) ) {
+					$dialog = array(
+						/* translators: %1$s will be replaced by the object-title */
+						'title'   => sprintf( __( 'Enable automatic simplification?', 'easy-language' ), esc_html( $post_object->get_title() ) ),
+						'texts'   => array(
 							/* translators: %1$s will be replaced by the API-title */
-							echo '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'API %1$s not configured.', 'easy-language' ), $api_obj->get_title() ) ) . '">&nbsp;</span>';
-						}
+							'<p>' . sprintf( __( 'After activation the texts in this object will automatic simplified with the API %1$s.', 'easy-language' ), esc_html( $api_obj->get_title() ) ) . '</p>',
+						),
+						'buttons' => array(
+							array(
+								'action'  => 'easy_language_prevent_automatic_simplification( ' . absint( $simplified_post_obj->get_id() ) . ', "' . $simplified_post_obj->get_type() . '", false, null , "location.reload();" );',
+								'variant' => 'primary',
+								'text'    => __( 'Yes, enable it', 'easy-language' ),
+							),
+							array(
+								'action'  => 'closeDialog();',
+								'variant' => 'secondary',
+								'text'    => __( 'No, let it disabled', 'easy-language' ),
+							),
+						),
+					);
+					echo '<span class="dashicons dashicons-admin-generic easy-language-automatic-simplification-prevented easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_html__( 'Automatic simplification is prevented', 'easy-language' ) . '"></span>';
+				}
 
-						// show quota hint.
-						$this->show_quota_hint( $api_obj );
+				// show mark if content of original object has been changed.
+				if ( $post_object->has_changed( $language_code ) && current_user_can( 'edit_el_simplifier' ) ) {
+					echo '<span class="dashicons dashicons-image-rotate" title="' . esc_html__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
+				}
+			} else {
+				// create link to simplify this post if used pagebuilder is active.
+				$page_builder = $post_object->get_page_builder();
+				if ( $page_builder->is_active() ) {
+					// get simplification-URL.
+					$create_simplification_link = $post_object->get_simplification_link( $language_code );
+
+					// add warning before adding simplified object if used pagebuilder is unknown.
+					$add_class                 = 'easy-dialog-for-wordpress';
+					$show_page_builder_warning = false;
+					if ( 'Undetected' === $page_builder->get_name() ) {
+						$show_page_builder_warning = true;
+						$add_class                 = 'easy-language-missing-pagebuilder-warning';
 					}
 
-					// show link to view object in frontend.
-					echo '<a href="' . esc_url( $show_link ) . '" class="dashicons dashicons-admin-site-alt3" target="_blank" title="' . esc_attr( __( 'Show in fronted (opens new window)', 'easy-language' ) ) . '">&nbsp;</a>';
+					// define dialog for click on simplify-link.
+					$dialog = array(
+						/* translators: %1$s will be replaced by the object-title */
+						'title'   => sprintf( __( 'Add simplification for %1$s', 'easy-language' ), esc_html( $post_object->get_title() ) ),
+						'texts'   => array(
+							/* translators: %1$s will be replaced by the object-type-name (e.g. post or page), %2$s will be replaced by the API-title */
+							'<p>' . sprintf( __( 'Please decide how you want to proceed to simplify this %1$s.<br>Note that the use of the API %2$s may incur costs.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $api_obj->get_title() ) ) . '</p>',
+						),
+						'buttons' => array(
+							array(
+								'action'  => 'easy_language_add_simplification_object(' . absint( $post_id ) . ', "' . $post_object->get_type() . '", "' . esc_attr( $language_code ) . '", "auto", true );',
+								'variant' => 'primary',
+								/* translators: %1$s will be replaced by the API-title */
+								'text'    => sprintf( __( 'Simplify now via %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ) ),
+							),
+							array(
+								'action'  => 'easy_language_add_simplification_object(' . absint( $post_id ) . ', "' . $post_object->get_type() . '", "' . esc_attr( $language_code ) . '", "manually", ' . $api_obj->is_configured() . ' );',
+								'variant' => 'secondary',
+								/* translators: %1$s will be replaced by the object-type-name (e.g. post or page) */
+								'text'    => sprintf( __( 'Just add %1$s', 'easy-language' ), esc_html( $post_object->get_type_name() ) ),
+							),
+							array(
+								'action' => 'closeDialog();',
+								'text'   => __( 'Cancel', 'easy-language' ),
+							),
+						),
+					);
 
-					// get link to delete this simplification if user has capability for it.
-					if ( current_user_can( 'delete_el_simplifier' ) ) {
-						$delete_simplification = get_delete_post_link( $simplified_post_id );
-
-						// show link to delete the simplified post.
-						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $delete_simplification ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s.', 'easy-language' ), $settings['label'] ) ) . '" data-object-type-name="' . esc_attr( $post_object->get_type_name() ) . '" data-title="' . esc_attr( $post_object->get_title() ) . '">&nbsp;</a>';
+					// add settings-button.
+					if ( current_user_can( 'manage_options' ) ) {
+						$dialog['buttons'][] = array(
+							'href'      => esc_url( Helper::get_settings_page_url() ),
+							'className' => 'dashicons dashicons-admin-generic',
+							'text'      => '&nbsp;',
+						);
 					}
 
-					// show mark if automatic simplification for this object is prevented.
-					if ( $simplified_post_obj->is_automatic_mode_prevented() && 1 === absint( get_option( 'easy_language_automatic_simplification_enabled', 1 ) ) ) {
+					/**
+					 * Filter the dialog.
+					 *
+					 * @since 2.0.0 Available since 2.0.0.
+					 *
+					 * @param array $dialog The dialog configuration.
+					 * @param Api_Base $api_obj The used API as object.
+					 * @param Post_Object $post_object The Post as object.
+					 */
+					$dialog = apply_filters( 'easy_language_first_simplify_dialog', $dialog, $api_obj, $post_object );
+
+					// show link to add simplification for this language.
+					/* translators: %1$s is the name of the language */
+					echo '<a href="' . esc_url( $create_simplification_link ) . '" class="dashicons dashicons-plus ' . esc_attr( $add_class ) . '" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" data-title="' . esc_attr( $post_object->get_title() ) . '" data-object-type-name="' . esc_attr( $post_object->get_type_name() ) . '" title="' . esc_attr( sprintf( esc_html__( 'Simplify this %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+
+					// if the detected pagebuilder is "undetected" show warning.
+					if ( false !== $show_page_builder_warning ) {
 						$dialog = array(
 							/* translators: %1$s will be replaced by the object-title */
-							'title'   => sprintf( __( 'Enable automatic simplification?', 'easy-language' ), esc_html( $post_object->get_title() ) ),
+							'title'   => sprintf( __( 'Unknown page builder or Classic Editor', 'easy-language' ), esc_html( $post_object->get_title() ) ),
 							'texts'   => array(
 								/* translators: %1$s will be replaced by the API-title */
-								'<p>' . sprintf( __( 'After activation the texts in this object will automatic simplified with the API %1$s.', 'easy-language' ), esc_html( $api_obj->get_title() ) ) . '</p>',
+								'<p>' . sprintf( __( 'This %1$s has been edited with an unknown page builder.<br>This could also be the Classic Editor.<br>If this %1$s has been edited with another page builder, the plugin Easy Language does not support it atm.<br>Please <a href="%2$s" target="_blank">contact our support</a>.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_url( Helper::get_support_url() ) ) . '</p>',
 							),
 							'buttons' => array(
-								array(
-									'action'  => 'easy_language_prevent_automatic_simplification( ' . absint( $simplified_post_obj->get_id() ) . ', "' . $simplified_post_obj->get_type() . '", false, null , "location.reload();" );',
-									'variant' => 'primary',
-									'text'    => __( 'Yes, enable it', 'easy-language' ),
-								),
 								array(
 									'action'  => 'closeDialog();',
-									'variant' => 'secondary',
-									'text'    => __( 'No, let it disabled', 'easy-language' ),
+									'variant' => 'primary',
+									'text'    => __( 'OK', 'easy-language' ),
 								),
 							),
 						);
-						echo '<span class="dashicons dashicons-admin-generic easy-language-automatic-simplification-prevented easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_html__( 'Automatic simplification is prevented', 'easy-language' ) . '"></span>';
-					}
 
-					// show mark if content of original object has been changed.
-					if ( $post_object->has_changed( $language_code ) && current_user_can( 'edit_el_simplifier' ) ) {
-						echo '<span class="dashicons dashicons-image-rotate" title="' . esc_html__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
+						/* translators: %1$s is the name of the object (e.g. page or post) */
+						echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress"  data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_attr( sprintf( __( 'This %1$s has been edited with an unknown page builder or the classic editor', 'easy-language' ), esc_html( $post_object->get_type_name() ) ) ) . '"></span>';
 					}
 				} else {
-					// create link to simplify this post if used pagebuilder is active.
-					$page_builder = $post_object->get_page_builder();
-					if ( $page_builder->is_active() ) {
-						// get simplification-URL.
-						$create_simplification_link = $post_object->get_simplification_link( $language_code );
-
-						// add warning before adding simplified object if used pagebuilder is unknown.
-						$add_class                 = 'easy-dialog-for-wordpress';
-						$show_page_builder_warning = false;
-						if ( 'Undetected' === $page_builder->get_name() ) {
-							$show_page_builder_warning = true;
-							$add_class                 = 'easy-language-missing-pagebuilder-warning';
-						}
-
-						// define dialog for click on simplify-link.
-						$dialog = array(
-							/* translators: %1$s will be replaced by the object-title */
-							'title'   => sprintf( __( 'Add simplification for %1$s', 'easy-language' ), esc_html( $post_object->get_title() ) ),
-							'texts'   => array(
-								/* translators: %1$s will be replaced by the object-type-name (e.g. post or page), %2$s will be replaced by the API-title */
-								'<p>' . sprintf( __( 'Please decide how you want to proceed to simplify this %1$s.<br>Note that the use of the API %2$s may incur costs.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $api_obj->get_title() ) ) . '</p>',
-							),
-							'buttons' => array(
-								array(
-									'action'  => 'easy_language_add_simplification_object(' . absint( $post_id ) . ', "' . $post_object->get_type() . '", "' . esc_attr( $language_code ) . '", "auto", true );',
-									'variant' => 'primary',
-									/* translators: %1$s will be replaced by the API-title */
-									'text'    => sprintf( __( 'Simplify now via %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ) ),
-								),
-								array(
-									'action'  => 'easy_language_add_simplification_object(' . absint( $post_id ) . ', "' . $post_object->get_type() . '", "' . esc_attr( $language_code ) . '", "manually", ' . $api_obj->is_configured() . ' );',
-									'variant' => 'secondary',
-									/* translators: %1$s will be replaced by the object-type-name (e.g. post or page) */
-									'text'    => sprintf( __( 'Just add %1$s', 'easy-language' ), esc_html( $post_object->get_type_name() ) ),
-								),
-								array(
-									'action' => 'closeDialog();',
-									'text'   => __( 'Cancel', 'easy-language' ),
-								),
-							),
-						);
-
-						// add settings-button.
-						if ( current_user_can( 'manage_options' ) ) {
-							$dialog['buttons'][] = array(
-								'href'      => esc_url( Helper::get_settings_page_url() ),
-								'className' => 'dashicons dashicons-admin-generic',
-								'text'      => '&nbsp;',
-							);
-						}
-
-						/**
-						 * Filter the dialog.
-						 *
-						 * @since 2.0.0 Available since 2.0.0.
-						 *
-						 * @param array $dialog The dialog configuration.
-						 * @param Api_Base $api_obj The used API as object.
-						 * @param Post_Object $post_object The Post as object.
-						 */
-						$dialog = apply_filters( 'easy_language_first_simplify_dialog', $dialog, $api_obj, $post_object );
-
-						// show link to add simplification for this language.
-						/* translators: %1$s is the name of the language */
-						echo '<a href="' . esc_url( $create_simplification_link ) . '" class="dashicons dashicons-plus ' . esc_attr( $add_class ) . '" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" data-title="' . esc_attr( $post_object->get_title() ) . '" data-object-type-name="' . esc_attr( $post_object->get_type_name() ) . '" title="' . esc_attr( sprintf( esc_html__( 'Simplify this %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
-
-						// if the detected pagebuilder is "undetected" show warning.
-						if ( false !== $show_page_builder_warning ) {
-							$dialog = array(
-								/* translators: %1$s will be replaced by the object-title */
-								'title'   => sprintf( __( 'Unknown page builder or Classic Editor', 'easy-language' ), esc_html( $post_object->get_title() ) ),
-								'texts'   => array(
-									/* translators: %1$s will be replaced by the API-title */
-									'<p>' . sprintf( __( 'This %1$s has been edited with an unknown page builder.<br>This could also be the Classic Editor.<br>If this %1$s has been edited with another page builder, the plugin Easy Language does not support it atm.<br>Please <a href="%2$s" target="_blank">contact our support</a>.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_url( Helper::get_support_url() ) ) . '</p>',
-								),
-								'buttons' => array(
-									array(
-										'action'  => 'closeDialog();',
-										'variant' => 'primary',
-										'text'    => __( 'OK', 'easy-language' ),
-									),
-								),
-							);
-
-							/* translators: %1$s is the name of the object (e.g. page or post) */
-							echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress"  data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_attr( sprintf( __( 'This %1$s has been edited with an unknown page builder or the classic editor', 'easy-language' ), esc_html( $post_object->get_type_name() ) ) ) . '"></span>';
-						}
-					} else {
-						// otherwise should warning that the for this object used page builder is not active or not supported.
-						/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-						echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
-					}
+					// otherwise should warning that the for this object used page builder is not active or not supported.
+					/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
+					echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) ) . '" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
 				}
 			}
 		}

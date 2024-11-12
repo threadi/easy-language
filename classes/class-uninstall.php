@@ -161,8 +161,7 @@ class Uninstall {
 		/**
 		 * Delete managed transients.
 		 */
-		$transients_obj = Transients::get_instance();
-		foreach ( $transients_obj->get_transients() as $transient ) {
+		foreach ( Transients::get_instance()->get_transients() as $transient ) {
 			$transient->delete();
 		}
 

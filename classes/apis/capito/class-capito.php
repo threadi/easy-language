@@ -471,7 +471,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_active_target_languages(): array {
 		// get actual enabled target-languages, if token is given.
-		$target_languages = get_option( 'easy_language_languages', array() );
+		$target_languages = array();
 		if ( $this->is_capito_token_set() ) {
 			$target_languages = get_option( 'easy_language_capito_target_languages', array() );
 			if ( ! is_array( $target_languages ) ) {

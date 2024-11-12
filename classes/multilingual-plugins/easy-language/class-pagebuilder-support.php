@@ -80,19 +80,23 @@ class Pagebuilder_Support {
 	 * @return void
 	 */
 	public function add_meta_box( string $post_type ): void {
-		// only for supported post-types.
+		// get supported post-types.
 		$post_types = Init::get_instance()->get_supported_post_types();
-		if ( ! empty( $post_types[ $post_type ] ) ) {
-			// add meta-box.
-			add_meta_box(
-				'easy-language',
-				__( 'Language', 'easy-language' ),
-				array( $this, 'render_meta_box_content' ),
-				$post_type,
-				'side',
-				'high'
-			);
+
+		// bail if post type is not supported.
+		if ( empty( $post_types[ $post_type ] ) ) {
+			return;
 		}
+
+		// add meta-box.
+		add_meta_box(
+			'easy-language',
+			__( 'Language', 'easy-language' ),
+			array( $this, 'render_meta_box_content' ),
+			$post_type,
+			'side',
+			'high'
+		);
 	}
 
 	/**

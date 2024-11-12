@@ -59,7 +59,7 @@ class Languages {
 	public function get_active_languages(): array {
 		// get active api.
 		$api_obj = Apis::get_instance()->get_active_api();
-		if ( false !== $api_obj && $api_obj->has_settings() ) {
+		if ( $api_obj instanceof Base && $api_obj->has_settings() ) {
 			// get the supported target languages of this api if it has settings for it.
 			return $api_obj->get_active_target_languages();
 		}
