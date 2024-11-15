@@ -154,7 +154,7 @@ class Gutenberg extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return has_blocks( $post_object->get_content() );
+		return function_exists( 'has_blocks' ) && has_blocks( $post_object->get_content() );
 	}
 
 	/**

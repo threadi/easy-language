@@ -8,9 +8,7 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Define what SUMM AI supports and what not.
@@ -37,7 +35,7 @@ class Apis {
 	 *
 	 * @return void
 	 */
-	private function __clone() { }
+	private function __clone() {}
 
 	/**
 	 * Return the instance of this Singleton object.
@@ -74,9 +72,18 @@ class Apis {
 	 */
 	public function get_active_api(): false|Base {
 		foreach ( $this->get_available_apis() as $api_obj ) {
-			if ( $api_obj->is_active() ) {
-				return $api_obj;
+			// bail if this is not a Base object.
+			if ( ! $api_obj instanceof Base ) {
+				continue;
 			}
+
+			// bail if this API is not active.
+			if ( ! $api_obj->is_active() ) {
+				continue;
+			}
+
+			// return this object as active API.
+			return $api_obj;
 		}
 		return false;
 	}
@@ -90,9 +97,18 @@ class Apis {
 	 */
 	public function get_api_by_name( string $name ): false|Base {
 		foreach ( $this->get_available_apis() as $api_obj ) {
-			if ( $name === $api_obj->get_name() ) {
-				return $api_obj;
+			// bail if this is not a Base object.
+			if ( ! $api_obj instanceof Base ) {
+				continue;
 			}
+
+			// bail if names do not match.
+			if ( $name !== $api_obj->get_name() ) {
+				continue;
+			}
+
+			// return this object as matching object.
+			return $api_obj;
 		}
 		return false;
 	}
@@ -105,48 +121,51 @@ class Apis {
 	 */
 	public function export_api_log(): void {
 		// check nonce.
-		if ( ( isset( $_REQUEST['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-export-api-log' ) ) || empty( $_REQUEST['nonce'] ) ) {
+		check_admin_referer( 'easy-language-export-api-log', 'nonce' );
+
+		// get name of the api to export.
+		$export_api = isset( $_GET['api'] ) ? sanitize_text_field( wp_unslash( $_GET['api'] ) ) : '';
+
+		// bail if no api is given.
+		if ( empty( $export_api ) ) {
 			// redirect user back.
 			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}
 
-		// get name of the api to export.
-		$export_api = isset( $_GET['api'] ) ? sanitize_text_field( wp_unslash( $_GET['api'] ) ) : '';
+		// get api object.
+		$api_object = $this->get_api_by_name( $export_api );
 
-		if ( ! empty( $export_api ) ) {
-			// get api object.
-			$api_object = $this->get_api_by_name( $export_api );
-			if ( false !== $api_object ) {
-				// get the entries.
-				$entries = array(
-					array(
-						__( 'Date', 'easy-language' ),
-						__( 'Request', 'easy-language' ),
-						__( 'Response', 'easy-language' ),
-					),
-				);
-				foreach ( $api_object->get_log_entries() as $entry ) {
-					$entries[] = array(
-						$entry->time,
-						$entry->request,
-						$entry->response,
-					);
-				}
-
-				// set header for response as CSV-download.
-				header( 'Content-type: application/csv' );
-				header( 'Content-Disposition: attachment; filename=' . sanitize_file_name( gmdate( 'YmdHi' ) . '_' . get_option( 'blogname' ) . '.csv' ) );
-				$fp = fopen( 'php://output', 'w' );
-				foreach ( $entries as $row ) {
-					fputcsv( $fp, $row );
-				}
-				exit;
-			}
+		// bail if no API object could be loaded.
+		if ( ! $api_object instanceof Base ) {
+			// redirect user back.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
 		}
 
-		// redirect user back.
-		wp_safe_redirect( wp_get_referer() );
+		// get the entries.
+		$entries = array(
+			array(
+				__( 'Date', 'easy-language' ),
+				__( 'Request', 'easy-language' ),
+				__( 'Response', 'easy-language' ),
+			),
+		);
+		foreach ( $api_object->get_log_entries() as $entry ) {
+			$entries[] = array(
+				$entry->time,
+				$entry->request,
+				$entry->response,
+			);
+		}
+
+		// set header for response as CSV-download.
+		header( 'Content-type: application/csv' );
+		header( 'Content-Disposition: attachment; filename=' . sanitize_file_name( gmdate( 'YmdHi' ) . '_' . get_option( 'blogname' ) . '.csv' ) );
+		$fp = fopen( 'php://output', 'w' );
+		foreach ( $entries as $row ) {
+			fputcsv( $fp, $row );
+		}
 		exit;
 	}
 }

@@ -308,9 +308,9 @@ body .text-translations-table #source_language, body .text-translations-table #t
 	}
 }
 
-a.wp-easy-dialog, span.wp-easy-dialog { cursor: pointer }
+a.easy-dialog-for-wordpress, span.easy-dialog-for-wordpress { cursor: pointer }
 
-body.wp-easy-dialog-on-body.wp-core-ui .components-modal__frame.wp-easy-dialog:after {
+body.easy-dialog-for-wordpress.wp-core-ui .components-modal__frame.easy-dialog:after {
 	background-image: url(/wp-content/plugins/easy-language/gfx/easy-language-icon.png);
 	width: 60px;
 	height: 60px;
@@ -323,15 +323,15 @@ body.wp-easy-dialog-on-body.wp-core-ui .components-modal__frame.wp-easy-dialog:a
 	z-index: 100;
 }
 
-body.wp-easy-dialog-on-body.wp-core-ui .hide-header .wp-easy-dialog-text {
+body.easy-dialog-for-wordpress.wp-core-ui .hide-header .easy-dialog-for-wordpress-text {
 	padding-right: 64px;
 }
 
-body.wp-easy-dialog-on-body.wp-core-ui .components-modal__header .components-modal__header-heading {
+body.easy-dialog-for-wordpress.wp-core-ui .components-modal__header .components-modal__header-heading {
 	padding-right: 64px;
 }
 
-body.wp-easy-dialog-on-body.wp-core-ui .wp-easy-dialog .wp-progressbar:after {
+body.easy-dialog-for-wordpress.wp-core-ui .easy-dialog .edfw-progressbar:after {
 	background-image: url(/wp-content/plugins/easy-language/gfx/loading.svg);
 	content: "";
 	display: block;
@@ -386,7 +386,15 @@ body .review-hint-button:after {
 	font-weight: bold;
 }
 
-#wp-easy-setup .components-panel__body p {
+#easy-setup-for-wordpress .components-panel__body p {
 	color: #000;
 	font-size: 1em
+}
+
+body.settings_page_easy_language_settings .state .dashicons-yes { color: green }
+body.settings_page_easy_language_settings .state .dashicons-no { color: red }
+
+body.admin_page_easyLanguageSetup #easy-setup-for-wordpress {
+	min-width: 760px;
+	width: 50%;
 }

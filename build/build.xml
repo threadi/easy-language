@@ -41,10 +41,10 @@
         <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install2.txt">
             <arg line="i concurrently"/>
         </exec>
-		<exec dir="${src.dir}/vendor/threadi/wp-easy-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install3.txt">
+		<exec dir="${src.dir}/vendor/threadi/easy-dialog-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install3.txt">
 			<arg line="install"/>
 		</exec>
-		<exec dir="${src.dir}/vendor/threadi/wp-easy-setup/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install4.txt">
+		<exec dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install4.txt">
 			<arg line="install"/>
 		</exec>
 		<exec dir="${src.dir}/vendor/threadi/react-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install5.txt">
@@ -87,10 +87,10 @@
         <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build2.txt">
             <arg line="run build:navigation-switcher"/>
         </exec>
-		<exec dir="${src.dir}/vendor/threadi/wp-easy-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build3.txt">
+		<exec dir="${src.dir}/vendor/threadi/easy-dialog-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build3.txt">
 			<arg line="run build"/>
 		</exec>
-		<exec dir="${src.dir}/vendor/threadi/wp-easy-setup/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build4.txt">
+		<exec dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build4.txt">
 			<arg line="run build"/>
 		</exec>
 		<exec dir="${src.dir}/vendor/threadi/react-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build5.txt">
@@ -159,9 +159,9 @@
 			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
 			<zipfileset dir="${src.dir}/vendor/gettext" prefix="${plugin.slug}/vendor/gettext" />
 			<zipfileset dir="${src.dir}/vendor/composer" prefix="${plugin.slug}/vendor/composer" />
-			<zipfileset dir="${src.dir}/vendor/threadi/wp-easy-dialog/build/" prefix="${plugin.slug}/vendor/threadi/wp-easy-dialog/build/" />
-			<zipfileset dir="${src.dir}/vendor/threadi/wp-easy-setup/build/" prefix="${plugin.slug}/vendor/threadi/wp-easy-setup/build/" />
-			<zipfileset dir="${src.dir}/vendor/threadi/wp-easy-setup/lib/" prefix="${plugin.slug}/vendor/threadi/wp-easy-setup/lib/" />
+			<zipfileset dir="${src.dir}/vendor/threadi/easy-dialog-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-dialog-for-wordpress/build/" />
+			<zipfileset dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-setup-for-wordpress/build/" />
+			<zipfileset dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/lib/" prefix="${plugin.slug}/vendor/threadi/easy-setup-for-wordpress/lib/" />
 			<zipfileset dir="${src.dir}/vendor/threadi/react-dialog/build/" prefix="${plugin.slug}/vendor/threadi/react-dialog/build/" />
             <zipfileset dir="${src.dir}" includes="uninstall.php,readme.txt" prefix="${plugin.slug}" />
             <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />

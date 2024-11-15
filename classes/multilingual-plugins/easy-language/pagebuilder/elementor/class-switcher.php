@@ -7,6 +7,9 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language\PageBuilder\Elementor;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use Elementor\Core\DynamicTags\Tag;
 use Elementor\Modules\DynamicTags\Module;
 

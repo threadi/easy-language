@@ -7,13 +7,11 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Helper;
 use easyLanguage\Log;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * DB-object for our own plugin.
@@ -211,7 +209,7 @@ class Db {
 
 		// log error.
 		if ( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during adding entry in DB: ' . $wpdb->last_error, 'error' );
+			Log::get_instance()->add_log( __( 'Error during adding entry in DB: ', 'easy-language' ) . $wpdb->last_error, 'error' );
 		}
 
 		// get DB-id.

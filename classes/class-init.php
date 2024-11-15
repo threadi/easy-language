@@ -8,9 +8,7 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Init the plugin.
@@ -54,22 +52,30 @@ class Init {
 	 * @return void
 	 */
 	public function init(): void {
+		// include admin-related files.
+		if ( is_admin() ) {
+			include_once Helper::get_plugin_path() . '/inc/admin.php';
+			// include all settings-files.
+			foreach ( glob( Helper::get_plugin_path() . 'inc/settings/*.php' ) as $filename ) {
+				include $filename;
+			}
+		}
+
 		// run updates.
 		Update::get_instance()->init();
 
 		// include all API-files.
-		foreach ( glob( plugin_dir_path( EASY_LANGUAGE ) . 'inc/apis/*.php' ) as $filename ) {
+		foreach ( glob( Helper::get_plugin_path() . 'inc/apis/*.php' ) as $filename ) {
 			require_once $filename;
 		}
 
 		// include all settings-files.
-		foreach ( glob( plugin_dir_path( EASY_LANGUAGE ) . 'inc/multilingual-plugins/*.php' ) as $filename ) {
+		foreach ( glob( Helper::get_plugin_path() . 'inc/multilingual-plugins/*.php' ) as $filename ) {
 			require_once $filename;
 		}
 
-		// get our own installer-handler.
-		$installer_obj = Install::get_instance();
-		$installer_obj->init();
+		// initialize our installer.
+		Installer::get_instance()->init();
 
 		// initialize the multilingual-plugins.
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
@@ -81,22 +87,12 @@ class Init {
 
 		// general hooks.
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
-		add_action( 'init', array( $this, 'plugin_init' ) );
 		add_action( 'cli_init', array( $this, 'cli' ) );
 		add_action( 'update_option_easy_language_api', array( $this, 'update_easy_language_api' ), 10, 2 );
 
 		// ajax-hooks.
 		add_action( 'wp_ajax_easy_language_reset_intro', array( $this, 'reset_intro' ) );
 		add_action( 'wp_ajax_easy_language_set_icon_for_language', array( $this, 'set_icon_for_language_via_ajax' ) );
-	}
-
-	/**
-	 * Process on every load.
-	 *
-	 * @return void
-	 */
-	public function plugin_init(): void {
-		/* nothing to do */
 	}
 
 	/**
@@ -133,35 +129,38 @@ class Init {
 
 		// loop through the active multilingual-plugins.
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
+			// bail if this is not a foreign plugin.
+			if ( ! $plugin_obj->is_foreign_plugin() ) {
+				continue;
+			}
+
 			/**
 			 * Show hint if this is a foreign plugin.
 			 */
-			if ( $plugin_obj->is_foreign_plugin() ) {
-				// set transient name.
-				$transient_name = 'easy_language_plugin_' . $plugin_obj->get_name();
+			// set transient name.
+			$transient_name = 'easy_language_plugin_' . $plugin_obj->get_name();
 
-				// get transient-object for this plugin.
-				$transient_obj = $transients_obj->get_transient_by_name( $transient_name );
-				if ( $transient_obj->is_set() ) {
-					// bail if this transient is already set.
-					continue;
-				}
-				$transient_obj = $transients_obj->add();
-				$transient_obj->set_name( $transient_name );
-				$transient_obj->set_dismissible_days( 180 );
-
-				/**
-				 * Show hint if the foreign plugin does NOT support apis.
-				 */
-				/* translators: %1$s will be replaced by the name of the multilingual-plugin */
-				$message = sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional language.', 'easy-language' ), $plugin_obj->get_title() );
-				if ( false === $plugin_obj->is_supporting_apis() ) {
-					/* translators: %1$s will be replaced by the name of the multilingual-plugin */
-					$message .= '<br><br>' . sprintf( __( 'Due to limitations of %1$s, it is unfortunately not possible for us to provide automatic simplification for easy or plain language. If you want to use this, you could use the <i>Easy Language</i> plugin alongside %1$s.', 'easy-language' ), esc_html( $plugin_obj->get_title() ), esc_html( $plugin_obj->get_title() ) );
-				}
-				$transient_obj->set_message( $message );
-				$transient_obj->save();
+			// get transient-object for this plugin.
+			$transient_obj = $transients_obj->get_transient_by_name( $transient_name );
+			if ( $transient_obj->is_set() ) {
+				// bail if this transient is already set.
+				continue;
 			}
+			$transient_obj = $transients_obj->add();
+			$transient_obj->set_name( $transient_name );
+			$transient_obj->set_dismissible_days( 180 );
+
+			/**
+			 * Show hint if the foreign plugin does NOT support APIs.
+			 */
+			/* translators: %1$s will be replaced by the name of the multilingual-plugin */
+			$message = sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional language.', 'easy-language' ), $plugin_obj->get_title() );
+			if ( false === $plugin_obj->is_supporting_apis() ) {
+				/* translators: %1$s will be replaced by the name of the multilingual-plugin */
+				$message .= '<br><br>' . sprintf( __( 'Due to limitations of %1$s, it is unfortunately not possible for us to provide automatic simplification for easy or plain language. If you want to use this, you could use the <i>Easy Language</i> plugin alongside %1$s.', 'easy-language' ), esc_html( $plugin_obj->get_title() ), esc_html( $plugin_obj->get_title() ) );
+			}
+			$transient_obj->set_message( $message );
+			$transient_obj->save();
 		}
 
 		// remove first step hint if API-settings are called.
@@ -283,11 +282,13 @@ class Init {
 			Helper::validate_language_support_on_api( $new_api_obj );
 		}
 
-		// Log event.
+		// log this event.
 		if ( empty( $old_value ) ) {
-			Log::get_instance()->add_log( 'API initialized with ' . $new_value, 'success' );
+			/* translators: %1$s will be replaced by the new value. */
+			Log::get_instance()->add_log( sprintf( __( 'API has been initialized with %1$s', 'easy-language' ), $new_value ), 'success' );
 		} else {
-			Log::get_instance()->add_log( 'API changed from ' . $old_value . ' to ' . $new_value, 'success' );
+			/* translators: %1$s will be replaced by the old value, %2$s by the new value. */
+			Log::get_instance()->add_log( sprintf( __( 'API has been changed from %1$s to %2$s', 'easy-language' ), $old_value, $new_value ), 'success' );
 		}
 	}
 
@@ -311,7 +312,7 @@ class Init {
 		delete_option( 'easy_language_intro_step_2' );
 
 		// Log event.
-		Log::get_instance()->add_log( 'Intro resetted', 'success' );
+		Log::get_instance()->add_log( __( 'Intro has been reset', 'easy-language' ), 'success' );
 
 		// return ok.
 		wp_send_json( array( 'result' => 'ok' ) );
@@ -340,6 +341,10 @@ class Init {
 			// get actual assignments of the language.
 			$attachment = Helper::get_attachment_by_language_code( $language_code );
 
+			if ( ! $attachment ) {
+				return;
+			}
+
 			// remove the language from this assignment.
 			$assigned_languages = get_post_meta( $attachment->ID, 'easy_language_code', true );
 			if ( ! empty( $assigned_languages[ $language_code ] ) ) {
@@ -359,10 +364,28 @@ class Init {
 			delete_option( 'easy_language_icons' );
 
 			// Log event.
-			Log::get_instance()->add_log( 'New icon set for ' . $language_code, 'success' );
+			/* translators: %1$s will be replaced by a language code. */
+			Log::get_instance()->add_log( sprintf( __( 'New icon set for %1$s', 'easy-language' ), $language_code ), 'success' );
 		}
 
-		// return nothing.
-		wp_die();
+		// create dialog.
+		$dialog_config = array(
+			'detail' => array(
+				'title'   => __( 'Icon replaced', 'easy-language' ),
+				'texts'   => array(
+					'<p><strong>' . __( 'The icon has been replaced.', 'easy-language' ) . '</strong></p>',
+				),
+				'buttons' => array(
+					array(
+						'action'  => 'closeDialog();',
+						'variant' => 'primary',
+						'text'    => __( 'OK', 'easy-language' ),
+					),
+				),
+			),
+		);
+
+		// return JSON with dialog.
+		wp_send_json( $dialog_config );
 	}
 }

@@ -51,7 +51,7 @@ class Update {
 	 * @return void
 	 */
 	public function init(): void {
-		add_action( 'plugins_loaded', array( $this, 'run' ) );
+		add_action( 'init', array( $this, 'run' ) );
 	}
 
 	/**
@@ -79,12 +79,14 @@ class Update {
 			if ( version_compare( $installed_plugin_version, '2.1.0', '>=' ) ) {
 				$this->version210();
 			}
+
+			$this->version210();
+			$this->version230();
+
+			// save new plugin-version in DB.
+			delete_option( 'easyLanguageVersion' );
+			add_option( 'easyLanguageVersion', $installed_plugin_version, '', true );
 		}
-
-		$this->version210();
-
-		// save new plugin-version in DB.
-		update_option( 'easyLanguageVersion', $installed_plugin_version );
 	}
 
 	/**
@@ -107,7 +109,7 @@ class Update {
 
 		// set setup to complete if an API key is set or texts are simplified.
 		$setup_obj = Setup::get_instance();
-		if( ! $setup_obj->is_completed() ) {
+		if ( ! $setup_obj->is_completed() ) {
 			$setup_completed = false;
 
 			// check active API.
@@ -134,5 +136,27 @@ class Update {
 
 		// remote now unused transients.
 		Transients::get_instance()->delete_transient( Transients::get_instance()->get_transient_by_name( 'easy_language_intro_step_1' ) );
+	}
+
+	/**
+	 * On update to version 2.3.0 or newer.
+	 *
+	 * @return void
+	 */
+	public function version230(): void {
+		// get actual value for setup and save it in new field, if not already set.
+		if ( ! get_option( 'esfw_completed' ) ) {
+			update_option( 'esfw_completed', get_option( 'wp_easy_setup_completed' ) );
+		}
+
+		// remove our schedules.
+		wp_unschedule_hook( 'easy_language_capito_quota_interval' );
+		wp_unschedule_hook( 'easy_language_summ_ai_request_quota' );
+
+		// re-initialize the active API for clean usage.
+		$api_obj = Apis::get_instance()->get_active_api();
+		if ( $api_obj instanceof Base ) {
+			$api_obj->enable();
+		}
 	}
 }

@@ -8,9 +8,7 @@
 namespace easyLanguage\Apis\Capito;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Api_Base;
 use easyLanguage\Base;
@@ -348,18 +346,12 @@ class Capito extends Base implements Api_Base {
 
 		// set capito api key to nothing but with active autoload.
 		if ( ! get_option( 'easy_language_capito_api_key' ) ) {
-			update_option( 'easy_language_capito_api_key', '', true );
+			add_option( 'easy_language_capito_api_key', '', '', true );
 		}
 
 		// set capito quota array.
 		if ( ! get_option( 'easy_language_capito_quota' ) ) {
-			update_option( 'easy_language_capito_quota', array(), true );
-		}
-
-		// check if quota-interval does already exist.
-		if ( ! wp_next_scheduled( 'easy_language_capito_request_quota' ) ) {
-			// add it.
-			wp_schedule_event( time(), get_option( 'easy_language_capito_quota_interval', 'daily' ), 'easy_language_capito_request_quota' );
+			update_option( 'easy_language_capito_quota', array(), '', true );
 		}
 
 		$charset_collate = $wpdb->get_charset_collate();
@@ -471,7 +463,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_active_target_languages(): array {
 		// get actual enabled target-languages, if token is given.
-		$target_languages = get_option( 'easy_language_languages', array() );
+		$target_languages = array();
 		if ( $this->is_capito_token_set() ) {
 			$target_languages = get_option( 'easy_language_capito_target_languages', array() );
 			if ( ! is_array( $target_languages ) ) {
@@ -836,7 +828,14 @@ class Capito extends Base implements Api_Base {
 	 * @noinspection PhpUnused
 	 */
 	public function validate_api_key( ?string $value ): ?string {
-		$errors = get_settings_errors();
+		$errors = array();
+		if ( function_exists( 'get_settings_errors' ) ) {
+			$errors = get_settings_errors();
+		}
+
+		if ( ! function_exists( 'add_settings_error' ) ) {
+			return $value;
+		}
 
 		/**
 		 * If a result-entry already exists, do nothing here.
@@ -868,7 +867,7 @@ class Capito extends Base implements Api_Base {
 				$this->get_quota_from_api( $value );
 
 				// Log event.
-				Log::get_instance()->add_log( 'Token for capito has been changed.', 'success' );
+				Log::get_instance()->add_log( __( 'Token for capito has been changed.', 'easy-language' ), 'success' );
 			}
 
 			// delete api-settings hint.
@@ -991,7 +990,7 @@ class Capito extends Base implements Api_Base {
 
 			// check if key is limited.
 			if ( ! empty( $quota['assistance']['subscription']['remaining'] ) ) {
-				if( absint( $quota['assistance']['subscription']['remaining'] ) > 0 && absint( $quota['assistance']['subscription']['remaining'] ) < 1000 ) {
+				if ( absint( $quota['assistance']['subscription']['remaining'] ) > 0 && absint( $quota['assistance']['subscription']['remaining'] ) < 1000 ) {
 					// get the transients-object to add the new one.
 					$transient_obj = $transients_obj->add();
 					$transient_obj->set_dismissible_days( 2 );
@@ -1000,8 +999,7 @@ class Capito extends Base implements Api_Base {
 					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the capito API is nearly depleted.</strong> You will soon not be able to use any simplifications from capito. Please contact the <a href="%1$s" target="_blank">Capito support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 					$transient_obj->set_type( 'error' );
 					$transient_obj->save();
-				}
-				elseif( 0 === absint( $quota['assistance']['subscription']['remaining'] ) ) {
+				} elseif ( 0 === absint( $quota['assistance']['subscription']['remaining'] ) ) {
 					// get the transients-object to add the new one.
 					$transient_obj = $transients_obj->add();
 					$transient_obj->set_dismissible_days( 2 );
@@ -1048,6 +1046,9 @@ class Capito extends Base implements Api_Base {
 			delete_option( 'easy_language_intro_step_2' );
 		}
 
+		// remove our schedule.
+		wp_clear_scheduled_hook( 'easy_language_capito_request_quota' );
+
 		// redirect user.
 		wp_safe_redirect( wp_get_referer() );
 		exit;
@@ -1086,12 +1087,6 @@ class Capito extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function enable(): void {
-		// check if quota-interval does already exist.
-		if ( ! wp_next_scheduled( 'easy_language_capito_request_quota' ) ) {
-			// add it.
-			wp_schedule_event( time(), get_option( 'easy_language_capito_quota_interval', 'daily' ), 'easy_language_capito_request_quota' );
-		}
-
 		// bail if this is run via REST API.
 		if ( ! Helper::is_admin_api_request() ) {
 			return;

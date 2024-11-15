@@ -7,13 +7,11 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language\PageBuilder\Elementor;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use Elementor\Base_Data_Control;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Define the custom control.

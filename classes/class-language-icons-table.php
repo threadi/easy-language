@@ -8,9 +8,7 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use WP_List_Table;
 
@@ -96,6 +94,10 @@ class Language_Icons_Table extends WP_List_Table {
 				$output .= ' <a href="#" class="replace-icon">' . esc_html__( 'Replace', 'easy-language' ) . '</a>';
 				$output .= '<span data-language-code="' . esc_attr( $item['code'] ) . '"></span>';
 				return $output;
+
+			// return any value.
+			default:
+				return '';
 		}
 	}
 

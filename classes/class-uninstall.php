@@ -92,14 +92,14 @@ class Uninstall {
 				switch_to_blog( $blog_id->blog_id );
 
 				// run tasks for uninstalling in this blog.
-				$this->tasks();
+				$this->deactivation_tasks();
 			}
 
 			// switch back to original blog.
 			switch_to_blog( $original_blog_id );
 		} else {
 			// simply run the tasks on single-site-install.
-			$this->tasks();
+			$this->deactivation_tasks();
 		}
 	}
 
@@ -108,7 +108,7 @@ class Uninstall {
 	 *
 	 * @return void
 	 */
-	private function tasks(): void {
+	private function deactivation_tasks(): void {
 		// get all images which have assigned 'easy_language_icon' post meta and delete them.
 		$query                            = array(
 			'posts_per_page' => -1,
@@ -161,8 +161,7 @@ class Uninstall {
 		/**
 		 * Delete managed transients.
 		 */
-		$transients_obj = Transients::get_instance();
-		foreach ( $transients_obj->get_transients() as $transient ) {
+		foreach ( Transients::get_instance()->get_transients() as $transient ) {
 			$transient->delete();
 		}
 
@@ -179,6 +178,9 @@ class Uninstall {
 		Log::get_instance()->delete_table();
 		Log_Api::get_instance()->delete_table();
 		Db::get_instance()->delete_tables();
+
+		// remove setup-options.
+		Setup::get_instance()->uninstall();
 
 		/**
 		 * Remove settings.

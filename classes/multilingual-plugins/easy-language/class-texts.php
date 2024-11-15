@@ -9,9 +9,7 @@
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Apis;
 use easyLanguage\Helper;
@@ -129,7 +127,7 @@ class Texts {
 			$copy_post_obj = $post_obj->add_simplification_object( $target_language, $api_object, false );
 			if ( $copy_post_obj ) {
 				// Log event.
-				Log::get_instance()->add_log( 'New simplification object created: ' . $copy_post_obj->get_title(), 'success' );
+				Log::get_instance()->add_log( __( 'New simplification object created: ', 'easy-language' ) . $copy_post_obj->get_title(), 'success' );
 
 				// forward user to the edit-page of the newly created object.
 				wp_safe_redirect( $copy_post_obj->get_page_builder()->get_edit_link() );
@@ -137,12 +135,12 @@ class Texts {
 			}
 
 			// Log event.
-			Log::get_instance()->add_log( 'Error during creating of new simplification object based on ' . $post_obj->get_title(), 'error' );
+			Log::get_instance()->add_log( __( 'Error during creating of new simplification object based on ', 'easy-language' ) . $post_obj->get_title(), 'error' );
 
 		}
 
 		// Log event.
-		Log::get_instance()->add_log( 'Faulty request to create new simplified object.', 'error' );
+		Log::get_instance()->add_log( __( 'Faulty request to create new simplified object.', 'easy-language' ), 'error' );
 
 		// redirect user.
 		wp_safe_redirect( wp_get_referer() );
@@ -189,7 +187,7 @@ class Texts {
 		}
 
 		// Log event.
-		Log::get_instance()->add_log( 'Deleted simplified object <i>' . $post_title . '</i>', 'success' );
+		Log::get_instance()->add_log( __( 'Deleted simplified object ', 'easy-language' ) . '<i>' . $post_title . '</i>', 'success' );
 	}
 
 	/**
@@ -218,7 +216,8 @@ class Texts {
 
 		if ( $object_id > 0 ) {
 			// Log event.
-			Log::get_instance()->add_log( 'Request to simplify object ' . absint( $object_id ) . ' (' . $object_type . ') without JS.', 'success' );
+			/* translators: %1$d will be replaced by an ID, %2$s by a type name.. */
+			Log::get_instance()->add_log( sprintf( __( 'Request to simplify object %1$d (%2$s) without JS.', 'easy-language' ), absint( $object_id ), $object_type ), 'success' );
 
 			// run simplification of this object.
 			$object = Helper::get_object( $object_id, $object_type );
@@ -262,7 +261,8 @@ class Texts {
 			// bail if we have no results.
 			if ( empty( $entries ) ) {
 				// Log event.
-				Log::get_instance()->add_log( 'Requested object ' . $entry_id . ' could not be found for simplification.', 'error' );
+				/* translators: %1$s will be replaced by an ID. */
+				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
 
 				wp_safe_redirect( wp_get_referer() );
 				exit;
@@ -277,7 +277,8 @@ class Texts {
 			// bail if no objects could be found.
 			if ( empty( $post_objects ) ) {
 				// Log event.
-				Log::get_instance()->add_log( 'Requested object ' . $entry_id . ' could not be found for simplification. #2', 'error' );
+				/* translators: %1$s will be replaced by an ID. */
+				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
 
 				wp_safe_redirect( wp_get_referer() );
 				exit;
@@ -289,7 +290,8 @@ class Texts {
 			// bail if none could be found.
 			if ( false === $object ) {
 				// Log event.
-				Log::get_instance()->add_log( 'Requested object ' . $entry_id . ' could not be found for simplification. #3', 'error' );
+				/* translators: %1$s will be replaced by an ID. */
+				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
 
 				wp_safe_redirect( wp_get_referer() );
 				exit;
@@ -324,7 +326,7 @@ class Texts {
 		$post_obj = new Post_Object( $post_id );
 
 		// Log event.
-		Log::get_instance()->add_log( 'Check updated <i>' . $post_obj->get_title() . '</i>', 'success' );
+		Log::get_instance()->add_log( __( 'Check updated ', 'easy-language' ) . '<i>' . $post_obj->get_title() . '</i>', 'success' );
 
 		// if this is an original object, check its contents.
 		if ( $post_obj->is_simplifiable() ) {
@@ -469,8 +471,9 @@ class Texts {
 				$original_post->remove_changed_marker( $language_code );
 			}
 
-			// Log event.
-			Log::get_instance()->add_log( 'Update of ' . $post_obj->get_title() . ' has been processed.', 'success' );
+			// log event.
+			/* translators: %1$s will be replaced by a title. */
+			Log::get_instance()->add_log( sprintf( __( 'Update of %1$s has been processed.', 'easy-language' ), $post_obj->get_title() ), 'success' );
 		}
 	}
 
@@ -499,7 +502,8 @@ class Texts {
 			}
 
 			// Log event.
-			Log::get_instance()->add_log( '<i>' . $post_obj->get_title() . '</i> has been moved to trash and cleaned up.', 'success' );
+			/* translators: %1$s will be replaced by a title. */
+			Log::get_instance()->add_log( sprintf( __( '%1$s has been moved to trash and cleaned up.', 'easy-language' ), '<i>' . $post_obj->get_title() . '</i>' ), 'success' );
 		}
 	}
 
@@ -594,7 +598,7 @@ class Texts {
 			$po           = str_replace( $replace_from, '"Language: ' . $export_language_code . '\n"' . PHP_EOL . $replace_from, $po );
 
 			// Log event.
-			Log::get_instance()->add_log( 'Simplifications exported.', 'success' );
+			Log::get_instance()->add_log( __( 'Simplifications exported.', 'easy-language' ), 'success' );
 
 			// get WP Filesystem-handler.
 			require_once ABSPATH . '/wp-admin/includes/file.php';

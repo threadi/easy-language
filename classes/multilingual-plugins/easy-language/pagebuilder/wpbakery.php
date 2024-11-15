@@ -5,12 +5,10 @@
  * @package easy-language
  */
 
-use easyLanguage\Multilingual_plugins\Easy_Language\Parser\WPBakery;
-
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
+
+use easyLanguage\Multilingual_plugins\Easy_Language\Parser\WPBakery;
 
 /**
  * Add WPBakery-object to list of supported pagebuilder.

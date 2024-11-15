@@ -8,9 +8,7 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use WP_List_Table;
 
@@ -133,6 +131,7 @@ class Log_Api_Table extends WP_List_Table {
 				return '';
 
 			case 'state':
+				// TODO ersetzen durch Icon.
 				return wp_kses_post( __( $item[ $column_name ], 'easy-language' ) );
 
 			case 'request':
@@ -188,26 +187,30 @@ class Log_Api_Table extends WP_List_Table {
 	 * @return void
 	 */
 	public function extra_tablenav( $which ): void {
-		if ( 'top' === $which ) {
-			$api = $this->get_api_filter();
+		// bail if this is not for top view.
+		if ( 'top' !== $which ) {
+			return;
+		}
 
-			if ( ! empty( $api ) ) {
-				// define export-URL.
-				$url = add_query_arg(
-					array(
-						'action' => 'easy_language_export_api_log',
-						'nonce'  => wp_create_nonce( 'easy-language-export-api-log' ),
-						'api'    => $api,
-					),
-					get_admin_url() . 'admin.php'
-				);
-				?><a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Export as CSV', 'easy-language' ); ?></a>
-				<?php
-			} else {
-				?>
-				<span class="button disabled" title="<?php echo esc_html__( 'Choose an API to export above', 'easy-language' ); ?>"><?php echo esc_html__( 'Export as CSV', 'easy-language' ); ?></span>
-				<?php
-			}
+		// get api.
+		$api = $this->get_api_filter();
+
+		if ( ! empty( $api ) ) {
+			// define export-URL.
+			$url = add_query_arg(
+				array(
+					'action' => 'easy_language_export_api_log',
+					'nonce'  => wp_create_nonce( 'easy-language-export-api-log' ),
+					'api'    => $api,
+				),
+				get_admin_url() . 'admin.php'
+			);
+			?><a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Export as CSV', 'easy-language' ); ?></a>
+			<?php
+		} else {
+			?>
+			<span class="button disabled" title="<?php echo esc_html__( 'Choose an API to export above', 'easy-language' ); ?>"><?php echo esc_html__( 'Export as CSV', 'easy-language' ); ?></span>
+			<?php
 		}
 	}
 
@@ -217,10 +220,15 @@ class Log_Api_Table extends WP_List_Table {
 	 * @return string
 	 */
 	private function get_api_filter(): string {
+		// get API from request.
 		$api = filter_input( INPUT_GET, 'api', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		// bail if no APO was in request.
 		if ( is_null( $api ) ) {
 			return '';
 		}
+
+		// return the API from request.
 		return $api;
 	}
 

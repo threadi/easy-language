@@ -2,15 +2,15 @@
 /**
  * File for handler for things the ChatGpt supports.
  *
+ * @source https://platform.openai.com/docs/api-reference/chat/create
+ *
  * @package easy-language
  */
 
 namespace easyLanguage\Apis\ChatGpt;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Apis;
 use easyLanguage\Api_Base;
@@ -122,7 +122,7 @@ class ChatGpt extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return the public description of the SUMM AI API.
+	 * Return the public description of the ChatGpt API.
 	 *
 	 * @return string
 	 */
@@ -253,7 +253,7 @@ class ChatGpt extends Base implements Api_Base {
 	 */
 	public function get_active_target_languages(): array {
 		// get actual enabled target-languages, if token is given.
-		$target_languages = get_option( 'easy_language_languages', array() );
+		$target_languages = array();
 		if ( $this->is_chatgpt_token_set() ) {
 			$target_languages = get_option( 'easy_language_chatgpt_target_languages', array() );
 			if ( ! is_array( $target_languages ) ) {
@@ -386,7 +386,7 @@ class ChatGpt extends Base implements Api_Base {
 
 		// Set description for token field if it has not been set.
 		/* translators: %1$s will be replaced by the Chatgpt URL */
-		$description = sprintf( __( 'Get your ChatGpt API Token <a href="%1$s" target="_blank">here (opens new window)</a>.<br>If you have any questions about the token provided by ChatGpt, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+		$description = sprintf( __( 'Get your ChatGpt API Token <a href="%1$s" target="_blank">here (opens new window)</a>.<br>If you have any questions about the token provided by ChatGpt, please contact their support: <a href="%2$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_api_management_url() ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_chatgpt_token_set() ) {
 			// set link to remove the token.
 			$remove_token_url = add_query_arg(
@@ -430,6 +430,7 @@ class ChatGpt extends Base implements Api_Base {
 
 		// Define list of models this plugin supports atm.
 		$models = array(
+			'gpt-4o'        => 'gpt-4o',
 			'gpt-4'         => 'gpt-4',
 			'gpt-3.5-turbo' => 'gpt-3.5-turbo',
 		);
@@ -756,7 +757,7 @@ class ChatGpt extends Base implements Api_Base {
 			Transients::get_instance()->get_transient_by_name( 'easy_language_api_changed' )->delete();
 
 			// Log event.
-			Log::get_instance()->add_log( 'Token for ChatGpt has been changed.', 'success' );
+			Log::get_instance()->add_log( __( 'Token for ChatGpt has been changed.', 'easy-language' ), 'success' );
 		}
 
 		// show intro if it has not been shown until now.
@@ -936,5 +937,14 @@ class ChatGpt extends Base implements Api_Base {
 	public function get_pro_hint(): string {
 		/* translators: %1$s will be replaced by the link to laolaweb.com */
 		return sprintf( __( 'More languages and Options with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a>', 'easy-language' ), esc_url( Helper::get_pro_url() ) );
+	}
+
+	/**
+	 * Return the API management URL.
+	 *
+	 * @return string
+	 */
+	private function get_api_management_url(): string {
+		return 'https://platform.openai.com/api-keys';
 	}
 }

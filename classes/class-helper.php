@@ -8,9 +8,7 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 use WP_Admin_Bar;
@@ -673,5 +671,39 @@ class Helper {
 			return str_starts_with( $current_url['path'], $rest_url['path'] );
 		}
 		return false;
+	}
+
+	/**
+	 * Return the version of the given file.
+	 *
+	 * With WP_DEBUG or plugin-debug enabled its @filemtime().
+	 * Without this it's the plugin-version.
+	 *
+	 * @param string $filepath The absolute path to the requested file.
+	 *
+	 * @return string
+	 */
+	public static function get_file_version( string $filepath ): string {
+		// check for WP_DEBUG.
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			return filemtime( $filepath );
+		}
+
+		// check for own debug.
+		if ( 1 === absint( get_option( 'easy_language_debug_mode', 0 ) ) ) {
+			return filemtime( $filepath );
+		}
+
+		$plugin_version = EASY_LANGUAGE_VERSION;
+
+		/**
+		 * Filter the used file version (for JS- and CSS-files which get enqueued).
+		 *
+		 * @since 2.3.0 Available since 2.3.0.
+		 *
+		 * @param string $plugin_version The plugin-version.
+		 * @param string $filepath The absolute path to the requested file.
+		 */
+		return apply_filters( 'easy_language_file_version', $plugin_version, $filepath );
 	}
 }

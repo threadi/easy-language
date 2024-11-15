@@ -2,9 +2,11 @@ jQuery(document).ready(function($) {
 	// get internationalization tools of WordPress.
 	let { __ } = wp.i18n;
 
+	let settings_body = $('body.settings_page_easy_language_settings .wrap > h1');
+
 	// add option near to list-headline.
-	$('body.settings_page_easy_language_settings .wrap > h1').after('<a class="page-title-action easy-language-pro-hint" href="' + easyLanguageJsVars.pro_url + '" target="_blank">' + easyLanguageJsVars.title_get_pro + '</a>');
-	$('body.settings_page_easy_language_settings .wrap > h1').each(function() {
+	settings_body.after('<a class="page-title-action easy-language-pro-hint" href="' + easyLanguageJsVars.pro_url + '" target="_blank">' + easyLanguageJsVars.title_get_pro + '</a>');
+	settings_body.each(function() {
 		let button = document.createElement('a');
 		button.className = 'review-hint-button page-title-action';
 		button.href = easyLanguageJsVars.review_url;
@@ -109,12 +111,12 @@ jQuery(document).ready(function($) {
 						'language': obj.parent().find('span').data( 'language-code' ),
 						'nonce': easyLanguageJsVars.set_icon_for_language_nonce
 					},
-					success: function() {
+					success: function( dialog_config ) {
 						// replace img in list.
 						obj.parent().find('img').attr( 'src', attachment.url );
 
 						// show success message.
-						alert(__( 'Icon successfully replaced.', 'easy-language' ));
+						easy_language_create_dialog( dialog_config );
 					}
 				}
 			);

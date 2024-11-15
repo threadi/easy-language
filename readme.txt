@@ -164,5 +164,15 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Optimized build of release
 
 = 2.3.0 =
+* Added new hooks
+* Added colored status icons in log table
 * Update Capito API to support of v2
-* Optimized some code
+* Updated support for ChatGpt language models
+* Compatibility with WordPress 6.7
+* Optimized the code on multiple positions
+* Reduced usage of SQL-statements in backend
+* Replace dialog- and setup-library with new one
+* Made all plugin texts translatable
+* Fixed update script
+* Fixed usage of schedules
+* Fixed import of icons on initial installation

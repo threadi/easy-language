@@ -7,17 +7,15 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Base;
 use easyLanguage\Helper;
 use easyLanguage\Init;
 use easyLanguage\Languages;
 use WP_Post;
 use WP_Query;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Handles a single post-object.

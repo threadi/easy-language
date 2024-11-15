@@ -8,23 +8,21 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 
 /**
- * Uninstall-object.
+ * Installer-object.
  */
-class Install {
+class Installer {
 
 	/**
 	 * Instance of this object.
 	 *
-	 * @var ?Install
+	 * @var ?Installer
 	 */
-	private static ?Install $instance = null;
+	private static ?Installer $instance = null;
 
 	/**
 	 * Constructor for Init-Handler.
@@ -41,7 +39,7 @@ class Install {
 	/**
 	 * Return the instance of this Singleton object.
 	 */
-	public static function get_instance(): Install {
+	public static function get_instance(): Installer {
 		if ( ! static::$instance instanceof static ) {
 			static::$instance = new static();
 		}
@@ -187,6 +185,12 @@ class Install {
 		// get the plugin-supports by call its install-routines.
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
 			$plugin_obj->install();
+		}
+
+		// enable the default API for a moment for set the default settings.
+		$api_obj = Apis::get_instance()->get_active_api();
+		if ( $api_obj instanceof Base ) {
+			$api_obj->enable();
 		}
 	}
 

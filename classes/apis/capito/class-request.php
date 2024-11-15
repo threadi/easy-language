@@ -8,9 +8,7 @@
 namespace easyLanguage\Apis\Capito;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Log;
 use easyLanguage\Log_Api;
@@ -167,7 +165,7 @@ class Request {
 		// bail if no text for simplification is given.
 		if ( 'PUT' === $this->get_method() && ! $this->has_text() ) {
 			// Log event.
-			Log::get_instance()->add_log( 'capito: no text given for simplification.', 'error' );
+			Log::get_instance()->add_log( __( 'capito: no text given for simplification.', 'easy-language' ), 'error' );
 			return;
 		}
 
@@ -330,7 +328,7 @@ class Request {
 
 		// log error.
 		if ( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during adding API log entry: ' . $wpdb->last_error, 'error' );
+			Log::get_instance()->add_log( __( 'Error during adding API log entry: ', 'easy-language' ) . $wpdb->last_error, 'error' );
 		}
 	}
 

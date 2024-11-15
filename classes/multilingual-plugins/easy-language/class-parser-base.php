@@ -7,6 +7,9 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
@@ -258,7 +261,7 @@ class Parser_Base {
 						),
 					);
 					?>
-					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary wp-easy-dialog elementor-button" data-dialog="<?php echo esc_attr( wp_json_encode( $dialog_config ) ); ?>" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( $title ); ?>">
+					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary easy-dialog-for-wordpress elementor-button" data-dialog="<?php echo esc_attr( wp_json_encode( $dialog_config ) ); ?>" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( $title ); ?>">
 						<?php
 							$min_percent = 0.8;
 							/**

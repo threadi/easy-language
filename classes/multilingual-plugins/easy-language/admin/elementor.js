@@ -4,7 +4,7 @@ window.addEventListener(
     let view = elementor.modules.controls.BaseData.extend(
 			{
 				onReady: function () {
-					this.$el.find( '.wp-easy-dialog' ).on(
+					this.$el.find( '.easy-dialog-for-wordpress' ).on(
                         'click',
 					function (e) {
 						e.preventDefault();
@@ -24,5 +24,5 @@ window.addEventListener(
  * @param config
  */
 function easy_language_create_dialog( config ) {
-	document.body.dispatchEvent(new CustomEvent("wp-easy-dialog", config));
+	document.body.dispatchEvent(new CustomEvent("easy-dialog-for-wordpress", config));
 }
