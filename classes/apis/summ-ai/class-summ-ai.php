@@ -8,9 +8,7 @@
 namespace easyLanguage\Apis\Summ_Ai;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Apis;
 use easyLanguage\Base;
@@ -213,10 +211,11 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Return list of supported source-languages.
 	 *
+	 * @param bool $without_img True to load without images.
+	 *
 	 * @return array
-	 * @noinspection DuplicatedCode
 	 */
-	public function get_supported_source_languages(): array {
+	public function get_supported_source_languages( bool $without_img = false ): array {
 		$source_languages = array(
 			'de_DE'          => array(
 				'label'       => __( 'German', 'easy-language' ),
@@ -224,7 +223,7 @@ class Summ_AI extends Base implements Api_Base {
 				'description' => __( 'Informal german spoken in Germany.', 'easy-language' ),
 				'icon'        => 'icon-de-de',
 				'img'         => 'de_de.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
+				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
 			),
 			'de_DE_formal'   => array(
 				'label'       => __( 'German (Formal)', 'easy-language' ),
@@ -232,7 +231,7 @@ class Summ_AI extends Base implements Api_Base {
 				'description' => __( 'Formal german spoken in Germany.', 'easy-language' ),
 				'icon'        => 'icon-de-de',
 				'img'         => 'de_de.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_DE_formal' ) : '',
+				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_DE_formal' ) : '',
 			),
 			'de_CH'          => array(
 				'label'       => __( 'Suisse german', 'easy-language' ),
@@ -240,7 +239,7 @@ class Summ_AI extends Base implements Api_Base {
 				'description' => __( 'Formal german spoken in Suisse.', 'easy-language' ),
 				'icon'        => 'icon-de-ch',
 				'img'         => 'de_ch.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_CH' ) : '',
+				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_CH' ) : '',
 			),
 			'de_CH_informal' => array(
 				'label'       => __( 'Suisse german (Informal)', 'easy-language' ),
@@ -248,7 +247,7 @@ class Summ_AI extends Base implements Api_Base {
 				'description' => __( 'Informal german spoken in Suisse.', 'easy-language' ),
 				'icon'        => 'icon-de-ch',
 				'img'         => 'de_ch.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_CH_informal' ) : '',
+				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_CH_informal' ) : '',
 			),
 			'de_AT'          => array(
 				'label'       => __( 'Austria German', 'easy-language' ),
@@ -256,7 +255,7 @@ class Summ_AI extends Base implements Api_Base {
 				'description' => __( 'German spoken in Austria.', 'easy-language' ),
 				'icon'        => 'icon-de-at',
 				'img'         => 'de_at.png',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_AT' ) : '',
+				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_AT' ) : '',
 			),
 		);
 
@@ -273,10 +272,11 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Return the languages this API supports.
 	 *
+	 * @param bool $without_img True to load without images.
+	 *
 	 * @return array
-	 * @noinspection DuplicatedCode
 	 */
-	public function get_supported_target_languages(): array {
+	public function get_supported_target_languages( bool $without_img = false ): array {
 		$target_languages = array(
 			'de_EL' => array(
 				'label'       => __( 'Einfache Sprache', 'easy-language' ),
@@ -286,7 +286,7 @@ class Summ_AI extends Base implements Api_Base {
 				'api_value'   => 'plain',
 				'icon'        => 'icon-de-el',
 				'img'         => 'de_EL.svg',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
+				'img_icon'    => ( ! $without_img && $this->is_active() ) ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
 			),
 			'de_LS' => array(
 				'label'       => __( 'Leichte Sprache', 'easy-language' ),
@@ -296,7 +296,7 @@ class Summ_AI extends Base implements Api_Base {
 				'api_value'   => 'easy',
 				'icon'        => 'icon-de-ls',
 				'img'         => 'de_LS.svg',
-				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
+				'img_icon'    => ( ! $without_img && $this->is_active() ) ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
 			),
 		);
 
@@ -392,9 +392,6 @@ class Summ_AI extends Base implements Api_Base {
 			update_option( 'easy_language_summ_ai_quota_interval', 'daily' );
 		}
 
-		// set schedule for quota request.
-		wp_schedule_event( time(), get_option( 'easy_language_summ_ai_quota_interval', 'daily' ), 'easy_language_summ_ai_request_quota' );
-
 		// set translation mode to editor.
 		if ( ! get_option( 'easy_language_summ_ai_email_mode' ) ) {
 			update_option( 'easy_language_summ_ai_email_mode', 'editor' );
@@ -437,6 +434,9 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function uninstall(): void {
+		// remove our schedule.
+		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
+
 		/**
 		 * Remove settings.
 		 */
@@ -858,7 +858,7 @@ class Summ_AI extends Base implements Api_Base {
 				'label_for'   => 'easy_language_summ_ai_source_languages',
 				'fieldId'     => 'easy_language_summ_ai_source_languages',
 				'description' => __( 'These are the possible source languages for SUMM AI-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
-				'options'     => $this->get_supported_source_languages(),
+				'options'     => $this->get_supported_source_languages( true ),
 				'readonly'    => false === $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
 				'pro_hint'    => $this->get_pro_hint(),
 			)
@@ -876,7 +876,7 @@ class Summ_AI extends Base implements Api_Base {
 				'label_for'   => 'easy_language_summ_ai_target_languages',
 				'fieldId'     => 'easy_language_summ_ai_target_languages',
 				'description' => __( 'These are the possible target languages for SUMM AI-simplifications.', 'easy-language' ),
-				'options'     => $this->get_supported_target_languages(),
+				'options'     => $this->get_supported_target_languages( true ),
 				'readonly'    => false === $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
 				'pro_hint'    => $this->get_pro_hint(),
 			)
@@ -936,6 +936,10 @@ class Summ_AI extends Base implements Api_Base {
 			$errors = get_settings_errors();
 		}
 
+		if ( ! function_exists( 'add_settings_error' ) ) {
+			return $value;
+		}
+
 		/**
 		 * If a result-entry already exists, do nothing here.
 		 *
@@ -979,7 +983,7 @@ class Summ_AI extends Base implements Api_Base {
 				$this->set_mode( 'paid' );
 
 				// log the event.
-				Log::get_instance()->add_log( 'Token for SUMM AI has been changed.', 'success' );
+				Log::get_instance()->add_log( __( 'Token for SUMM AI has been changed.', 'easy-language' ), 'success' );
 			}
 		}
 
@@ -1383,6 +1387,9 @@ class Summ_AI extends Base implements Api_Base {
 		$transients_obj = Transients::get_instance();
 		$transient_obj  = $transients_obj->get_transient_by_name( 'easy_language_summ_ai_quota' );
 		$transient_obj->delete();
+
+		// remove schedule.
+		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
 
 		// revert to free mode.
 		$this->set_mode( 'free' );

@@ -162,7 +162,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// bail of WPML-class does not exist.
 		if ( ! class_exists( 'WPML_Flags_Factory' ) ) {
 			// Log event.
-			Log::get_instance()->add_log( 'WPML-objects missing - WPML support will not be activated.', 'error' );
+			Log::get_instance()->add_log( __( 'WPML-objects missing - WPML support will not be activated.', 'easy-language' ), 'error' );
 
 			return;
 		}

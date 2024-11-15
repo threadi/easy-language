@@ -5,12 +5,10 @@
  * @package easy-language
  */
 
-use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Undetected;
-
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
+
+use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Undetected;
 
 /**
  * Add Undetected-object to list of supported pagebuilder.

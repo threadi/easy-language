@@ -8,9 +8,7 @@
 namespace easyLanguage\Multilingual_plugins\Easy_Language\Parser;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Helper;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser;

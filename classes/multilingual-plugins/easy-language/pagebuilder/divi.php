@@ -5,14 +5,12 @@
  * @package easy-language
  */
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Helper;
 use easyLanguage\Multilingual_plugins\Easy_Language\Init;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Divi;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Add Undetected-object to list of supported pagebuilder.
@@ -163,7 +161,7 @@ add_action( 'et_fb_enqueue_assets', 'easy_language_divi_add_scripts' );
  */
 function easy_language_js_top_for_divi( string $js_top ): string {
 	// bail if Divi is not enabled.
-	if( ! Divi::get_instance()->is_active() ) {
+	if ( ! Divi::get_instance()->is_active() ) {
 		return $js_top;
 	}
 

@@ -7,13 +7,11 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language\Parser;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser_Base;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Handler for parsing texts from any unknown page builder.

@@ -8,9 +8,7 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Language-Handling for this plugin.
@@ -26,16 +24,14 @@ class Languages {
 	/**
 	 * Constructor for Init-Handler.
 	 */
-	private function __construct() {
-	}
+	private function __construct() {}
 
 	/**
 	 * Prevent cloning of this object.
 	 *
 	 * @return void
 	 */
-	private function __clone() {
-	}
+	private function __clone() {}
 
 	/**
 	 * Return the instance of this Singleton object.
@@ -128,9 +124,11 @@ class Languages {
 	/**
 	 * Return possible target languages.
 	 *
+	 * @param bool $without_img True if the setting should load without image.
+	 *
 	 * @return array
 	 */
-	public function get_possible_target_languages(): array {
+	public function get_possible_target_languages( bool $without_img = false ): array {
 		$target_languages = array(
 			'de_EL' => array(
 				'label'       => __( 'Einfache Sprache', 'easy-language' ),
@@ -139,7 +137,7 @@ class Languages {
 				'url'         => 'de_el',
 				'icon'        => 'icon-de-el',
 				'img'         => 'de_EL.png',
-				'img_icon'    => Helper::get_icon_img_for_language_code( 'de_EL' ),
+				'img_icon'    => ! $without_img ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
 			),
 			'de_LS' => array(
 				'label'       => __( 'Leichte Sprache', 'easy-language' ),
@@ -148,7 +146,7 @@ class Languages {
 				'url'         => 'de_ls',
 				'icon'        => 'icon-de-ls',
 				'img'         => 'de_LS.png',
-				'img_icon'    => Helper::get_icon_img_for_language_code( 'de_LS' ),
+				'img_icon'    => ! $without_img ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
 			),
 		);
 

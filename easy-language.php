@@ -29,14 +29,5 @@ define( 'EASY_LANGUAGE_VERSION', '@@VersionNumber@@' );
 require_once __DIR__ . '/inc/autoload.php';
 require_once __DIR__ . '/inc/constants.php';
 
-// include admin-related files.
-if ( is_admin() ) {
-	include_once 'inc/admin.php';
-	// include all settings-files.
-	foreach ( glob( plugin_dir_path( EASY_LANGUAGE ) . 'inc/settings/*.php' ) as $filename ) {
-		include $filename;
-	}
-}
-
 // initialize the plugin.
 easyLanguage\Init::get_instance()->init();

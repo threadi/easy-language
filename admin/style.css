@@ -390,3 +390,11 @@ body .review-hint-button:after {
 	color: #000;
 	font-size: 1em
 }
+
+body.settings_page_easy_language_settings .state .dashicons-yes { color: green }
+body.settings_page_easy_language_settings .state .dashicons-no { color: red }
+
+body.admin_page_easyLanguageSetup #easy-setup-for-wordpress {
+	min-width: 760px;
+	width: 50%;
+}

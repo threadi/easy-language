@@ -5,12 +5,10 @@
  * @package easy-language
  */
 
-use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Avada;
-
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
+
+use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Avada;
 
 /**
  * Add Avada-object to list of supported pagebuilder.

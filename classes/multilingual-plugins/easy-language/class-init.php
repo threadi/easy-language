@@ -8,9 +8,7 @@
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Api_Base;
 use easyLanguage\Apis;
@@ -110,7 +108,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// get our own pagebuilder-support-handler.
 		$pagebuilder = Pagebuilder_Support::get_instance();
-		$pagebuilder->init( $this );
+		$pagebuilder->init();
 
 		// get our own REST API-support-handler.
 		$rest_api = REST_Api::get_instance();
@@ -609,7 +607,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		update_option( 'easy_language_summ_ai_source_languages', $languages );
 
 		// Log event.
-		Log::get_instance()->add_log( 'Locale in WordPress changed from ' . $old_value . ' to ' . $new_value, 'success' );
+		/* translators: %1$s will be replaced by the old value, %2$s by the new one. */
+		Log::get_instance()->add_log( sprintf( __( 'Locale in WordPress changed from %1$s to %2$s', 'easy-language' ), $old_value, $new_value ), 'success' );
 	}
 
 	/**
@@ -880,7 +879,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		}
 
 		// Log event.
-		Log::get_instance()->add_log( 'Plugin activated', 'success' );
+		Log::get_instance()->add_log( __( 'Plugin activated', 'easy-language' ), 'success' );
 
 		// validate language support on API.
 		$api_obj = Apis::get_instance()->get_active_api();
@@ -934,7 +933,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		}
 
 		// Log event.
-		Log::get_instance()->add_log( 'Plugin deactivated', 'success' );
+		Log::get_instance()->add_log( __( 'Plugin deactivated', 'easy-language' ), 'success' );
 	}
 
 	/**
@@ -1108,7 +1107,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				'fieldId'     => 'easy_language_languages',
 				/* translators: %1$s will be replaced by the settings-URL for the active API */
 				'description' => ( $readonly && $active_api ) ? sprintf( __( 'Go to <a href="%1$s">API-settings</a> to choose the languages you want to use.', 'easy-language' ), esc_url( $active_api->get_settings_url() ) ) : __( 'Choose the language you want to use for simplifications of texts.', 'easy-language' ),
-				'options'     => Languages::get_instance()->get_possible_target_languages(),
+				'options'     => Languages::get_instance()->get_possible_target_languages( true ),
 				'readonly'    => $readonly,
 			)
 		);
@@ -1652,7 +1651,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			// bail if object is not a simplified object.
 			if ( ! $object || ! $object->is_simplified() ) {
 				// Log event.
-				Log::get_instance()->add_log( 'Requested object ' . $object_id . ' (' . $object_type . ') is not intended to be simplified.', 'error' );
+				/* translators: %1$d will be replaced by an ID, %2$s by a type name. */
+				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d (%2$d) is not intended to be simplified.', 'easy-language' ), $object_id, $object_type ), 'error' );
 
 				// collect return array.
 				$return = array(
@@ -1686,7 +1686,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			// bail if no API is activated.
 			if ( false === $api_obj ) {
 				// Log event.
-				Log::get_instance()->add_log( 'No API active for simplification of texts.', 'error' );
+				Log::get_instance()->add_log( __( 'No API active for simplification of texts.', 'easy-language' ), 'error' );
 
 				// collect return array.
 				$return = array(
@@ -1749,7 +1749,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				}
 
 				// Log event.
-				Log::get_instance()->add_log( 'Simplification of ' . $object_id . ' (' . $object_type . ') run in an error: ' . $error_message, 'error' );
+				/* translators: %1$d will be replaced by an ID, %2$s by a type name. */
+				Log::get_instance()->add_log( sprintf( __( 'Simplification of %1$d (%2$s) run in an error: ', 'easy-language' ), $object_id, $object_type ) . $error_message, 'error' );
 
 				// collect return array for this error.
 				$return = array(
@@ -2127,7 +2128,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// bail if deletion is already running.
 		if ( 1 === absint( get_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING, 0 ) ) ) {
 			// Log event.
-			Log::get_instance()->add_log( 'Deletion of simplified texts is already running.', 'error' );
+			Log::get_instance()->add_log( __( 'Deletion of simplified texts is already running.', 'easy-language' ), 'error' );
 
 			return;
 		}
@@ -2152,7 +2153,8 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, absint( get_option( update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, 0 ) ) ) + 1 );
 
 			// log this event.
-			Log::get_instance()->add_log( 'Text ' . $entry->get_id() . ' deleted', 'success' );
+			/* translators: %1$d wll be replaced by an ID. */
+			Log::get_instance()->add_log( sprintf( __( 'Text %1$d deleted', 'easy-language' ), $entry->get_id() ), 'success' );
 		}
 
 		// remove running marker.
@@ -2721,7 +2723,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$transient_obj->save();
 
 		// Log event.
-		Log::get_instance()->add_log( 'All to simplify texts has been deleted', 'success' );
+		Log::get_instance()->add_log( __( 'All to simplify texts has been deleted', 'easy-language' ), 'success' );
 
 		// redirect user back to list.
 		wp_safe_redirect( wp_get_referer() );

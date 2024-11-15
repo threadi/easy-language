@@ -10,9 +10,7 @@
 namespace easyLanguage\Apis\ChatGpt;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Apis;
 use easyLanguage\Api_Base;
@@ -432,7 +430,7 @@ class ChatGpt extends Base implements Api_Base {
 
 		// Define list of models this plugin supports atm.
 		$models = array(
-			'gpt-4o'         => 'gpt-4o',
+			'gpt-4o'        => 'gpt-4o',
 			'gpt-4'         => 'gpt-4',
 			'gpt-3.5-turbo' => 'gpt-3.5-turbo',
 		);
@@ -759,7 +757,7 @@ class ChatGpt extends Base implements Api_Base {
 			Transients::get_instance()->get_transient_by_name( 'easy_language_api_changed' )->delete();
 
 			// Log event.
-			Log::get_instance()->add_log( 'Token for ChatGpt has been changed.', 'success' );
+			Log::get_instance()->add_log( __( 'Token for ChatGpt has been changed.', 'easy-language' ), 'success' );
 		}
 
 		// show intro if it has not been shown until now.

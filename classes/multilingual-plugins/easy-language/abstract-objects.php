@@ -8,14 +8,11 @@
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
 // prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Apis;
 use easyLanguage\Base;
 use easyLanguage\Helper;
-use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Divi;
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Parser for texts.

@@ -111,12 +111,12 @@ jQuery(document).ready(function($) {
 						'language': obj.parent().find('span').data( 'language-code' ),
 						'nonce': easyLanguageJsVars.set_icon_for_language_nonce
 					},
-					success: function() {
+					success: function( dialog_config ) {
 						// replace img in list.
 						obj.parent().find('img').attr( 'src', attachment.url );
 
 						// show success message.
-						alert(__( 'Icon successfully replaced.', 'easy-language' ));
+						easy_language_create_dialog( dialog_config );
 					}
 				}
 			);

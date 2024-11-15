@@ -8,9 +8,7 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 
@@ -187,6 +185,12 @@ class Installer {
 		// get the plugin-supports by call its install-routines.
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
 			$plugin_obj->install();
+		}
+
+		// enable the default API for a moment for set the default settings.
+		$api_obj = Apis::get_instance()->get_active_api();
+		if ( $api_obj instanceof Base ) {
+			$api_obj->enable();
 		}
 	}
 

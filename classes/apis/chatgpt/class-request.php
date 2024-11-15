@@ -7,15 +7,13 @@
 
 namespace easyLanguage\Apis\ChatGpt;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Log;
 use easyLanguage\Log_Api;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use WP_Error;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Create and send request to ChatGpt API. Gets the response.
@@ -333,7 +331,7 @@ class Request {
 
 		// log error.
 		if ( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during adding API log entry: ' . $wpdb->last_error, 'error' );
+			Log::get_instance()->add_log( __( 'Error during adding API log entry: ', 'easy-language' ) . $wpdb->last_error, 'error' );
 		}
 	}
 

@@ -7,14 +7,12 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language\Parser;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser_Base;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Handler for parsing avada-content.

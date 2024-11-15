@@ -7,6 +7,9 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language\PageBuilder\Elementor;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use Elementor\Widget_Base;
 use Elementor\Controls_Manager;
 

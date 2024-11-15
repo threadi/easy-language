@@ -7,6 +7,9 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Languages;

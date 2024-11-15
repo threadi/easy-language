@@ -7,14 +7,12 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Helper;
 use easyLanguage\Languages;
 use WP_List_Table;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Handler for log-output in backend.

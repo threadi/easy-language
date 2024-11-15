@@ -8,9 +8,7 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 use WP_Admin_Bar;

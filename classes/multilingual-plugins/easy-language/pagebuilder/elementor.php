@@ -5,6 +5,9 @@
  * @package easy-language
  */
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Helper;
 use easyLanguage\Multilingual_plugins\Easy_Language\Init;
 use easyLanguage\Multilingual_plugins\Easy_Language\PageBuilder\Elementor\Switcher_Widget;
@@ -16,11 +19,6 @@ use easyLanguage\Multilingual_plugins\Easy_Language\PageBuilder\Elementor\Langua
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Elementor;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 use Elementor\Plugin;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Add Elementor-object to list of supported pagebuilder.

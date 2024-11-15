@@ -7,14 +7,10 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
-use easyLanguage\Base;
-use easyLanguage\Multilingual_Plugins;
-use WP_Post;
-
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
+
+use WP_Post;
 
 /**
  * Helper for pagebuilder-support.
@@ -27,13 +23,6 @@ class Pagebuilder_Support {
 	 * @var ?Pagebuilder_Support
 	 */
 	private static ?Pagebuilder_Support $instance = null;
-
-	/**
-	 * Instance of initializing object.
-	 *
-	 * @var Base
-	 */
-	private Base $init;
 
 	/**
 	 * Constructor for this object.
@@ -60,14 +49,9 @@ class Pagebuilder_Support {
 	/**
 	 * Initialize pagebuilder-support for our own plugin.
 	 *
-	 * @param Base $init The Base-object.
-	 *
 	 * @return void
 	 */
-	public function init( Base $init ): void {
-		// secure initializing object.
-		$this->init = $init;
-
+	public function init(): void {
 		// add meta-box.
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 	}

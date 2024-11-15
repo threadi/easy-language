@@ -7,6 +7,9 @@
 
 namespace easyLanguage;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 
 /**
@@ -130,7 +133,8 @@ class Log_Api {
 
 		// log error.
 		if ( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during adding API log entry: ' . $wpdb->last_error, 'error' );
+			/* translators: %1$s will be replaced by the error code. */
+			Log::get_instance()->add_log( sprintf( __( 'Error during adding API log entry: %1', 'easy-language' ), '<code>' . $wpdb->last_error . '</code>' ), 'error' );
 		}
 
 		/**

@@ -5,12 +5,10 @@
  * @package easy-language
  */
 
-use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Themify;
-
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
+
+use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Themify;
 
 /**
  * Add Themify-object to list of supported pagebuilder.

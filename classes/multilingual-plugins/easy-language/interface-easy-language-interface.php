@@ -8,9 +8,7 @@
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Initialize the object.

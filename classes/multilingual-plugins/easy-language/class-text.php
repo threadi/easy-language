@@ -7,6 +7,9 @@
 
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Base;
 use easyLanguage\Apis;
 use easyLanguage\Helper;
@@ -205,7 +208,7 @@ class Text {
 
 		// log error.
 		if ( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during adding simplification of text in DB: ' . $wpdb->last_error, 'error' );
+			Log::get_instance()->add_log( __( 'Error during adding simplification of text in DB: ', 'easy-language' ) . $wpdb->last_error, 'error' );
 		} else {
 			// change state of text to "simplified".
 			$this->set_state( 'simplified' );
@@ -340,7 +343,7 @@ class Text {
 
 		// log error.
 		if ( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during updating state of entry in DB: ' . $wpdb->last_error, 'error' );
+			Log::get_instance()->add_log( __( 'Error during updating state of entry in DB: ', 'easy-language' ) . $wpdb->last_error, 'error' );
 		}
 	}
 
@@ -433,7 +436,7 @@ class Text {
 
 		// log error.
 		if ( $wpdb->last_error ) {
-			Log::get_instance()->add_log( 'Error during adding object to original in DB: ' . $wpdb->last_error, 'error' );
+			Log::get_instance()->add_log( __( 'Error during adding object to original in DB: ', 'easy-language' ) . $wpdb->last_error, 'error' );
 		}
 	}
 
