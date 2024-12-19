@@ -176,3 +176,8 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Fixed update script
 * Fixed usage of schedules
 * Fixed import of icons on initial installation
+
+= 2.3.1 =
+* Added new GitHub action to build releases
+* Removed language file generation from release build
+* Fixed WPML-support as wpml-config.xml was missing in releases
