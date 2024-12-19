@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Optimized
+
+- Optimized some plugin-own styles in wp-admin
+
 ### Fixed
 
 - Fixed potential wrong file paths
