@@ -134,7 +134,7 @@ class Log_Api {
 		// log error.
 		if ( $wpdb->last_error ) {
 			/* translators: %1$s will be replaced by the error code. */
-			Log::get_instance()->add_log( sprintf( __( 'Error during adding API log entry: %1', 'easy-language' ), '<code>' . $wpdb->last_error . '</code>' ), 'error' );
+			Log::get_instance()->add_log( sprintf( __( 'Error during adding API log entry: %1$s', 'easy-language' ), '<code>' . $wpdb->last_error . '</code>' ), 'error' );
 		}
 
 		/**

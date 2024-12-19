@@ -181,3 +181,4 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Added new GitHub action to build releases
 * Removed language file generation from release build
 * Fixed WPML-support as wpml-config.xml was missing in releases
+* Fixed multiple typos
