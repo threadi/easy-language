@@ -88,97 +88,11 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 
 == Changelog ==
 
-= 1.0.0 =
-* Initial release
-
-= 2.0.0 =
-* Plugin completely revised
-* Added simplification for posts and pages in Einfache or Leichte Sprache, manually or automatic
-* Added support for API-based simplifications via SUMM AI and capito
-* Added support for different source and target languages
-* Added support for different PageBuilder (Block Editor, Classic Editor)
-* Added multiple hooks
-* Extended support for simplifications with TranslatePress
-* WordPress Coding Standard 3.0 compatible
-
-= 2.0.1 =
-* Removed language files from release
-* Fixed usage of language-columns in post-types (was only a problem if Pro-plugin is used with other languages)
-
-= 2.0.2 =
-* Added more hooks
-* Optimized output of flags
-* Optimized some codes
-* Fixed missing language mappings for SUMM AI simplifications for austria and suisse
-* Fixed missing flag-icons for capito languages
-* Fixed missing API-value for target language on capito
-* Fixed some typos
-
-= 2.0.3 =
-* Added automatic generated hook documentation
-* Optimized same text-descriptions
-* Fixed missing translation output
-* Fixed wrong defined WP Bakery hook for HTML-widgets
-
-= 2.0.4 =
-* Fixed autoloader-generation
-
-= 2.0.5 =
-* Compatibility with WordPress 6.5
-* Updated dependencies for Gutenberg-scripts
-
-= 2.1.0 =
-* Added rate us hint on settings page
-* WordPress Coding Standard 3.1 compatible and each release must pass this
-* Log-format for requests to SUMM AI and capito changed to JSON
-* Help and support pages are not linked language-dependent
-* Changed minimum interval from minutely to 10-minutely to match WordPress-requirements
-* Migrating interval from old to new value of 10-minutely
-* Compatibility with WordPress 6.5.2
-* Updated dependencies for Gutenberg-scripts
-
-= 2.1.1 =
-* Compatibility with WordPress 6.6
-* Fixed possible error with SUMM AI settings for languages with used API Key
-
-= 2.1.2 =
-* Fixed order of logs
-* Fixed test of SUMM AI token if plan does only contain easy language
-
-= 2.2.0 =
-* Added setup after installation
-* Added link to settings in some dialogs
-* Added link to forum in settings
-* Optimized first SUMM AI API key check
-* Optimized usage of JS-links in dialogs of Divi
-* Optimized hint on supported languages
-* Updates dependencies
-* Fixed potential loading of wrong target languages for each API
-
-= 2.2.1 =
-* Test-Release
-
-= 2.2.2 =
-* Hide language hint in setup page
-* Updated blueprint.json
-* Optimized build of release
-
-= 2.3.0 =
-* Added new hooks
-* Added colored status icons in log table
-* Update Capito API to support of v2
-* Updated support for ChatGpt language models
-* Compatibility with WordPress 6.7
-* Optimized the code on multiple positions
-* Reduced usage of SQL-statements in backend
-* Replace dialog- and setup-library with new one
-* Made all plugin texts translatable
-* Fixed update script
-* Fixed usage of schedules
-* Fixed import of icons on initial installation
-
 = 2.3.1 =
 * Added new GitHub action to build releases
 * Removed language file generation from release build
+* Moved changelog to GitHub
 * Fixed WPML-support as wpml-config.xml was missing in releases
 * Fixed multiple typos
+
+[older changes](https://github.com/threadi/easy-language/changelog.md)
