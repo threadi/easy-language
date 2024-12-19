@@ -21,8 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 const EASY_LANGUAGE = __FILE__;
 
 // embed necessary files.
-require_once 'inc/autoload.php';
-require_once 'inc/constants.php';
+require_once __DIR__ . '/inc/autoload.php';
+require_once __DIR__ . '/inc/constants.php';
 
 // include all API-files.
 foreach ( glob( plugin_dir_path( EASY_LANGUAGE ) . 'inc/apis/*.php' ) as $filename ) {

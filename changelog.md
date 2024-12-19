@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed potential wrong file paths
+
 ## [2.3.1]
 
 ### Added
