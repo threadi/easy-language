@@ -95,4 +95,4 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 * Fixed WPML-support as wpml-config.xml was missing in releases
 * Fixed multiple typos
 
-[older changes](https://github.com/threadi/easy-language/changelog.md)
+[older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
