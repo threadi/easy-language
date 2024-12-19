@@ -1652,7 +1652,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			if ( ! $object || ! $object->is_simplified() ) {
 				// Log event.
 				/* translators: %1$d will be replaced by an ID, %2$s by a type name. */
-				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d (%2$d) is not intended to be simplified.', 'easy-language' ), $object_id, $object_type ), 'error' );
+				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d (%2$s) is not intended to be simplified.', 'easy-language' ), $object_id, $object_type ), 'error' );
 
 				// collect return array.
 				$return = array(
