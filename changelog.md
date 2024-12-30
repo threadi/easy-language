@@ -9,6 +9,7 @@
 ### Fixed
 
 - Fixed potential wrong file paths
+- Fixed Divi dialog for dialogs
 
 ## [2.3.1]
 
