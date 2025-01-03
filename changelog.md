@@ -2,9 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added some more hooks
+
 ### Optimized
 
 - Optimized some plugin-own styles in wp-admin
+- No more difference between posts and pages in uRL generation
 
 ### Fixed
 
