@@ -9,6 +9,7 @@
 ### Optimized
 
 - Optimized some plugin-own styles in wp-admin
+- Small code optimizations
 - No more difference between posts and pages in uRL generation
 
 ### Fixed

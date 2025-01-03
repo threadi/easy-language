@@ -14,6 +14,9 @@
  * @package easy-language
  */
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 // do nothing if PHP-version is not 8.0 or newer.
 if ( version_compare( PHP_VERSION, '8.0', '<' ) ) {
 	return;

@@ -8,9 +8,7 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 /**
  * Init the plugin.
@@ -18,7 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * depending on WordPress-settings.
  */
 class Multilingual_Plugins {
-
 
 	/**
 	 * Instance of this object.
