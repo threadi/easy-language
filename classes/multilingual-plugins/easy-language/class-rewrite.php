@@ -68,7 +68,7 @@ class Rewrite {
 		add_filter( 'init', array( $this, 'set_rules' ) );
 
 		// hooks to set urls.
-		add_filter( 'get_page_uri', array( $this, 'page_link' ), 10, 2 );
+		add_filter( 'get_page_uri', array( $this, 'post_link' ), 10, 2 );
 		add_filter( 'pre_post_link', array( $this, 'post_link' ), 10, 2 );
 
 		// misc hooks.
@@ -191,30 +191,7 @@ class Rewrite {
 	}
 
 	/**
-	 * Add language-specific prefix to URLs of translated pages.
-	 *
-	 * @param string  $url The generated url without projekt-url.
-	 * @param WP_Post $post The object of the post.
-	 *
-	 * @return string
-	 */
-	public function page_link( string $url, WP_Post $post ): string {
-		// get language of this post.
-		$language = get_post_meta( $post->ID, 'easy_language_simplification_language', true );
-		if ( ! empty( $language ) ) {
-			// get all supported languages.
-			$languages = Languages::get_instance()->get_active_languages();
-
-			// get the corresponding url-part of the language.
-			if ( ! empty( $languages[ $language ] ) ) {
-				return $languages[ $language ]['url'] . '/' . $url;
-			}
-		}
-		return $url;
-	}
-
-	/**
-	 * Add language-specific prefix to URLs of translated posts.
+	 * Add language-specific prefix to URLs of simplified pages.
 	 *
 	 * @param string  $url The generated url without projekt-url.
 	 * @param WP_Post $post The object of the post.
@@ -222,17 +199,36 @@ class Rewrite {
 	 * @return string
 	 */
 	public function post_link( string $url, WP_Post $post ): string {
+		$false = false;
+		/**
+		 * Prevent the usage of the simple generation of permalinks.
+		 *
+		 * @since 2.3.2 Available since 2.3.2
+		 * @param bool $false True to prevent the usage.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
+		 */
+		if( apply_filters( 'easy_language_prevent_simple_permalinks', $false ) ) {
+			return $url;
+		}
+
 		// get language of this post.
 		$language = get_post_meta( $post->ID, 'easy_language_simplification_language', true );
-		if ( ! empty( $language ) ) {
-			// get all supported languages.
-			$languages = Languages::get_instance()->get_active_languages();
 
-			// get the corresponding url-part of the language.
-			if ( ! empty( $languages[ $language ] ) ) {
-				return $languages[ $language ]['url'] . $url;
-			}
+		// bail if no language has been set.
+		if ( empty( $language ) ) {
+			return $url;
 		}
-		return $url;
+
+		// get all supported languages.
+		$languages = Languages::get_instance()->get_active_languages();
+
+		// bail if there is no corresponding URL part for this language.
+		if ( empty( $languages[ $language ] ) ) {
+			return $url;
+		}
+
+		// return the URL prefixed with the language part.
+		return $languages[ $language ]['url'] . '/' . $url;
 	}
 }

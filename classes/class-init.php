@@ -56,7 +56,7 @@ class Init {
 		if ( is_admin() ) {
 			include_once Helper::get_plugin_path() . '/inc/admin.php';
 			// include all settings-files.
-			foreach ( glob( Helper::get_plugin_path() . 'inc/settings/*.php' ) as $filename ) {
+			foreach ( glob( Helper::get_plugin_path() . '/inc/settings/*.php' ) as $filename ) {
 				include $filename;
 			}
 		}
@@ -65,12 +65,12 @@ class Init {
 		Update::get_instance()->init();
 
 		// include all API-files.
-		foreach ( glob( Helper::get_plugin_path() . 'inc/apis/*.php' ) as $filename ) {
+		foreach ( glob( Helper::get_plugin_path() . '/inc/apis/*.php' ) as $filename ) {
 			require_once $filename;
 		}
 
 		// include all settings-files.
-		foreach ( glob( Helper::get_plugin_path() . 'inc/multilingual-plugins/*.php' ) as $filename ) {
+		foreach ( glob( Helper::get_plugin_path() . '/inc/multilingual-plugins/*.php' ) as $filename ) {
 			require_once $filename;
 		}
 

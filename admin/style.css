@@ -150,9 +150,9 @@ body .text-translations-table #source_language, body .text-translations-table #t
 .easy-api-radios input[type='radio'] + label > p:last-child { margin-bottom: 0 }
 
 .easy-api-radios input[type='radio'] + label:before {
-    background-color: #c45602;
+    background-color: var( --lwel-hint-bg);
     border-radius: 8px;
-    color: #fff;
+    color: var(--lwel-hint-font);
     content: attr(data-active-title);
     display: none;
     padding: 4px 12px;
@@ -382,6 +382,8 @@ body .review-hint-button:after {
 }
 
 .easy-language-help-tab {
+	background-color: var(--lwel-hint-bg);
+	color: var(--lwel-hint-font);
 	float: right;
 	font-weight: bold;
 }

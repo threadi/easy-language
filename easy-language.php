@@ -23,7 +23,7 @@ if ( version_compare( PHP_VERSION, '8.0', '<' ) ) {
 const EASY_LANGUAGE = __FILE__;
 
 // set version number.
-define( 'EASY_LANGUAGE_VERSION', '@@VersionNumber@@' );
+const EASY_LANGUAGE_VERSION = '@@VersionNumber@@';
 
 // embed necessary files.
 require_once __DIR__ . '/inc/autoload.php';
