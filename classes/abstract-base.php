@@ -8,9 +8,7 @@
 namespace easyLanguage;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use WP_Query;
 
@@ -311,8 +309,8 @@ abstract class Base {
 	 */
 	public function get_language_specific_support_page(): string {
 		// return language-specific URL if it exists.
-		if ( ! empty( $this->support_url[ helper::get_current_language() ] ) ) {
-			return $this->support_url[ helper::get_current_language() ];
+		if ( ! empty( $this->support_url[ Helper::get_current_language() ] ) ) {
+			return $this->support_url[ Helper::get_current_language() ];
 		}
 
 		// otherwise return default url.

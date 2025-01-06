@@ -8,9 +8,9 @@
 namespace easyLanguage;
 
 // prevent direct access.
-use easyLanguage\Multilingual_plugins\Easy_Language\Texts;
-
 defined( 'ABSPATH' ) || exit;
+
+use easyLanguage\Multilingual_plugins\Easy_Language\Texts;
 
 /**
  * Helper-function for updates of this plugin.

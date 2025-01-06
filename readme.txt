@@ -88,11 +88,12 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 
 == Changelog ==
 
-= 2.3.1 =
-* Added new GitHub action to build releases
-* Removed language file generation from release build
-* Moved changelog to GitHub
-* Fixed WPML-support as wpml-config.xml was missing in releases
-* Fixed multiple typos
+= @@VersionNumber@@ =
+- Added some more hooks
+- Optimized some plugin-own styles in wp-admin
+- Small code optimizations
+- No more difference between posts and pages in uRL generation
+- Fixed potential wrong file paths
+- Fixed Divi dialog for dialogs
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
