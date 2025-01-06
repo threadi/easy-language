@@ -208,7 +208,7 @@ class Rewrite {
 		 *
 		 * @noinspection PhpConditionAlreadyCheckedInspection
 		 */
-		if( apply_filters( 'easy_language_prevent_simple_permalinks', $false ) ) {
+		if ( apply_filters( 'easy_language_prevent_simple_permalinks', $false ) ) {
 			return $url;
 		}
 
