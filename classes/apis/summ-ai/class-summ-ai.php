@@ -368,7 +368,7 @@ class Summ_AI extends Base implements Api_Base {
 			foreach ( $source_languages as $source_language => $enabled ) {
 				if ( ! empty( $mappings[ $source_language ] ) ) {
 					foreach ( $mappings[ $source_language ] as $language ) {
-						if ( 'de_EL' === $language ) {
+						if ( 'de_LS' === $language ) { // set default language for SUMM AI.
 							$languages[ $language ] = '1';
 						}
 					}

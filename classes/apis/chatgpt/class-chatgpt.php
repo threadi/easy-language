@@ -560,7 +560,7 @@ class ChatGpt extends Base implements Api_Base {
 		// set target language depending on source-language and if only one target could be possible.
 		if ( ! get_option( 'easy_language_chatgpt_target_languages' ) ) {
 			$language  = helper::get_wp_lang();
-			$languages = array( 'de_EL' => '1' );
+			$languages = array( 'de_LS' => '1' ); // set default language for ChatGPT.
 			update_option( 'easy_language_chatgpt_target_languages', $languages );
 		}
 

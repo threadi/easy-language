@@ -145,7 +145,11 @@ class No_Api extends Base implements Api_Base {
 	 */
 	public function get_mapping_languages(): array {
 		return array(
-			'de_DE' => array( 'de_EL' ),
+			'de_DE' => array( 'de_LS' ), // set default language for plugin on installation.
+			'de_DE_formal' => array( 'de_LS' ), // set default language for plugin on installation.
+			'de_CH'          => array( 'de_LS' ),
+			'de_CH_informal' => array( 'de_LS' ),
+			'de_AT'          => array( 'de_LS' ),
 		);
 	}
 
