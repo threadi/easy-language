@@ -97,7 +97,6 @@ class Setup {
 			add_action( 'esfw_set_completed', array( $this, 'set_completed' ) );
 			add_action( 'esfw_process', array( $this, 'run_process' ) );
 			add_action( 'esfw_process', array( $this, 'show_process_end' ), PHP_INT_MAX );
-			add_filter( 'esfw_steps', array( $this, 'update_steps' ) );
 
 			// add hooks to enable the setup of this plugin.
 			add_action( 'admin_menu', array( $this, 'add_setup_menu' ) );
@@ -353,6 +352,9 @@ class Setup {
 		// 2. Run import of positions.
 		$this->set_process_label( 'run step 2' );
 
+		// update step counter.
+		$this->update_process_step( 1 );
+
 		// set steps to max steps to end the process.
 		update_option( 'esfw_steps', $max_steps );
 	}
@@ -519,5 +521,25 @@ class Setup {
 	 */
 	public function uninstall(): void {
 		\easySetupForWordPress\Setup::get_instance()->uninstall( $this->get_setup_name() );
+	}
+
+	/**
+	 * Return the actual max steps.
+	 *
+	 * @return int
+	 */
+	public function get_max_step(): int {
+		return absint( get_option( 'esfw_max_steps' ) );
+	}
+
+	/**
+	 * Updates the process step.
+	 *
+	 * @param int $step Steps to add.
+	 *
+	 * @return void
+	 */
+	public function update_process_step( int $step = 1 ): void {
+		update_option( 'esfw_step', absint( get_option( 'esfw_step' ) + $step ) );
 	}
 }
