@@ -163,7 +163,7 @@ class Helper {
 		if ( is_array( $post_meta ) ) {
 			foreach ( $post_meta as $meta_key => $meta_values ) {
 				// ignore some keys.
-				if ( in_array( $meta_key, array( '_edit_lock', '_edit_last', '_wp_page_template', '_wp_old_slug' ), true ) ) {
+				if ( in_array( $meta_key, self::get_object_keys_to_ignore(), true ) ) {
 					continue;
 				}
 
@@ -705,5 +705,22 @@ class Helper {
 		 * @param string $filepath The absolute path to the requested file.
 		 */
 		return apply_filters( 'easy_language_file_version', $plugin_version, $filepath );
+	}
+
+	/**
+	 * Return object post meta keys we ignore.
+	 *
+	 * @return string[]
+	 */
+	private static function get_object_keys_to_ignore(): array {
+		$keys = array( '_edit_lock', '_edit_last', '_wp_old_slug' );
+
+		/**
+		 * Filter the list of post meta keys we ignore during creating new object.
+		 *
+		 * @since 2.4.0 Available since 2.4.0.
+		 * @param array $keys List of keys to ignore.
+		 */
+		return apply_filters( 'easy_language_post_meta_keys_to_ignore', $keys );
 	}
 }
