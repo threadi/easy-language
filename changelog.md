@@ -2,8 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added default target language setting for each german language
+
 ### Optimized
 
+- New default target language for new installations in any german languages: plain language
+-> reason: there are clearer guidelines for this in germany
 - Progressbar on setup now jumps to green
 
 ## [2.3.2] - 06.01.2025
