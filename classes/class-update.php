@@ -82,6 +82,7 @@ class Update {
 
 			$this->version210();
 			$this->version230();
+			$this->version240();
 
 			// save new plugin-version in DB.
 			delete_option( 'easyLanguageVersion' );
@@ -157,6 +158,18 @@ class Update {
 		$api_obj = Apis::get_instance()->get_active_api();
 		if ( $api_obj instanceof Base ) {
 			$api_obj->enable();
+		}
+	}
+
+	/**
+	 * On update to version 2.4.0 or newer.
+	 *
+	 * @return void
+	 */
+	public function version240(): void {
+		// set separator.
+		if ( ! get_option( 'easy_language_summ_ai_separator' ) ) {
+			update_option( 'easy_language_summ_ai_separator', 'interpunct' );
 		}
 	}
 }

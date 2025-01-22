@@ -5,6 +5,7 @@
 ### Added
 
 - Added default target language setting for each german language
+- Added option to choose separator for SUMM AI simplifications if valid API Key is used
 - Added some new hooks
 
 ### Optimized
