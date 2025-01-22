@@ -397,6 +397,11 @@ class Summ_AI extends Base implements Api_Base {
 			update_option( 'easy_language_summ_ai_email_mode', 'editor' );
 		}
 
+		// set separator.
+		if ( ! get_option( 'easy_language_summ_ai_separator' ) ) {
+			update_option( 'easy_language_summ_ai_separator', 'interpunct' );
+		}
+
 		// set summ ai api as default API.
 		update_option( 'easy_language_api', $this->get_name() );
 
@@ -469,6 +474,7 @@ class Summ_AI extends Base implements Api_Base {
 			'easy_language_summ_ai_paid_quota',
 			'easy_language_summ_ai_quota_interval',
 			'easy_language_summ_ai_email_mode',
+			'easy_language_summ_ai_separator'
 		);
 	}
 
@@ -905,6 +911,27 @@ class Summ_AI extends Base implements Api_Base {
 			)
 		);
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_quota_interval', array( 'sanitize_callback' => array( $this, 'set_quota_interval' ) ) );
+
+		// add option for separator.
+		add_settings_field(
+			'easy_language_summ_ai_separator',
+			__( 'Choose separator', 'easy-language' ),
+			'easy_language_admin_select_field',
+			'easyLanguageSummAIPage',
+			'settings_section_summ_ai',
+			array(
+				'label_for'   => 'easy_language_summ_ai_separator',
+				'fieldId'     => 'easy_language_summ_ai_separator',
+				'disable_empty' => true,
+				'values' => array(
+					'interpunct' => __( 'interpunct', 'easy-language' ),
+					'hyphen' => __( 'hyphen', 'easy-language' ),
+				),
+				'readonly'    => ! $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
+				'description' => __( 'The separator which is used to split compound words, e.g. Bundes-Kanzler (hyphen) or Bundes·kanzler (interpunct). By default it is interpunct.', 'easy-language' ),
+			)
+		);
+		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_separator' );
 
 		// Enable test-marker.
 		add_settings_field(

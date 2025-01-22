@@ -2,6 +2,8 @@
 /**
  * File for handler for each request to SUMM AI API.
  *
+ * @doc https://backend.summ-ai.com/api/docs/
+ *
  * @package easy-language
  */
 
@@ -338,12 +340,23 @@ class Request {
 	}
 
 	/**
-	 * Get text_type for request.
+	 * Get separator for request.
 	 *
 	 * @return string
 	 */
 	public function get_separator(): string {
 		return $this->separator;
+	}
+
+	/**
+	 * Set separator for request.
+	 *
+	 * @param string $separator The separator to use.
+	 *
+	 * @return void
+	 */
+	public function set_separator( string $separator ): void {
+		$this->separator = $separator;
 	}
 
 	/**
