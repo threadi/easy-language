@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Optimized
+
+- Progressbar on setup now jumps to green
+
 ## [2.3.2] - 06.01.2025
 
 ### Added

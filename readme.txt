@@ -12,7 +12,7 @@ Simplify your website into easy or plain language - supported by AI.
 
 == Description ==
 
-Simplify your website into easy ir plain language - supported by AI.
+Simplify your website into easy or plain language - supported by AI.
 
 The Plugin Easy Language adds the functionality to simplify and display your pages and posts into easy or plain language. The translation process can be manually or support by an AI-engine.
 
