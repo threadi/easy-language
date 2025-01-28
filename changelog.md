@@ -5,18 +5,20 @@
 ### Added
 
 - Added default target language setting for each german language
-- Added option to choose separator for SUMM AI simplifications if valid API Key is used
+- Added new settings for each SUMM AI supported language for new lines and separator
 - Added some new hooks
 
 ### Optimized
 
 - New default target language for new installations in any german languages: plain language
 -> reason: there are clearer guidelines for this in germany
+- Using new SUMM AI API endpoints like /api/v1/translation/
 - Progressbar on setup now jumps to green
 
 ### Fixed
 
 - Assigned page template got lost during creating a new simplification object
+- Fixed missing usage of test mode marker for SUMM AI
 
 ## [2.3.2] - 06.01.2025
 

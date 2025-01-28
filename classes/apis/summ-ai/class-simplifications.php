@@ -76,13 +76,25 @@ class Simplifications {
 	 * @return array The result as array.
 	 */
 	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html ): array {
+		// get the separator setting for target language.
+		$separators = (array)get_option( 'easy_language_summ_ai_target_languages_separator' );
+		$separator = $separators[$target_language];
+
+		// get the new line setting for target language.
+		$new_lines_array = (array)get_option( 'easy_language_summ_ai_target_languages_new_lines' );
+		$new_lines = 0;
+		if( ! empty( $new_lines_array[$target_language] ) ) {
+			$new_lines = 1;
+		}
+
 		// build request.
 		$request_obj = $this->init->get_request_object();
 		$request_obj->set_url( $this->init->get_api_url() );
 		$request_obj->set_token( $this->init->get_token() );
 		$request_obj->set_text( $text_to_translate );
 		$request_obj->set_text_type( 'plain_text' );
-		$request_obj->set_separator( get_option( 'easy_language_summ_ai_separator' ) );
+		$request_obj->set_separator( $separator );
+		$request_obj->set_new_lines( $new_lines );
 		$request_obj->set_method( 'POST' );
 		$request_obj->set_is_test( $this->init->is_test_mode_active() );
 		$request_obj->set_source_language( $source_language );

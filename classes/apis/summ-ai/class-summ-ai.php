@@ -221,6 +221,7 @@ class Summ_AI extends Base implements Api_Base {
 				'label'       => __( 'German', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Informal german spoken in Germany.', 'easy-language' ),
+				'api_value' => 'de',
 				'icon'        => 'icon-de-de',
 				'img'         => 'de_de.png',
 				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
@@ -229,6 +230,7 @@ class Summ_AI extends Base implements Api_Base {
 				'label'       => __( 'German (Formal)', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Formal german spoken in Germany.', 'easy-language' ),
+				'api_value' => 'de',
 				'icon'        => 'icon-de-de',
 				'img'         => 'de_de.png',
 				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_DE_formal' ) : '',
@@ -237,6 +239,7 @@ class Summ_AI extends Base implements Api_Base {
 				'label'       => __( 'Suisse german', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Formal german spoken in Suisse.', 'easy-language' ),
+				'api_value' => 'de',
 				'icon'        => 'icon-de-ch',
 				'img'         => 'de_ch.png',
 				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_CH' ) : '',
@@ -245,6 +248,7 @@ class Summ_AI extends Base implements Api_Base {
 				'label'       => __( 'Suisse german (Informal)', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Informal german spoken in Suisse.', 'easy-language' ),
+				'api_value' => 'de',
 				'icon'        => 'icon-de-ch',
 				'img'         => 'de_ch.png',
 				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_CH_informal' ) : '',
@@ -253,6 +257,7 @@ class Summ_AI extends Base implements Api_Base {
 				'label'       => __( 'Austria German', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'German spoken in Austria.', 'easy-language' ),
+				'api_value' => 'de',
 				'icon'        => 'icon-de-at',
 				'img'         => 'de_at.png',
 				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_AT' ) : '',
@@ -287,6 +292,8 @@ class Summ_AI extends Base implements Api_Base {
 				'icon'        => 'icon-de-el',
 				'img'         => 'de_EL.svg',
 				'img_icon'    => ( ! $without_img && $this->is_active() ) ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
+				'new_lines'   => false,
+				'separator'   => 'none'
 			),
 			'de_LS' => array(
 				'label'       => __( 'Leichte Sprache', 'easy-language' ),
@@ -297,6 +304,8 @@ class Summ_AI extends Base implements Api_Base {
 				'icon'        => 'icon-de-ls',
 				'img'         => 'de_LS.svg',
 				'img_icon'    => ( ! $without_img && $this->is_active() ) ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
+				'new_lines'   => true,
+				'separator'   => 'hyphen'
 			),
 		);
 
@@ -355,7 +364,7 @@ class Summ_AI extends Base implements Api_Base {
 
 		// set source language depending on WP-locale and its support.
 		if ( ! get_option( 'easy_language_summ_ai_source_languages' ) ) {
-			$language  = helper::get_wp_lang();
+			$language  = Helper::get_wp_lang();
 			$languages = array( $language => '1' );
 			update_option( 'easy_language_summ_ai_source_languages', $languages );
 		}
@@ -377,6 +386,26 @@ class Summ_AI extends Base implements Api_Base {
 			update_option( 'easy_language_summ_ai_target_languages', $languages );
 		}
 
+		// set separator setting for each activated target language.
+		if ( ! get_option( 'easy_language_summ_ai_target_languages_separator' ) ) {
+			$target_languages = $this->get_supported_target_languages();
+			$separators = array();
+			foreach( $target_languages as $target_language => $settings ) {
+				$separators[$target_language] = $settings['separator'];
+			}
+			update_option( 'easy_language_summ_ai_target_languages_separator', $separators );
+		}
+
+		// set new_lines setting for each activated target language.
+		if ( ! get_option( 'easy_language_summ_ai_target_languages_new_lines' ) ) {
+			$target_languages = $this->get_supported_target_languages();
+			$new_lines = array();
+			foreach( $target_languages as $target_language => $settings ) {
+				$new_lines[$target_language] = $settings['new_lines'] ? 1 : 0;
+			}
+			update_option( 'easy_language_summ_ai_target_languages_new_lines', $new_lines );
+		}
+
 		// set SUMM AI API as default API, if not already set.
 		if ( ! get_option( 'easy_language_api' ) ) {
 			update_option( 'easy_language_api', $this->get_name() );
@@ -395,11 +424,6 @@ class Summ_AI extends Base implements Api_Base {
 		// set translation mode to editor.
 		if ( ! get_option( 'easy_language_summ_ai_email_mode' ) ) {
 			update_option( 'easy_language_summ_ai_email_mode', 'editor' );
-		}
-
-		// set separator.
-		if ( ! get_option( 'easy_language_summ_ai_separator' ) ) {
-			update_option( 'easy_language_summ_ai_separator', 'interpunct' );
 		}
 
 		// set summ ai api as default API.
@@ -465,6 +489,8 @@ class Summ_AI extends Base implements Api_Base {
 		return array(
 			'easy_language_summ_ai_source_languages',
 			'easy_language_summ_ai_target_languages',
+			'easy_language_summ_ai_target_languages_separator',
+			'easy_language_summ_ai_target_languages_new_lines',
 			'easy_language_summ_ai_mode',
 			'easy_language_summ_ai_disable_free_requests',
 			'easy_language_summ_ai_api_key',
@@ -875,7 +901,7 @@ class Summ_AI extends Base implements Api_Base {
 		add_settings_field(
 			'easy_language_summ_ai_target_languages',
 			__( 'Choose target languages', 'easy-language' ),
-			'easy_language_admin_multiple_checkboxes_field',
+			array( $this, 'show_target_language_settings' ),
 			'easyLanguageSummAIPage',
 			'settings_section_summ_ai',
 			array(
@@ -887,7 +913,9 @@ class Summ_AI extends Base implements Api_Base {
 				'pro_hint'    => $this->get_pro_hint(),
 			)
 		);
-		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages', array( 'sanitize_callback' => array( $this, 'validate_language_settings' ) ) );
+		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages', array( 'sanitize_callback' => array( $this, 'validate_target_language_settings' ) ) );
+		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages_separator', array( 'sanitize_callback' => array( $this, 'validate_target_language_separator_settings' ) ) );
+		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages_new_lines', array( 'sanitize_callback' => array( $this, 'validate_target_language_new_lines_settings' ) ) );
 
 		// get possible intervals.
 		$intervals = array();
@@ -911,27 +939,6 @@ class Summ_AI extends Base implements Api_Base {
 			)
 		);
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_quota_interval', array( 'sanitize_callback' => array( $this, 'set_quota_interval' ) ) );
-
-		// add option for separator.
-		add_settings_field(
-			'easy_language_summ_ai_separator',
-			__( 'Choose separator', 'easy-language' ),
-			'easy_language_admin_select_field',
-			'easyLanguageSummAIPage',
-			'settings_section_summ_ai',
-			array(
-				'label_for'   => 'easy_language_summ_ai_separator',
-				'fieldId'     => 'easy_language_summ_ai_separator',
-				'disable_empty' => true,
-				'values' => array(
-					'interpunct' => __( 'interpunct', 'easy-language' ),
-					'hyphen' => __( 'hyphen', 'easy-language' ),
-				),
-				'readonly'    => ! $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
-				'description' => __( 'The separator which is used to split compound words, e.g. Bundes-Kanzler (hyphen) or Bundes·kanzler (interpunct). By default it is interpunct.', 'easy-language' ),
-			)
-		);
-		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_separator' );
 
 		// Enable test-marker.
 		add_settings_field(
@@ -1044,7 +1051,7 @@ class Summ_AI extends Base implements Api_Base {
 	}
 
 	/**
-	 * Validate the language-settings.
+	 * Validate the target language-settings.
 	 *
 	 * The source-language must be possible to simplify in the target-language.
 	 *
@@ -1052,7 +1059,7 @@ class Summ_AI extends Base implements Api_Base {
 	 *
 	 * @return array|null
 	 */
-	public function validate_language_settings( ?array $values ): ?array {
+	public function validate_target_language_settings( ?array $values ): ?array {
 		$values = Helper::settings_validate_multiple_checkboxes( $values );
 		if ( empty( $values ) ) {
 			add_settings_error( 'easy_language_summ_ai_target_languages', 'easy_language_summ_ai_target_languages', __( 'You have to set a target-language for simplifications.', 'easy-language' ) );
@@ -1062,6 +1069,28 @@ class Summ_AI extends Base implements Api_Base {
 
 		// return value.
 		return $values;
+	}
+
+	/**
+	 * Validate the target language separator settings.
+	 *
+	 * @param array|null $values The settings to check.
+	 *
+	 * @return array|null
+	 */
+	public function validate_target_language_separator_settings( ?array $values ): ?array {
+		return Helper::settings_validate_muliple_select_fields( $values );
+	}
+
+	/**
+	 * Validate the target language new_lines settings.
+	 *
+	 * @param array|null $values The settings to check.
+	 *
+	 * @return array|null
+	 */
+	public function validate_target_language_new_lines_settings( ?array $values ): ?array {
+		return Helper::settings_validate_multiple_checkboxes( $values );
 	}
 
 	/**
@@ -1503,5 +1532,121 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_translatepress_machine_class(): string {
 		return 'easyLanguage\Multilingual_plugins\TranslatePress\Translatepress_Summ_Ai_Machine_Translator';
+	}
+
+	/**
+	 * Show the possible target languages with its additional settings as table.
+	 *
+	 * @param array $attr List of attributes for this field-list.
+	 *
+	 * @return void
+	 */
+	public function show_target_language_settings( array $attr ): void {
+		// bail if no options are set.
+		if ( empty( $attr['options'] ) ) {
+			return;
+		}
+
+		// set possible list of separators.
+		$separators = array(
+			'interpunct' => __( 'interpunct', 'easy-language' ),
+			'hyphen' => __( 'hyphen', 'easy-language' ),
+			'none' => __( 'do not use separator', 'easy-language' ),
+		);
+
+		// show description, if set.
+		if ( ! empty( $attr['description'] ) ) {
+			echo '<p class="easy-language-checkbox">' . wp_kses_post( $attr['description'] ) . '</p>';
+		}
+
+		// start table.
+		echo '<table class="easy-language-target-language"><thead><tr><th class="title">' . esc_html__( 'Enable your target language', 'easy-language' ) . '</th><th class="separator">' . esc_html__( 'Choose separator', 'easy-language' ) . '</th><th class="new-lines">' . esc_html__( 'Enable new lines', 'easy-language' ) . '</th></tr></thead><tbody>';
+
+		// loop through the options (the target languages).
+		foreach ( $attr['options'] as $key => $settings ) {
+			// add row.
+			echo '<tr>';
+
+			// get checked-marker.
+			$actual_values = get_option( $attr['fieldId'], array() );
+			$checked       = ! empty( $actual_values[ $key ] ) ? ' checked' : '';
+
+			// get separator setting for this language.
+			$separator_value = get_option( $attr['fieldId'] . '_separator' );
+			$separator = ! empty( $separator_value[ $key ] ) ? $separator_value[ $key ] : '';
+
+			// get new line setting for this language.
+			$new_lines_value = get_option( $attr['fieldId'] . '_new_lines' );
+			$new_lines = ! empty( $new_lines_value[ $key ] ) ? ' checked' : '' ;
+
+			// title.
+			$title = __( 'Check to enable this language.', 'easy-language' );
+
+			// readonly.
+			$readonly = '';
+			if ( isset( $attr['readonly'] ) && false !== $attr['readonly'] ) {
+				$readonly = ' disabled="disabled"';
+				?>
+				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo ! empty( $checked ) ? 1 : 0; ?>">
+				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_separator_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr( $separator ); ?>">
+				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_new_lines_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo ! empty( $new_lines ) ? 1 : 0; ?>">
+				<?php
+			}
+			if ( isset( $settings['enabled'] ) && false === $settings['enabled'] ) {
+				$readonly = ' disabled="disabled"';
+				$title    = '';
+			}
+
+			// get icon, if set.
+			$icon = '';
+			if ( ! empty( $settings['img_icon'] ) ) {
+				$icon = $settings['img_icon'];
+			}
+
+			// output.
+			?>
+			<td>
+				<div class="easy-language-checkbox">
+					<input type="checkbox" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>[<?php echo esc_attr( $key ); ?>]" value="1"<?php echo esc_attr( $checked ) . esc_attr( $readonly ); ?> title="<?php echo esc_attr( $title ); ?>">
+					<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>"><?php echo esc_html( $settings['label'] ) . wp_kses_post( $icon ); ?></label>
+					<?php
+					if ( ! empty( $settings['description'] ) ) {
+						echo '<p>' . wp_kses_post( $settings['description'] ) . '</p>';
+					}
+					?>
+				</div>
+			</td>
+			<td>
+				<select id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>_separator" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_separator[<?php echo esc_attr( $key ); ?>]"<?php echo esc_attr( $readonly ); ?>>
+					<?php
+						foreach( $separators as $value => $label ) {
+							$selected = $separator === $value ? ' selected' : '';
+							?><option value="<?php echo esc_attr( $value ); ?>"<?php echo $selected; ?>><?php echo esc_attr( $label ); ?></option><?php
+						}
+					?>
+				</select>
+			</td>
+			<td>
+				<input type="checkbox" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>_new_line" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_new_lines[<?php echo esc_attr( $key ); ?>]" value="1"<?php echo esc_attr( $new_lines ) . esc_attr( $readonly ); ?> title="<?php echo esc_attr( $title ); ?>">
+			</td>
+			</tr>
+			<?php
+		}
+
+		// end of table.
+		echo '</tbody></table>';
+
+		if ( ! empty( $attr['pro_hint'] ) ) {
+			do_action( 'easy_language_admin_show_pro_hint', $attr['pro_hint'] );
+		}
+	}
+
+	/**
+	 * Return if test mode for this API is active or not.
+	 *
+	 * @return bool
+	 */
+	public function is_test_mode_active(): bool {
+		return 1 === absint( get_option( 'easy_language_summ_ai_test' ));
 	}
 }
