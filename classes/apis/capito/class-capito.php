@@ -161,7 +161,7 @@ class Capito extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_logo_url(): string {
-		return Helper::get_plugin_url() . 'classes/apis/capito/gfx/logo.svg';
+		return Helper::get_plugin_url() . 'classes/apis/capito/gfx/2025_logo.svg';
 	}
 
 	/**

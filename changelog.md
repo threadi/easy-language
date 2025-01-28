@@ -14,6 +14,7 @@
 -> reason: there are clearer guidelines for this in germany
 - Using new SUMM AI API endpoints like /api/v1/translation/
 - Progressbar on setup now jumps to green
+- Updated Capito logo
 
 ### Fixed
 
