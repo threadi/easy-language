@@ -32,6 +32,8 @@
 
 .form-table p.easy-language-checkbox { margin-bottom: 8px }
 
+.form-table .easy-language-checkbox label { cursor: pointer }
+
 #easy-language label {
 	display: block;
 	margin-bottom: 1em;
@@ -399,4 +401,21 @@ body.settings_page_easy_language_settings .state .dashicons-no { color: red }
 body.admin_page_easyLanguageSetup #easy-setup-for-wordpress {
 	min-width: 760px;
 	width: 50%;
+}
+
+table.easy-language-target-language {
+	width: 100%;
+}
+
+table.easy-language-target-language th, table.easy-language-target-language td {
+	padding: 0 0 1em;
+	vertical-align: middle;
+}
+
+table th.separator {
+	width: 124px;
+}
+
+table th.new-lines {
+	width: 92px;
 }

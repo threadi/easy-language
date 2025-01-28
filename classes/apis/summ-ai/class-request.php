@@ -96,6 +96,13 @@ class Request {
 	private string $separator = 'interpunct';
 
 	/**
+	 * New lines setting.
+	 *
+	 * @var int
+	 */
+	private int $new_lines = 1;
+
+	/**
 	 * Source-language for this request.
 	 *
 	 * @var string
@@ -204,11 +211,18 @@ class Request {
 		// get summ_ai-object.
 		$summ_ai_obj = Summ_AI::get_instance();
 
+		// map source language.
+		$source_language = 'de';
+		$supported_source_languages = $summ_ai_obj->get_supported_source_languages();
+		if ( ! empty( $this->source_language ) && ! empty( $supported_source_languages[ $this->source_language ] ) && ! empty( $supported_source_languages[ $this->source_language ]['api_value'] ) ) {
+			$source_language = $supported_source_languages[ $this->source_language ]['api_value'];
+		}
+
 		// map target language.
-		$request_target_language    = 'easy';
+		$target_language    = 'easy';
 		$supported_target_languages = $summ_ai_obj->get_supported_target_languages();
 		if ( ! empty( $this->target_language ) && ! empty( $supported_target_languages[ $this->target_language ] ) && ! empty( $supported_target_languages[ $this->target_language ]['api_value'] ) ) {
-			$request_target_language = $supported_target_languages[ $this->target_language ]['api_value'];
+			$target_language = $supported_target_languages[ $this->target_language ]['api_value'];
 		}
 
 		// merge header-array.
@@ -234,11 +248,13 @@ class Request {
 		// collect attributes to send request-data via POST-method.
 		if ( 'POST' === $this->get_method() ) {
 			$data['input_text']            = $this->get_text();
-			$data['input_text_type']       = $this->get_text_type();
 			$data['user']                  = get_option( 'home' ) . '|' . $summ_ai_obj->get_contact_email();
-			$data['is_test']               = $this->is_test();
+			$data['input_text_type']       = $this->get_text_type();
+			$data['output_language_level'] = $target_language;
 			$data['separator']             = $this->get_separator();
-			$data['output_language_level'] = $request_target_language;
+			$data['is_new_lines']          = 1 === $this->get_new_lines();
+			$data['translation_language']  = $source_language;
+			$data['is_test']               = $this->is_test();
 			$args['body']                  = wp_json_encode( $data );
 		}
 
@@ -483,5 +499,25 @@ class Request {
 		if ( in_array( $method, array( 'GET', 'POST' ), true ) ) {
 			$this->method = $method;
 		}
+	}
+
+	/**
+	 * Return new lines setting.
+	 *
+	 * @return int
+	 */
+	private function get_new_lines(): int {
+		return $this->new_lines;
+	}
+
+	/**
+	 * Set new lines settings.
+	 *
+	 * @param int $new_lines 1 if new lines should be used, 0 if not.
+	 *
+	 * @return void
+	 */
+	public function set_new_lines( int $new_lines ): void {
+		$this->new_lines = $new_lines;
 	}
 }
