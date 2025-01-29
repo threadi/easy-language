@@ -167,9 +167,27 @@ class Update {
 	 * @return void
 	 */
 	public function version240(): void {
-		// set separator.
-		if ( ! get_option( 'easy_language_summ_ai_separator' ) ) {
-			update_option( 'easy_language_summ_ai_separator', 'interpunct' );
+		// remove old separator setting.
+		delete_option( 'easy_language_summ_ai_separator' );
+
+		// set separator setting for each activated target language.
+		if ( ! get_option( 'easy_language_summ_ai_target_languages_separator' ) ) {
+			$target_languages = Apis\Summ_Ai\Summ_AI::get_instance()->get_supported_target_languages();
+			$separators       = array();
+			foreach ( $target_languages as $target_language => $settings ) {
+				$separators[ $target_language ] = $settings['separator'];
+			}
+			update_option( 'easy_language_summ_ai_target_languages_separator', $separators );
+		}
+
+		// set new_lines setting for each activated target language.
+		if ( ! get_option( 'easy_language_summ_ai_target_languages_new_lines' ) ) {
+			$target_languages = Apis\Summ_Ai\Summ_AI::get_instance()->get_supported_target_languages();
+			$new_lines        = array();
+			foreach ( $target_languages as $target_language => $settings ) {
+				$new_lines[ $target_language ] = $settings['new_lines'] ? 1 : 0;
+			}
+			update_option( 'easy_language_summ_ai_target_languages_new_lines', $new_lines );
 		}
 	}
 }
