@@ -77,13 +77,13 @@ class Simplifications {
 	 */
 	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html ): array {
 		// get the separator setting for target language.
-		$separators = (array)get_option( 'easy_language_summ_ai_target_languages_separator' );
-		$separator = $separators[$target_language];
+		$separators = (array) get_option( 'easy_language_summ_ai_target_languages_separator' );
+		$separator  = $separators[ $target_language ];
 
 		// get the new line setting for target language.
-		$new_lines_array = (array)get_option( 'easy_language_summ_ai_target_languages_new_lines' );
-		$new_lines = 0;
-		if( ! empty( $new_lines_array[$target_language] ) ) {
+		$new_lines_array = (array) get_option( 'easy_language_summ_ai_target_languages_new_lines' );
+		$new_lines       = 0;
+		if ( ! empty( $new_lines_array[ $target_language ] ) ) {
 			$new_lines = 1;
 		}
 

@@ -89,11 +89,15 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added some more hooks
-- Optimized some plugin-own styles in wp-admin
-- Small code optimizations
-- No more difference between posts and pages in uRL generation
-- Fixed potential wrong file paths
-- Fixed Divi dialog for dialogs
+- Added default target language setting for each german language
+- Added new settings for each SUMM AI supported language for new lines and separator
+- Added some new hooks
+- New default target language for new installations in any german languages: plain language
+-> reason: there are clearer guidelines for this in germany
+- Using new SUMM AI API endpoints like /api/v1/translation/
+- Progressbar on setup now jumps to green
+- Updated Capito logo
+- Assigned page template got lost during creating a new simplification object
+- Fixed missing usage of test mode marker for SUMM AI
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)

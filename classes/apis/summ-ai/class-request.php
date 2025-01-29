@@ -212,14 +212,14 @@ class Request {
 		$summ_ai_obj = Summ_AI::get_instance();
 
 		// map source language.
-		$source_language = 'de';
+		$source_language            = 'de';
 		$supported_source_languages = $summ_ai_obj->get_supported_source_languages();
 		if ( ! empty( $this->source_language ) && ! empty( $supported_source_languages[ $this->source_language ] ) && ! empty( $supported_source_languages[ $this->source_language ]['api_value'] ) ) {
 			$source_language = $supported_source_languages[ $this->source_language ]['api_value'];
 		}
 
 		// map target language.
-		$target_language    = 'easy';
+		$target_language            = 'easy';
 		$supported_target_languages = $summ_ai_obj->get_supported_target_languages();
 		if ( ! empty( $this->target_language ) && ! empty( $supported_target_languages[ $this->target_language ] ) && ! empty( $supported_target_languages[ $this->target_language ]['api_value'] ) ) {
 			$target_language = $supported_target_languages[ $this->target_language ]['api_value'];

@@ -221,7 +221,7 @@ class Summ_AI extends Base implements Api_Base {
 				'label'       => __( 'German', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Informal german spoken in Germany.', 'easy-language' ),
-				'api_value' => 'de',
+				'api_value'   => 'de',
 				'icon'        => 'icon-de-de',
 				'img'         => 'de_de.png',
 				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_de' ) : '',
@@ -230,7 +230,7 @@ class Summ_AI extends Base implements Api_Base {
 				'label'       => __( 'German (Formal)', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Formal german spoken in Germany.', 'easy-language' ),
-				'api_value' => 'de',
+				'api_value'   => 'de',
 				'icon'        => 'icon-de-de',
 				'img'         => 'de_de.png',
 				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_DE_formal' ) : '',
@@ -239,7 +239,7 @@ class Summ_AI extends Base implements Api_Base {
 				'label'       => __( 'Suisse german', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Formal german spoken in Suisse.', 'easy-language' ),
-				'api_value' => 'de',
+				'api_value'   => 'de',
 				'icon'        => 'icon-de-ch',
 				'img'         => 'de_ch.png',
 				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_CH' ) : '',
@@ -248,7 +248,7 @@ class Summ_AI extends Base implements Api_Base {
 				'label'       => __( 'Suisse german (Informal)', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'Informal german spoken in Suisse.', 'easy-language' ),
-				'api_value' => 'de',
+				'api_value'   => 'de',
 				'icon'        => 'icon-de-ch',
 				'img'         => 'de_ch.png',
 				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_CH_informal' ) : '',
@@ -257,7 +257,7 @@ class Summ_AI extends Base implements Api_Base {
 				'label'       => __( 'Austria German', 'easy-language' ),
 				'enable'      => true,
 				'description' => __( 'German spoken in Austria.', 'easy-language' ),
-				'api_value' => 'de',
+				'api_value'   => 'de',
 				'icon'        => 'icon-de-at',
 				'img'         => 'de_at.png',
 				'img_icon'    => ( ! $without_img ) ? Helper::get_icon_img_for_language_code( 'de_AT' ) : '',
@@ -293,7 +293,7 @@ class Summ_AI extends Base implements Api_Base {
 				'img'         => 'de_EL.svg',
 				'img_icon'    => ( ! $without_img && $this->is_active() ) ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
 				'new_lines'   => false,
-				'separator'   => 'none'
+				'separator'   => 'none',
 			),
 			'de_LS' => array(
 				'label'       => __( 'Leichte Sprache', 'easy-language' ),
@@ -305,7 +305,7 @@ class Summ_AI extends Base implements Api_Base {
 				'img'         => 'de_LS.svg',
 				'img_icon'    => ( ! $without_img && $this->is_active() ) ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
 				'new_lines'   => true,
-				'separator'   => 'hyphen'
+				'separator'   => 'hyphen',
 			),
 		);
 
@@ -389,9 +389,9 @@ class Summ_AI extends Base implements Api_Base {
 		// set separator setting for each activated target language.
 		if ( ! get_option( 'easy_language_summ_ai_target_languages_separator' ) ) {
 			$target_languages = $this->get_supported_target_languages();
-			$separators = array();
-			foreach( $target_languages as $target_language => $settings ) {
-				$separators[$target_language] = $settings['separator'];
+			$separators       = array();
+			foreach ( $target_languages as $target_language => $settings ) {
+				$separators[ $target_language ] = $settings['separator'];
 			}
 			update_option( 'easy_language_summ_ai_target_languages_separator', $separators );
 		}
@@ -399,9 +399,9 @@ class Summ_AI extends Base implements Api_Base {
 		// set new_lines setting for each activated target language.
 		if ( ! get_option( 'easy_language_summ_ai_target_languages_new_lines' ) ) {
 			$target_languages = $this->get_supported_target_languages();
-			$new_lines = array();
-			foreach( $target_languages as $target_language => $settings ) {
-				$new_lines[$target_language] = $settings['new_lines'] ? 1 : 0;
+			$new_lines        = array();
+			foreach ( $target_languages as $target_language => $settings ) {
+				$new_lines[ $target_language ] = $settings['new_lines'] ? 1 : 0;
 			}
 			update_option( 'easy_language_summ_ai_target_languages_new_lines', $new_lines );
 		}
@@ -500,7 +500,7 @@ class Summ_AI extends Base implements Api_Base {
 			'easy_language_summ_ai_paid_quota',
 			'easy_language_summ_ai_quota_interval',
 			'easy_language_summ_ai_email_mode',
-			'easy_language_summ_ai_separator'
+			'easy_language_summ_ai_separator',
 		);
 	}
 
@@ -1550,8 +1550,8 @@ class Summ_AI extends Base implements Api_Base {
 		// set possible list of separators.
 		$separators = array(
 			'interpunct' => __( 'interpunct', 'easy-language' ),
-			'hyphen' => __( 'hyphen', 'easy-language' ),
-			'none' => __( 'do not use separator', 'easy-language' ),
+			'hyphen'     => __( 'hyphen', 'easy-language' ),
+			'none'       => __( 'do not use separator', 'easy-language' ),
 		);
 
 		// show description, if set.
@@ -1573,11 +1573,11 @@ class Summ_AI extends Base implements Api_Base {
 
 			// get separator setting for this language.
 			$separator_value = get_option( $attr['fieldId'] . '_separator' );
-			$separator = ! empty( $separator_value[ $key ] ) ? $separator_value[ $key ] : '';
+			$separator       = ! empty( $separator_value[ $key ] ) ? $separator_value[ $key ] : '';
 
 			// get new line setting for this language.
 			$new_lines_value = get_option( $attr['fieldId'] . '_new_lines' );
-			$new_lines = ! empty( $new_lines_value[ $key ] ) ? ' checked' : '' ;
+			$new_lines       = ! empty( $new_lines_value[ $key ] ) ? ' checked' : '';
 
 			// title.
 			$title = __( 'Check to enable this language.', 'easy-language' );
@@ -1619,10 +1619,12 @@ class Summ_AI extends Base implements Api_Base {
 			<td>
 				<select id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>_separator" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_separator[<?php echo esc_attr( $key ); ?>]"<?php echo esc_attr( $readonly ); ?>>
 					<?php
-						foreach( $separators as $value => $label ) {
-							$selected = $separator === $value ? ' selected' : '';
-							?><option value="<?php echo esc_attr( $value ); ?>"<?php echo $selected; ?>><?php echo esc_attr( $label ); ?></option><?php
-						}
+					foreach ( $separators as $value => $label ) {
+						$selected = $separator === $value ? ' selected' : '';
+						?>
+							<option value="<?php echo esc_attr( $value ); ?>"<?php echo esc_attr( $selected ); ?>><?php echo esc_attr( $label ); ?></option>
+							<?php
+					}
 					?>
 				</select>
 			</td>
@@ -1647,6 +1649,6 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return bool
 	 */
 	public function is_test_mode_active(): bool {
-		return 1 === absint( get_option( 'easy_language_summ_ai_test' ));
+		return 1 === absint( get_option( 'easy_language_summ_ai_test' ) );
 	}
 }
