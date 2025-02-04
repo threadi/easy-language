@@ -8,9 +8,7 @@
 namespace easyLanguage\Apis\Summ_Ai;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Base;
 use easyLanguage\Multilingual_plugins\Easy_Language\Init;
@@ -88,7 +86,7 @@ class Simplifications {
 		}
 
 		// build request.
-		$request_obj = $this->init->get_request_object();
+		$request_obj = $this->init->get_request_object(); // TODO Abstract Request object ergänzen und Rückgabe daraufhin ändern.
 		$request_obj->set_url( $this->init->get_api_url() );
 		$request_obj->set_token( $this->init->get_token() );
 		$request_obj->set_text( $text_to_translate );
@@ -151,18 +149,5 @@ class Simplifications {
 
 		// return nothing.
 		return array();
-	}
-
-	/**
-	 * Run simplification of all objects with texts.
-	 *
-	 * @return int
-	 */
-	public function run(): int {
-		$c = 0;
-		foreach ( Init::get_instance()->get_objects_with_texts() as $object ) {
-			$c = $c + $object->process_simplifications( $this->init->get_simplifications_obj(), $this->init->get_active_language_mapping() );
-		}
-		return $c;
 	}
 }

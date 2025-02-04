@@ -244,7 +244,7 @@ class Text {
 		}
 
 		/**
-		 * Replace content depending on the field.
+		 * Replace content in simplification object depending on the field.
 		 */
 		foreach ( $simplification_objects as $translation_object ) {
 			switch ( $translation_object['field'] ) {
@@ -262,7 +262,7 @@ class Text {
 						'post_title' => wp_strip_all_tags( $title ),
 					);
 
-					// add individual post-name for permalink of enabled.
+					// add individual post-name for permalink if enabled.
 					if ( 1 === absint( get_option( 'easy_language_generate_permalink', 0 ) ) ) {
 						$array['post_name'] = wp_unique_post_slug( $title, $object_id, $object->get_status(), $object->get_type(), 0 );
 					}
@@ -321,7 +321,8 @@ class Text {
 
 	/**
 	 * Set state of this text.
-	 * Only if it is a valid state:
+	 *
+	 * Only if it is one of this valid states:
 	 * - to_simplify => text will be simplified
 	 * - processing => text is simplified
 	 * - in_use => text has been simplified
@@ -334,16 +335,20 @@ class Text {
 	 * @return void
 	 */
 	public function set_state( string $state ): void {
+		// bail if a not allowed state is used.
 		if ( ! in_array( $state, array( 'to_simplify', 'processing', 'in_use', 'ignore' ), true ) ) {
 			return;
 		}
 
+		// get the db connection.
 		global $wpdb;
+
+		// update the state of this text to the given state-string.
 		$wpdb->update( DB::get_instance()->get_table_name_originals(), array( 'state' => $state ), array( 'id' => $this->get_id() ) );
 
-		// log error.
+		// log any DB-errors.
 		if ( $wpdb->last_error ) {
-			Log::get_instance()->add_log( __( 'Error during updating state of entry in DB: ', 'easy-language' ) . $wpdb->last_error, 'error' );
+			Log::get_instance()->add_log( __( 'Error during updating state of entry in DB:', 'easy-language' ) . ' <code>' . wp_json_encode( $wpdb->last_error ) . '</code>', 'error' );
 		}
 	}
 

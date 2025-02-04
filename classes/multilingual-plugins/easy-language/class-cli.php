@@ -10,8 +10,6 @@ namespace easyLanguage\Multilingual_plugins\Easy_Language;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Apis;
-
 /**
  * Handler for CLI-operations.
  */
@@ -42,17 +40,10 @@ class Cli {
 	 * @noinspection PhpUndefinedClassInspection
 	 */
 	public function process_simplifications(): void {
-		// get active API.
-		$api_obj = Apis::get_instance()->get_active_api();
-		if ( false !== $api_obj ) {
-			$c = $api_obj->get_simplifications_obj()->run();
+		// run the simplifications as if they were scheduled.
+		Init::get_instance()->run_automatic_simplification();
 
-			// return message.
-			\WP_CLI::success( $c . ' simplifications has been saved.' );
-			exit;
-		}
-
-		// return message.
-		\WP_CLI::error( 'No API activated to automatic simplifications.' );
+		// return success message.
+		\WP_CLI::success( 'Simplifications has been saved.' );
 	}
 }
