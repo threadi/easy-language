@@ -102,7 +102,7 @@ abstract class Objects {
 	 *
 	 * @return void
 	 */
-	protected function set_array_marker_during_simplification( string $option, string|int|array $value ): void {
+	public function set_array_marker_during_simplification( string $option, string|int|array $value ): void {
 		$actual_value                     = get_option( $option, array() );
 		$actual_value[ $this->get_md5() ] = $value;
 		update_option( $option, $actual_value );
@@ -468,7 +468,6 @@ abstract class Objects {
 	 * @param Text   $entry The text-object.
 	 *
 	 * @return int
-	 * @noinspection PhpUnused
 	 */
 	public function process_simplification( object $simplification_obj, array $language_mappings, Text $entry ): int {
 		// counter for simplifications.

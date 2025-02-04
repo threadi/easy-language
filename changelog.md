@@ -1,6 +1,16 @@
 # Changelog
 
-## [2.4.0]
+## [2.4.1] - 04.02.2025
+
+### Optimized
+
+- WP CLI processing of simplification now uses the exact same tasks like automatic simplification via schedule
+
+### Fixed
+
+- Fixed automatic scheduled simplification of texts
+
+## [2.4.0] - 29.01.2025
 
 ### Added
 

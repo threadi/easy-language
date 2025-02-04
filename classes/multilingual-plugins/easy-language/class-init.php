@@ -2106,12 +2106,18 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return array
 	 */
 	public function get_objects_with_texts(): array {
+		// create list of objects to simplify.
 		$object_list = array();
+
+		// get all texts which should be simplified.
 		foreach ( Texts::get_instance()->get_texts() as $text_obj ) {
+			// get their objects.
 			foreach ( $text_obj->get_objects() as $object ) {
 				$object_list[ $object['object_id'] ] = new Post_Object( $object['object_id'] );
 			}
 		}
+
+		// return resulting list of simplified objects.
 		return $object_list;
 	}
 
@@ -2261,18 +2267,23 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * Run automatic simplification.
+	 * Run automatic simplification (or via CLI).
 	 *
 	 * @return void
 	 */
 	public function run_automatic_simplification(): void {
-		// bail if automatic simplification is disabled.
-		if ( 1 !== absint( get_option( 'easy_language_automatic_simplification_enabled', 0 ) ) ) {
+		// get marker if CLI is used.
+		$is_cli = Helper::is_cli();
+
+		// bail if automatic simplification is disabled and this is not called via WP CLI.
+		if ( ! $is_cli && 1 !== absint( get_option( 'easy_language_automatic_simplification_enabled', 0 ) ) ) {
 			return;
 		}
 
-		// bail if no API is active.
+		// get the API.
 		$api_obj = Apis::get_instance()->get_active_api();
+
+		// bail if no API is active.
 		if ( false === $api_obj ) {
 			return;
 		}
@@ -2282,10 +2293,18 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			return;
 		}
 
+		// get limit from settings.
+		$limit = get_option( 'easy_language_automatic_item_count', 6 );
+
+		// on WP CLI we are use an unlimited list of entries.
+		if ( $is_cli ) {
+			$limit = 0;
+		}
+
 		// get one text of a not locked, not prevented and actual not trashed object which should be simplified.
 		$query               = $this->get_filter_for_entries_to_simplify();
 		$query['not_locked'] = true;
-		$entries             = DB::get_instance()->get_entries( $query, array(), get_option( 'easy_language_automatic_item_count', 6 ) );
+		$entries             = DB::get_instance()->get_entries( $query, array(), $limit );
 
 		// bail if no text could be found.
 		if ( empty( $entries ) ) {
@@ -2294,24 +2313,35 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// loop through the results.
 		foreach ( $entries as $entry ) {
-			// get the objects where this text is been used.
-			$post_objects = $entry->get_objects();
+			// bail if entry is not an object.
+			if ( ! $entry instanceof Text ) {
+				continue;
+			}
+
+			// get the simplification objects where this text is been used.
+			$simplification_objects = $entry->get_objects();
 
 			// bail if no objects could be found.
-			if ( empty( $post_objects ) ) {
-				return;
+			if ( empty( $simplification_objects ) ) {
+				continue;
 			}
 
-			// get object of the first one.
-			$object = Helper::get_object( absint( $post_objects[0]['object_id'] ), $post_objects[0]['object_type'] );
+			// get object of the first one as we simplify this text only one time.
+			$object = Helper::get_object( absint( $simplification_objects[0]['object_id'] ), $simplification_objects[0]['object_type'] );
 
-			// bail if none could be found.
-			if ( false === $object ) {
-				return;
+			// bail if object could be loaded for this text.
+			if ( ! $object instanceof Objects ) {
+				continue;
 			}
+
+			// mark simplification for this object as running.
+			$object->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, time() );
 
 			// call translation for the text on the object.
 			$object->process_simplification( $api_obj->get_simplifications_obj(), $api_obj->get_mapping_languages(), $entry );
+
+			// remove running marker to mark end of process.
+			$object->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
 		}
 	}
 
@@ -2625,16 +2655,22 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// we assume it is a post-object and check for it.
 		$wp_post_object = get_post( $object_id );
-		if ( ! is_null( $wp_post_object ) ) {
-			// check if it is a supported post-type.
-			$post_types = self::get_instance()->get_supported_post_types();
-			if ( ! empty( $post_types[ $wp_post_object->post_type ] ) ) {
-				return new Post_Object( $object_id );
-			}
+
+		// bail if object could not be found.
+		if ( is_null( $wp_post_object ) ) {
+			return false;
 		}
 
-		// otherwise we return false.
-		return false;
+		// check if it is a supported post-type.
+		$post_types = self::get_instance()->get_supported_post_types();
+
+		// bail if object is not supported.
+		if ( empty( $post_types[ $wp_post_object->post_type ] ) ) {
+			return false;
+		}
+
+		// return the object.
+		return new Post_Object( $object_id );
 	}
 
 	/**
