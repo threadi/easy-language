@@ -210,10 +210,13 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 			case 'used_in':
 				return '<span class="pro-marker">' . __( 'Only in Pro', 'easy-language' ) . '</span>';
 		}
+
+		// or return nothing.
+		return '';
 	}
 
 	/**
-	 * Add export-buttons on top of table.
+	 * Add delete button on top of table.
 	 *
 	 * @param string $which The position.
 	 * @return void
