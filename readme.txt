@@ -89,7 +89,7 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 == Changelog ==
 
 = @@VersionNumber@@ =
-- WP CLI processing of simplification now uses the exact same tasks like automatic simplification via schedule
-- Fixed automatic scheduled simplification of texts
+- Fixed error if SUMM AI quota is depleted and message about this should be shown
+- Fixed potential error with third-party-plugins in multisite-installation
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
