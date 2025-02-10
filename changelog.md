@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed error if SUMM AI quota is depleted and message about this should be shown
+
 ## [2.4.1] - 04.02.2025
 
 ### Optimized

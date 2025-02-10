@@ -177,10 +177,10 @@ class Summ_AI extends Base implements Api_Base {
 			$percent = absint( $quota['character_spent'] ) / absint( $quota['character_limit'] );
 			if ( 1 === $percent ) {
 				/* translators: %1$s will be replaced by the URL where the SUMM AI API key could be requested */
-				$text .= sprintf( __( '<p><strong>You have completely depleted the free quota available with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%2$s">here</a> to get more.</p>', 'easy-language' ), esc_url( $this->get_settings_url() ) );
+				$text .= sprintf( __( '<p><strong>You have completely depleted the free quota available with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%1$s">here</a> to get more.</p>', 'easy-language' ), esc_url( $this->get_settings_url() ) );
 			} elseif ( $percent > $min_percent ) {
 				/* translators: %1$s will be replaced by the URL where the SUMM AI API key could be requested */
-				$text .= sprintf( __( '<p><strong>You have almost used up your free quota available with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%2$s">here</a> to get more.</p>', 'easy-language' ), esc_url( $this->get_settings_url() ) );
+				$text .= sprintf( __( '<p><strong>You have almost used up your free quota available with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%1$s">here</a> to get more.</p>', 'easy-language' ), esc_url( $this->get_settings_url() ) );
 			} else {
 				/* translators: %1$d will be a number, %2$s will be replaced by the URL where the SUMM AI API key could be requested */
 				$text .= sprintf( __( '<p><strong>You are currently using a free quota of %1$d characters available for text simplifications with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%2$s">here</a> to get more.</p>', 'easy-language' ), absint( $quota['character_limit'] ), esc_url( $this->get_settings_url() ) );
