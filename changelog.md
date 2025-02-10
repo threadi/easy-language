@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fixed error if SUMM AI quota is depleted and message about this should be shown
+- Fixed potential error with third-party-plugins in multisite-installation
 
 ## [2.4.1] - 04.02.2025
 

@@ -83,9 +83,7 @@ class Db {
 		global $wpdb;
 		$prefix = $wpdb->prefix;
 		if ( is_multisite() ) {
-			$current_blog = get_current_blog_id();
-			switch_to_blog( get_current_site()->blog_id );
-			switch_to_blog( $current_blog );
+			$prefix = $wpdb->base_prefix;
 		}
 		return $prefix;
 	}
