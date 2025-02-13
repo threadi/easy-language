@@ -89,6 +89,7 @@ class Init {
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'cli_init', array( $this, 'cli' ) );
 		add_action( 'update_option_easy_language_api', array( $this, 'update_easy_language_api' ), 10, 2 );
+		add_action( 'admin_action_easy_language_clear_log', array( $this, 'clear_log_by_request' ) );
 
 		// ajax-hooks.
 		add_action( 'wp_ajax_easy_language_reset_intro', array( $this, 'reset_intro' ) );
@@ -387,5 +388,26 @@ class Init {
 
 		// return JSON with dialog.
 		wp_send_json( $dialog_config );
+	}
+
+	/**
+	 * Clear log by request.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function clear_log_by_request(): void {
+		// check nonce.
+		check_admin_referer( 'easy-language-clear-log', 'nonce' );
+
+		// get db object.
+		global $wpdb;
+
+		// clear the log.
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM `' . Log::get_instance()->get_table_name() . '` WHERE 1 = %d', array( 1 ) ) );
+
+		// redirect user back.
+		wp_safe_redirect( wp_get_referer() );
+		exit;
 	}
 }

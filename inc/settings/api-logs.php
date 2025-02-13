@@ -48,7 +48,6 @@ function easy_language_admin_add_menu_content_api_logs(): void {
 	}
 	?>
 	<div class="wrap">
-		<div id="icon-users" class="icon32"></div>
 		<h2><?php echo esc_html__( 'API Logs', 'easy-language' ); ?></h2>
 		<?php
 		$log_table = new Log_Api_Table();
