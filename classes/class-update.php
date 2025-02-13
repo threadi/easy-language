@@ -83,6 +83,7 @@ class Update {
 			$this->version210();
 			$this->version230();
 			$this->version240();
+			$this->version250();
 
 			// save new plugin-version in DB.
 			delete_option( 'easyLanguageVersion' );
@@ -188,6 +189,23 @@ class Update {
 				$new_lines[ $target_language ] = $settings['new_lines'] ? 1 : 0;
 			}
 			update_option( 'easy_language_summ_ai_target_languages_new_lines', $new_lines );
+		}
+	}
+
+	/**
+	 * On update to version 2.5.0 or newer.
+	 *
+	 * @return void
+	 */
+	public function version250(): void {
+		// set embolden negative setting for each activated target language.
+		if ( ! get_option( 'easy_language_summ_ai_target_languages_embolden_negative' ) ) {
+			$target_languages = Apis\Summ_Ai\Summ_AI::get_instance()->get_supported_target_languages();
+			$embolden_negatives        = array();
+			foreach ( $target_languages as $target_language => $settings ) {
+				$embolden_negatives[ $target_language ] = $settings['embolden_negative'] ? 1 : 0;
+			}
+			update_option( 'easy_language_summ_ai_target_languages_embolden_negative', $embolden_negatives );
 		}
 	}
 }

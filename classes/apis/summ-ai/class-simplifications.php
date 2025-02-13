@@ -85,6 +85,13 @@ class Simplifications {
 			$new_lines = 1;
 		}
 
+		// get the embolden setting for target language.
+		$embolden_negatives_array = (array) get_option( 'easy_language_summ_ai_target_languages_embolden_negative' );
+		$embolden_negative       = 0;
+		if ( ! empty( $embolden_negatives_array[ $target_language ] ) ) {
+			$embolden_negative = 1;
+		}
+
 		// build request.
 		$request_obj = $this->init->get_request_object(); // TODO Abstract Request object ergänzen und Rückgabe daraufhin ändern.
 		$request_obj->set_url( $this->init->get_api_url() );
@@ -93,6 +100,7 @@ class Simplifications {
 		$request_obj->set_text_type( 'plain_text' );
 		$request_obj->set_separator( $separator );
 		$request_obj->set_new_lines( $new_lines );
+		$request_obj->set_embolden_negative( $embolden_negative );
 		$request_obj->set_method( 'POST' );
 		$request_obj->set_is_test( $this->init->is_test_mode_active() );
 		$request_obj->set_source_language( $source_language );

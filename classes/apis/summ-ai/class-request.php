@@ -103,6 +103,13 @@ class Request {
 	private int $new_lines = 1;
 
 	/**
+	 * Embolden negative settings.
+	 *
+	 * @var int
+	 */
+	private int $embolden_negative = 0;
+
+	/**
 	 * Source-language for this request.
 	 *
 	 * @var string
@@ -253,6 +260,7 @@ class Request {
 			$data['output_language_level'] = $target_language;
 			$data['separator']             = $this->get_separator();
 			$data['is_new_lines']          = 1 === $this->get_new_lines();
+			$data['embolden_negative']     = 1 === $this->get_embolden_negative();
 			$data['translation_language']  = $source_language;
 			$data['is_test']               = $this->is_test();
 			$args['body']                  = wp_json_encode( $data );
@@ -519,5 +527,25 @@ class Request {
 	 */
 	public function set_new_lines( int $new_lines ): void {
 		$this->new_lines = $new_lines;
+	}
+
+	/**
+	 * Return new lines setting.
+	 *
+	 * @return int
+	 */
+	private function get_embolden_negative(): int {
+		return $this->embolden_negative;
+	}
+
+	/**
+	 * Set embolden negative settings.
+	 *
+	 * @param int $embolden_negative 1 if embolden negative should be used, 0 if not.
+	 *
+	 * @return void
+	 */
+	public function set_embolden_negative( int $embolden_negative ): void {
+		$this->embolden_negative = $embolden_negative;
 	}
 }

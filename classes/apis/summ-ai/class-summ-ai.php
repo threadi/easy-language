@@ -293,6 +293,7 @@ class Summ_AI extends Base implements Api_Base {
 				'img'         => 'de_EL.svg',
 				'img_icon'    => ( ! $without_img && $this->is_active() ) ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
 				'new_lines'   => false,
+				'embolden_negative' => false,
 				'separator'   => 'none',
 			),
 			'de_LS' => array(
@@ -305,6 +306,7 @@ class Summ_AI extends Base implements Api_Base {
 				'img'         => 'de_LS.svg',
 				'img_icon'    => ( ! $without_img && $this->is_active() ) ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
 				'new_lines'   => true,
+				'embolden_negative' => false,
 				'separator'   => 'hyphen',
 			),
 		);
@@ -406,6 +408,16 @@ class Summ_AI extends Base implements Api_Base {
 			update_option( 'easy_language_summ_ai_target_languages_new_lines', $new_lines );
 		}
 
+		// set embold negative setting for each activated target language.
+		if ( ! get_option( 'easy_language_summ_ai_target_languages_embolden_negative' ) ) {
+			$target_languages = $this->get_supported_target_languages();
+			$embolden_negatives        = array();
+			foreach ( $target_languages as $target_language => $settings ) {
+				$embolden_negatives[ $target_language ] = $settings['embolden_negative'] ? 1 : 0;
+			}
+			update_option( 'easy_language_summ_ai_target_languages_embolden_negative', $embolden_negatives );
+		}
+
 		// set SUMM AI API as default API, if not already set.
 		if ( ! get_option( 'easy_language_api' ) ) {
 			update_option( 'easy_language_api', $this->get_name() );
@@ -491,6 +503,7 @@ class Summ_AI extends Base implements Api_Base {
 			'easy_language_summ_ai_target_languages',
 			'easy_language_summ_ai_target_languages_separator',
 			'easy_language_summ_ai_target_languages_new_lines',
+			'easy_language_summ_ai_target_languages_embolden_negative',
 			'easy_language_summ_ai_mode',
 			'easy_language_summ_ai_disable_free_requests',
 			'easy_language_summ_ai_api_key',
@@ -916,6 +929,7 @@ class Summ_AI extends Base implements Api_Base {
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages', array( 'sanitize_callback' => array( $this, 'validate_target_language_settings' ) ) );
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages_separator', array( 'sanitize_callback' => array( $this, 'validate_target_language_separator_settings' ) ) );
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages_new_lines', array( 'sanitize_callback' => array( $this, 'validate_target_language_new_lines_settings' ) ) );
+		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages_embolden_negative', array( 'sanitize_callback' => array( $this, 'validate_target_language_embolden_negatives_settings' ) ) );
 
 		// get possible intervals.
 		$intervals = array();
@@ -1090,6 +1104,17 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return array|null
 	 */
 	public function validate_target_language_new_lines_settings( ?array $values ): ?array {
+		return Helper::settings_validate_multiple_checkboxes( $values );
+	}
+
+	/**
+	 * Validate the target language embolden negatives settings.
+	 *
+	 * @param array|null $values The settings to check.
+	 *
+	 * @return array|null
+	 */
+	public function validate_target_language_embolden_negatives_settings( ?array $values ): ?array {
 		return Helper::settings_validate_multiple_checkboxes( $values );
 	}
 
@@ -1560,7 +1585,7 @@ class Summ_AI extends Base implements Api_Base {
 		}
 
 		// start table.
-		echo '<table class="easy-language-target-language"><thead><tr><th class="title">' . esc_html__( 'Enable your target language', 'easy-language' ) . '</th><th class="separator">' . esc_html__( 'Choose separator', 'easy-language' ) . '</th><th class="new-lines">' . esc_html__( 'Enable new lines', 'easy-language' ) . '</th></tr></thead><tbody>';
+		echo '<table class="easy-language-target-language"><thead><tr><th class="title">' . esc_html__( 'Enable your target language', 'easy-language' ) . '</th><th class="separator">' . esc_html__( 'Choose separator', 'easy-language' ) . '</th><th class="new-lines">' . esc_html__( 'Enable new lines', 'easy-language' ) . '</th><th class="embolden-negative">' . esc_html__( 'Embolden negative', 'easy-language' ) . '</th></tr></thead><tbody>';
 
 		// loop through the options (the target languages).
 		foreach ( $attr['options'] as $key => $settings ) {
@@ -1579,6 +1604,10 @@ class Summ_AI extends Base implements Api_Base {
 			$new_lines_value = get_option( $attr['fieldId'] . '_new_lines' );
 			$new_lines       = ! empty( $new_lines_value[ $key ] ) ? ' checked' : '';
 
+			// get embolden negative for this language.
+			$embolden_negative_value = get_option( $attr['fieldId'] . '_embolden_negative' );
+			$embolden_negative = ! empty( $embolden_negative_value[ $key ] ) ? ' checked' : '';
+
 			// title.
 			$title = __( 'Check to enable this language.', 'easy-language' );
 
@@ -1590,6 +1619,7 @@ class Summ_AI extends Base implements Api_Base {
 				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo ! empty( $checked ) ? 1 : 0; ?>">
 				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_separator_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr( $separator ); ?>">
 				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_new_lines_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo ! empty( $new_lines ) ? 1 : 0; ?>">
+				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_embolden_negative_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo ! empty( $embolden_negative ) ? 1 : 0; ?>">
 				<?php
 			}
 			if ( isset( $settings['enabled'] ) && false === $settings['enabled'] ) {
@@ -1630,6 +1660,9 @@ class Summ_AI extends Base implements Api_Base {
 			</td>
 			<td>
 				<input type="checkbox" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>_new_line" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_new_lines[<?php echo esc_attr( $key ); ?>]" value="1"<?php echo esc_attr( $new_lines ) . esc_attr( $readonly ); ?> title="<?php echo esc_attr( $title ); ?>">
+			</td>
+			<td>
+				<input type="checkbox" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>_embolden_negative" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_embolden_negative[<?php echo esc_attr( $key ); ?>]" value="1"<?php echo esc_attr( $embolden_negative ) . esc_attr( $readonly ); ?> title="<?php echo esc_attr( $title ); ?>">
 			</td>
 			</tr>
 			<?php
