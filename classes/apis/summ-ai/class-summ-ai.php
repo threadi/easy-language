@@ -1682,6 +1682,6 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return bool
 	 */
 	public function is_test_mode_active(): bool {
-		return 1 === absint( get_option( 'easy_language_summ_ai_test' ) );
+		return $this->is_summ_api_token_set() && 1 === absint( get_option( 'easy_language_summ_ai_test' ) );
 	}
 }

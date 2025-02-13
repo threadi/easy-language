@@ -11,6 +11,7 @@
 ### Optimized
 
 - Check for completed setup before initialising any admin options for this plugin
+- Do not use test mode for SUMM AI without API key
 
 ## [2.4.2] - 10.02.2025
 
