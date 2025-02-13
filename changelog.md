@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Optimized
+
+- Check for completed setup before initialising any admin options for this plugin
+
 ## [2.4.2] - 10.02.2025
 
 ### Fixed
