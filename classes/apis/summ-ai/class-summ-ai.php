@@ -514,6 +514,7 @@ class Summ_AI extends Base implements Api_Base {
 			'easy_language_summ_ai_quota_interval',
 			'easy_language_summ_ai_email_mode',
 			'easy_language_summ_ai_separator',
+			'easy_language_summ_ai_html_mode'
 		);
 	}
 
@@ -930,6 +931,22 @@ class Summ_AI extends Base implements Api_Base {
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages_separator', array( 'sanitize_callback' => array( $this, 'validate_target_language_separator_settings' ) ) );
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages_new_lines', array( 'sanitize_callback' => array( $this, 'validate_target_language_new_lines_settings' ) ) );
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages_embolden_negative', array( 'sanitize_callback' => array( $this, 'validate_target_language_embolden_negatives_settings' ) ) );
+
+		// Enable test-marker.
+		add_settings_field(
+			'easy_language_summ_ai_html_mode',
+			__( 'Enable HTML-mode', 'easy-language' ),
+			'easy_language_admin_checkbox_field',
+			'easyLanguageSummAIPage',
+			'settings_section_summ_ai',
+			array(
+				'label_for'   => 'easy_language_summ_ai_html_mode',
+				'fieldId'     => 'easy_language_summ_ai_html_mode',
+				'readonly'    => ! $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
+				'description' => __( 'If this is enabled, the HTML mode of the SUMM AI API is used. This enables a more precise transfer of HTML-formatted texts into the simplified texts.', 'easy-language' ),
+			)
+		);
+		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_html_mode' );
 
 		// get possible intervals.
 		$intervals = array();

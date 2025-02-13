@@ -7,6 +7,7 @@
 - Added option for embolden negative words during simplification via SUMM AI
 - Added option to clear API log
 - Added option to clear the plugin log
+- Added SUMM AI HTML-mode as option, only usable with valid SUMM AI API key
 
 ### Optimized
 
