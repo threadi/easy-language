@@ -17,6 +17,7 @@ use easyLanguage\Helper;
 use easyLanguage\Languages;
 use easyLanguage\Log;
 use easyLanguage\Multilingual_Plugins_Base;
+use easyLanguage\Setup;
 use easyLanguage\Transients;
 use WP_Admin_Bar;
 use WP_Post;
@@ -172,6 +173,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return void
 	 */
 	public function admin_init(): void {
+		// bail if setup has not been run.
+		if( ! Setup::get_instance()->is_completed() ) {
+			return;
+		}
+
 		// get active API.
 		$api_obj = Apis::get_instance()->get_active_api();
 

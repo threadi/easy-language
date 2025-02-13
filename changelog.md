@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Added option for embolden negative words during simplification via SUMM AI
+
+### Optimized
+
+- Check for completed setup before initialising any admin options for this plugin
+
 ## [2.4.2] - 10.02.2025
 
 ### Fixed
