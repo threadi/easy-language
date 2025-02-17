@@ -200,8 +200,8 @@ class Update {
 	public function version250(): void {
 		// set embolden negative setting for each activated target language.
 		if ( ! get_option( 'easy_language_summ_ai_target_languages_embolden_negative' ) ) {
-			$target_languages = Apis\Summ_Ai\Summ_AI::get_instance()->get_supported_target_languages();
-			$embolden_negatives        = array();
+			$target_languages   = Apis\Summ_Ai\Summ_AI::get_instance()->get_supported_target_languages();
+			$embolden_negatives = array();
 			foreach ( $target_languages as $target_language => $settings ) {
 				$embolden_negatives[ $target_language ] = $settings['embolden_negative'] ? 1 : 0;
 			}
