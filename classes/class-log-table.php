@@ -192,11 +192,12 @@ class Log_Table extends WP_List_Table {
 			$url = add_query_arg(
 				array(
 					'action' => 'easy_language_clear_log',
-					'nonce'  => wp_create_nonce( 'easy-language-clear-log' )
+					'nonce'  => wp_create_nonce( 'easy-language-clear-log' ),
 				),
 				get_admin_url() . 'admin.php'
 			);
-			?><a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Clear log', 'easy-language' ); ?></a><?php
+			?><a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Clear log', 'easy-language' ); ?></a>
+			<?php
 		} else {
 			?>
 			<span class="button disabled" title="<?php echo esc_html__( 'Choose an API above to clear the log', 'easy-language' ); ?>"><?php echo esc_html__( 'Clear log', 'easy-language' ); ?></span>

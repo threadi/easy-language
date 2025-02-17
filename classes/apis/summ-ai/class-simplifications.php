@@ -87,7 +87,7 @@ class Simplifications {
 
 		// get the embolden setting for target language.
 		$embolden_negatives_array = (array) get_option( 'easy_language_summ_ai_target_languages_embolden_negative' );
-		$embolden_negative       = 0;
+		$embolden_negative        = 0;
 		if ( ! empty( $embolden_negatives_array[ $target_language ] ) ) {
 			$embolden_negative = 1;
 		}

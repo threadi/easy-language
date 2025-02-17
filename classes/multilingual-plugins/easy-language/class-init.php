@@ -174,7 +174,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	public function admin_init(): void {
 		// bail if setup has not been run.
-		if( ! Setup::get_instance()->is_completed() ) {
+		if ( ! Setup::get_instance()->is_completed() ) {
 			return;
 		}
 
