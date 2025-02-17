@@ -48,11 +48,11 @@ function easy_language_admin_add_menu_content_logs(): void {
 	}
 	?>
 	<div class="wrap">
-		<div id="icon-users" class="icon32"></div>
 		<h2><?php echo esc_html__( 'General Logs', 'easy-language' ); ?></h2>
 		<?php
 		$log_table = new Log_Table();
 		$log_table->prepare_items();
+		$log_table->views();
 		$log_table->display();
 		?>
 	</div>

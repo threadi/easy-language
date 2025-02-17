@@ -1,14 +1,18 @@
 # Changelog
 
-## [Unreleased]
+## [2.5.0] - 17.02.2025
 
 ### Added
 
 - Added option for embolden negative words during simplification via SUMM AI
+- Added option to clear API log
+- Added option to clear the plugin log
+- Added SUMM AI HTML-mode as option, only usable with valid SUMM AI API key
 
 ### Optimized
 
 - Check for completed setup before initialising any admin options for this plugin
+- Do not use test mode for SUMM AI without API key
 
 ## [2.4.2] - 10.02.2025
 

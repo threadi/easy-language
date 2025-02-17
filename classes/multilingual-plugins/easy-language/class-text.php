@@ -586,6 +586,6 @@ class Text {
 		$result = (array) $wpdb->get_results( $prepared_sql, ARRAY_A );
 
 		// return the result.
-		return 1 === $result[0]['html'];
+		return 1 === absint( $result[0]['html'] );
 	}
 }

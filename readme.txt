@@ -89,7 +89,11 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Fixed error if SUMM AI quota is depleted and message about this should be shown
-- Fixed potential error with third-party-plugins in multisite-installation
+- Added option for embolden negative words during simplification via SUMM AI
+- Added option to clear API log
+- Added option to clear the plugin log
+- Added SUMM AI HTML-mode as option, only usable with valid SUMM AI API key
+- Check for completed setup before initialising any admin options for this plugin
+- Do not use test mode for SUMM AI without API key
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)

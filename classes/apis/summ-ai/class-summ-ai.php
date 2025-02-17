@@ -284,30 +284,30 @@ class Summ_AI extends Base implements Api_Base {
 	public function get_supported_target_languages( bool $without_img = false ): array {
 		$target_languages = array(
 			'de_EL' => array(
-				'label'       => __( 'Einfache Sprache', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
-				'url'         => 'de_el',
-				'api_value'   => 'plain',
-				'icon'        => 'icon-de-el',
-				'img'         => 'de_EL.svg',
-				'img_icon'    => ( ! $without_img && $this->is_active() ) ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
-				'new_lines'   => false,
+				'label'             => __( 'Einfache Sprache', 'easy-language' ),
+				'enabled'           => true,
+				'description'       => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+				'url'               => 'de_el',
+				'api_value'         => 'plain',
+				'icon'              => 'icon-de-el',
+				'img'               => 'de_EL.svg',
+				'img_icon'          => ( ! $without_img && $this->is_active() ) ? Helper::get_icon_img_for_language_code( 'de_EL' ) : '',
+				'new_lines'         => false,
 				'embolden_negative' => false,
-				'separator'   => 'none',
+				'separator'         => 'none',
 			),
 			'de_LS' => array(
-				'label'       => __( 'Leichte Sprache', 'easy-language' ),
-				'enabled'     => true,
-				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
-				'url'         => 'de_ls',
-				'api_value'   => 'easy',
-				'icon'        => 'icon-de-ls',
-				'img'         => 'de_LS.svg',
-				'img_icon'    => ( ! $without_img && $this->is_active() ) ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
-				'new_lines'   => true,
-				'embolden_negative' => false,
-				'separator'   => 'hyphen',
+				'label'             => __( 'Leichte Sprache', 'easy-language' ),
+				'enabled'           => true,
+				'description'       => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
+				'url'               => 'de_ls',
+				'api_value'         => 'easy',
+				'icon'              => 'icon-de-ls',
+				'img'               => 'de_LS.svg',
+				'img_icon'          => ( ! $without_img && $this->is_active() ) ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
+				'new_lines'         => true,
+				'embolden_negative' => true,
+				'separator'         => 'hyphen',
 			),
 		);
 
@@ -410,8 +410,8 @@ class Summ_AI extends Base implements Api_Base {
 
 		// set embold negative setting for each activated target language.
 		if ( ! get_option( 'easy_language_summ_ai_target_languages_embolden_negative' ) ) {
-			$target_languages = $this->get_supported_target_languages();
-			$embolden_negatives        = array();
+			$target_languages   = $this->get_supported_target_languages();
+			$embolden_negatives = array();
 			foreach ( $target_languages as $target_language => $settings ) {
 				$embolden_negatives[ $target_language ] = $settings['embolden_negative'] ? 1 : 0;
 			}
@@ -514,6 +514,7 @@ class Summ_AI extends Base implements Api_Base {
 			'easy_language_summ_ai_quota_interval',
 			'easy_language_summ_ai_email_mode',
 			'easy_language_summ_ai_separator',
+			'easy_language_summ_ai_html_mode',
 		);
 	}
 
@@ -930,6 +931,22 @@ class Summ_AI extends Base implements Api_Base {
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages_separator', array( 'sanitize_callback' => array( $this, 'validate_target_language_separator_settings' ) ) );
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages_new_lines', array( 'sanitize_callback' => array( $this, 'validate_target_language_new_lines_settings' ) ) );
 		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_target_languages_embolden_negative', array( 'sanitize_callback' => array( $this, 'validate_target_language_embolden_negatives_settings' ) ) );
+
+		// Enable test-marker.
+		add_settings_field(
+			'easy_language_summ_ai_html_mode',
+			__( 'Enable HTML-mode', 'easy-language' ),
+			'easy_language_admin_checkbox_field',
+			'easyLanguageSummAIPage',
+			'settings_section_summ_ai',
+			array(
+				'label_for'   => 'easy_language_summ_ai_html_mode',
+				'fieldId'     => 'easy_language_summ_ai_html_mode',
+				'readonly'    => ! $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
+				'description' => __( 'If this is enabled, the HTML mode of the SUMM AI API is used. This enables a more precise transfer of HTML-formatted texts into the simplified texts.', 'easy-language' ),
+			)
+		);
+		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_html_mode' );
 
 		// get possible intervals.
 		$intervals = array();
@@ -1606,7 +1623,7 @@ class Summ_AI extends Base implements Api_Base {
 
 			// get embolden negative for this language.
 			$embolden_negative_value = get_option( $attr['fieldId'] . '_embolden_negative' );
-			$embolden_negative = ! empty( $embolden_negative_value[ $key ] ) ? ' checked' : '';
+			$embolden_negative       = ! empty( $embolden_negative_value[ $key ] ) ? ' checked' : '';
 
 			// title.
 			$title = __( 'Check to enable this language.', 'easy-language' );
@@ -1682,6 +1699,6 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return bool
 	 */
 	public function is_test_mode_active(): bool {
-		return 1 === absint( get_option( 'easy_language_summ_ai_test' ) );
+		return $this->is_summ_api_token_set() && 1 === absint( get_option( 'easy_language_summ_ai_test' ) );
 	}
 }

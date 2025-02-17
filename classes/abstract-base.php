@@ -424,6 +424,13 @@ abstract class Base {
 	}
 
 	/**
+	 * Delete the log entries.
+	 *
+	 * @return void
+	 */
+	public function delete_log_entries(): void {}
+
+	/**
 	 * Return simplifications-object.
 	 *
 	 * @return object|false

@@ -195,7 +195,7 @@ class Log_Api_Table extends WP_List_Table {
 		// get api.
 		$api = $this->get_api_filter();
 
-		if ( ! empty( $api ) ) {
+		if ( ! empty( $api ) && ! empty( $this->items ) ) {
 			// define export-URL.
 			$url = add_query_arg(
 				array(
@@ -207,9 +207,21 @@ class Log_Api_Table extends WP_List_Table {
 			);
 			?><a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Export as CSV', 'easy-language' ); ?></a>
 			<?php
+
+			// define clear URL.
+			$url = add_query_arg(
+				array(
+					'action' => 'easy_language_clear_api_log',
+					'nonce'  => wp_create_nonce( 'easy-language-clear-api-log' ),
+					'api'    => $api,
+				),
+				get_admin_url() . 'admin.php'
+			);
+			?><a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Clear log', 'easy-language' ); ?></a><?php
 		} else {
 			?>
 			<span class="button disabled" title="<?php echo esc_html__( 'Choose an API to export above', 'easy-language' ); ?>"><?php echo esc_html__( 'Export as CSV', 'easy-language' ); ?></span>
+			<span class="button disabled" title="<?php echo esc_html__( 'Choose an API above to clear the log', 'easy-language' ); ?>"><?php echo esc_html__( 'Clear log', 'easy-language' ); ?></span>
 			<?php
 		}
 	}

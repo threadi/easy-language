@@ -70,7 +70,7 @@ class Simplifications {
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.
 	 * @param string $target_language The target language of the text.
-	 * @param bool   $is_html Marker if the text contains HTML-Code. TODO until SUMM AI HTML is better supported.
+	 * @param bool   $is_html Marker if the text contains HTML-Code.
 	 * @return array The result as array.
 	 */
 	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html ): array {
@@ -97,7 +97,7 @@ class Simplifications {
 		$request_obj->set_url( $this->init->get_api_url() );
 		$request_obj->set_token( $this->init->get_token() );
 		$request_obj->set_text( $text_to_translate );
-		$request_obj->set_text_type( 'plain_text' );
+		$request_obj->set_text_type( $is_html && 1 === absint( get_option( 'easy_language_summ_ai_html_mode' ) ) ? 'html' : 'plain_text' );
 		$request_obj->set_separator( $separator );
 		$request_obj->set_new_lines( $new_lines );
 		$request_obj->set_embolden_negative( $embolden_negative );
