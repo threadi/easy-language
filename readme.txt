@@ -53,10 +53,11 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 
 - Block Editor (Gutenberg)
 - Avada
-- Elementor
+- Avia
 - Divi
-- WPBakery
+- Elementor
 - Themify
+- WPBakery
 
 Please Note: The plugin was tested in a broad variety of WordPress-pages, but we highly recommend to install and test the plugin in a development environment first.
 

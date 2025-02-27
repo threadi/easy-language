@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Avada pagebuilder for simplifications.
+ * File for handling Avia pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -15,22 +15,22 @@ use easyLanguage\Multilingual_plugins\Easy_Language\Parser_Base;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 
 /**
- * Handler for parsing avada-content.
+ * Handler for parsing Avia-content.
  */
-class Avada extends Parser_Base implements Parser {
+class Avia extends Parser_Base implements Parser {
 	/**
 	 * Internal name of the parser.
 	 *
 	 * @var string
 	 */
-	protected string $name = 'Avada';
+	protected string $name = 'Avia';
 
 	/**
 	 * Instance of this object.
 	 *
-	 * @var ?Avada
+	 * @var ?Avia
 	 */
-	private static ?Avada $instance = null;
+	private static ?Avia $instance = null;
 
 	/**
 	 * Constructor for this object.
@@ -47,7 +47,7 @@ class Avada extends Parser_Base implements Parser {
 	/**
 	 * Return the instance of this Singleton object.
 	 */
-	public static function get_instance(): Avada {
+	public static function get_instance(): Avia {
 		if ( ! static::$instance instanceof static ) {
 			static::$instance = new static();
 		}
@@ -62,18 +62,20 @@ class Avada extends Parser_Base implements Parser {
 	 */
 	private function get_flow_text_shortcodes(): array {
 		$shortcodes = array(
-			'fusion_title' => array(),
-			'fusion_text'  => array(),
+			'av_heading' => array(
+				'heading'
+			),
+			'av_textblock' => array(),
 		);
 
 		/**
-		 * Filter the possible Avada shortcodes.
+		 * Filter the possible Avia shortcodes.
 		 *
-		 * @since 2.0.0 Available since 2.0.0.
+		 * @since 2.6.0 Available since 2.6.0.
 		 *
 		 * @param array $shortcodes List of shortcodes.
 		 */
-		return apply_filters( 'easy_language_avada_text_widgets', $shortcodes );
+		return apply_filters( 'easy_language_avia_text_widgets', $shortcodes );
 	}
 
 	/**
@@ -85,17 +87,17 @@ class Avada extends Parser_Base implements Parser {
 	 */
 	private function is_flow_text_widget_html( string $widget_name ): bool {
 		$html_support_widgets = array(
-			'fusion_text' => true,
+			'av_textblock' => true,
 		);
 
 		/**
-		 * Filter the possible Avada widgets with HTML-support.
+		 * Filter the possible Avia widgets with HTML-support.
 		 *
-		 * @since 2.0.0 Available since 2.0.0.
+		 * @since 2.6.0 Available since 2.6.0.
 		 *
 		 * @param array $html_support_widgets List of widgets with HTML-support.
 		 */
-		$html_widgets = apply_filters( 'easy_language_avada_html_widgets', $html_support_widgets );
+		$html_widgets = apply_filters( 'easy_language_avia_html_widgets', $html_support_widgets );
 
 		return isset( $html_widgets[ $widget_name ] );
 	}
@@ -103,13 +105,13 @@ class Avada extends Parser_Base implements Parser {
 	/**
 	 * Return parsed texts.
 	 *
-	 * Get the Avada-content and parse its widgets to get the content of flow-text-widgets.
+	 * Get the Avia-content and parse its widgets to get the content of flow-text-widgets.
 	 *
 	 * @return array
 	 */
 	public function get_parsed_texts(): array {
-		// do nothing if avada is not active.
-		if ( false === $this->is_avada_active() ) {
+		// do nothing if Avia is not active.
+		if ( false === $this->is_avia_active() ) {
 			return array();
 		}
 
@@ -156,29 +158,48 @@ class Avada extends Parser_Base implements Parser {
 	 * @return string
 	 */
 	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
-		// do nothing if avada is not active.
-		if ( false === $this->is_avada_active() ) {
+		// do nothing if Avia is not active.
+		if ( false === $this->is_avia_active() ) {
 			return $original_complete;
 		}
 
+		$text = str_replace( $this->get_text(), $simplified_part, $original_complete );
+		$text = str_replace( '<!-- wp:shortcode -->', '', $text );
+		$text = str_replace( '<!-- /wp:shortcode -->', '', $text );
+
+		// save the updated Avia content.
+		Avia_Builder()->update_post_content( $this->get_object_id(), $text );
+
+		// return the content for post_content.
 		return str_replace( $this->get_text(), $simplified_part, $original_complete );
 	}
 
 	/**
-	 * Return whether Avada is active.
+	 * Return whether Avia is active.
 	 *
 	 * @return bool
 	 */
-	private function is_avada_active(): bool {
-		$is_avada = false;
+	private function is_avia_active(): bool {
+		// get the theme object.
 		$theme    = wp_get_theme();
-		if ( 'Avada' === $theme->get( 'Name' ) ) {
-			$is_avada = true;
+
+		// return true if Avia Builder exists as object.
+		if( function_exists( 'Avia_Builder' ) ) {
+			return true;
 		}
-		if ( $theme->parent() && 'Avada' === $theme->parent()->get( 'Name' ) ) {
-			$is_avada = true;
+
+		// return true if the theme is Enfold itself.
+		if ( 'Enfold' === $theme->get( 'Name' ) ) {
+			return true;
 		}
-		return $is_avada;
+
+		// return true if it is a child-theme with Enfold as parent.
+		if ( $theme->parent() && 'Enfold' === $theme->parent()->get( 'Name' ) ) {
+			return true;
+		}
+
+		// return false if it Avia is not used.
+		return false;
 	}
 
 	/**
@@ -189,7 +210,7 @@ class Avada extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return 'active' === get_post_meta( $post_object->get_id(), 'fusion_builder_status', true );
+		return 'active' === get_post_meta( $post_object->get_id(), '_aviaLayoutBuilder_active', true );
 	}
 
 	/**
@@ -198,17 +219,6 @@ class Avada extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_active(): bool {
-		return $this->is_avada_active();
-	}
-
-	/**
-	 * Prevent translate-option in frontend.
-	 *
-	 * TODO wirklich nötig?
-	 *
-	 * @return bool
-	 */
-	public function hide_translate_menu_in_frontend(): bool {
-		return true;
+		return $this->is_avia_active();
 	}
 }

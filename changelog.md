@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Added support for Avia Layout Architect from Enfold theme
+
 ## [2.5.0] - 17.02.2025
 
 ### Added
