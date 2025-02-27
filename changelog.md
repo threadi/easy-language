@@ -5,6 +5,12 @@
 ### Added
 
 - Added support for Avia Layout Architect from Enfold theme
+- Added link to support forum in plugin list on our plugin
+- Added shortcode to output the language switcher in frontend
+
+### Optimized
+
+- Optimized hint which infos about simplifications are only visible in Pro-plugin
 
 ## [2.5.0] - 17.02.2025
 

@@ -14,7 +14,7 @@ use easyLanguage\Helper;
 use easyLanguage\Languages;
 
 /**
- * Rewrite-Handling for this plugin.
+ * Object which handles the language switcher.
  */
 class Switcher {
 
@@ -71,6 +71,7 @@ class Switcher {
 		add_filter( 'wp_get_nav_menu_items', array( $this, 'set_menu_items' ) );
 		add_action( 'wp_nav_menu_item_custom_fields', array( $this, 'add_menu_options' ) );
 		add_action( 'wp_update_nav_menu_item', array( $this, 'save_menu_options' ), 10, 2 );
+		add_shortcode( 'easy-language-switcher', array( $this, 'use_shortcode' ) );
 	}
 
 	/**
@@ -416,5 +417,23 @@ class Switcher {
 		} else {
 			delete_post_meta( $item_id, 'easy-language-icons' );
 		}
+	}
+
+	/**
+	 * Use shortcode to output the language switcher.
+	 *
+	 * @param array $attributes Attribute on the shortcode.
+	 *
+	 * @return string
+	 */
+	public function use_shortcode( array $attributes ): string {
+		return wp_kses_post(
+			$this->get(
+				array(
+					'hide_actual_language' => ! empty( $attributes['hide_actual_language'] ) && 'yes' === $attributes['hide_actual_language'],
+					'show_icons'           => ! empty( $attributes['show_icons'] ) && 'yes' === $attributes['show_icons'],
+				)
+			)
+		);
 	}
 }

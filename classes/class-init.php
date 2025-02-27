@@ -90,6 +90,7 @@ class Init {
 		add_action( 'cli_init', array( $this, 'cli' ) );
 		add_action( 'update_option_easy_language_api', array( $this, 'update_easy_language_api' ), 10, 2 );
 		add_action( 'admin_action_easy_language_clear_log', array( $this, 'clear_log_by_request' ) );
+		add_filter( 'plugin_row_meta', array( $this, 'add_row_meta_links' ), 10, 2 );
 
 		// ajax-hooks.
 		add_action( 'wp_ajax_easy_language_reset_intro', array( $this, 'reset_intro' ) );
@@ -409,5 +410,36 @@ class Init {
 		// redirect user back.
 		wp_safe_redirect( wp_get_referer() );
 		exit;
+	}
+
+	/**
+	 * Add links in row meta.
+	 *
+	 * @param array  $links List of links.
+	 * @param string $file The requested plugin file name.
+	 *
+	 * @return array
+	 */
+	public function add_row_meta_links( array $links, string $file ): array {
+		// bail if this is not our plugin.
+		if( WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . $file !== EASY_LANGUAGE ) {
+			return $links;
+		}
+
+		// add our custom links.
+		$row_meta = array(
+			'support' => '<a href="' . esc_url( Helper::get_plugin_support_url() ) . '" target="_blank" title="' . esc_html__( 'Support Forum', 'easy-language' ) . '">' . esc_html__( 'Support Forum', 'easy-language' ) . '</a>',
+		);
+
+		/**
+		 * Filter the links in row meta of our plugin in plugin list.
+		 *
+		 * @since 2.6.0 Available since 2.6.0.
+		 * @param array $row_meta List of links.
+		 */
+		$row_meta = apply_filters( 'easy_language_plugin_row_meta', $row_meta );
+
+		// return the resulting list of links.
+		return array_merge( $links, $row_meta );
 	}
 }

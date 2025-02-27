@@ -59,6 +59,8 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 - Themify
 - WPBakery
 
+We also provide Shortcodes as documented [here](https://github.com/threadi/easy-language/blob/master/doc/shortcodes.md).
+
 Please Note: The plugin was tested in a broad variety of WordPress-pages, but we highly recommend to install and test the plugin in a development environment first.
 
 The development repository is on [GitHub](https://github.com/threadi/easy-language).
@@ -90,11 +92,9 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added option for embolden negative words during simplification via SUMM AI
-- Added option to clear API log
-- Added option to clear the plugin log
-- Added SUMM AI HTML-mode as option, only usable with valid SUMM AI API key
-- Check for completed setup before initialising any admin options for this plugin
-- Do not use test mode for SUMM AI without API key
+- Added support for Avia Layout Architect from Enfold theme
+- Added link to support forum in plugin list on our plugin
+- Added shortcode to output the language switcher in frontend
+- Optimized hint which infos about simplifications are only visible in Pro-plugin
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
