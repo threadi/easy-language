@@ -208,7 +208,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 
 			// show hint for pro in used in column.
 			case 'used_in':
-				return '<span class="pro-marker">' . __( 'Only in Pro', 'easy-language' ) . '</span>';
+				return '<span class="pro-marker">' . __( 'Info only with Pro visible', 'easy-language' ) . '</span>';
 		}
 
 		// or return nothing.

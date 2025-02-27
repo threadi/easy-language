@@ -6,6 +6,10 @@
 
 - Added support for Avia Layout Architect from Enfold theme
 
+### Optimized
+
+- Optimized hint which infos are only visible in Pro-plugin
+
 ## [2.5.0] - 17.02.2025
 
 ### Added
