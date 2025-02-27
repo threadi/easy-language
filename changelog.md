@@ -6,6 +6,7 @@
 
 - Added support for Avia Layout Architect from Enfold theme
 - Added link to support forum in plugin list on our plugin
+- Added shortcode to output the language switcher in frontend
 
 ### Optimized
 
