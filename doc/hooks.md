@@ -21,7 +21,19 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/class-language-icon.php](class-language-icon.php), [line 126](class-language-icon.php#L126-L133)
+Source: [classes/class-language-icon.php](class-language-icon.php), [line 136](class-language-icon.php#L136-L143)
+
+### `easy_language_admin_show_pro_hint`
+
+*Show the possible target languages with its additional settings as table.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$attr['pro_hint']` |  | 
+
+Source: [classes/apis/summ-ai/class-summ-ai.php](apis/summ-ai/class-summ-ai.php), [line 1581](apis/summ-ai/class-summ-ai.php#L1581-L1694)
 
 ### `easy_language_capito_automatic_interval`
 
@@ -40,7 +52,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/capito/class-capito.php](apis/capito/class-capito.php), [line 725](apis/capito/class-capito.php#L725-L733)
+Source: [classes/apis/capito/class-capito.php](apis/capito/class-capito.php), [line 729](apis/capito/class-capito.php#L729-L737)
 
 ### `easy_language_chatgpt_automatic_interval`
 
@@ -59,7 +71,38 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/chatgpt/class-chatgpt.php](apis/chatgpt/class-chatgpt.php), [line 521](apis/chatgpt/class-chatgpt.php#L521-L529)
+Source: [classes/apis/chatgpt/class-chatgpt.php](apis/chatgpt/class-chatgpt.php), [line 526](apis/chatgpt/class-chatgpt.php#L526-L534)
+
+### `easy_language_uninstaller`
+
+*Run additional tasks for uninstallation via WP CLI.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$options` | `array` | Options used to call this command.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.3.0` | Available since 2.3.0.
+
+Source: [classes/class-cli.php](class-cli.php), [line 35](class-cli.php#L35-L42)
+
+### `easy_language_installer`
+
+*Run additional tasks for installation via WP CLI.*
+
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.3.0` | Available since 2.3.0.
+
+Source: [classes/class-cli.php](class-cli.php), [line 47](class-cli.php#L47-L52)
 
 ### `easy_language_replace_texts`
 
@@ -80,14 +123,14 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/class-text.php](multilingual-plugins/easy-language/class-text.php), [line 301](multilingual-plugins/easy-language/class-text.php#L301-L311)
+Source: [classes/multilingual-plugins/easy-language/class-text.php](multilingual-plugins/easy-language/class-text.php), [line 304](multilingual-plugins/easy-language/class-text.php#L304-L314)
 
 ### `easy_language_add_settings_after_post_types`
 
 *Add settings for this plugin.*
 
 
-Source: [classes/multilingual-plugins/easy-language/class-init.php](multilingual-plugins/easy-language/class-init.php), [line 1002](multilingual-plugins/easy-language/class-init.php#L1002-L1067)
+Source: [classes/multilingual-plugins/easy-language/class-init.php](multilingual-plugins/easy-language/class-init.php), [line 1030](multilingual-plugins/easy-language/class-init.php#L1030-L1095)
 
 ## Filters
 
@@ -108,7 +151,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/class-language-icon.php](class-language-icon.php), [line 57](class-language-icon.php#L57-L65)
+Source: [classes/class-language-icon.php](class-language-icon.php), [line 61](class-language-icon.php#L61-L69)
 
 ### `easy_language_summ_ai_request_object`
 
@@ -127,7 +170,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/summ-ai/class-simplifications.php](apis/summ-ai/class-simplifications.php), [line 89](apis/summ-ai/class-simplifications.php#L89-L97)
+Source: [classes/apis/summ-ai/class-simplifications.php](apis/summ-ai/class-simplifications.php), [line 108](apis/summ-ai/class-simplifications.php#L108-L116)
 
 ### `easy_language_simplified_text`
 
@@ -147,7 +190,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/summ-ai/class-simplifications.php](apis/summ-ai/class-simplifications.php), [line 111](apis/summ-ai/class-simplifications.php#L111-L120)
+Source: [classes/apis/summ-ai/class-simplifications.php](apis/summ-ai/class-simplifications.php), [line 130](apis/summ-ai/class-simplifications.php#L130-L139)
 
 ### `easy_language_quota_percent`
 
@@ -165,7 +208,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/summ-ai/class-summ-ai.php](apis/summ-ai/class-summ-ai.php), [line 160](apis/summ-ai/class-summ-ai.php#L160-L167)
+Source: [classes/apis/summ-ai/class-summ-ai.php](apis/summ-ai/class-summ-ai.php), [line 165](apis/summ-ai/class-summ-ai.php#L165-L172)
 
 ### `easy_language_summ_ai_source_languages`
 
@@ -183,7 +226,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/summ-ai/class-summ-ai.php](apis/summ-ai/class-summ-ai.php), [line 256](apis/summ-ai/class-summ-ai.php#L256-L263)
+Source: [classes/apis/summ-ai/class-summ-ai.php](apis/summ-ai/class-summ-ai.php), [line 269](apis/summ-ai/class-summ-ai.php#L269-L276)
 
 ### `easy_language_summ_ai_target_languages`
 
@@ -201,7 +244,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/summ-ai/class-summ-ai.php](apis/summ-ai/class-summ-ai.php), [line 296](apis/summ-ai/class-summ-ai.php#L296-L303)
+Source: [classes/apis/summ-ai/class-summ-ai.php](apis/summ-ai/class-summ-ai.php), [line 316](apis/summ-ai/class-summ-ai.php#L316-L323)
 
 ### `easy_language_summ_ai_mapping_languages`
 
@@ -219,7 +262,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/summ-ai/class-summ-ai.php](apis/summ-ai/class-summ-ai.php), [line 322](apis/summ-ai/class-summ-ai.php#L322-L329)
+Source: [classes/apis/summ-ai/class-summ-ai.php](apis/summ-ai/class-summ-ai.php), [line 342](apis/summ-ai/class-summ-ai.php#L342-L349)
 
 ### `easy_language_quota_percent`
 
@@ -237,7 +280,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/summ-ai/class-summ-ai.php](apis/summ-ai/class-summ-ai.php), [line 1036](apis/summ-ai/class-summ-ai.php#L1036-L1043)
+Source: [classes/apis/summ-ai/class-summ-ai.php](apis/summ-ai/class-summ-ai.php), [line 1159](apis/summ-ai/class-summ-ai.php#L1159-L1166)
 
 ### `easy_language_capito_source_languages`
 
@@ -292,24 +335,6 @@ Version | Description
 `2.0.0` | Available since 2.0.0.
 
 Source: [classes/apis/capito/class-capito.php](apis/capito/class-capito.php), [line 300](apis/capito/class-capito.php#L300-L307)
-
-### `easy_language_quota_percent`
-
-*Hook for minimal quota percent.*
-
-**Arguments**
-
-Argument | Type | Description
--------- | ---- | -----------
-`$min_percent` | `float` | Minimal percent for quota warning.
-
-**Changelog**
-
-Version | Description
-------- | -----------
-`2.0.0` | Available since 2.0.0.
-
-Source: [classes/apis/capito/class-capito.php](apis/capito/class-capito.php), [line 988](apis/capito/class-capito.php#L988-L995)
 
 ### `easy_language_capito_request_object`
 
@@ -366,7 +391,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/chatgpt/class-chatgpt.php](apis/chatgpt/class-chatgpt.php), [line 199](apis/chatgpt/class-chatgpt.php#L199-L206)
+Source: [classes/apis/chatgpt/class-chatgpt.php](apis/chatgpt/class-chatgpt.php), [line 200](apis/chatgpt/class-chatgpt.php#L200-L207)
 
 ### `easy_language_chatgpt_target_languages`
 
@@ -384,7 +409,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/chatgpt/class-chatgpt.php](apis/chatgpt/class-chatgpt.php), [line 239](apis/chatgpt/class-chatgpt.php#L239-L246)
+Source: [classes/apis/chatgpt/class-chatgpt.php](apis/chatgpt/class-chatgpt.php), [line 240](apis/chatgpt/class-chatgpt.php#L240-L247)
 
 ### `easy_language_chatgpt_mapping_languages`
 
@@ -402,7 +427,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/chatgpt/class-chatgpt.php](apis/chatgpt/class-chatgpt.php), [line 290](apis/chatgpt/class-chatgpt.php#L290-L297)
+Source: [classes/apis/chatgpt/class-chatgpt.php](apis/chatgpt/class-chatgpt.php), [line 294](apis/chatgpt/class-chatgpt.php#L294-L301)
 
 ### `easy_language_chatgpt_models`
 
@@ -420,7 +445,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/chatgpt/class-chatgpt.php](apis/chatgpt/class-chatgpt.php), [line 434](apis/chatgpt/class-chatgpt.php#L434-L441)
+Source: [classes/apis/chatgpt/class-chatgpt.php](apis/chatgpt/class-chatgpt.php), [line 439](apis/chatgpt/class-chatgpt.php#L439-L446)
 
 ### `easy_language_chatgpt_request_object`
 
@@ -439,7 +464,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/chatgpt/class-simplifications.php](apis/chatgpt/class-simplifications.php), [line 89](apis/chatgpt/class-simplifications.php#L89-L97)
+Source: [classes/apis/chatgpt/class-simplifications.php](apis/chatgpt/class-simplifications.php), [line 91](apis/chatgpt/class-simplifications.php#L91-L99)
 
 ### `easy_language_simplified_text`
 
@@ -459,7 +484,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/apis/chatgpt/class-simplifications.php](apis/chatgpt/class-simplifications.php), [line 113](apis/chatgpt/class-simplifications.php#L113-L122)
+Source: [classes/apis/chatgpt/class-simplifications.php](apis/chatgpt/class-simplifications.php), [line 115](apis/chatgpt/class-simplifications.php#L115-L124)
 
 ### `easy_language_possible_source_languages`
 
@@ -477,7 +502,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/class-languages.php](class-languages.php), [line 118](class-languages.php#L118-L125)
+Source: [classes/class-languages.php](class-languages.php), [line 114](class-languages.php#L114-L121)
 
 ### `easy_language_supported_target_languages`
 
@@ -495,7 +520,26 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/class-languages.php](class-languages.php), [line 155](class-languages.php#L155-L162)
+Source: [classes/class-languages.php](class-languages.php), [line 153](class-languages.php#L153-L160)
+
+### `easy_language_transient_hide_on`
+
+*Filter where a single transient should be hidden.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$hide_on` | `array` | List of absolute URLs.
+`$this` | `\easyLanguage\Transient` | The actual transient object.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.2.0` | Available since 2.2.0.
+
+Source: [classes/class-transient.php](class-transient.php), [line 362](class-transient.php#L362-L370)
 
 ### `easy_language_register_plugin`
 
@@ -513,7 +557,64 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/class-multilingual-plugins.php](class-multilingual-plugins.php), [line 60](class-multilingual-plugins.php#L60-L67)
+Source: [classes/class-multilingual-plugins.php](class-multilingual-plugins.php), [line 57](class-multilingual-plugins.php#L57-L64)
+
+### `easy_language_setup`
+
+*Filter the configured setup for this plugin.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$setup` | `array` | The setup-configuration.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.2.0` | Available since 2.2.0.
+
+Source: [classes/class-setup.php](class-setup.php), [line 179](class-setup.php#L179-L186)
+
+### `easy_language_transient_title`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`Helper::get_plugin_name()` |  | 
+
+Source: [classes/class-setup.php](class-setup.php), [line 196](class-setup.php#L196-L196)
+
+### `easy_language_setup_config`
+
+*Filter the setup configuration.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$config` | `array` | List of configuration for the setup.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`3.0.0` | Available since 3.0.0.
+
+Source: [classes/class-setup.php](class-setup.php), [line 250](class-setup.php#L250-L256)
+
+### `easy_language_setup_process_completed_text`
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$completed_text` |  | 
+`$config_name` |  | 
+
+Source: [classes/class-setup.php](class-setup.php), [line 383](class-setup.php#L383-L383)
 
 ### `easy_language_get_object`
 
@@ -533,7 +634,44 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/class-helper.php](class-helper.php), [line 493](class-helper.php#L493-L502)
+Source: [classes/class-helper.php](class-helper.php), [line 498](class-helper.php#L498-L507)
+
+### `easy_language_file_version`
+
+*Filter the used file version (for JS- and CSS-files which get enqueued).*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$plugin_version` | `string` | The plugin-version.
+`$filepath` | `string` | The absolute path to the requested file.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.3.0` | Available since 2.3.0.
+
+Source: [classes/class-helper.php](class-helper.php), [line 719](class-helper.php#L719-L727)
+
+### `easy_language_post_meta_keys_to_ignore`
+
+*Filter the list of post meta keys we ignore during creating new object.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$keys` | `array` | List of keys to ignore.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.4.0` | Available since 2.4.0.
+
+Source: [classes/class-helper.php](class-helper.php), [line 738](class-helper.php#L738-L744)
 
 ### `easy_language_post_type_names`
 
@@ -551,7 +689,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/class-init.php](class-init.php), [line 210](class-init.php#L210-L217)
+Source: [classes/class-init.php](class-init.php), [line 214](class-init.php#L214-L221)
 
 ### `easy_language_post_type_settings`
 
@@ -569,7 +707,43 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/class-init.php](class-init.php), [line 247](class-init.php#L247-L254)
+Source: [classes/class-init.php](class-init.php), [line 251](class-init.php#L251-L258)
+
+### `easy_language_plugin_row_meta`
+
+*Filter the links in row meta of our plugin in plugin list.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$row_meta` | `array` | List of links.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.6.0` | Available since 2.6.0.
+
+Source: [classes/class-init.php](class-init.php), [line 434](class-init.php#L434-L440)
+
+### `easy_language_status_list`
+
+*Filter the list of possible states in log table.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$list` |  | 
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.3.0` | Available since 2.3.0
+
+Source: [classes/class-log-table.php](class-log-table.php), [line 162](class-log-table.php#L162-L167)
 
 ### `easy_language_capito_request_object`
 
@@ -607,6 +781,24 @@ Version | Description
 
 Source: [classes/multilingual-plugins/translatepress/class-translatepress-summ-ai-machine-translator.php](multilingual-plugins/translatepress/class-translatepress-summ-ai-machine-translator.php), [line 57](multilingual-plugins/translatepress/class-translatepress-summ-ai-machine-translator.php#L57-L64)
 
+### `easy_language_prevent_simple_permalinks`
+
+*Prevent the usage of the simple generation of permalinks.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$false` | `bool` | True to prevent the usage.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.3.2` | Available since 2.3.2
+
+Source: [classes/multilingual-plugins/easy-language/class-rewrite.php](multilingual-plugins/easy-language/class-rewrite.php), [line 203](multilingual-plugins/easy-language/class-rewrite.php#L203-L211)
+
 ### `easy_language_simplification_table_to_simplify`
 
 *Filter the column name.*
@@ -624,7 +816,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php](multilingual-plugins/easy-language/class-texts-to-simplify-table.php), [line 122](multilingual-plugins/easy-language/class-texts-to-simplify-table.php#L122-L130)
+Source: [classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php](multilingual-plugins/easy-language/class-texts-to-simplify-table.php), [line 120](multilingual-plugins/easy-language/class-texts-to-simplify-table.php#L120-L128)
 
 ### `easy_language_simplification_to_simplify_table_options`
 
@@ -643,7 +835,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php](multilingual-plugins/easy-language/class-texts-to-simplify-table.php), [line 177](multilingual-plugins/easy-language/class-texts-to-simplify-table.php#L177-L185)
+Source: [classes/multilingual-plugins/easy-language/class-texts-to-simplify-table.php](multilingual-plugins/easy-language/class-texts-to-simplify-table.php), [line 175](multilingual-plugins/easy-language/class-texts-to-simplify-table.php#L175-L183)
 
 ### `easy_language_js_top`
 
@@ -661,7 +853,7 @@ Version | Description
 ------- | -----------
 `2.2.0` | Available since 2.2.0.
 
-Source: [classes/multilingual-plugins/easy-language/abstract-objects.php](multilingual-plugins/easy-language/abstract-objects.php), [line 156](multilingual-plugins/easy-language/abstract-objects.php#L156-L162)
+Source: [classes/multilingual-plugins/easy-language/abstract-objects.php](multilingual-plugins/easy-language/abstract-objects.php), [line 153](multilingual-plugins/easy-language/abstract-objects.php#L153-L159)
 
 ### `easy_language_js_top`
 
@@ -679,7 +871,7 @@ Version | Description
 ------- | -----------
 `2.2.0` | Available since 2.2.0.
 
-Source: [classes/multilingual-plugins/easy-language/abstract-objects.php](multilingual-plugins/easy-language/abstract-objects.php), [line 544](multilingual-plugins/easy-language/abstract-objects.php#L544-L550)
+Source: [classes/multilingual-plugins/easy-language/abstract-objects.php](multilingual-plugins/easy-language/abstract-objects.php), [line 540](multilingual-plugins/easy-language/abstract-objects.php#L540-L546)
 
 ### `easy_language_simplification_table_used_in`
 
@@ -698,7 +890,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/class-texts-in-use-table.php](multilingual-plugins/easy-language/class-texts-in-use-table.php), [line 138](multilingual-plugins/easy-language/class-texts-in-use-table.php#L138-L146)
+Source: [classes/multilingual-plugins/easy-language/class-texts-in-use-table.php](multilingual-plugins/easy-language/class-texts-in-use-table.php), [line 136](multilingual-plugins/easy-language/class-texts-in-use-table.php#L136-L144)
 
 ### `easy_language_simplification_table_options`
 
@@ -717,7 +909,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/class-texts-in-use-table.php](multilingual-plugins/easy-language/class-texts-in-use-table.php), [line 200](multilingual-plugins/easy-language/class-texts-in-use-table.php#L200-L208)
+Source: [classes/multilingual-plugins/easy-language/class-texts-in-use-table.php](multilingual-plugins/easy-language/class-texts-in-use-table.php), [line 198](multilingual-plugins/easy-language/class-texts-in-use-table.php#L198-L206)
 
 ### `easy_language_first_simplify_dialog`
 
@@ -737,7 +929,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/class-init.php](multilingual-plugins/easy-language/class-init.php), [line 427](multilingual-plugins/easy-language/class-init.php#L427-L436)
+Source: [classes/multilingual-plugins/easy-language/class-init.php](multilingual-plugins/easy-language/class-init.php), [line 452](multilingual-plugins/easy-language/class-init.php#L452-L461)
 
 ### `easy_language_possible_post_types`
 
@@ -755,7 +947,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/class-init.php](multilingual-plugins/easy-language/class-init.php), [line 1030](multilingual-plugins/easy-language/class-init.php#L1030-L1037)
+Source: [classes/multilingual-plugins/easy-language/class-init.php](multilingual-plugins/easy-language/class-init.php), [line 1058](multilingual-plugins/easy-language/class-init.php#L1058-L1065)
 
 ### `easy_language_first_simplify_dialog`
 
@@ -775,7 +967,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/class-init.php](multilingual-plugins/easy-language/class-init.php), [line 1376](multilingual-plugins/easy-language/class-init.php#L1376-L1385)
+Source: [classes/multilingual-plugins/easy-language/class-init.php](multilingual-plugins/easy-language/class-init.php), [line 1404](multilingual-plugins/easy-language/class-init.php#L1404-L1413)
 
 ### `easy_language_get_object_by_wp_object`
 
@@ -795,7 +987,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/class-init.php](multilingual-plugins/easy-language/class-init.php), [line 1412](multilingual-plugins/easy-language/class-init.php#L1412-L1421)
+Source: [classes/multilingual-plugins/easy-language/class-init.php](multilingual-plugins/easy-language/class-init.php), [line 1440](multilingual-plugins/easy-language/class-init.php#L1440-L1449)
 
 ### `easy_language_quota_percent`
 
@@ -813,7 +1005,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/class-init.php](multilingual-plugins/easy-language/class-init.php), [line 1969](multilingual-plugins/easy-language/class-init.php#L1969-L1976)
+Source: [classes/multilingual-plugins/easy-language/class-init.php](multilingual-plugins/easy-language/class-init.php), [line 2024](multilingual-plugins/easy-language/class-init.php#L2024-L2031)
 
 ### `easy_language_divi_text_widgets`
 
@@ -831,7 +1023,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/parser/class-divi.php](multilingual-plugins/easy-language/parser/class-divi.php), [line 75](multilingual-plugins/easy-language/parser/class-divi.php#L75-L82)
+Source: [classes/multilingual-plugins/easy-language/parser/class-divi.php](multilingual-plugins/easy-language/parser/class-divi.php), [line 73](multilingual-plugins/easy-language/parser/class-divi.php#L73-L80)
 
 ### `easy_language_divi_html_widgets`
 
@@ -849,7 +1041,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/parser/class-divi.php](multilingual-plugins/easy-language/parser/class-divi.php), [line 97](multilingual-plugins/easy-language/parser/class-divi.php#L97-L104)
+Source: [classes/multilingual-plugins/easy-language/parser/class-divi.php](multilingual-plugins/easy-language/parser/class-divi.php), [line 95](multilingual-plugins/easy-language/parser/class-divi.php#L95-L102)
 
 ### `easy_language_gutenberg_blocks`
 
@@ -869,6 +1061,42 @@ Version | Description
 
 Source: [classes/multilingual-plugins/easy-language/parser/class-gutenberg.php](multilingual-plugins/easy-language/parser/class-gutenberg.php), [line 78](multilingual-plugins/easy-language/parser/class-gutenberg.php#L78-L85)
 
+### `easy_language_avia_text_widgets`
+
+*Filter the possible Avia shortcodes.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$shortcodes` | `array` | List of shortcodes.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.6.0` | Available since 2.6.0.
+
+Source: [classes/multilingual-plugins/easy-language/parser/class-avia.php](multilingual-plugins/easy-language/parser/class-avia.php), [line 71](multilingual-plugins/easy-language/parser/class-avia.php#L71-L78)
+
+### `easy_language_avia_html_widgets`
+
+*Filter the possible Avia widgets with HTML-support.*
+
+**Arguments**
+
+Argument | Type | Description
+-------- | ---- | -----------
+`$html_support_widgets` | `array` | List of widgets with HTML-support.
+
+**Changelog**
+
+Version | Description
+------- | -----------
+`2.6.0` | Available since 2.6.0.
+
+Source: [classes/multilingual-plugins/easy-language/parser/class-avia.php](multilingual-plugins/easy-language/parser/class-avia.php), [line 93](multilingual-plugins/easy-language/parser/class-avia.php#L93-L100)
+
 ### `easy_language_avada_text_widgets`
 
 *Filter the possible Avada shortcodes.*
@@ -885,11 +1113,11 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/parser/class-avada.php](multilingual-plugins/easy-language/parser/class-avada.php), [line 71](multilingual-plugins/easy-language/parser/class-avada.php#L71-L78)
+Source: [classes/multilingual-plugins/easy-language/parser/class-avada.php](multilingual-plugins/easy-language/parser/class-avada.php), [line 69](multilingual-plugins/easy-language/parser/class-avada.php#L69-L76)
 
 ### `easy_language_avada_html_widgets`
 
-*Filter the possible Divi widgets with HTML-support.*
+*Filter the possible Avada widgets with HTML-support.*
 
 **Arguments**
 
@@ -903,7 +1131,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/parser/class-avada.php](multilingual-plugins/easy-language/parser/class-avada.php), [line 93](multilingual-plugins/easy-language/parser/class-avada.php#L93-L100)
+Source: [classes/multilingual-plugins/easy-language/parser/class-avada.php](multilingual-plugins/easy-language/parser/class-avada.php), [line 91](multilingual-plugins/easy-language/parser/class-avada.php#L91-L98)
 
 ### `easy_language_themify_text_widgets`
 
@@ -921,7 +1149,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/parser/class-themify.php](multilingual-plugins/easy-language/parser/class-themify.php), [line 83](multilingual-plugins/easy-language/parser/class-themify.php#L83-L90)
+Source: [classes/multilingual-plugins/easy-language/parser/class-themify.php](multilingual-plugins/easy-language/parser/class-themify.php), [line 81](multilingual-plugins/easy-language/parser/class-themify.php#L81-L88)
 
 ### `easy_language_themify_html_widgets`
 
@@ -939,7 +1167,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/parser/class-themify.php](multilingual-plugins/easy-language/parser/class-themify.php), [line 105](multilingual-plugins/easy-language/parser/class-themify.php#L105-L112)
+Source: [classes/multilingual-plugins/easy-language/parser/class-themify.php](multilingual-plugins/easy-language/parser/class-themify.php), [line 103](multilingual-plugins/easy-language/parser/class-themify.php#L103-L110)
 
 ### `easy_language_wpbakery_text_widgets`
 
@@ -957,7 +1185,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/parser/class-wpbakery.php](multilingual-plugins/easy-language/parser/class-wpbakery.php), [line 80](multilingual-plugins/easy-language/parser/class-wpbakery.php#L80-L87)
+Source: [classes/multilingual-plugins/easy-language/parser/class-wpbakery.php](multilingual-plugins/easy-language/parser/class-wpbakery.php), [line 78](multilingual-plugins/easy-language/parser/class-wpbakery.php#L78-L85)
 
 ### `easy_language_wpbakery_html_widgets`
 
@@ -975,7 +1203,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/parser/class-wpbakery.php](multilingual-plugins/easy-language/parser/class-wpbakery.php), [line 102](multilingual-plugins/easy-language/parser/class-wpbakery.php#L102-L109)
+Source: [classes/multilingual-plugins/easy-language/parser/class-wpbakery.php](multilingual-plugins/easy-language/parser/class-wpbakery.php), [line 100](multilingual-plugins/easy-language/parser/class-wpbakery.php#L100-L107)
 
 ### `easy_language_elementor_text_widgets`
 
@@ -993,7 +1221,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/parser/class-elementor.php](multilingual-plugins/easy-language/parser/class-elementor.php), [line 91](multilingual-plugins/easy-language/parser/class-elementor.php#L91-L98)
+Source: [classes/multilingual-plugins/easy-language/parser/class-elementor.php](multilingual-plugins/easy-language/parser/class-elementor.php), [line 89](multilingual-plugins/easy-language/parser/class-elementor.php#L89-L96)
 
 ### `easy_language_elementor_html_widgets`
 
@@ -1011,7 +1239,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/parser/class-elementor.php](multilingual-plugins/easy-language/parser/class-elementor.php), [line 113](multilingual-plugins/easy-language/parser/class-elementor.php#L113-L120)
+Source: [classes/multilingual-plugins/easy-language/parser/class-elementor.php](multilingual-plugins/easy-language/parser/class-elementor.php), [line 111](multilingual-plugins/easy-language/parser/class-elementor.php#L111-L118)
 
 ### `easy_language_pagebuilder`
 
@@ -1023,7 +1251,7 @@ Argument | Type | Description
 -------- | ---- | -----------
 `array()` |  | 
 
-Source: [classes/multilingual-plugins/easy-language/class-post-object.php](multilingual-plugins/easy-language/class-post-object.php), [line 283](multilingual-plugins/easy-language/class-post-object.php#L283-L291)
+Source: [classes/multilingual-plugins/easy-language/class-post-object.php](multilingual-plugins/easy-language/class-post-object.php), [line 281](multilingual-plugins/easy-language/class-post-object.php#L281-L289)
 
 ### `easy_language_quota_percent`
 
@@ -1041,7 +1269,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/multilingual-plugins/easy-language/class-parser-base.php](multilingual-plugins/easy-language/class-parser-base.php), [line 264](multilingual-plugins/easy-language/class-parser-base.php#L264-L271)
+Source: [classes/multilingual-plugins/easy-language/class-parser-base.php](multilingual-plugins/easy-language/class-parser-base.php), [line 267](multilingual-plugins/easy-language/class-parser-base.php#L267-L274)
 
 ### `easy_language_register_api`
 
@@ -1059,7 +1287,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/class-apis.php](class-apis.php), [line 60](class-apis.php#L60-L67)
+Source: [classes/class-apis.php](class-apis.php), [line 59](class-apis.php#L59-L66)
 
 ### `easy_language_get_transients_for_display`
 
@@ -1077,7 +1305,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [classes/class-transients.php](class-transients.php), [line 152](class-transients.php#L152-L159)
+Source: [classes/class-transients.php](class-transients.php), [line 150](class-transients.php#L150-L157)
 
 
 <p align="center"><a href="https://github.com/pronamic/wp-documentor"><img src="https://cdn.jsdelivr.net/gh/pronamic/wp-documentor@main/logos/pronamic-wp-documentor.svgo-min.svg" alt="Pronamic WordPress Documentor" width="32" height="32"></a><br><em>Generated by <a href="https://github.com/pronamic/wp-documentor">Pronamic WordPress Documentor</a> <code>1.2.0</code></em><p>

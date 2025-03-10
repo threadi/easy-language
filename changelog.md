@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.6.0] - 10.03.2025
 
 ### Added
 
@@ -11,6 +11,7 @@
 ### Optimized
 
 - Optimized hint which infos about simplifications are only visible in Pro-plugin
+- Added hint where prices for each API can be found
 
 ## [2.5.0] - 17.02.2025
 

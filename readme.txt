@@ -96,5 +96,6 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 - Added link to support forum in plugin list on our plugin
 - Added shortcode to output the language switcher in frontend
 - Optimized hint which infos about simplifications are only visible in Pro-plugin
+- Added hint where prices for each API can be found
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
