@@ -62,8 +62,8 @@ class Avia extends Parser_Base implements Parser {
 	 */
 	private function get_flow_text_shortcodes(): array {
 		$shortcodes = array(
-			'av_heading' => array(
-				'heading'
+			'av_heading'   => array(
+				'heading',
 			),
 			'av_textblock' => array(),
 		);
@@ -181,10 +181,10 @@ class Avia extends Parser_Base implements Parser {
 	 */
 	private function is_avia_active(): bool {
 		// get the theme object.
-		$theme    = wp_get_theme();
+		$theme = wp_get_theme();
 
 		// return true if Avia Builder exists as object.
-		if( function_exists( 'Avia_Builder' ) ) {
+		if ( function_exists( 'Avia_Builder' ) ) {
 			return true;
 		}
 
