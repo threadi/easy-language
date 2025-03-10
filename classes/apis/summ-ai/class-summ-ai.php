@@ -185,6 +185,8 @@ class Summ_AI extends Base implements Api_Base {
 				/* translators: %1$d will be a number, %2$s will be replaced by the URL where the SUMM AI API key could be requested */
 				$text .= sprintf( __( '<p><strong>You are currently using a free quota of %1$d characters available for text simplifications with the Easy Language plugin.</strong><br>Enter your SUMM AI API key <a href="%2$s">here</a> to get more.</p>', 'easy-language' ), absint( $quota['character_limit'] ), esc_url( $this->get_settings_url() ) );
 			}
+			/* translators: %1$s will be replaced by a URL. */
+			$text .= '<p>' . sprintf( __( 'Ask SUMM AI about the prices <a href="%1$s" target="_blank">here</a>.', 'easy-language' ), $this->get_language_specific_support_page() ) . '</p>';
 		} else {
 			$text .= '<p><strong>' . __( 'You are currently using your own paid SUMM AI API key.', 'easy-language' ) . '</strong></p>';
 		}

@@ -15,6 +15,7 @@ use easyLanguage\Base;
 use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Language_Icon;
+use easyLanguage\Languages;
 use easyLanguage\Log;
 use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
@@ -145,7 +146,8 @@ class Capito extends Base implements Api_Base {
 		} elseif ( ! empty( $quota['unlimited'] ) ) {
 			$text .= '<p><strong>' . __( 'Unlimited quota', 'easy-language' ) . '</strong></p>';
 		} elseif ( -1 === $quota['character_limit'] ) {
-			$text .= '<p><strong>' . __( 'The available quota is retrieved after entering the API key in the API settings.', 'easy-language' ) . '</strong></p>';
+			/* translators: %1$s will be replaced by a URL. */
+			$text .= '<p><strong>' . __( 'The available quota is retrieved after entering the API key in the API settings.', 'easy-language' ) . ' ' . sprintf( __( 'You can see the prices for the contingents <a href="%1$s" target="_blank">here</a>.', 'easy-language' ), $this->get_prices_url() ) . '</strong></p>';
 		}
 
 		// wrapper for buttons.
@@ -1218,5 +1220,17 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_translatepress_machine_class(): string {
 		return 'easyLanguage\Multilingual_plugins\TranslatePress\Translatepress_Capito_Machine_Translator';
+	}
+
+	/**
+	 * Return the URL for the price list.
+	 *
+	 * @return string
+	 */
+	private function get_prices_url(): string {
+		if ( Languages::get_instance()->is_german_language() ) {
+			return 'https://www.capito.eu/preise-pakete/';
+		}
+		return 'https://www.capito.eu/en/prices-packages/';
 	}
 }

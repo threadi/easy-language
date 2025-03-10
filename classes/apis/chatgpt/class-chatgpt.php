@@ -128,8 +128,9 @@ class ChatGpt extends Base implements Api_Base {
 	 */
 	public function get_description(): string {
 		/* translators: %1$d will be replaced by the link to Chatgpt */
-		$text  = sprintf( __( '<p><a href="%1$s" target="_blank"><strong>ChatGpt</strong> (opens new window)</a> is an AI-tool for any conversations.<br>It helps you to answer questions you have.</p><p>This API tries to simplify texts based on its on artificial intelligence.<br>The results are based on no standards for Easy or Plain language.</p><p>The number of simplifications with ChatGpt is limited to <strong>tokens</strong>.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
-		$text .= '<p><strong>' . __( 'You will use tokens on ChatGpt for every simplification. Please consult your ChatGpt-account about the usage.', 'easy-language' ) . '</strong></p>';
+		$text = sprintf( __( '<p><a href="%1$s" target="_blank"><strong>ChatGpt</strong> (opens new window)</a> is an AI-tool for any conversations.<br>It helps you to answer questions you have.</p><p>This API tries to simplify texts based on its on artificial intelligence.<br>The results are based on no standards for Easy or Plain language.</p><p>The number of simplifications with ChatGpt is limited to <strong>tokens</strong>.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+		/* translators: %1$s will be replaced by a URL. */
+		$text .= '<p><strong>' . __( 'You will use tokens on ChatGpt for every simplification. Please consult your ChatGpt-account about the usage.', 'easy-language' ) . ' ' . sprintf( __( 'You can see the prices for the usage <a href="%1$s" target="_blank">here</a>.', 'easy-language' ), $this->get_prices_url() ) . '</strong></p>';
 
 		// wrapper for buttons.
 		$text .= '<p>';
@@ -946,5 +947,14 @@ class ChatGpt extends Base implements Api_Base {
 	 */
 	private function get_api_management_url(): string {
 		return 'https://platform.openai.com/api-keys';
+	}
+
+	/**
+	 * Return the URL for the price list.
+	 *
+	 * @return string
+	 */
+	private function get_prices_url(): string {
+		return 'https://openai.com/chatgpt/pricing/';
 	}
 }
