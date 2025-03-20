@@ -236,7 +236,7 @@ class Helper {
 	 * @param ?array $values The list of values.
 	 * @return array|null
 	 */
-	public static function settings_validate_muliple_select_fields( ?array $values ): ?array {
+	public static function settings_validate_multiple_select_fields( ?array $values ): ?array {
 		$filter = current_filter();
 		if ( ! empty( $filter ) ) {
 			$filter = str_replace( 'sanitize_option_', '', $filter );

@@ -202,8 +202,16 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				continue;
 			}
 
-			// bail if the post-type is not visible in backend.
-			if ( false === $post_type_obj->show_in_menu ) {
+			$false = false;
+			/**
+			 * Bail if the post-type is not visible in backend.
+			 *
+			 * @since 2.6.1 Available since 2.6.1.
+			 * @param bool $false Return value, should not be match the show_in_menu setting for post type.
+			 * @param string $post_type The requested post type name.
+			 * @noinspection PhpConditionAlreadyCheckedInspection
+			 **/
+			if ( apply_filters( 'easy_language_post_type_backend_visibility', $false, $post_type ) === $post_type_obj->show_in_menu ) {
 				continue;
 			}
 

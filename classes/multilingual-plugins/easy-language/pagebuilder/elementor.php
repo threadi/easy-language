@@ -68,6 +68,12 @@ function easy_language_add_elementor_page_settings_controls( Post $page ): void 
 	// get the original-object.
 	$post_object = new Post_Object( $page->get_id() );
 
+	// bail if post type is not supported.
+	$supported_post_types = \easyLanguage\Multilingual_plugins\Easy_Language\Init::get_instance()->get_supported_post_types();
+	if( empty( $supported_post_types[ $post_object->get_type() ] ) ) {
+		return;
+	}
+
 	// get the post-language.
 	$language_array = $post_object->get_language();
 	$language       = reset( $language_array );
@@ -112,6 +118,12 @@ add_action( 'elementor/element/wp-post/document_settings/after_section_end', 'ea
 function easy_language_add_elementor_page_settings_controls_page( Page $page ): void {
 	// get the original-object.
 	$post_object = new Post_Object( $page->get_id() );
+
+	// bail if post type is not supported.
+	$supported_post_types = \easyLanguage\Multilingual_plugins\Easy_Language\Init::get_instance()->get_supported_post_types();
+	if( empty( $supported_post_types[ $post_object->get_type() ] ) ) {
+		return;
+	}
 
 	// get the post-language.
 	$language_array = $post_object->get_language();

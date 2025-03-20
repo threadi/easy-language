@@ -1112,7 +1112,7 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return array|null
 	 */
 	public function validate_target_language_separator_settings( ?array $values ): ?array {
-		return Helper::settings_validate_muliple_select_fields( $values );
+		return Helper::settings_validate_multiple_select_fields( $values );
 	}
 
 	/**

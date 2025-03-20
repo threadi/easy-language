@@ -73,6 +73,7 @@ The development repository is on [GitHub](https://github.com/threadi/easy-langua
 * Support for any taxonomies (e.g. category descriptions)
 * Simplification of single texts
 * Show where any simplified text is used in your website
+* Support for third party plugins like Popup Maker or ElementsKit
 
 More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://laolaweb.com/en/plugins/easy-language-for-wordpress/)
 

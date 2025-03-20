@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Optimized
+
+- Options in Elementor are now only visible if a supported post type is used
+- Fixed some typos
+
 ## [2.6.0] - 10.03.2025
 
 ### Added
