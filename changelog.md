@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Added support for Salient WpBakery
+
+### Optimized
+
+- Optimized handling of SUMM AI free simplification requests
+
 ## [2.6.0] - 10.03.2025
 
 ### Added
