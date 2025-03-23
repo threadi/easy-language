@@ -8,7 +8,10 @@
 
 ### Optimized
 
+- Optimized usage of file versions for each enqueued file for better performance during loading
 - Optimized handling of SUMM AI free simplification requests
+- Extended security checks during plugin build by using WP VIP recommendations
+- Small optimisation regarding security of inputs and outputs
 
 ### Removed
 

@@ -316,7 +316,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 				<?php
 			} else {
 				?>
-				<span class="button disabled" title="<?php echo esc_html__( 'Choose a language above to export', 'easy-language' ); ?>"><?php echo esc_html__( 'Export as Portable Object (po)', 'easy-language' ); ?></span>
+				<span class="button disabled" title="<?php echo esc_attr__( 'Choose a language above to export', 'easy-language' ); ?>"><?php echo esc_html__( 'Export as Portable Object (po)', 'easy-language' ); ?></span>
 				<?php
 			}
 		}

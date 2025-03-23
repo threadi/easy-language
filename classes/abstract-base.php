@@ -461,7 +461,7 @@ abstract class Base {
 
 		// Show setting-button if this API is enabled.
 		if ( $this->is_active() ) {
-			$text .= '<a href="' . esc_html( $this->get_settings_url() ) . '" class="button button-primary" title="' . esc_html__( 'Go to settings', 'easy-language' ) . '"><span class="dashicons dashicons-admin-generic"></span></a>';
+			$text .= '<a href="' . esc_url( $this->get_settings_url() ) . '" class="button button-primary" title="' . esc_attr__( 'Go to settings', 'easy-language' ) . '"><span class="dashicons dashicons-admin-generic"></span></a>';
 		}
 
 		$text .= '</p>';

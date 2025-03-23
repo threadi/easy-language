@@ -390,12 +390,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 							),
 						),
 					);
-					echo '<span class="dashicons dashicons-admin-generic easy-language-automatic-simplification-prevented easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_html__( 'Automatic simplification is prevented', 'easy-language' ) . '"></span>';
+					echo '<span class="dashicons dashicons-admin-generic easy-language-automatic-simplification-prevented easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_attr__( 'Automatic simplification is prevented', 'easy-language' ) . '"></span>';
 				}
 
 				// show mark if content of original object has been changed.
 				if ( $post_object->has_changed( $language_code ) && current_user_can( 'edit_el_simplifier' ) ) {
-					echo '<span class="dashicons dashicons-image-rotate" title="' . esc_html__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
+					echo '<span class="dashicons dashicons-image-rotate" title="' . esc_attr__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
 				}
 			} else {
 				// create link to simplify this post if used pagebuilder is active.
@@ -1858,7 +1858,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy-language-simplifications',
 			plugins_url( '/classes/multilingual-plugins/easy-language/admin/simplifications.js', EASY_LANGUAGE ),
 			array( 'jquery', 'easy-dialog', 'wp-i18n' ),
-			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/simplifications.js' ),
+			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/simplifications.js' ),
 			true
 		);
 
@@ -1889,7 +1889,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy-language-admin-dirty-js',
 			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'libs/jquery.dirty.js',
 			array( 'jquery' ),
-			filemtime( trailingslashit( plugin_dir_path( EASY_LANGUAGE ) ) . 'libs/jquery.dirty.js' ),
+			Helper::get_file_version( trailingslashit( plugin_dir_path( EASY_LANGUAGE ) ) . 'libs/jquery.dirty.js' ),
 			true
 		);
 	}
@@ -1909,7 +1909,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy-language-plugin-admin',
 			plugins_url( '/classes/multilingual-plugins/easy-language/admin/js.js', EASY_LANGUAGE ),
 			array( 'jquery', 'easy-dialog', 'wp-i18n' ),
-			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/js.js' ),
+			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/js.js' ),
 			true
 		);
 
@@ -1988,7 +1988,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy-language',
 			plugins_url( '/classes/multilingual-plugins/easy-language/frontend/style.css', EASY_LANGUAGE ),
 			array(),
-			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/frontend/style.css' )
+			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/frontend/style.css' )
 		);
 	}
 

@@ -82,7 +82,7 @@ function easy_language_divi_add_scripts(): void {
 		'easy-language-language-field',
 		trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'classes/multilingual-plugins/easy-language/pagebuilder/divi/build/style-language_field.css',
 		array(),
-		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/style-language_field.css' ),
+		Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/style-language_field.css' ),
 	);
 	wp_enqueue_style( 'easy-language-language-field' );
 
@@ -91,7 +91,7 @@ function easy_language_divi_add_scripts(): void {
 		'easy-language-language-field',
 		trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'classes/multilingual-plugins/easy-language/pagebuilder/divi/build/language_field.js',
 		array( 'jquery', 'et-dynamic-asset-helpers' ),
-		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/language_field.js' ),
+		Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/language_field.js' ),
 		true
 	);
 
@@ -117,7 +117,7 @@ function easy_language_divi_add_scripts(): void {
 		'easy-language-divi-simplifications',
 		plugins_url( '/classes/multilingual-plugins/easy-language/admin/divi.js', EASY_LANGUAGE ),
 		array( 'jquery', 'react-dialog', 'wp-i18n' ),
-		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/divi.js' ),
+		Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/divi.js' ),
 		true
 	);
 
@@ -147,7 +147,7 @@ function easy_language_divi_add_scripts(): void {
 		'react-dialog',
 		$admin_css,
 		array( 'wp-components' ),
-		filemtime( $admin_css_path )
+		Helper::get_file_version( $admin_css_path )
 	);
 }
 add_action( 'et_fb_enqueue_assets', 'easy_language_divi_add_scripts' );

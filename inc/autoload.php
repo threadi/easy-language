@@ -6,9 +6,7 @@
  */
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
 if ( defined( 'EASY_LANGUAGE' ) ) {
 	require dirname( EASY_LANGUAGE ) . '/vendor/autoload.php';

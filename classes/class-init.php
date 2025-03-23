@@ -428,7 +428,7 @@ class Init {
 
 		// add our custom links.
 		$row_meta = array(
-			'support' => '<a href="' . esc_url( Helper::get_plugin_support_url() ) . '" target="_blank" title="' . esc_html__( 'Support Forum', 'easy-language' ) . '">' . esc_html__( 'Support Forum', 'easy-language' ) . '</a>',
+			'support' => '<a href="' . esc_url( Helper::get_plugin_support_url() ) . '" target="_blank" title="' . esc_attr__( 'Support Forum', 'easy-language' ) . '">' . esc_html__( 'Support Forum', 'easy-language' ) . '</a>',
 		);
 
 		/**

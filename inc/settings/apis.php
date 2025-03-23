@@ -133,7 +133,7 @@ function easy_language_admin_choose_api( array $attr ): void {
 				?>
 				<div class="easy-api-radio<?php echo esc_attr( $css_class ); ?>">
 					<input type="radio" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>" value="<?php echo esc_attr( $key ); ?>"<?php echo esc_attr( $checked ); ?>>
-					<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" data-active-title="<?php echo esc_html__( 'Activated', 'easy-language' ); ?>" data-choose-title="<?php echo esc_html__( 'Chosen', 'easy-language' ); ?>">
+					<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" data-active-title="<?php echo esc_attr__( 'Activated', 'easy-language' ); ?>" data-choose-title="<?php echo esc_attr__( 'Chosen', 'easy-language' ); ?>">
 						<?php
 						// get api-logo, if it exists.
 						$logo_url = $settings->get_logo_url();

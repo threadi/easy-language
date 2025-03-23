@@ -177,7 +177,7 @@ function easy_language_pagebuilder_elementor_styles(): void {
 			'easy-language-elementor-admin',
 			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'classes/multilingual-plugins/easy-language/admin/elementor.css',
 			array(),
-			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/elementor.css' ),
+			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/elementor.css' ),
 		);
 		wp_enqueue_style( 'easy-language-elementor-admin' );
 
@@ -186,7 +186,7 @@ function easy_language_pagebuilder_elementor_styles(): void {
 			'easy-language-elementor-admin',
 			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'classes/multilingual-plugins/easy-language/admin/elementor.js',
 			array( 'jquery', 'easy-dialog' ),
-			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/elementor.js' ),
+			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/elementor.js' ),
 			true
 		);
 		wp_enqueue_script( 'easy-language-elementor-admin' );

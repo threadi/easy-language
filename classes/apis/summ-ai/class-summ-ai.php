@@ -1112,7 +1112,7 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return array|null
 	 */
 	public function validate_target_language_separator_settings( ?array $values ): ?array {
-		return Helper::settings_validate_muliple_select_fields( $values );
+		return Helper::settings_validate_multiple_select_fields( $values );
 	}
 
 	/**
@@ -1216,6 +1216,7 @@ class Summ_AI extends Base implements Api_Base {
 
 		// redirect user.
 		wp_safe_redirect( wp_get_referer() );
+		exit;
 	}
 
 	/**
@@ -1450,6 +1451,7 @@ class Summ_AI extends Base implements Api_Base {
 
 		// redirect user.
 		wp_safe_redirect( wp_get_referer() );
+		exit;
 	}
 
 	/**
@@ -1496,6 +1498,7 @@ class Summ_AI extends Base implements Api_Base {
 
 		// redirect user.
 		wp_safe_redirect( wp_get_referer() );
+		exit;
 	}
 
 	/**
@@ -1671,7 +1674,7 @@ class Summ_AI extends Base implements Api_Base {
 					foreach ( $separators as $value => $label ) {
 						$selected = $separator === $value ? ' selected' : '';
 						?>
-							<option value="<?php echo esc_attr( $value ); ?>"<?php echo esc_attr( $selected ); ?>><?php echo esc_attr( $label ); ?></option>
+							<option value="<?php echo esc_attr( $value ); ?>"<?php echo esc_attr( $selected ); ?>><?php echo esc_html( $label ); ?></option>
 							<?php
 					}
 					?>

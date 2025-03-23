@@ -5,6 +5,9 @@
  * @package easy-language
  */
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Apis\Summ_Ai\Summ_AI;
 
 /**
