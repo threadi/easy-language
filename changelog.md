@@ -10,6 +10,10 @@
 
 - Optimized handling of SUMM AI free simplification requests
 
+### Removed
+
+- Removed support link targeting the contact page of laOlaWeb
+
 ## [2.6.0] - 10.03.2025
 
 ### Added
