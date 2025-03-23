@@ -32,7 +32,7 @@ Run in main directory:
 ### update translation-file
 
 1. Open .po-file of the language in PoEdit.
-2. Go to "Translate > "Update from POT-file".
+2. Go to "Translate" > "Update from POT-file".
 3. After this the new entries are added to the language-file.
 
 ### export translation-file
@@ -80,3 +80,11 @@ Hint: will be called by ant-command mentioned above.
 ## Generate documentation
 
 `vendor/bin/wp-documentor parse classes --format=markdown --output=doc/hooks.md --prefix=easy_language`
+
+## Check for WordPress VIP Coding Standards
+
+Hint: this check runs against the VIP-GO-platform which is not our target for this plugin. Many warnings can be ignored.
+
+### Run
+
+`vendor/bin/phpcs --extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/,*translatepress* --standard=WordPress-VIP-Go .`

@@ -5,12 +5,10 @@
  * @package easy-language.
  */
 
-use easyLanguage\Apis\No_Api\No_Api;
-
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
+
+use easyLanguage\Apis\No_Api\No_Api;
 
 /**
  * Register the No-Api in this plugin.

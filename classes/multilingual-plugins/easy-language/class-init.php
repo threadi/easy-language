@@ -390,12 +390,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 							),
 						),
 					);
-					echo '<span class="dashicons dashicons-admin-generic easy-language-automatic-simplification-prevented easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_html__( 'Automatic simplification is prevented', 'easy-language' ) . '"></span>';
+					echo '<span class="dashicons dashicons-admin-generic easy-language-automatic-simplification-prevented easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( $dialog ) ) . '" title="' . esc_attr__( 'Automatic simplification is prevented', 'easy-language' ) . '"></span>';
 				}
 
 				// show mark if content of original object has been changed.
 				if ( $post_object->has_changed( $language_code ) && current_user_can( 'edit_el_simplifier' ) ) {
-					echo '<span class="dashicons dashicons-image-rotate" title="' . esc_html__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
+					echo '<span class="dashicons dashicons-image-rotate" title="' . esc_attr__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
 				}
 			} else {
 				// create link to simplify this post if used pagebuilder is active.

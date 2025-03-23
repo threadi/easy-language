@@ -222,8 +222,8 @@ class Log_Api_Table extends WP_List_Table {
 			<?php
 		} else {
 			?>
-			<span class="button disabled" title="<?php echo esc_html__( 'Choose an API to export above', 'easy-language' ); ?>"><?php echo esc_html__( 'Export as CSV', 'easy-language' ); ?></span>
-			<span class="button disabled" title="<?php echo esc_html__( 'Choose an API above to clear the log', 'easy-language' ); ?>"><?php echo esc_html__( 'Clear log', 'easy-language' ); ?></span>
+			<span class="button disabled" title="<?php echo esc_attr__( 'Choose an API to export above', 'easy-language' ); ?>"><?php echo esc_html__( 'Export as CSV', 'easy-language' ); ?></span>
+			<span class="button disabled" title="<?php echo esc_attr__( 'Choose an API above to clear the log', 'easy-language' ); ?>"><?php echo esc_html__( 'Clear log', 'easy-language' ); ?></span>
 			<?php
 		}
 	}

@@ -6,11 +6,9 @@
  */
 
 // prevent direct access.
-use easyLanguage\Apis\ChatGpt\ChatGpt;
+defined( 'ABSPATH' ) || exit;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+use easyLanguage\Apis\ChatGpt\ChatGpt;
 
 /**
  * Register the ChatGpt Api in this plugin.

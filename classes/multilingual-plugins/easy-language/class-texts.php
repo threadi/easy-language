@@ -92,7 +92,7 @@ class Texts {
 		add_action( 'wp_trash_post', array( $this, 'trash_object' ) );
 
 		// if object is untrashed.
-		add_filter( 'untrashed_post', array( $this, 'untrash_object' ), 10, 2 );
+		add_action( 'untrashed_post', array( $this, 'untrash_object' ), 10, 2 );
 
 		// delete simplifications if object is really deleted.
 		add_action( 'before_delete_post', array( $this, 'delete_object' ) );
@@ -264,6 +264,7 @@ class Texts {
 				/* translators: %1$s will be replaced by an ID. */
 				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
 
+				// redirect user back.
 				wp_safe_redirect( wp_get_referer() );
 				exit;
 			}
@@ -280,6 +281,7 @@ class Texts {
 				/* translators: %1$s will be replaced by an ID. */
 				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
 
+				// redirect user back.
 				wp_safe_redirect( wp_get_referer() );
 				exit;
 			}
@@ -293,6 +295,7 @@ class Texts {
 				/* translators: %1$s will be replaced by an ID. */
 				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
 
+				// redirect user back.
 				wp_safe_redirect( wp_get_referer() );
 				exit;
 			}

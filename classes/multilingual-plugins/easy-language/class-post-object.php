@@ -356,7 +356,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		// get list of simplifications in languages.
 		$languages = get_post_meta( $this->get_id(), 'easy_language_simplified_in', true );
 
-		// return true if list is not empty.
+		// return true if the list is not empty.
 		return ! empty( $languages );
 	}
 

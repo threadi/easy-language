@@ -1142,6 +1142,7 @@ class Capito extends Base implements Api_Base {
 
 		// redirect user.
 		wp_safe_redirect( wp_get_referer() );
+		exit;
 	}
 
 	/**

@@ -65,7 +65,7 @@ class Rewrite {
 		$this->init = $init;
 
 		// hook to set rewrite rules.
-		add_filter( 'init', array( $this, 'set_rules' ) );
+		add_action( 'init', array( $this, 'set_rules' ) );
 
 		// hooks to set urls.
 		add_filter( 'get_page_uri', array( $this, 'post_link' ), 10, 2 );
