@@ -24,7 +24,7 @@ function easy_language_add_styles_and_js_admin(): void {
 		'easy-language-admin',
 		plugin_dir_url( EASY_LANGUAGE ) . '/admin/style.css',
 		array(),
-		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/admin/style.css' ),
+		Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/admin/style.css' ),
 	);
 
 	// backend-JS.
@@ -32,7 +32,7 @@ function easy_language_add_styles_and_js_admin(): void {
 		'easy-language-admin',
 		plugins_url( '/admin/js.js', EASY_LANGUAGE ),
 		array( 'jquery', 'easy-dialog', 'wp-i18n' ),
-		filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/admin/js.js' ),
+		Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/admin/js.js' ),
 		true
 	);
 

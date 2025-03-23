@@ -8,6 +8,7 @@
 
 ### Optimized
 
+- Optimized usage of file versions for each enqueued file for better performance during loading
 - Optimized handling of SUMM AI free simplification requests
 
 ### Removed

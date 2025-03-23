@@ -1858,7 +1858,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy-language-simplifications',
 			plugins_url( '/classes/multilingual-plugins/easy-language/admin/simplifications.js', EASY_LANGUAGE ),
 			array( 'jquery', 'easy-dialog', 'wp-i18n' ),
-			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/simplifications.js' ),
+			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/simplifications.js' ),
 			true
 		);
 
@@ -1889,7 +1889,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy-language-admin-dirty-js',
 			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'libs/jquery.dirty.js',
 			array( 'jquery' ),
-			filemtime( trailingslashit( plugin_dir_path( EASY_LANGUAGE ) ) . 'libs/jquery.dirty.js' ),
+			Helper::get_file_version( trailingslashit( plugin_dir_path( EASY_LANGUAGE ) ) . 'libs/jquery.dirty.js' ),
 			true
 		);
 	}
@@ -1909,7 +1909,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy-language-plugin-admin',
 			plugins_url( '/classes/multilingual-plugins/easy-language/admin/js.js', EASY_LANGUAGE ),
 			array( 'jquery', 'easy-dialog', 'wp-i18n' ),
-			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/js.js' ),
+			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/admin/js.js' ),
 			true
 		);
 
@@ -1988,7 +1988,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			'easy-language',
 			plugins_url( '/classes/multilingual-plugins/easy-language/frontend/style.css', EASY_LANGUAGE ),
 			array(),
-			filemtime( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/frontend/style.css' )
+			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/frontend/style.css' )
 		);
 	}
 
