@@ -471,7 +471,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 							'title'   => sprintf( __( 'Unknown page builder or Classic Editor', 'easy-language' ), esc_html( $post_object->get_title() ) ),
 							'texts'   => array(
 								/* translators: %1$s will be replaced by the API-title */
-								'<p>' . sprintf( __( 'This %1$s has been edited with an unknown page builder.<br>This could also be the Classic Editor.<br>If this %1$s has been edited with another page builder, the plugin Easy Language does not support it atm.<br>Please <a href="%2$s" target="_blank">contact our support</a>.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_url( Helper::get_support_url() ) ) . '</p>',
+								'<p>' . sprintf( __( 'This %1$s has been edited with an unknown page builder.<br>This could also be the Classic Editor.<br>If this %1$s has been edited with another page builder, the plugin Easy Language does not support it atm.<br>Please <a href="%2$s" target="_blank">contact our support forum</a>.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_url( Helper::get_plugin_support_url() ) ) . '</p>',
 							),
 							'buttons' => array(
 								array(
@@ -1768,7 +1768,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 						'title'     => __( 'Error', 'easy-language' ),
 						'texts'     => array(
 							/* translators: %1$s will be replaced by the support-URL */
-							'<p>' . sprintf( __( '<strong>This error should never happen!</strong> Please contact the <a href="%1$s" target="_blank">Plugin-support (opens new window)</a> about the following error:', 'easy-language' ), esc_url( Helper::get_support_url() ) ) . '</p>',
+							'<p>' . sprintf( __( '<strong>This error should never happen!</strong> Please contact the <a href="%1$s" target="_blank">support forum (opens new window)</a> about the following error:', 'easy-language' ), esc_url( Helper::get_plugin_support_url() ) ) . '</p>',
 							$error_message,
 						),
 						'buttons'   => array(

@@ -315,18 +315,6 @@ class Helper {
 	}
 
 	/**
-	 * Return the URL for plugin-support.
-	 *
-	 * @return string
-	 */
-	public static function get_support_url(): string {
-		if ( Languages::get_instance()->is_german_language() ) {
-			return 'https://laolaweb.com/kontakt/';
-		}
-		return 'https://laolaweb.com/en/contact/';
-	}
-
-	/**
 	 * Return the URL for laolaweb.com where we can order the Pro-Version.
 	 *
 	 * @return string
