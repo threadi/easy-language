@@ -287,10 +287,21 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		// check the list of supported pagebuilder for compatibility.
 		// the first one which matches will be used.
 		foreach ( apply_filters( 'easy_language_pagebuilder', array() ) as $page_builder_obj ) {
-			if ( $page_builder_obj->is_object_using_pagebuilder( $this ) ) {
-				$page_builder_obj->set_object_id( $this->get_id() );
-				return $page_builder_obj;
+			// bail if object is not of type Parser_Base.
+			if( ! $page_builder_obj instanceof Parser_Base ) {
+				continue;
 			}
+
+			// bail if object does not use this PageBuilder.
+			if ( ! $page_builder_obj->is_object_using_pagebuilder( $this ) ) {
+				continue;
+			}
+
+			// set the object id.
+			$page_builder_obj->set_object_id( $this->get_id() );
+
+			// return the parser for this PageBuilder.
+			return $page_builder_obj;
 		}
 
 		// return false if no pagebuilder could be detected.
