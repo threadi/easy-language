@@ -2,7 +2,7 @@
 Contributors: laolaweb, threadi
 Tags: easy language, leichte sprache, simplify, summ ai, capito
 Requires at least: 6.0
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 8.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -54,8 +54,11 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 - Block Editor (Gutenberg)
 - Avada
 - Avia
+- Breakdance Builder
+- Classic Editor
 - Divi
 - Elementor
+- Salient
 - Themify
 - WPBakery
 
@@ -92,10 +95,14 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added support for Avia Layout Architect from Enfold theme
-- Added link to support forum in plugin list on our plugin
-- Added shortcode to output the language switcher in frontend
-- Optimized hint which infos about simplifications are only visible in Pro-plugin
-- Added hint where prices for each API can be found
+- Added support for theme Salient WpBakery
+- Added support for PageBuilder Breakdance
+- Optimized usage of file versions for each enqueued file for better performance during loading
+- Optimized handling of SUMM AI free simplification requests
+- Speedup detection of used PageBuilder
+- Extended security checks during plugin build by using WP VIP recommendations
+- Small optimisation regarding security of inputs and outputs
+- Set compatibility with WordPress 6.8
+- Removed support link targeting the contact page of laOlaWeb
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)

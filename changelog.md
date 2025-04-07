@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.7.0] - 07.04.2025
 
 ### Added
 
@@ -14,6 +14,7 @@
 - Speedup detection of used PageBuilder
 - Extended security checks during plugin build by using WP VIP recommendations
 - Small optimisation regarding security of inputs and outputs
+- Set compatibility with WordPress 6.8
 
 ### Removed
 
