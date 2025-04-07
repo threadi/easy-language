@@ -243,7 +243,7 @@ class Breakdance extends Parser_Base implements Parser {
 			$this->get_object_id(),
 			'_breakdance_data',
 			[
-				'tree_json_string' => $data,
+				'tree_json_string' => wp_json_encode( $data ),
 			]
 		);
 
