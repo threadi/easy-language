@@ -1,17 +1,20 @@
 # Changelog
 
-## [Unreleased]
+## [2.7.0] - 07.04.2025
 
 ### Added
 
-- Added support for Salient WpBakery
+- Added support for theme Salient WpBakery
+- Added support for PageBuilder Breakdance
 
 ### Optimized
 
 - Optimized usage of file versions for each enqueued file for better performance during loading
 - Optimized handling of SUMM AI free simplification requests
+- Speedup detection of used PageBuilder
 - Extended security checks during plugin build by using WP VIP recommendations
 - Small optimisation regarding security of inputs and outputs
+- Set compatibility with WordPress 6.8
 
 ### Removed
 
