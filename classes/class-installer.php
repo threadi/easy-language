@@ -11,6 +11,7 @@ namespace easyLanguage;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
+use WP_Role;
 
 /**
  * Installer-object.
@@ -173,7 +174,9 @@ class Installer {
 		// loop through the capabilities and add them to the translator.
 		foreach ( Init::get_instance()->get_capabilities( 'el_simplifier', 'el_simplifier' ) as $capability ) {
 			$translator_role->add_cap( $capability );
-			$admin_role->add_cap( $capability );
+			if( $admin_role instanceof WP_Role ) {
+				$admin_role->add_cap( $capability );
+			}
 		}
 
 		// get the available APIs to call its install-routines.
@@ -243,7 +246,15 @@ class Installer {
 		 */
 		global $wp_roles;
 		foreach ( $wp_roles->roles as $role_name => $settings ) {
+			// get the role by its name.
 			$role = get_role( $role_name );
+
+			// bail if role could not be found.
+			if( ! $role instanceof WP_Role ) {
+				continue;
+			}
+
+			// remove our caps from this role.
 			foreach ( Init::get_instance()->get_capabilities( 'el_simplifier', 'el_simplifier' ) as $capability ) {
 				$role->remove_cap( $capability );
 			}

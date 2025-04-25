@@ -9,6 +9,7 @@ namespace easyLanguage\Apis\No_Api;
 
 use easyLanguage\Base;
 use easyLanguage\Api_Base;
+use stdClass;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -130,15 +131,6 @@ class No_Api extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return active target languages.
-	 *
-	 * @return array
-	 */
-	public function get_active_target_languages(): array {
-		return array();
-	}
-
-	/**
 	 * Set mapping languages.
 	 *
 	 * @return array[]
@@ -211,10 +203,10 @@ class No_Api extends Base implements Api_Base {
 	/**
 	 * Get simplification object for this API: none for this one.
 	 *
-	 * @return \stdClass
+	 * @return stdClass
 	 */
 	public function get_simplifications_obj(): object {
-		return new \stdClass();
+		return new stdClass();
 	}
 
 	/**

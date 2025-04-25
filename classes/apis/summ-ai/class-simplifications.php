@@ -11,7 +11,6 @@ namespace easyLanguage\Apis\Summ_Ai;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Base;
-use easyLanguage\Multilingual_plugins\Easy_Language\Init;
 
 /**
  * Simplifications-Handling for this plugin.

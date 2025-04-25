@@ -121,6 +121,7 @@ abstract class Base {
 	 * Return whether this plugin supports our APIs.
 	 *
 	 * @return bool
+	 * @noinspection PhpUnused
 	 */
 	public function is_supporting_apis(): bool {
 		return $this->supports_apis;
@@ -129,7 +130,7 @@ abstract class Base {
 	/**
 	 * Get quota as array containing 'character_spent' and 'character_limit'.
 	 *
-	 * @return array
+	 * @return array<string,int>
 	 */
 	public function get_quota(): array {
 		return array(
@@ -196,7 +197,7 @@ abstract class Base {
 	/**
 	 * Return list of active language-mappings.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function get_active_language_mapping(): array {
 		$result = array();
@@ -273,7 +274,14 @@ abstract class Base {
 			'do_not_use_easy_language_filter' => true,
 		);
 		$results = new WP_Query( $query );
-		return $results->posts;
+
+		// bail if no results returned.
+		if( 0 === $results->found_posts ) {
+			return array();
+		}
+
+		// return the resulting list.
+		return $results->get_posts();
 	}
 
 	/**
@@ -468,6 +476,15 @@ abstract class Base {
 
 		// return resulting text.
 		return $text;
+	}
+
+	/**
+	 * Return whether this object is active.
+	 *
+	 * @return bool
+	 */
+	public function is_active(): bool {
+		return false;
 	}
 
 	/**

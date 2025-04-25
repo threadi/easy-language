@@ -45,10 +45,11 @@ jobs:
               run: composer dump-autoload -oa --no-dev
 
             - name: Run WordPress Coding Standard fixes
-              run: vendor/bin/phpcbf --extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/,*translatepress* --standard=ruleset.xml .
+              run: vendor/bin/phpcbf --standard=ruleset.xml .
+              continue-on-error: true
 
             - name: Run WordPress Coding Standard checks
-              run: vendor/bin/phpcs --extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/,*translatepress* --standard=ruleset.xml .
+              run: vendor/bin/phpcs --standard=ruleset.xml .
 
             - name: Set version number 1
               uses: richardrigutins/replace-in-files@v2

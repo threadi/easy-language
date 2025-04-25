@@ -130,7 +130,7 @@ class Translatepress_Capito_Machine_Translator extends TRP_Machine_Translator {
 			}
 		}
 
-		// will have the same indexes as $new_strings or it will be an empty array if something went wrong.
+		// will have the same indexes as $new_strings, or it will be an empty array if something went wrong.
 		return $translated_strings;
 	}
 

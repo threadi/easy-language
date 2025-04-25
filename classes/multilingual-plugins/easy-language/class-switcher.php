@@ -366,7 +366,7 @@ class Switcher {
 	/**
 	 * Add options for language-switcher in classic menu.
 	 *
-	 * @param int $item_id The Id of the item.
+	 * @param int $item_id The ID of the item.
 	 *
 	 * @return void
 	 */

@@ -14,7 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use easyLanguage\Apis\Summ_Ai\Request;
 use easyLanguage\Base;
-use easyLanguage\Multilingual_plugins\Easy_Language\Init;
 
 /**
  * Simplification-Handling for this plugin.

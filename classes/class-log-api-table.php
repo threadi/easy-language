@@ -48,7 +48,7 @@ class Log_Api_Table extends WP_List_Table {
 
 		// order table.
 		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( ! in_array( $order_by, array_keys( $this->get_sortable_columns() ), true ) ) {
+		if ( ! array_key_exists( $order_by, $this->get_sortable_columns() ) ) {
 			$order_by = 'date';
 		}
 		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );

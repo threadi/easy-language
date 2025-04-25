@@ -410,7 +410,7 @@ class Summ_AI extends Base implements Api_Base {
 			update_option( 'easy_language_summ_ai_target_languages_new_lines', $new_lines );
 		}
 
-		// set embold negative setting for each activated target language.
+		// set embolden negative setting for each activated target language.
 		if ( ! get_option( 'easy_language_summ_ai_target_languages_embolden_negative' ) ) {
 			$target_languages   = $this->get_supported_target_languages();
 			$embolden_negatives = array();
@@ -495,7 +495,7 @@ class Summ_AI extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return list of options this plugin is using, e.g. for clean uninstall.
+	 * Return list of options this plugin is using, e.g. for clean uninstalling.
 	 *
 	 * @return array
 	 */
@@ -521,7 +521,7 @@ class Summ_AI extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return list of transients this plugin is using, e.g. for clean uninstall.
+	 * Return list of transients this plugin is using, e.g. for clean uninstalling.
 	 *
 	 * @return array
 	 */
@@ -636,9 +636,8 @@ class Summ_AI extends Base implements Api_Base {
 	 * Return request object.
 	 *
 	 * @return Request
-	 * @noinspection PhpMissingReturnTypeInspection
 	 */
-	public function get_request_object() {
+	public function get_request_object(): Request {
 		return new Request();
 	}
 

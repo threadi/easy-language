@@ -84,10 +84,10 @@ class Pagebuilder_Support {
 	}
 
 	/**
-	 * Content of meta-box with infos about ..
-	 * .. the actual edited language.
-	 * .. which language is also available.
-	 * .. the possibility to delete this simplification complete.
+	 * Content of meta-box with infos about:
+	 * - the actual edited language.
+	 * - which language is also available.
+	 * - the possibility to delete this simplification complete.
 	 *
 	 * @param WP_Post $post The Post-object.
 	 *

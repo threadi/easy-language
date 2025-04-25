@@ -101,7 +101,6 @@ class Init {
 	 * Initialize our main CLI-functions.
 	 *
 	 * @return void
-	 * @noinspection PhpUndefinedClassInspection
 	 * @noinspection PhpFullyQualifiedNameUsageInspection
 	 */
 	public function cli(): void {
@@ -318,9 +317,6 @@ class Init {
 
 		// return ok.
 		wp_send_json( array( 'result' => 'ok' ) );
-
-		// return nothing more.
-		wp_die();
 	}
 
 	/**

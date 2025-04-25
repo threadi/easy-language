@@ -87,7 +87,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * Initialize our main CLI-functions.
 	 *
 	 * @return void
-	 * @noinspection PhpUndefinedClassInspection
 	 * @noinspection PhpFullyQualifiedNameUsageInspection
 	 */
 	public function cli(): void {
@@ -100,15 +99,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * @return void
 	 */
 	public function install(): void {}
-
-	/**
-	 * Return supported languages.
-	 *
-	 * @return array
-	 */
-	public function get_supported_languages(): array {
-		return array();
-	}
 
 	/**
 	 * Run on uninstallation.
@@ -155,6 +145,12 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	public function get_active_languages(): array {
 		// get settings from translatepress.
 		$trp       = TRP_Translate_Press::get_trp_instance();
+
+		// bail if trp instance could not be loaded.
+		if( is_null( $trp ) ) {
+			return array();
+		}
+
 		$trp_query = $trp->get_component( 'settings' );
 
 		// initialize the list to return.

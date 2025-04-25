@@ -1,6 +1,6 @@
 <?php
 /**
- * File for interface which describe translatable and translated objects (cpt like page, post or taxonomy like category ..).
+ * File for interface which describe translatable and translated objects (cpt like page, post or taxonomy like category).
  *
  * @package easy-language
  */

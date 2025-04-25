@@ -111,7 +111,7 @@ abstract class Objects {
 	/**
 	 * Cleanup single simplification marker of this object.
 	 *
-	 * @param string $marker The marker to cleanup.
+	 * @param string $marker The marker to clean up.
 	 *
 	 * @return void
 	 */
@@ -143,7 +143,6 @@ abstract class Objects {
 	 * @param bool   $initialization Mark if this is the initialization of a simplification.
 	 *
 	 * @return int
-	 * @noinspection PhpUndefinedFunctionInspection
 	 */
 	public function process_simplifications( object $simplification_obj, array $language_mappings, int $limit = 0, bool $initialization = true ): int {
 		// get object-hash.
@@ -399,11 +398,13 @@ abstract class Objects {
 
 		// loop through simplifications of this object.
 		foreach ( $entries as $entry ) {
-			$c = $c + $this->process_simplification( $simplification_obj, $language_mappings, $entry );
+			$c += $this->process_simplification( $simplification_obj, $language_mappings, $entry );
 
 			// update counter for simplification of texts.
 			$simplification_count_in_loop = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, array() );
-			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, ++$simplification_count_in_loop[ $hash ] );
+			if( is_array( $simplification_count_in_loop ) ) {
+				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, ++$simplification_count_in_loop[ $hash ] );
+			}
 
 			// show progress on CLI.
 			$progress ? $progress->tick() : false;
@@ -528,10 +529,8 @@ abstract class Objects {
 		$replaced_count = 0;
 		foreach ( $language_mappings as $source_language => $target_languages ) {
 			foreach ( $target_languages as $target_language ) {
-				if ( false !== $entry->has_simplification_in_language( $target_language ) && $source_language === $entry->get_source_language() ) {
-					if ( $entry->replace_original_with_simplification( $this->get_id(), $target_language ) ) {
-						++$replaced_count;
-					}
+				if ( false !== $entry->has_simplification_in_language( $target_language ) && $source_language === $entry->get_source_language() && $entry->replace_original_with_simplification( $this->get_id(), $target_language ) ) {
+					++$replaced_count;
 				}
 			}
 		}

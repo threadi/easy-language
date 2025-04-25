@@ -1,6 +1,6 @@
 <?php
 /**
- * File for initialisation of this plugin.
+ * File to load plugins we support.
  *
  * @package easy-language
  */
@@ -11,9 +11,7 @@ namespace easyLanguage;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Init the plugin.
- * This object is minify on purpose as the main functions are handled in own objects
- * depending on WordPress-settings.
+ * Handle the plugins support.
  */
 class Multilingual_Plugins {
 

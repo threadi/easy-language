@@ -112,7 +112,7 @@ class Log_Api {
 		/**
 		 * If debug is not enabled, just log errors.
 		 */
-		if ( 0 === absint( get_option( 'easy_language_debug_mode', 0 ) ) && 'error' !== $state ) {
+		if ( 'error' !== $state && 0 === absint( get_option( 'easy_language_debug_mode', 0 ) ) ) {
 			return;
 		}
 

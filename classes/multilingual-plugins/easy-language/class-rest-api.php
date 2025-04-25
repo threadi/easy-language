@@ -140,8 +140,7 @@ class REST_Api {
 		// collect the return.
 		ob_start();
 		Pagebuilder_Support::get_instance()->render_meta_box_content( $wp_post_object );
-		$contents = ob_get_contents();
-		ob_end_clean();
+		$contents = ob_get_clean();
 
 		// return possible options.
 		return array(

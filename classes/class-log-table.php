@@ -11,6 +11,7 @@ namespace easyLanguage;
 defined( 'ABSPATH' ) || exit;
 
 use WP_List_Table;
+use WP_User;
 
 /**
  * Handler for log-output in backend.
@@ -112,7 +113,7 @@ class Log_Table extends WP_List_Table {
 
 			// return the user who requested this event.
 			case 'user_id':
-				$user = new \WP_User( absint( $item[ $column_name ] ) );
+				$user = new WP_User( absint( $item[ $column_name ] ) );
 				if ( $user->ID > 0 ) {
 					// link to user-profile if actual user has the capability for it.
 					if ( current_user_can( 'manage_options' ) ) {

@@ -216,7 +216,7 @@ class Texts {
 
 		if ( $object_id > 0 ) {
 			// Log event.
-			/* translators: %1$d will be replaced by an ID, %2$s by a type name.. */
+			/* translators: %1$d will be replaced by an ID, %2$s by a type name. */
 			Log::get_instance()->add_log( sprintf( __( 'Request to simplify object %1$d (%2$s) without JS.', 'easy-language' ), absint( $object_id ), $object_type ), 'success' );
 
 			// run simplification of this object.
@@ -423,9 +423,7 @@ class Texts {
 						&& false === in_array( $entry->get_original(), $parsed_texts, true )
 					) {
 						$entry->delete();
-					} elseif ( false !== $entry->is_field( 'title' )
-						&& trim( $entry->get_simplification( $target_language ) !== $title )
-					) {
+					} elseif ( false !== $entry->is_field( 'title' ) && trim( $entry->get_simplification( $target_language ) ) !== $title ) {
 						$entry->delete();
 					}
 				}
@@ -445,27 +443,23 @@ class Texts {
 
 				// check if the text is already saved as original text for simplification.
 				$original_text_obj = $this->db->get_entry_by_text( $text['text'], $source_language );
-				if ( false === $original_text_obj ) {
-					// also check if this is a simplified text of the given language.
-					if ( false === $this->db->get_entry_by_simplification( trim( $text['text'] ), $source_language ) ) {
-						// if not save the text for simplification.
-						$original_text_obj = $this->db->add( $text['text'], $source_language, 'post_content', $text['html'] );
-						$original_text_obj->set_object( get_post_type( $post_obj->get_id() ), $post_obj->get_id(), $index, $pagebuilder_obj->get_name() );
-						$original_text_obj->set_state( 'in_use' );
-					}
+				// also check if this is a simplified text of the given language.
+				if ( ( false === $original_text_obj ) && false === $this->db->get_entry_by_simplification( trim( $text['text'] ), $source_language ) ) {
+					// if not save the text for simplification.
+					$original_text_obj = $this->db->add( $text['text'], $source_language, 'post_content', $text['html'] );
+					$original_text_obj->set_object( get_post_type( $post_obj->get_id() ), $post_obj->get_id(), $index, $pagebuilder_obj->get_name() );
+					$original_text_obj->set_state( 'in_use' );
 				}
 			}
 
 			// check if the title has already saved as original text for simplification.
 			$original_title_obj = $this->db->get_entry_by_text( $title, $source_language );
-			if ( false === $original_title_obj ) {
-				// also check if this is a simplified text of the given language.
-				if ( false === $this->db->get_entry_by_simplification( trim( $title ), $source_language ) ) {
-					// save the text for simplification.
-					$original_title_obj = $this->db->add( $title, $source_language, 'title', false );
-					$original_title_obj->set_object( get_post_type( $post_id ), $post_id, 0, $pagebuilder_obj->get_name() );
-					$original_title_obj->set_state( 'in_use' );
-				}
+			// also check if this is a simplified text of the given language.
+			if ( ( false === $original_title_obj ) && false === $this->db->get_entry_by_simplification( trim( $title ), $source_language ) ) {
+				// save the text for simplification.
+				$original_title_obj = $this->db->add( $title, $source_language, 'title', false );
+				$original_title_obj->set_object( get_post_type( $post_id ), $post_id, 0, $pagebuilder_obj->get_name() );
+				$original_title_obj->set_state( 'in_use' );
 			}
 
 			// remove changed-marker on original object for each language.

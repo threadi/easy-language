@@ -1,5 +1,19 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Using PHPStan to check for potential PHP errors in plugin
+- Optimized WordPress Coding Standard check
+- Some code optimizations
+
+### Fixed
+
+- Fixed potential error on select field validation
+- Fixed error in saving simplified titles of pages or posts
+- Fixed error in reading inner blocks in Block Editor
+
 ## [2.7.0] - 07.04.2025
 
 ### Added
@@ -7,7 +21,7 @@
 - Added support for theme Salient WpBakery
 - Added support for PageBuilder Breakdance
 
-### Optimized
+### Changed
 
 - Optimized usage of file versions for each enqueued file for better performance during loading
 - Optimized handling of SUMM AI free simplification requests
@@ -28,7 +42,7 @@
 - Added link to support forum in plugin list on our plugin
 - Added shortcode to output the language switcher in frontend
 
-### Optimized
+### Changed
 
 - Optimized hint which infos about simplifications are only visible in Pro-plugin
 - Added hint where prices for each API can be found
@@ -42,7 +56,7 @@
 - Added option to clear the plugin log
 - Added SUMM AI HTML-mode as option, only usable with valid SUMM AI API key
 
-### Optimized
+### Changed
 
 - Check for completed setup before initialising any admin options for this plugin
 - Do not use test mode for SUMM AI without API key
@@ -56,7 +70,7 @@
 
 ## [2.4.1] - 04.02.2025
 
-### Optimized
+### Changed
 
 - WP CLI processing of simplification now uses the exact same tasks like automatic simplification via schedule
 
@@ -72,7 +86,7 @@
 - Added new settings for each SUMM AI supported language for new lines and separator
 - Added some new hooks
 
-### Optimized
+### Changed
 
 - New default target language for new installations in any german languages: plain language
 -> reason: there are clearer guidelines for this in germany
@@ -91,7 +105,7 @@
 
 - Added some more hooks
 
-### Optimized
+### Changed
 
 - Optimized some plugin-own styles in wp-admin
 - Small code optimizations

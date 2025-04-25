@@ -125,8 +125,8 @@ class Gutenberg extends Parser_Base implements Parser {
 		}
 
 		// loop through inner-blocks.
-		foreach ( $block['innerBlocks'] as $block ) {
-			$resulting_texts = $this->get_block_text( $block, $resulting_texts );
+		foreach ( $block['innerBlocks'] as $inner_block ) {
+			$resulting_texts = $this->get_block_text( $inner_block, $resulting_texts );
 		}
 
 		// return resulting list.

@@ -206,7 +206,7 @@ class Transient {
 		if ( $this->has_action() ) {
 			$action = $this->get_action();
 			if ( method_exists( $action[0], $action[1] ) ) {
-				call_user_func( $action );
+				$action();
 			}
 		}
 
@@ -261,15 +261,11 @@ class Transient {
 		$db_record = $this->get_admin_transient_dismiss_cache();
 
 		// return bool depending on value.
-		if ( 'forever' === $db_record || absint( $db_record ) >= time() ) {
-			return false;
-		} else {
-			return true;
-		}
+		return ! ( 'forever' === $db_record || absint( $db_record ) >= time() );
 	}
 
 	/**
-	 * Get transient-dismiss-cache.
+	 * Return transient-dismiss-cache.
 	 *
 	 * @return string|int|false
 	 */
