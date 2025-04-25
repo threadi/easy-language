@@ -11,7 +11,6 @@ namespace easyLanguage\Apis\ChatGpt;
 
 use easyLanguage\Apis\Summ_Ai\Request;
 use easyLanguage\Base;
-use easyLanguage\Multilingual_plugins\Easy_Language\Init;
 
 // prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {

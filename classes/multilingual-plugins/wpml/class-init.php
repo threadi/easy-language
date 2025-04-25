@@ -86,15 +86,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	public function install(): void {}
 
 	/**
-	 * Return supported languages.
-	 *
-	 * @return array
-	 */
-	public function get_supported_languages(): array {
-		return array();
-	}
-
-	/**
 	 * Run on uninstallation.
 	 *
 	 * We do nothing: it's up to WPML to clean up the database.

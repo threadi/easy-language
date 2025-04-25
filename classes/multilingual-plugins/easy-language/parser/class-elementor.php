@@ -289,8 +289,7 @@ class Elementor extends Parser_Base implements Parser {
 	 */
 	public function get_edit_link(): string {
 		if ( $this->is_elementor_active() ) {
-			$document = Plugin::$instance->documents->get( $this->get_object_id() );
-			return $document->get_edit_url();
+			return Plugin::$instance->documents->get( $this->get_object_id() )->get_edit_url();
 		}
 		return parent::get_edit_link();
 	}

@@ -270,7 +270,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$post_object = new Post_Object( $post_id );
 
 		// show only the used language in trash.
-		if ( 'trash' === get_post_status( $post_id ) && 'easy-language' === $column ) {
+		if ( 'easy-language' === $column && 'trash' === get_post_status( $post_id ) ) {
 			// get the post-language.
 			$language_array = $post_object->get_language();
 			$language       = reset( $language_array );
@@ -717,7 +717,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * Initialize our main CLI-functions.
 	 *
 	 * @return void
-	 * @noinspection PhpUndefinedClassInspection
 	 * @noinspection PhpFullyQualifiedNameUsageInspection
 	 */
 	public function cli(): void {
@@ -845,7 +844,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			$post_type_names = \easyLanguage\Init::get_instance()->get_post_type_names();
 
 			// add cap for translator-role to edit this post-types.
-			if ( ! empty( $post_type_names[ $post_type ] ) ) {
+			if ( ! empty( $post_type_names[ $post_type ] ) && $translator_role instanceof WP_Role ) {
 				$translator_role->add_cap( 'create_' . $post_type_names[ $post_type ] );
 				$translator_role->add_cap( 'delete_' . $post_type_names[ $post_type ] );
 				$translator_role->add_cap( 'delete_others_' . $post_type_names[ $post_type ] );
@@ -1047,7 +1046,15 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$post_types_array = array( 'post', 'page' );
 		$post_types       = array();
 		foreach ( $post_types_array as $post_type ) {
+			// get the post type object.
 			$post_type_obj = get_post_type_object( $post_type );
+
+			// bail if post type object could not be loaded.
+			if( ! $post_type_obj instanceof WP_Post_Type ) {
+				continue;
+			}
+
+			// add label.
 			if ( false !== $post_type_obj->show_ui && false !== $post_type_obj->public && 'attachment' !== $post_type_obj->name ) {
 				$post_types[ $post_type ] = array(
 					'label' => $post_type_obj->label,
@@ -1464,7 +1471,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// get supported post-types.
 		$post_types = $this->get_supported_post_types();
 		foreach ( $post_types as $post_type => $enabled ) {
-			if ( 1 === absint( $enabled ) && $post_type === $called_post_type ) {
+			if ( $post_type === $called_post_type && 1 === absint( $enabled ) ) {
 				$selected_option = filter_input( INPUT_GET, 'admin_filter_easy_language_changed', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 				if ( is_null( $selected_option ) ) {
 					$selected_option = '';
@@ -1499,7 +1506,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		}
 
 		// do not change anything if this is not the main query, our filter-var is not set or this is not edit.php.
-		if ( empty( $selected_option ) || false === $query->is_main_query() || 'edit.php' !== $pagenow ) {
+		if ( 'edit.php' !== $pagenow || empty( $selected_option ) || false === $query->is_main_query() ) {
 			return;
 		}
 
@@ -1512,7 +1519,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// get supported post-types.
 		$post_types = $this->get_supported_post_types();
 		foreach ( $post_types as $post_type => $enabled ) {
-			if ( 1 === absint( $enabled ) && $post_type === $called_post_type ) {
+			if ( $post_type === $called_post_type && 1 === absint( $enabled ) ) {
 				remove_action( 'pre_get_posts', array( $this, 'hide_translated_objects' ) );
 				switch ( $selected_option ) {
 					case 'translated':
@@ -1650,7 +1657,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		// get the object-type from request.
 		$object_type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : 0;
 
-		if ( absint( $object_id ) > 0 && ! empty( $object_type ) ) {
+		if ( ! empty( $object_type ) && absint( $object_id ) > 0 ) {
 			// get object.
 			$object = Helper::get_object( $object_id, $object_type );
 
@@ -1681,9 +1688,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					),
 				);
 				wp_send_json( $return );
-
-				// do nothing more.
-				wp_die();
 			}
 
 			// get api.
@@ -1715,9 +1719,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					),
 				);
 				wp_send_json( $return );
-
-				// do nothing more.
-				wp_die();
 			}
 
 			// get info if this is a simplification-initialization.
@@ -1783,7 +1784,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 				// return results.
 				wp_send_json( $return );
-				wp_die();
 			}
 
 			// collect return array.
@@ -1794,7 +1794,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				$results[ $object->get_md5() ],
 			);
 			wp_send_json( $return );
-			wp_die();
 		}
 
 		// return general error.
@@ -1818,9 +1817,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			),
 		);
 		wp_send_json( $return );
-
-		// return nothing.
-		wp_die();
 	}
 
 	/**
@@ -2084,9 +2080,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// hide pointer.
 		update_option( 'easy_language_intro_step_2', 2 );
-
-		// return nothing.
-		wp_die();
 	}
 
 	/**
@@ -2104,27 +2097,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				update_option( 'easy_language_intro_step_2', 2 );
 			}
 		}
-	}
-
-	/**
-	 * Return all texts.
-	 *
-	 * @return array
-	 */
-	public function get_objects_with_texts(): array {
-		// create list of objects to simplify.
-		$object_list = array();
-
-		// get all texts which should be simplified.
-		foreach ( Texts::get_instance()->get_texts() as $text_obj ) {
-			// get their objects.
-			foreach ( $text_obj->get_objects() as $object ) {
-				$object_list[ $object['object_id'] ] = new Post_Object( $object['object_id'] );
-			}
-		}
-
-		// return resulting list of simplified objects.
-		return $object_list;
 	}
 
 	/**
@@ -2171,9 +2143,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// remove running marker.
 		delete_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING );
-
-		// return nothing more.
-		wp_die();
 	}
 
 	/**
@@ -2197,9 +2166,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// collect return value.
 		echo absint( $count_deletion ) . ';' . absint( $max_deletions ) . ';' . absint( $running_deletion );
-
-		// return nothing more.
-		wp_die();
 	}
 
 	/**
@@ -2232,9 +2198,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				$entry->set_state( 'to_simplify' );
 			}
 		}
-
-		// return nothing more.
-		wp_die();
 	}
 
 	/**
@@ -2267,9 +2230,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				$entry->set_state( 'ignore' );
 			}
 		}
-
-		// return nothing more.
-		wp_die();
 	}
 
 	/**
@@ -2413,9 +2373,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// return result.
 		wp_send_json( $return );
-
-		// return nothing more.
-		wp_die();
 	}
 
 	/**
@@ -2500,6 +2457,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				),
 			)
 		);
+
+		// return result.
+		wp_send_json_success();
 	}
 
 	/**
@@ -2532,20 +2492,24 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// return result.
 		wp_send_json( $return );
-
-		// return nothing more.
-		wp_die();
 	}
 
 	/**
 	 * Set automatic simplification intervall.
 	 *
-	 * @param string $value The value for the interval.
+	 * @param string|null $value The value for the interval.
 	 *
 	 * @return string
 	 */
-	public function set_automatic_interval( string $value ): string {
+	public function set_automatic_interval( ?string $value ): string {
+		// validate the value.
 		$value = Helper::settings_validate_select_field( $value );
+
+		// return empty string if validate is null.
+		if( is_null( $value ) ) {
+			return '';
+		}
+
 		if ( ! empty( $value ) ) {
 			wp_clear_scheduled_hook( 'easy_language_automatic_simplification' );
 			wp_schedule_event( time(), $value, 'easy_language_automatic_simplification' );

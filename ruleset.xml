@@ -3,12 +3,30 @@
 
 	<description>Easy Language Standards</description>
 
-    <config name="minimum_wp_version" value="6.2"/>
+	<!--
+	   Only scan files with .php extension.
+   -->
+	<arg name="extensions" value="php" />
 
 	<!--
-	Included via WordPress-Extra.
-	<rule ref="WordPress-Core"/>
+		Directories to exclude.
 	-->
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/doc/*</exclude-pattern>
+	<exclude-pattern>*/doc/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/svn/*</exclude-pattern>
+	<exclude-pattern>*/gettext-helper.php</exclude-pattern>
+	<exclude-pattern>*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/</exclude-pattern>
+	<exclude-pattern>*/classes/multilingual-plugins/easy-language/blocks/*/build/</exclude-pattern>
+	<exclude-pattern>*translatepress</exclude-pattern>
+
+	<!--
+		Require WordPress 6.2.
+	-->
+    <config name="minimum_wp_version" value="6.2"/>
+
+	<!-- Use additional rulesets -->
 	<rule ref="WordPress-Docs"/>
 	<rule ref="WordPress-Extra"/>
     <rule ref="WordPress">

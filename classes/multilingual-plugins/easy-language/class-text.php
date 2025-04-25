@@ -15,6 +15,7 @@ use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
 use easyLanguage\Log;
+use WP_User;
 
 /**
  * Object for single translatable text based on DB-dataset.
@@ -190,7 +191,9 @@ class Text {
 		$user_id = 0;
 		if ( is_user_logged_in() ) {
 			$user    = wp_get_current_user();
-			$user_id = $user->ID;
+			if( $user instanceof WP_User ) {
+				$user_id = $user->ID;
+			}
 		}
 
 		// save the simplification for this text.
@@ -386,7 +389,7 @@ class Text {
 		}
 
 		// if this text is used only from 1 object, delete it completely including its simplifications.
-		if ( 1 === absint( get_option( 'easy_language_delete_unused_simplifications', 0 ) ) && 1 === $object_count ) {
+		if ( 1 === $object_count && 1 === absint( get_option( 'easy_language_delete_unused_simplifications', 0 ) ) ) {
 			$wpdb->delete( DB::get_instance()->get_table_name_originals(), array( 'id' => $this->get_id() ) );
 			$wpdb->delete( DB::get_instance()->get_table_name_simplifications(), array( 'oid' => $this->get_id() ) );
 		}

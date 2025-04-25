@@ -7,9 +7,6 @@
 
 namespace easyLanguage\Multilingual_plugins\TranslatePress;
 
-use easyLanguage\Apis;
-use easyLanguage\Helper;
-
 /**
  * Handler for CLI-operations.
  */

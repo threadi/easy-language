@@ -109,15 +109,6 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	}
 
 	/**
-	 * Return supported languages.
-	 *
-	 * @return array
-	 */
-	public function get_supported_languages(): array {
-		return array();
-	}
-
-	/**
 	 * Run on uninstallation.
 	 *
 	 * @return void

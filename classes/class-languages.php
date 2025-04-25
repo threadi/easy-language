@@ -65,7 +65,7 @@ class Languages {
 		$settings_language = array();
 		$target_languages  = $this->get_possible_target_languages();
 		foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
-			$settings_language = $settings_language + $plugin_obj->get_supported_languages();
+			$settings_language += $plugin_obj->get_supported_languages();
 		}
 		foreach ( $settings_language as $language => $enabled ) {
 			if ( ! empty( $target_languages[ $language ] ) ) {

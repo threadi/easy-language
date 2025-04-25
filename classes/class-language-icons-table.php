@@ -19,7 +19,7 @@ class Language_Icons_Table extends WP_List_Table {
 	/**
 	 * Override the parent columns method. Defines the columns to use in your listing table
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function get_columns(): array {
 		return array(
@@ -31,7 +31,7 @@ class Language_Icons_Table extends WP_List_Table {
 	/**
 	 * Get the table data
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	private function table_data(): array {
 		$languages = array();

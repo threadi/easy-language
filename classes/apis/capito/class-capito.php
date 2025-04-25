@@ -353,7 +353,7 @@ class Capito extends Base implements Api_Base {
 
 		// set capito quota array.
 		if ( ! get_option( 'easy_language_capito_quota' ) ) {
-			update_option( 'easy_language_capito_quota', array(), '', true );
+			update_option( 'easy_language_capito_quota', array(), true );
 		}
 
 		$charset_collate = $wpdb->get_charset_collate();
@@ -411,7 +411,7 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Return list of options this plugin is using, e.g. for clean uninstallation.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	private function get_options(): array {
 		return array(
@@ -789,9 +789,8 @@ class Capito extends Base implements Api_Base {
 	 * Return request object.
 	 *
 	 * @return Request
-	 * @noinspection PhpMissingReturnTypeInspection
 	 */
-	public function get_request_object() {
+	public function get_request_object(): Request {
 		return new Request();
 	}
 

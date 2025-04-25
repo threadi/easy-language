@@ -243,11 +243,12 @@ class Db {
 
 		// set ordering: default goes for title first, then other fields (to show fast proceed as titles are smaller than other texts).
 		$sql_order = " ORDER BY IF( o.field = 'title', 0, 1 ) ASC";
-		if ( ! empty( $order ) && ! empty( $order['order_by'] ) && ! empty( $order['order'] ) && in_array( $order['order'], array( 'asc', 'desc' ), true ) ) {
-			if ( 'date' === $order['order_by'] ) {
+		if ( ! empty( $order['order_by'] ) && 'date' === $order['order_by'] && ! empty( $order ) && ! empty( $order['order'] ) && in_array( $order['order'], array(
+				'asc',
+				'desc'
+			), true ) ) {
 				$sql_order = ' ORDER BY o.time ' . sanitize_text_field( $order['order'] );
 			}
-		}
 
 		// init vars-array for prepared statement.
 		$vars = array( '1' );
@@ -342,7 +343,7 @@ class Db {
 		$sql = sprintf( $sql, $sql_select );
 
 		// concat sql-statement.
-		$sql = $sql . implode( ' ', $sql_join ) . $sql_where . $sql_order . $sql_limit;
+		$sql .= implode( ' ', $sql_join ) . $sql_where . $sql_order . $sql_limit;
 
 		// prepare SQL-statement.
 		$prepared_sql = $wpdb->prepare( $sql, $vars );

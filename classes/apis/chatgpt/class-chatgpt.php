@@ -634,7 +634,7 @@ class ChatGpt extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return list of options this plugin is using, e.g. for clean uninstall.
+	 * Return list of options this plugin is using, e.g. for clean uninstalling.
 	 *
 	 * @return array
 	 */
@@ -725,9 +725,8 @@ class ChatGpt extends Base implements Api_Base {
 	 * Return request object.
 	 *
 	 * @return Request
-	 * @noinspection PhpMissingReturnTypeInspection
 	 */
-	public function get_request_object() {
+	public function get_request_object(): Request {
 		return new Request();
 	}
 

@@ -223,9 +223,8 @@ class Texts_In_Use_Table extends WP_List_Table {
 						$user = new WP_User( $user_id );
 						if ( current_user_can( 'edit_users' ) ) {
 							return '<a href="' . get_edit_user_link( $user->ID ) . '">' . esc_html( $user->display_name ) . '</a>';
-						} else {
-							return esc_html( $user->display_name );
 						}
+						return esc_html( $user->display_name );
 					}
 				}
 

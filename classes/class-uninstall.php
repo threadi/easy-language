@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use WP_Query;
+use WP_Role;
 
 /**
  * Uninstall-object.
@@ -197,7 +198,15 @@ class Uninstall {
 		 */
 		global $wp_roles;
 		foreach ( $wp_roles->roles as $role_name => $settings ) {
+			// get the role object by its name.
 			$role = get_role( $role_name );
+
+			// bail if role could not be loaded.
+			if( ! $role instanceof WP_Role ) {
+				continue;
+			}
+
+			// remove our own caps from this role.
 			foreach ( Init::get_instance()->get_capabilities( 'el_simplifier', 'el_simplifier' ) as $capability ) {
 				$role->remove_cap( $capability );
 			}

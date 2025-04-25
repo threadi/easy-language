@@ -304,7 +304,7 @@ class Helper {
 		$filter = current_filter();
 		if ( ! empty( $filter ) ) {
 			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) ) {
+			if ( empty( $value ) ) {
 				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 				if ( ! empty( $pre_values ) ) {
 					$value = sanitize_text_field( $pre_values );
