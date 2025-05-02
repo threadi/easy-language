@@ -27,7 +27,7 @@ function easy_language_pagebuilder_divi( array $pagebuilder_list ): array {
 	// return resulting list of page-builders.
 	return $pagebuilder_list;
 }
-add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_divi', 2000 );
+add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_divi', 900 );
 
 /**
  * Add our custom toggle.

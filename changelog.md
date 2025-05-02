@@ -7,7 +7,9 @@
 - Using PHPStan to check for potential PHP errors in plugin
 - Optimized WordPress Coding Standard check
 - Updates Avada support
-- Some code optimizations
+- Multiple code optimizations to eliminate potential errors from the very beginning
+- Optimized styling of API log table
+- Added composer.json in plugin release to fulfill actual WordPress repository requirements
 - Updated dependencies
 
 ### Fixed
@@ -16,6 +18,8 @@
 - Fixed error in saving simplified titles of pages or posts
 - Fixed error in reading inner blocks in Block Editor
 - Fixed missing run of triggers after simplification has been saved
+- Fixed missing Divi support if Block Editor is also active
+- Fixed missing WpBakery support as Salient WpBakery get used even if it is not available
 
 ## [2.7.0] - 07.04.2025
 

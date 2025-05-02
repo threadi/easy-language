@@ -422,13 +422,13 @@ class Request implements Api_Requests {
 	/**
 	 * Set target-language for this request.
 	 *
-	 * @param string $lang The target language.
+	 * @param string $language The target language.
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
 	 */
-	public function set_target_language( string $lang ): void {
-		$this->target_language = $lang;
+	public function set_target_language( string $language ): void {
+		$this->target_language = $language;
 	}
 
 	/**

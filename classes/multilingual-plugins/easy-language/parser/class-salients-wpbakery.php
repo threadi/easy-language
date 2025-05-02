@@ -200,7 +200,7 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return 'true' === get_post_meta( $post_object->get_id(), '_wpb_vc_js_status', true );
+		return $this->is_active() && 'true' === get_post_meta( $post_object->get_id(), '_wpb_vc_js_status', true );
 	}
 
 	/**

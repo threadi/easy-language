@@ -419,3 +419,8 @@ table th.separator {
 table th.new-lines {
 	width: 92px;
 }
+
+body.settings_page_easy_language_settings #state { width: 48px }
+body.settings_page_easy_language_settings #date { width: 124px }
+body.settings_page_easy_language_settings #api { width: 80px }
+body.settings_page_easy_language_settings #response { min-width: 200px;width: auto }

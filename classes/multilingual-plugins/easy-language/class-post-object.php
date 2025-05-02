@@ -311,7 +311,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Get pagebuilder of this object.
+	 * Get pagebuilder which has been used to edit this object.
 	 *
 	 * @return Parser_Base|false
 	 */
@@ -520,7 +520,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			$pagebuilder_obj = $this->get_page_builder();
 
 			// bail if page builder could not be loaded.
-			if ( ! $pagebuilder_obj ) {
+			if ( ! $pagebuilder_obj instanceof Parser_Base ) {
 				return false;
 			}
 
