@@ -10,7 +10,7 @@ namespace easyLanguage\Multilingual_plugins\Easy_Language;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Base;
+use easyLanguage\Api_Base;
 use easyLanguage\Helper;
 use easyLanguage\Init;
 use easyLanguage\Languages;
@@ -126,14 +126,14 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	/**
 	 * Get WP-own post object as array.
 	 *
-	 * @return array<string,string>
+	 * @return array<int|string,mixed>
 	 */
 	public function get_object_as_array(): array {
 		// get post as array.
 		$post = get_post( $this->get_id(), ARRAY_A );
 
 		// bail if returned value is not an array.
-		if ( ! $post ) {
+		if ( ! is_array( $post ) ) {
 			return array();
 		}
 
@@ -151,7 +151,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		$post = get_post( $this->get_id() );
 
 		// bail if returned value is not an object.
-		if ( ! $post ) {
+		if ( ! $post instanceof WP_Post ) {
 			return false;
 		}
 
@@ -461,12 +461,12 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	/**
 	 * Add simplification object to this object if it is a not simplifiable object.
 	 *
-	 * @param string $target_language The target-language.
-	 * @param Base   $api_object The API to use.
-	 * @param bool   $prevent_automatic_mode True if automatic mode is prevented.
+	 * @param string   $target_language The target-language.
+	 * @param Api_Base $api_object The API to use.
+	 * @param bool     $prevent_automatic_mode True if automatic mode is prevented.
 	 * @return bool|Post_Object
 	 */
-	public function add_simplification_object( string $target_language, Base $api_object, bool $prevent_automatic_mode ): bool|Post_Object {
+	public function add_simplification_object( string $target_language, Api_Base $api_object, bool $prevent_automatic_mode ): bool|Post_Object {
 		// get DB-object.
 		$db = Db::get_instance();
 
@@ -482,9 +482,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			$post_array = $this->get_object_as_array();
 
 			// remove some settings.
-			unset( $post_array['ID'] );
-			unset( $post_array['page_template'] );
-			unset( $post_array['guid'] );
+			unset( $post_array['ID'], $post_array['page_template'], $post_array['guid'] );
 
 			// set author to actual user.
 			$post_array['post_author'] = get_current_user_id();

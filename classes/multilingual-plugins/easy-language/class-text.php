@@ -10,7 +10,7 @@ namespace easyLanguage\Multilingual_plugins\Easy_Language;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Base;
+use easyLanguage\Api_Base;
 use easyLanguage\Apis;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
@@ -550,10 +550,10 @@ class Text {
 	/**
 	 * Get for simplification used API.
 	 *
-	 * @return Base|false
+	 * @return Api_Base|false
 	 * @noinspection PhpUnused
 	 */
-	public function get_api(): Base|false {
+	public function get_api(): Api_Base|false {
 		global $wpdb;
 
 		// get from DB.

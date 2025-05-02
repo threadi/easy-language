@@ -830,13 +830,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			if ( false === $api_obj ) {
 				$api_obj = Apis::get_instance()->get_available_apis()[0];
 			}
-			if ( $api_obj instanceof Api_Base ) {
-				$mappings = $api_obj->get_mapping_languages();
-				foreach ( $api_obj->get_supported_source_languages() as $source_language => $enabled ) {
-					if ( ! empty( $mappings[ $source_language ] ) ) {
-						foreach ( $mappings[ $source_language ] as $language ) {
-							$languages[ $language ] = '1';
-						}
+			$mappings = $api_obj->get_mapping_languages();
+			foreach ( $api_obj->get_supported_source_languages() as $source_language => $enabled ) {
+				if ( ! empty( $mappings[ $source_language ] ) ) {
+					foreach ( $mappings[ $source_language ] as $language ) {
+						$languages[ $language ] = '1';
 					}
 				}
 			}
@@ -1489,13 +1487,19 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Get our own object for given WP-object.
 	 *
-	 * @param WP_Term|WP_User|WP_Post_Type|WP_Post|null $wp_object The WP-object.
-	 * @param int                                       $id The ID of the WP-object.
+	 * @param array<int|string,mixed>|WP_Post|WP_Post_Type|WP_Term|WP_User|null $wp_object The WP-object.
+	 * @param int                                                               $id The ID of the WP-object.
 	 *
 	 * @return Objects|false
 	 */
-	public function get_object_by_wp_object( WP_Term|WP_User|WP_Post_Type|WP_Post|null $wp_object, int $id ): Objects|false {
+	public function get_object_by_wp_object( array|WP_Post|WP_Post_Type|WP_Term|WP_User|null $wp_object, int $id ): Objects|false {
+		// bail if original object is null.
 		if ( is_null( $wp_object ) ) {
+			return false;
+		}
+
+		// bail if original object is not an object.
+		if ( ! is_object( $wp_object ) ) {
 			return false;
 		}
 
@@ -1511,7 +1515,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
 		 * @param Objects|false $object The easy language object to filter (e.g. WP_Post).
-		 * @param WP_Term|WP_User|WP_Post_Type|WP_Post|null $wp_object The original WP object.
+		 * @param array|WP_Post|WP_Post_Type|WP_Term|WP_User|null $wp_object The original WP object.
 		 * @param int $id The ID of the object.
 		 */
 		return apply_filters( 'easy_language_get_object_by_wp_object', $object, $wp_object, $id );
@@ -1733,7 +1737,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 			$object = Helper::get_object( $object_id, $object_type );
 
 			// bail if object is not a simplified object.
-			if ( ! $object || ! $object->is_simplified() ) {
+			if ( false === $object || ! $object->is_simplified() ) {
 				// Log event.
 				/* translators: %1$d will be replaced by an ID, %2$s by a type name. */
 				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d (%2$s) is not intended to be simplified.', 'easy-language' ), $object_id, $object_type ), 'error' );
@@ -1759,13 +1763,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					),
 				);
 				wp_send_json( $return );
+				exit;
 			}
 
-			// get api.
+			// get active API as object.
 			$api_obj = Apis::get_instance()->get_active_api();
 
 			// bail if no API is activated.
-			if ( false === $api_obj ) {
+			if ( ! $api_obj instanceof Api_Base ) {
 				// Log event.
 				Log::get_instance()->add_log( __( 'No API active for simplification of texts.', 'easy-language' ), 'error' );
 
@@ -1790,6 +1795,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					),
 				);
 				wp_send_json( $return );
+				exit;
 			}
 
 			// get info if this is a simplification-initialization.
@@ -1855,6 +1861,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 				// return results.
 				wp_send_json( $return );
+				exit;
 			}
 
 			// collect return array.
@@ -1865,6 +1872,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				$results[ $object->get_md5() ],
 			);
 			wp_send_json( $return );
+			exit;
 		}
 
 		// return general error.
@@ -2076,11 +2084,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Show quota hint in backend tables for post-type-objects.
 	 *
-	 * @param Base $api_obj The used API.
+	 * @param Api_Base $api_obj The used API.
 	 *
 	 * @return void
 	 */
-	public function show_quota_hint( Base $api_obj ): void {
+	public function show_quota_hint( Api_Base $api_obj ): void {
 		$quota_array   = $api_obj->get_quota();
 		$quota_percent = 0;
 		if ( ! empty( $quota_array['character_limit'] ) && $quota_array['character_limit'] > 0 ) {
@@ -2693,7 +2701,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$wp_post_object = get_post( $object_id );
 
 		// bail if object could not be found.
-		if ( is_null( $wp_post_object ) ) {
+		if ( ! $wp_post_object instanceof WP_Post ) {
 			return false;
 		}
 

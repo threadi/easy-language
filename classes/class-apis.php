@@ -68,17 +68,12 @@ class Apis {
 	}
 
 	/**
-	 * Return only active APIs. Should be one.
+	 * Return the active API.
 	 *
-	 * @return false|Base
+	 * @return false|Api_Base
 	 */
-	public function get_active_api(): false|Base {
+	public function get_active_api(): false|Api_Base {
 		foreach ( $this->get_available_apis() as $api_obj ) {
-			// bail if this is not a Base object.
-			if ( ! $api_obj instanceof Base ) {
-				continue;
-			}
-
 			// bail if this API is not active.
 			if ( ! $api_obj->is_active() ) {
 				continue;
@@ -95,15 +90,10 @@ class Apis {
 	 *
 	 * @param string $name The name of the requested API.
 	 *
-	 * @return false|Base
+	 * @return false|Api_Base
 	 */
-	public function get_api_by_name( string $name ): false|Base {
+	public function get_api_by_name( string $name ): false|Api_Base {
 		foreach ( $this->get_available_apis() as $api_obj ) {
-			// bail if this is not a Base object.
-			if ( ! $api_obj instanceof Base ) {
-				continue;
-			}
-
 			// bail if names do not match.
 			if ( $name !== $api_obj->get_name() ) {
 				continue;
