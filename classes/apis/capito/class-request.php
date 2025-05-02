@@ -195,15 +195,14 @@ class Request implements Api_Requests {
 
 		// set request-data for PUT.
 		if ( 'PUT' === $this->get_method() ) {
+			$data['content']     = $this->get_text();
+			$data['locale']      = $this->get_source_language();
+			$data['proficiency'] = $this->get_target_language();
 			// get the body as JSON.
 			$body = wp_json_encode( $data );
 			if ( ! $body ) {
 				$body = '';
 			}
-
-			$data['content']     = $this->get_text();
-			$data['locale']      = $this->get_source_language();
-			$data['proficiency'] = $this->get_target_language();
 			$args['body']        = $body;
 		}
 
@@ -289,12 +288,12 @@ class Request implements Api_Requests {
 	/**
 	 * Set target-language for this request.
 	 *
-	 * @param string $lang The target language.
+	 * @param string $language The target language.
 	 *
 	 * @return void
 	 */
-	public function set_target_language( string $lang ): void {
-		$this->target_language = $lang;
+	public function set_target_language( string $language ): void {
+		$this->target_language = $language;
 	}
 
 	/**
@@ -309,12 +308,12 @@ class Request implements Api_Requests {
 	/**
 	 * Set source-language for this request.
 	 *
-	 * @param string $lang The source language as string (e.g. "de_EL").
+	 * @param string $language The source language as string (e.g. "de_EL").
 	 *
 	 * @return void
 	 */
-	public function set_source_language( string $lang ): void {
-		$this->source_language = $lang;
+	public function set_source_language( string $language ): void {
+		$this->source_language = $language;
 	}
 
 	/**
