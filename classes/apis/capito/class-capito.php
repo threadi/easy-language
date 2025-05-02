@@ -11,6 +11,8 @@ namespace easyLanguage\Apis\Capito;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Api_Base;
+use easyLanguage\Api_Requests;
+use easyLanguage\Api_Simplifications;
 use easyLanguage\Base;
 use easyLanguage\Apis;
 use easyLanguage\Helper;
@@ -72,7 +74,7 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Language-specific support-URL.
 	 *
-	 * @var array
+	 * @var array<string,string>
 	 */
 	protected array $support_url = array(
 		'de_DE' => 'https://www.capito.eu/',
@@ -90,7 +92,7 @@ class Capito extends Base implements Api_Base {
 		$this->wpdb = $wpdb;
 
 		// table for requests and responses.
-		$this->table_requests = DB::get_instance()->get_wpdb_prefix() . 'easy_language_capito';
+		$this->table_requests = Db::get_instance()->get_wpdb_prefix() . 'easy_language_capito';
 
 		// add settings.
 		add_action( 'easy_language_settings_add_settings', array( $this, 'add_settings' ), 20 );
@@ -123,10 +125,11 @@ class Capito extends Base implements Api_Base {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Capito {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
@@ -169,7 +172,7 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Return list of supported source-languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_source_languages(): array {
@@ -234,7 +237,7 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Return the languages this API supports.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_target_languages(): array {
@@ -286,7 +289,7 @@ class Capito extends Base implements Api_Base {
 	 *
 	 * Left source, right possible target languages.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_mapping_languages(): array {
 		$language_mappings = array(
@@ -302,7 +305,7 @@ class Capito extends Base implements Api_Base {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $language_mappings List of mappings.
+		 * @param array<string,array<string>> $language_mappings List of mappings.
 		 */
 		return apply_filters( 'easy_language_capito_mapping_languages', $language_mappings );
 	}
@@ -326,14 +329,14 @@ class Capito extends Base implements Api_Base {
 
 		// set source language depending on WP-locale and its support.
 		if ( ! get_option( 'easy_language_capito_source_languages' ) ) {
-			$language  = helper::get_wp_lang();
+			$language  = Helper::get_wp_lang();
 			$languages = array( $language => '1' );
 			update_option( 'easy_language_capito_source_languages', $languages );
 		}
 
 		// set target language depending on source-language and if only one target could be possible.
 		if ( ! get_option( 'easy_language_capito_target_languages' ) ) {
-			$language  = helper::get_wp_lang();
+			$language  = Helper::get_wp_lang();
 			$languages = array( 'de_b1' => '1' );
 			if ( false !== str_contains( $language, 'en_' ) ) {
 				$languages = array( 'en_b1' => '1' );
@@ -427,7 +430,7 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Return list of transients this plugin is using, e.g. for clean uninstall.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	private function get_transients(): array {
 		return array(
@@ -445,14 +448,14 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Return the simplifications-object.
 	 *
-	 * @return object
+	 * @return Api_Simplifications
 	 */
-	public function get_simplifications_obj(): object {
+	public function get_simplifications_obj(): Api_Simplifications {
 		// get the object.
 		$obj = Simplifications::get_instance();
 
-		// initialize it.
-		$obj->init( $this );
+		// set the API.
+		$obj->set_api( $this );
 
 		// return resulting object.
 		return $obj;
@@ -461,7 +464,7 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Return supported target languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_active_target_languages(): array {
 		// get actual enabled target-languages, if token is given.
@@ -530,7 +533,7 @@ class Capito extends Base implements Api_Base {
 		}
 
 		// output tab.
-		echo '<a href="' . esc_url( helper::get_settings_page_url() ) . '&tab=' . esc_attr( $this->get_name() ) . '" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'capito', 'easy-language' ) . '</a>';
+		echo '<a href="' . esc_url( Helper::get_settings_page_url() ) . '&tab=' . esc_attr( $this->get_name() ) . '" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'capito', 'easy-language' ) . '</a>';
 	}
 
 	/**
@@ -539,8 +542,16 @@ class Capito extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function add_settings_page(): void {
+		// get the active API.
+		$api_obj = Apis::get_instance()->get_active_api();
+
+		// bail if no API is active.
+		if ( ! $api_obj ) {
+			return;
+		}
+
 		// bail if this API is not enabled.
-		if ( Apis::get_instance()->get_active_api()->get_name() !== $this->get_name() ) {
+		if ( $api_obj->get_name() !== $this->get_name() ) {
 			return;
 		}
 
@@ -757,7 +768,7 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Get quota as array containing 'character_spent' and 'character_limit'.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_quota(): array {
 		$quota = get_option( 'easy_language_capito_quota', array() );
@@ -788,9 +799,9 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Return request object.
 	 *
-	 * @return Request
+	 * @return Api_Requests
 	 */
-	public function get_request_object(): Request {
+	public function get_request_object(): Api_Requests {
 		return new Request();
 	}
 
@@ -843,7 +854,7 @@ class Capito extends Base implements Api_Base {
 		 *
 		 * @see https://core.trac.wordpress.org/ticket/21989
 		 */
-		if ( helper::check_if_setting_error_entry_exists_in_array( 'easy_language_capito_api_key', $errors ) ) {
+		if ( Helper::check_if_setting_error_entry_exists_in_array( 'easy_language_capito_api_key', $errors ) ) {
 			return $value;
 		}
 
@@ -884,9 +895,9 @@ class Capito extends Base implements Api_Base {
 	 *
 	 * The source-language must be possible to simplify in the target-language.
 	 *
-	 * @param ?array $values The values.
+	 * @param ?array<string> $values The values.
 	 *
-	 * @return array|null
+	 * @return array<string>|null
 	 */
 	public function validate_language_settings( ?array $values ): ?array {
 		$values = Helper::settings_validate_multiple_checkboxes( $values );
@@ -921,7 +932,7 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Return active source languages of this API.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_active_source_languages(): array {
 		// get actual enabled source-languages.
@@ -948,7 +959,7 @@ class Capito extends Base implements Api_Base {
 	 *
 	 * @param string $token The token (optional).
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function request_quota( string $token = '' ): array {
 		// send request.
@@ -976,9 +987,9 @@ class Capito extends Base implements Api_Base {
 	 *
 	 * @param string $token The optional token.
 	 *
-	 * @return array
+	 * @return void
 	 */
-	public function get_quota_from_api( string $token = '' ): array {
+	public function get_quota_from_api( string $token = '' ): void {
 		// get quota from api.
 		$quota = $this->request_quota( $token );
 
@@ -1018,9 +1029,6 @@ class Capito extends Base implements Api_Base {
 			// delete hint.
 			$transients_obj->get_transient_by_name( 'easy_language_capito_ai_quota' )->delete();
 		}
-
-		// return quota.
-		return $quota;
 	}
 
 	/**
@@ -1108,7 +1116,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function run_token_test(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-capito-test-token', 'nonce' );
+		check_admin_referer( 'easy-language-capito-test-token', 'nonce' );
 
 		// get global transients-object.
 		$transients_obj = Transients::get_instance();
@@ -1165,10 +1173,10 @@ class Capito extends Base implements Api_Base {
 	/**
 	 * Return all log entries of this API.
 	 *
-	 * @return array
+	 * @return array<int,mixed>
 	 */
 	public function get_log_entries(): array {
-		$results = $this->wpdb->get_results( $this->wpdb->prepare( 'SELECT `time`, `request`, `response` FROM ' . $this->table_requests . ' WHERE 1 = %d', array( 1 ) ) );
+		$results = $this->wpdb->get_results( $this->wpdb->prepare( 'SELECT `time`, `request`, `response` FROM ' . $this->table_requests . ' WHERE 1 = %d', array( 1 ) ) ); // @phpstan-ignore argument.type
 		if ( is_null( $results ) ) {
 			return array();
 		}
@@ -1232,5 +1240,16 @@ class Capito extends Base implements Api_Base {
 			return 'https://www.capito.eu/preise-pakete/';
 		}
 		return 'https://www.capito.eu/en/prices-packages/';
+	}
+
+	/**
+	 * Return language-specific request text for the API.
+	 *
+	 * @param string $target_language The target-language.
+	 *
+	 * @return string
+	 */
+	public function get_request_text_by_language( string $target_language ): string {
+		return '';
 	}
 }

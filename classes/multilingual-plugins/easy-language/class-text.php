@@ -39,7 +39,7 @@ class Text {
 	/**
 	 * List of simplifications.
 	 *
-	 * @var array
+	 * @var array<string,string>
 	 */
 	private array $simplifications = array();
 
@@ -64,7 +64,7 @@ class Text {
 	 */
 	public function __construct( int $id ) {
 		// get db-object.
-		$this->db = DB::get_instance();
+		$this->db = Db::get_instance();
 
 		// secure id of this object.
 		$this->id = $id;
@@ -161,7 +161,7 @@ class Text {
 		}
 
 		// get from DB.
-		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `simplification` FROM ' . DB::get_instance()->get_table_name_simplifications() . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
+		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `simplification` FROM ' . Db::get_instance()->get_table_name_simplifications() . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
 		if ( ! empty( $result ) ) {
 			// save in object.
 			$this->simplifications[ $language ] = $result['simplification'];
@@ -190,8 +190,8 @@ class Text {
 		// get current user.
 		$user_id = 0;
 		if ( is_user_logged_in() ) {
-			$user    = wp_get_current_user();
-			if( $user instanceof WP_User ) {
+			$user = wp_get_current_user();
+			if ( $user instanceof WP_User ) { // @phpstan-ignore instanceof.alwaysTrue
 				$user_id = $user->ID;
 			}
 		}
@@ -207,7 +207,7 @@ class Text {
 			'jobid'          => $job_id,
 			'user_id'        => $user_id,
 		);
-		$wpdb->insert( DB::get_instance()->get_table_name_simplifications(), $query );
+		$wpdb->insert( Db::get_instance()->get_table_name_simplifications(), $query );
 
 		// log error.
 		if ( $wpdb->last_error ) {
@@ -241,8 +241,8 @@ class Text {
 		// get object.
 		$object = Helper::get_object( $object_id );
 
-		// bail of no object could be loaded.
-		if ( false === $object ) {
+		// bail of object is not a Post_Object.
+		if ( ! $object instanceof Post_Object ) {
 			return false;
 		}
 
@@ -254,6 +254,13 @@ class Text {
 				case 'title':
 					// replace text depending on used pagebuilder for original text.
 					$obj = $object->get_page_builder();
+
+					// bail if pagebuilder could not be loaded.
+					if ( ! $obj ) {
+						return false;
+					}
+
+					// set title.
 					$obj->set_title( $object->get_title() );
 
 					// get title.
@@ -282,7 +289,7 @@ class Text {
 					$obj = $object->get_page_builder();
 
 					// do nothing if not page builder could be loaded.
-					if ( false === $obj ) {
+					if ( ! $obj ) {
 						return false;
 					}
 
@@ -304,17 +311,18 @@ class Text {
 					wp_update_post( $array );
 					break;
 				default:
+					$instance = $this;
 					/**
 					 * Hook for alternatives to replace texts with its simplified forms.
 					 *
 					 * @since 2.0.0 Available since 2.0.0.
 					 *
-					 * @param Text $this The text icon object.
+					 * @param Text $instance The text icon object.
 					 * @param string $target_language The target language.
 					 * @param int $object_id The ID of the object.
 					 * @param array $simplification_objects List of simplification objects.
 					 */
-					do_action( 'easy_language_replace_texts', $this, $target_language, $object_id, $simplification_objects );
+					do_action( 'easy_language_replace_texts', $instance, $target_language, $object_id, $simplification_objects );
 			}
 		}
 
@@ -347,7 +355,7 @@ class Text {
 		global $wpdb;
 
 		// update the state of this text to the given state-string.
-		$wpdb->update( DB::get_instance()->get_table_name_originals(), array( 'state' => $state ), array( 'id' => $this->get_id() ) );
+		$wpdb->update( Db::get_instance()->get_table_name_originals(), array( 'state' => $state ), array( 'id' => $this->get_id() ) );
 
 		// log any DB-errors.
 		if ( $wpdb->last_error ) {
@@ -371,7 +379,7 @@ class Text {
 		// delete connection between text and given object_id.
 		if ( $object_id > 0 ) {
 			$wpdb->delete(
-				DB::get_instance()->get_table_name_originals_objects(),
+				Db::get_instance()->get_table_name_originals_objects(),
 				array(
 					'oid'       => $this->get_id(),
 					'blog_id'   => get_current_blog_id(),
@@ -380,7 +388,7 @@ class Text {
 			);
 		} else {
 			$wpdb->delete(
-				DB::get_instance()->get_table_name_originals_objects(),
+				Db::get_instance()->get_table_name_originals_objects(),
 				array(
 					'oid'     => $this->get_id(),
 					'blog_id' => get_current_blog_id(),
@@ -390,21 +398,21 @@ class Text {
 
 		// if this text is used only from 1 object, delete it completely including its simplifications.
 		if ( 1 === $object_count && 1 === absint( get_option( 'easy_language_delete_unused_simplifications', 0 ) ) ) {
-			$wpdb->delete( DB::get_instance()->get_table_name_originals(), array( 'id' => $this->get_id() ) );
-			$wpdb->delete( DB::get_instance()->get_table_name_simplifications(), array( 'oid' => $this->get_id() ) );
+			$wpdb->delete( Db::get_instance()->get_table_name_originals(), array( 'id' => $this->get_id() ) );
+			$wpdb->delete( Db::get_instance()->get_table_name_simplifications(), array( 'oid' => $this->get_id() ) );
 		}
 	}
 
 	/**
 	 * Return list of simplification-objects which are using this text.
 	 *
-	 * @return array
+	 * @return array<array<string,string>>
 	 */
 	public function get_objects(): array {
 		global $wpdb;
 
 		// get our own DB-object.
-		$db = DB::get_instance();
+		$db = Db::get_instance();
 
 		// get from DB.
 		$prepared_sql = $wpdb->prepare(
@@ -415,8 +423,16 @@ class Text {
 			array( $this->get_id(), get_current_blog_id() )
 		);
 
-		// return result.
-		return (array) $wpdb->get_results( $prepared_sql, ARRAY_A );
+		// get the results.
+		$results = $wpdb->get_results( $prepared_sql, ARRAY_A );
+
+		// return empty array on no results.
+		if ( empty( $results ) ) {
+			return array();
+		}
+
+		// return the results.
+		return $results;
 	}
 
 	/**
@@ -440,7 +456,7 @@ class Text {
 			'blog_id'      => get_current_blog_id(),
 			'page_builder' => $page_builder,
 		);
-		$wpdb->insert( DB::get_instance()->get_table_name_originals_objects(), $query );
+		$wpdb->insert( Db::get_instance()->get_table_name_originals_objects(), $query );
 
 		// log error.
 		if ( $wpdb->last_error ) {
@@ -459,7 +475,7 @@ class Text {
 		// get from DB.
 		$prepared_sql = $wpdb->prepare(
 			'SELECT o.`time`
-				FROM ' . DB::get_instance()->get_table_name_originals() . ' o
+				FROM ' . Db::get_instance()->get_table_name_originals() . ' o
 				WHERE o.`id` = %d',
 			array( $this->get_id() )
 		);
@@ -492,7 +508,7 @@ class Text {
 	/**
 	 * Get target languages which depends on settings of the objects where the text is used.
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 * @noinspection PhpUnused
 	 */
 	public function get_target_languages(): array {
@@ -507,13 +523,24 @@ class Text {
 
 		// loop through the objects of this text.
 		foreach ( $this->get_objects() as $object_array ) {
-			$object = Helper::get_object( $object_array['object_id'], $object_array['object_type'] );
-			if ( false !== $object ) {
-				$language = array_key_first( $object->get_language() );
-				if ( ! empty( $languages[ $language ] ) ) {
-					$item_languages[ $language ] = $languages[ $language ]['label'];
-				}
+			// get the object.
+			$object = Helper::get_object( absint( $object_array['object_id'] ), $object_array['object_type'] );
+
+			// bail if object is unknown.
+			if ( ! $object ) {
+				continue;
 			}
+
+			// get the first language from the object.
+			$language = array_key_first( $object->get_language() );
+
+			// bail if language is unknown.
+			if ( empty( $languages[ $language ] ) ) {
+				continue;
+			}
+
+			// add language to the list.
+			$item_languages[ $language ] = $languages[ $language ]['label'];
 		}
 
 		// return resulting list.
@@ -532,7 +559,7 @@ class Text {
 		// get from DB.
 		$prepared_sql = $wpdb->prepare(
 			'SELECT s.`used_api`
-				FROM ' . DB::get_instance()->get_table_name_simplifications() . ' s
+				FROM ' . Db::get_instance()->get_table_name_simplifications() . ' s
 				WHERE s.`oid` = %d',
 			array( $this->get_id() )
 		);
@@ -559,7 +586,7 @@ class Text {
 		global $wpdb;
 
 		// get from DB.
-		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `user_id` FROM ' . DB::get_instance()->get_table_name_simplifications() . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
+		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `user_id` FROM ' . Db::get_instance()->get_table_name_simplifications() . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
 		if ( ! empty( $result ) ) {
 			// return result.
 			return $result['user_id'];
@@ -580,7 +607,7 @@ class Text {
 		// get from DB.
 		$prepared_sql = $wpdb->prepare(
 			'SELECT o.`html`
-				FROM ' . DB::get_instance()->get_table_name_originals() . ' o
+				FROM ' . Db::get_instance()->get_table_name_originals() . ' o
 				WHERE o.`id` = %d',
 			array( $this->get_id() )
 		);

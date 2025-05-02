@@ -41,11 +41,11 @@ class Installer {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Installer {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
@@ -61,7 +61,7 @@ class Installer {
 	/**
 	 * Get list of blogs in a multisite-installation.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	private function get_blogs(): array {
 		if ( false === is_multisite() ) {
@@ -166,15 +166,19 @@ class Installer {
 		if ( null === $translator_role ) {
 			$translator_role = add_role( 'el_simplifier', __( 'Editor for Easy Language', 'easy-language' ) );
 		}
-		$translator_role->add_cap( 'read' );
+		if ( $translator_role instanceof WP_Role ) {
+			$translator_role->add_cap( 'read' );
+		}
 
 		// get admin-role.
 		$admin_role = get_role( 'administrator' );
 
 		// loop through the capabilities and add them to the translator.
 		foreach ( Init::get_instance()->get_capabilities( 'el_simplifier', 'el_simplifier' ) as $capability ) {
-			$translator_role->add_cap( $capability );
-			if( $admin_role instanceof WP_Role ) {
+			if ( $translator_role instanceof WP_Role ) {
+				$translator_role->add_cap( $capability );
+			}
+			if ( $admin_role instanceof WP_Role ) {
 				$admin_role->add_cap( $capability );
 			}
 		}
@@ -250,7 +254,7 @@ class Installer {
 			$role = get_role( $role_name );
 
 			// bail if role could not be found.
-			if( ! $role instanceof WP_Role ) {
+			if ( ! $role instanceof WP_Role ) {
 				continue;
 			}
 

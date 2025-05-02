@@ -10,6 +10,7 @@ namespace easyLanguage\Apis\Capito;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Api_Requests;
 use easyLanguage\Log;
 use easyLanguage\Log_Api;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
@@ -18,12 +19,12 @@ use WP_Error;
 /**
  * Create and send request to capito API. Gets the response.
  */
-class Request {
+class Request implements Api_Requests {
 
 	/**
 	 * HTTP-header for the request.
 	 *
-	 * @var array
+	 * @var array<string,string>
 	 */
 	private array $header = array(
 		'Accept'       => '*/*',
@@ -61,7 +62,7 @@ class Request {
 	/**
 	 * Complete result of the request.
 	 *
-	 * @var array|WP_Error
+	 * @var array<string,mixed>|WP_Error
 	 */
 	private array|WP_Error $result;
 
@@ -89,7 +90,7 @@ class Request {
 	/**
 	 * The content of this request.
 	 *
-	 * @var array
+	 * @var array<string,mixed>
 	 */
 	private array $request;
 
@@ -119,7 +120,7 @@ class Request {
 	 */
 	public function __construct() {
 		// table for requests and responses.
-		$this->table_requests = DB::get_instance()->get_wpdb_prefix() . 'easy_language_capito';
+		$this->table_requests = Db::get_instance()->get_wpdb_prefix() . 'easy_language_capito';
 	}
 
 	/**
@@ -194,10 +195,16 @@ class Request {
 
 		// set request-data for PUT.
 		if ( 'PUT' === $this->get_method() ) {
+			// get the body as JSON.
+			$body = wp_json_encode( $data );
+			if ( ! $body ) {
+				$body = '';
+			}
+
 			$data['content']     = $this->get_text();
 			$data['locale']      = $this->get_source_language();
 			$data['proficiency'] = $this->get_target_language();
-			$args['body']        = wp_json_encode( $data );
+			$args['body']        = $body;
 		}
 
 		// secure request.
@@ -223,7 +230,11 @@ class Request {
 
 		// log the request (with anonymized token).
 		$args['headers']['Authorization'] = 'anonymized';
-		Log_Api::get_instance()->add_log( $capito_obj->get_name(), $this->http_status, wp_json_encode( $args ), 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
+		$args                             = wp_json_encode( $args );
+		if ( ! $args ) {
+			$args = '';
+		}
+		Log_Api::get_instance()->add_log( $capito_obj->get_name(), $this->http_status, $args, 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
 
 		// save request and result in db.
 		$this->save_in_db();
@@ -260,7 +271,7 @@ class Request {
 	/**
 	 * Get the complete request results.
 	 *
-	 * @return array|WP_Error
+	 * @return array<string,mixed>|WP_Error
 	 */
 	public function get_result(): WP_Error|array {
 		return $this->result;
@@ -336,7 +347,7 @@ class Request {
 	/**
 	 * Return the request-content.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	private function get_request(): array {
 		return $this->request;
@@ -371,4 +382,49 @@ class Request {
 	public function set_method( string $method ): void {
 		$this->method = $method;
 	}
+
+	/**
+	 * Set the text type.
+	 *
+	 * @param string $type The type to use.
+	 *
+	 * @return void
+	 */
+	public function set_text_type( string $type ): void {}
+
+	/**
+	 * Set the separator.
+	 *
+	 * @param string $separator The separator to use.
+	 *
+	 * @return void
+	 */
+	public function set_separator( string $separator ): void {}
+
+	/**
+	 * Set new lines.
+	 *
+	 * @param int $new_lines The setting for new lines.
+	 *
+	 * @return void
+	 */
+	public function set_new_lines( int $new_lines ): void {}
+
+	/**
+	 * Set embolden setting.
+	 *
+	 * @param int $embolden The setting for embolden.
+	 *
+	 * @return void
+	 */
+	public function set_embolden_negative( int $embolden ): void {}
+
+	/**
+	 * Set if this is a test.
+	 *
+	 * @param bool $is_test The setting.
+	 *
+	 * @return void
+	 */
+	public function set_is_test( bool $is_test ): void {}
 }

@@ -40,10 +40,11 @@ class Log_Api {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Log_Api {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
@@ -52,7 +53,7 @@ class Log_Api {
 	 * @return string
 	 */
 	public function get_table_name(): string {
-		return DB::get_instance()->get_wpdb_prefix() . 'easy_language_api_log';
+		return Db::get_instance()->get_wpdb_prefix() . 'easy_language_api_log';
 	}
 
 	/**

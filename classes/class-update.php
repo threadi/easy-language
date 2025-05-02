@@ -39,10 +39,11 @@ class Update {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Update {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
@@ -76,7 +77,7 @@ class Update {
 			)
 			&& version_compare( $installed_plugin_version, $db_plugin_version, '>' )
 		) {
-			if ( version_compare( $installed_plugin_version, '2.1.0', '>=' ) ) {
+			if ( version_compare( $installed_plugin_version, '2.1.0', '>=' ) ) { // @phpstan-ignore if.alwaysFalse
 				$this->version210();
 			}
 
@@ -103,7 +104,7 @@ class Update {
 			wp_schedule_event( time(), '10minutely', 'easy_language_automatic_simplification' );
 		} else {
 			$scheduled_event = wp_get_scheduled_event( 'easy_language_automatic_simplification' );
-			if ( in_array( $scheduled_event->schedule, array( '5minutely', 'minutely' ), true ) ) {
+			if ( $scheduled_event && in_array( $scheduled_event->schedule, array( '5minutely', 'minutely' ), true ) ) {
 				wp_clear_scheduled_hook( 'easy_language_automatic_simplification' );
 				wp_schedule_event( time(), '10minutely', 'easy_language_automatic_simplification' );
 			}
@@ -115,7 +116,7 @@ class Update {
 			$setup_completed = false;
 
 			// check active API.
-			$api_obj = APIs::get_instance()->get_active_api();
+			$api_obj = Apis::get_instance()->get_active_api();
 			if ( $api_obj ) {
 				$token_field_name = $api_obj->get_token_field_name();
 				if ( ! empty( $token_field_name ) && ! empty( get_option( $token_field_name ) ) ) {

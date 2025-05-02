@@ -48,17 +48,17 @@ class Avada extends Parser_Base implements Parser {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Avada {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
 	 * Define flow-text-shortcodes.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	private function get_flow_text_shortcodes(): array {
 		$shortcodes = array(
@@ -71,7 +71,7 @@ class Avada extends Parser_Base implements Parser {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $shortcodes List of shortcodes.
+		 * @param array<string,mixed> $shortcodes List of shortcodes.
 		 */
 		return apply_filters( 'easy_language_avada_text_widgets', $shortcodes );
 	}
@@ -93,7 +93,7 @@ class Avada extends Parser_Base implements Parser {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $html_support_widgets List of widgets with HTML-support.
+		 * @param array<string,mixed> $html_support_widgets List of widgets with HTML-support.
 		 */
 		$html_widgets = apply_filters( 'easy_language_avada_html_widgets', $html_support_widgets );
 
@@ -105,7 +105,7 @@ class Avada extends Parser_Base implements Parser {
 	 *
 	 * Get the Avada-content and parse its widgets to get the content of flow-text-widgets.
 	 *
-	 * @return array
+	 * @return array<array<string,mixed>>
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if avada is not active.
@@ -203,8 +203,6 @@ class Avada extends Parser_Base implements Parser {
 
 	/**
 	 * Prevent translate-option in frontend.
-	 *
-	 * TODO wirklich nötig?
 	 *
 	 * @return bool
 	 */

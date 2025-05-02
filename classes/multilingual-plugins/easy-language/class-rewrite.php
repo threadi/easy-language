@@ -48,10 +48,11 @@ class Rewrite {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Rewrite {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
@@ -125,9 +126,9 @@ class Rewrite {
 	/**
 	 * The definition of the rewrite rules used by WordPress.
 	 *
-	 * @param array $rules The actual rewrite-rules.
+	 * @param array<string,string> $rules The actual rewrite-rules.
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function set_rules_on_objects( array $rules ): array {
 		global $wp_rewrite;
@@ -142,11 +143,6 @@ class Rewrite {
 		$slug      = $wp_rewrite->root . '(' . implode( '|', $slugs ) . ')/';
 		$new_rules = array();
 		foreach ( $rules as $key => $rule ) {
-			// bail if something went wrong.
-			if ( ! is_string( $rule ) || ! is_string( $key ) ) {
-				continue;
-			}
-
 			// add our custom rule to allow language-specific slugs in front of urls.
 			$new_rules[ $slug . str_replace( $wp_rewrite->root, '', ltrim( $key, '^' ) ) ] = str_replace(
 				array( '[8]', '[7]', '[6]', '[5]', '[4]', '[3]', '[2]', '[1]', '?' ),
@@ -165,8 +161,8 @@ class Rewrite {
 	/**
 	 * Set the language-variable in query_vars.
 	 *
-	 * @param array $query_vars The actual query vars.
-	 * @return array
+	 * @param array<string> $query_vars The actual query vars.
+	 * @return array<string>
 	 */
 	public function set_query_vars( array $query_vars ): array {
 		$query_vars[] = filter_input( INPUT_GET, 'lang', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) ? 'lang' : '';

@@ -31,7 +31,7 @@ class Language_Icons_Table extends WP_List_Table {
 	/**
 	 * Get the table data
 	 *
-	 * @return array<string>
+	 * @return array<int,array<string,string>>
 	 */
 	private function table_data(): array {
 		$languages = array();
@@ -59,7 +59,7 @@ class Language_Icons_Table extends WP_List_Table {
 	/**
 	 * Define which columns are hidden
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function get_hidden_columns(): array {
 		return array();
@@ -68,7 +68,7 @@ class Language_Icons_Table extends WP_List_Table {
 	/**
 	 * Define the sortable columns
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function get_sortable_columns(): array {
 		return array();
@@ -77,8 +77,8 @@ class Language_Icons_Table extends WP_List_Table {
 	/**
 	 * Define what data to show on each column of the table.
 	 *
-	 * @param  array  $item        Data.
-	 * @param  String $column_name - Current column name.
+	 * @param  array<string,mixed> $item        Data.
+	 * @param  String              $column_name - Current column name.
 	 *
 	 * @return string
 	 */

@@ -40,10 +40,11 @@ class Pagebuilder_Support {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Pagebuilder_Support {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
@@ -126,6 +127,13 @@ class Pagebuilder_Support {
 		 * Get page builder of this object.
 		 */
 		$page_builder = $original_post_object->get_page_builder();
+
+		/**
+		 * Bail if page builder could not be loaded.
+		 */
+		if ( ! $page_builder ) {
+			return;
+		}
 
 		/**
 		 * Show list of active languages the content could be simplified

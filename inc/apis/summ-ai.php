@@ -13,8 +13,8 @@ use easyLanguage\Apis\Summ_Ai\Summ_AI;
 /**
  * Register the SUMM AI Api in the easy language plugin.
  *
- * @param array $api_list List of available APIs.
- * @return array
+ * @param array<int,mixed> $api_list List of available APIs.
+ * @return array<int,mixed>
  */
 function easy_language_register_summ_ai_api( array $api_list ): array {
 	$api_list[] = Summ_AI::get_instance();

@@ -38,16 +38,17 @@ class Multilingual_Plugins {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Multilingual_Plugins {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
 	 * Return available multilingual plugin-supports.
 	 *
-	 * @return array
+	 * @return array<int,Multilingual_Plugins_Base>
 	 */
 	public function get_available_plugins(): array {
 		$plugin_list = array();
@@ -57,7 +58,7 @@ class Multilingual_Plugins {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $plugin_list List of plugins.
+		 * @param array<int,Multilingual_Plugins_Base> $plugin_list List of plugins.
 		 */
 		return apply_filters( 'easy_language_register_plugin', $plugin_list );
 	}

@@ -8,17 +8,17 @@
 namespace easyLanguage\Apis\Capito;
 
 // prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Apis\Summ_Ai\Request;
+use easyLanguage\Api_Requests;
+use easyLanguage\Api_Simplifications;
+use easyLanguage\Simplification_Base;
 use easyLanguage\Base;
 
 /**
- * Simplification-Handling for this plugin.
+ * Simplification-Handling for this API.
  */
-class Simplifications {
+class Simplifications extends Simplification_Base implements Api_Simplifications {
 	/**
 	 * Instance of this object.
 	 *
@@ -49,21 +49,11 @@ class Simplifications {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Simplifications {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
-	}
-
-	/**
-	 * Initialize this object.
-	 *
-	 * @param Base $init The init-object.
-	 * @return void
-	 */
-	public function init( Base $init ): void {
-		$this->init = $init;
+		return self::$instance;
 	}
 
 	/**
@@ -73,18 +63,18 @@ class Simplifications {
 	 * @param string $source_language The source language of the text.
 	 * @param string $target_language The target language of the text.
 	 * @param bool   $is_html Marker if the text contains HTML-Code.
-	 * @return array The result as array.
+	 * @return array<string,int|string> The result as array.
 	 * @noinspection PhpUnused
 	 */
 	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html ): array {
 		// map the languages with its shorthand (e.g. de_DE => de).
-		$source_language = $this->init->get_supported_source_languages()[ $source_language ]['api_value'];
-		$target_language = $this->init->get_supported_target_languages()[ $target_language ]['api_value'];
+		$source_language = $this->get_api()->get_supported_source_languages()[ $source_language ]['api_value'];
+		$target_language = $this->get_api()->get_supported_target_languages()[ $target_language ]['api_value'];
 
 		// build request.
-		$request_obj = $this->init->get_request_object();
-		$request_obj->set_token( $this->init->get_token() );
-		$request_obj->set_url( $this->init->get_api_url() );
+		$request_obj = $this->get_api()->get_request_object();
+		$request_obj->set_token( $this->get_api()->get_token() );
+		$request_obj->set_url( $this->get_api()->get_api_url() );
 		$request_obj->set_text( $text_to_translate );
 		$request_obj->set_source_language( $source_language );
 		$request_obj->set_target_language( $target_language );
@@ -93,7 +83,7 @@ class Simplifications {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param Request $request_obj The capito request object.
+		 * @param Api_Requests $request_obj The capito request object.
 		 * @param bool $is_html Whether to use HTML or not.
 		 */
 		$request_obj = apply_filters( 'easy_language_capito_request_object', $request_obj, $is_html );
@@ -110,6 +100,7 @@ class Simplifications {
 			// get the simplified text.
 			$simplified_text = $request_array['content'];
 
+			$instance = $this;
 			/**
 			 * Filter the simplified text.
 			 *
@@ -117,9 +108,9 @@ class Simplifications {
 			 *
 			 * @param string $simplified_text The simplified text.
 			 * @param array $request_array The complete response array from the API.
-			 * @param Simplifications $this The simplification object.
+			 * @param Simplifications $instance The simplification object.
 			 */
-			$simplified_text = apply_filters( 'easy_language_simplified_text', $simplified_text, $request_array, $this );
+			$simplified_text = apply_filters( 'easy_language_simplified_text', $simplified_text, $request_array, $instance );
 
 			// return simplification to plugin which will save it.
 			return array(

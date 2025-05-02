@@ -51,37 +51,37 @@ class Breakdance extends Parser_Base implements Parser {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Breakdance {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
 	 * Define flow-text-widgets.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	private function get_flow_text_widgets(): array {
 		$widgets = array(
-			'EssentialElements\Text'          => array(
+			'EssentialElements\Text'      => array(
 				'properties' => array(
 					'content' => array(
 						'content' => array(
-							'text'
-						)
-					)
-				)
+							'text',
+						),
+					),
+				),
 			),
-			'EssentialElements\PostTitle'              => array(
+			'EssentialElements\PostTitle' => array(
 				'properties' => array(
 					'content' => array(
 						'content' => array(
-							'text'
-						)
-					)
-				)
+							'text',
+						),
+					),
+				),
 			),
 		);
 
@@ -90,7 +90,7 @@ class Breakdance extends Parser_Base implements Parser {
 		 *
 		 * @since 2.7.0 Available since 2.7.0.
 		 *
-		 * @param array $widgets List of widgets.
+		 * @param array<string,mixed> $widgets List of widgets.
 		 */
 		return apply_filters( 'easy_language_breakdance_text_widgets', $widgets );
 	}
@@ -112,7 +112,7 @@ class Breakdance extends Parser_Base implements Parser {
 		 *
 		 * @since 2.7.0 Available since 2.7.0.
 		 *
-		 * @param array $html_support_widgets List of widgets with HTML-support.
+		 * @param array<string,mixed> $html_support_widgets List of widgets with HTML-support.
 		 */
 		$html_widgets = apply_filters( 'easy_language_breakdance_html_widgets', $html_support_widgets );
 
@@ -124,7 +124,7 @@ class Breakdance extends Parser_Base implements Parser {
 	 *
 	 * Get the Breakdance-content and parse its widgets to get the content of flow-text-widgets.
 	 *
-	 * @return array
+	 * @return array<array<string,mixed>>
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if Breakdance is not active.
@@ -141,7 +141,7 @@ class Breakdance extends Parser_Base implements Parser {
 		}
 
 		// bail if root does not exist.
-		if( empty( $data['root']['children'] ) ) {
+		if ( empty( $data['root']['children'] ) ) {
 			return array();
 		}
 
@@ -166,25 +166,25 @@ class Breakdance extends Parser_Base implements Parser {
 	 * Loop through the elementor-widget to get the contents of the defined
 	 * flow-text-widgets.
 	 *
-	 * @param array $widget The widget-array.
-	 * @param array $resulting_texts The resulting texts as array.
-	 * @return array
+	 * @param array<string,mixed>     $widget The widget-array.
+	 * @param array<string|int,mixed> $resulting_texts The resulting texts as array.
+	 * @return array<string,mixed>
 	 */
 	private function get_widgets( array $widget, array $resulting_texts ): array {
 		// get content if it is a valid flow-text-widget.
 		$flow_text_widgets = $this->get_flow_text_widgets();
 
 		// get the contents of this widget, if it is allowed.
-		if ( ! empty( $widget['data']['type'] ) && ! empty( $flow_text_widgets[$widget['data']['type']] ) ) {
+		if ( ! empty( $widget['data']['type'] ) && ! empty( $flow_text_widgets[ $widget['data']['type'] ] ) ) {
 			// add this widget with its content to the list.
 			$resulting_texts[] = array(
-				'text' => $widget['data'][ 'properties' ][ 'content' ][ 'content' ][ 'text' ],
+				'text' => $widget['data']['properties']['content']['content']['text'],
 				'html' => $this->is_flow_text_widget_html( $widget['data']['type'] ),
 			);
 		}
 
 		// loop through inner-widgets.
-		if( ! empty( $widget['children'] ) ) {
+		if ( ! empty( $widget['children'] ) ) {
 			foreach ( $widget['children'] as $sub_widget ) {
 				$resulting_texts = $this->get_widgets( $sub_widget, $resulting_texts );
 			}
@@ -218,33 +218,28 @@ class Breakdance extends Parser_Base implements Parser {
 		}
 
 		// bail if root does not exist.
-		if( empty( $data['root']['children'] ) ) {
+		if ( empty( $data['root']['children'] ) ) {
 			return $original_complete;
 		}
 
 		// replace the texts.
 		foreach ( $data['root']['children'] as $index => $container ) {
-			// bail if no data is set.
-			if ( empty( $widget['data'] ) ) {
-				continue;
-			}
-
 			// bail if text does not match.
-			if( $this->get_text() !== $data['root']['children'][ $index ][ 'properties' ][ 'content' ][ 'content' ][ 'text' ] ) {
+			if ( $this->get_text() !== $data['root']['children'][ $index ]['properties']['content']['content']['text'] ) {
 				continue;
 			}
 
 			// replace the text.
-			$data['root']['children'][ $index ][ 'properties' ][ 'content' ][ 'content' ][ 'text' ] = $simplified_part;
+			$data['root']['children'][ $index ]['properties']['content']['content']['text'] = $simplified_part;
 		}
 
 		// save it.
 		set_meta(
 			$this->get_object_id(),
 			'_breakdance_data',
-			[
+			array(
 				'tree_json_string' => wp_json_encode( $data ),
-			]
+			)
 		);
 
 		// replacement for post_content.
@@ -278,7 +273,7 @@ class Breakdance extends Parser_Base implements Parser {
 	 */
 	public function get_edit_link(): string {
 		if ( $this->is_breakdance_active() ) {
-			return \Breakdance\Admin\get_builder_loader_url((string) $this->get_object_id() );
+			return \Breakdance\Admin\get_builder_loader_url( (string) $this->get_object_id() );
 		}
 		return parent::get_edit_link();
 	}

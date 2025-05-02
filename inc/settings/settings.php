@@ -96,11 +96,24 @@ function easy_language_admin_add_settings(): void {
 				foreach ( $sections as $section ) {
 					// loop through the field of this section.
 					foreach ( $section as $field ) {
+						// set the default function name.
 						$function_name = 'easy_language_admin_sanitize_settings_field';
+
+						// set custom function name.
 						if ( ! empty( $field['args']['sanitizeFunction'] ) && function_exists( $field['args']['sanitizeFunction'] ) ) {
 							$function_name = $field['args']['sanitizeFunction'];
 						}
-						add_filter( 'sanitize_option_' . $field['args']['fieldId'], $function_name, 10, 2 );
+
+						// bail if function is not callable.
+						if ( ! is_callable( $function_name ) ) {
+							continue;
+						}
+
+						// set hook name.
+						$hook = 'sanitize_option_' . $field['args']['fieldId'];
+
+						// add the filter.
+						add_filter( $hook, $function_name, 10, 2 );
 					}
 				}
 			}
@@ -112,7 +125,7 @@ add_action( 'admin_init', 'easy_language_admin_add_settings' );
 /**
  * Define an input-text-field.
  *
- * @param array $attr List of attributes.
+ * @param array<string,mixed> $attr List of attributes.
  *
  * @return void
  * @noinspection DuplicatedCode
@@ -175,7 +188,7 @@ function easy_language_admin_text_field( array $attr ): void {
 /**
  * Define an input-number-field.
  *
- * @param array $attr List of attributes.
+ * @param array<string,mixed> $attr List of attributes.
  *
  * @return void
  * @noinspection DuplicatedCode
@@ -224,7 +237,7 @@ function easy_language_admin_number_field( array $attr ): void {
 /**
  * Define an input-email-field.
  *
- * @param array $attr List of attributes.
+ * @param array<string,mixed> $attr List of attributes.
  *
  * @return void
  */
@@ -286,7 +299,7 @@ function easy_language_admin_email_field( array $attr ): void {
 /**
  * Define an input-checkbox-field.
  *
- * @param array $attr List of attributes.
+ * @param array<string,mixed> $attr List of attributes.
  * @return void
  */
 function easy_language_admin_checkbox_field( array $attr ): void {
@@ -337,7 +350,7 @@ function easy_language_admin_checkbox_field( array $attr ): void {
 /**
  * Show select-field with given values.
  *
- * @param array $attr List of attributes.
+ * @param array<string,mixed> $attr List of attributes.
  *
  * @return void
  */
@@ -394,7 +407,7 @@ function easy_language_admin_select_field( array $attr ): void {
 /**
  * Show multiple checkboxes for a single setting.
  *
- * @param array $attr List of attributes.
+ * @param array<string,mixed> $attr List of attributes.
  *
  * @return void
  */
@@ -453,7 +466,7 @@ function easy_language_admin_multiple_checkboxes_field( array $attr ): void {
 /**
  * Show multiple radio-fields for a single setting.
  *
- * @param array $attr List of attributes for this field-list.
+ * @param array<string,mixed> $attr List of attributes for this field-list.
  *
  * @return void
  * @noinspection PhpUnused
@@ -461,10 +474,8 @@ function easy_language_admin_multiple_checkboxes_field( array $attr ): void {
  */
 function easy_language_admin_multiple_radio_field( array $attr ): void {
 	if ( ! empty( $attr['options'] ) ) {
-		if ( ! empty( $attr['description_above'] ) && false !== $attr['description_above'] ) {
-			if ( ! empty( $attr['description'] ) ) {
-				echo '<p>' . wp_kses_post( $attr['description'] ) . '</p>';
-			}
+		if ( ! empty( $attr['description_above'] ) && false !== $attr['description_above'] && ! empty( $attr['description'] ) ) { // @phpstan-ignore notIdentical.alwaysTrue
+			echo '<p>' . wp_kses_post( $attr['description'] ) . '</p>';
 		}
 
 		foreach ( $attr['options'] as $key => $settings ) {
@@ -538,12 +549,13 @@ add_action( 'easy_language_admin_show_pro_hint', 'easy_language_admin_show_pro_h
 /**
  * Show multiple input-text fields for a single setting.
  *
- * @param array $attr List of attributes.
+ * @param array<string,mixed> $attr List of attributes.
  *
  * @return void
  */
 function easy_language_admin_multiple_text_field( array $attr ): void {
 	if ( ! empty( $attr['options'] ) ) {
+		// show description.
 		if ( ! empty( $attr['description'] ) ) {
 			echo '<p class="easy-language-input-text">' . wp_kses_post( $attr['description'] ) . '</p>';
 		}

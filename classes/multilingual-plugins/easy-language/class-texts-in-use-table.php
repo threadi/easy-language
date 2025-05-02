@@ -22,7 +22,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 	/**
 	 * Override the parent columns method. Defines the columns to use in your listing table
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function get_columns(): array {
 		return array(
@@ -41,12 +41,12 @@ class Texts_In_Use_Table extends WP_List_Table {
 	/**
 	 * Get the table data.
 	 *
-	 * @return array
+	 * @return array<Text>
 	 */
 	private function table_data(): array {
 		// order table.
 		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( ! in_array( $order_by, array_keys( $this->get_sortable_columns() ), true ) ) {
+		if ( ! array_key_exists( $order_by, $this->get_sortable_columns() ) ) {
 			$order_by = 'date';
 		}
 		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
@@ -69,7 +69,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 		}
 
 		// return resulting entry-objects.
-		return DB::get_instance()->get_entries(
+		return Db::get_instance()->get_entries(
 			$query,
 			array(
 				'order_by' => $order_by,
@@ -95,7 +95,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 	/**
 	 * Define which columns are hidden.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_hidden_columns(): array {
 		return array();
@@ -104,7 +104,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 	/**
 	 * Define the sortable columns.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_sortable_columns(): array {
 		return array( 'date' => array( 'date', false ) );
@@ -113,17 +113,12 @@ class Texts_In_Use_Table extends WP_List_Table {
 	/**
 	 * Define what data to show on each column of the table.
 	 *
-	 * @param array|object $item Data.
-	 * @param String       $column_name Current column name.
+	 * @param Text   $item Data.
+	 * @param String $column_name Current column name.
 	 *
 	 * @return string
 	 */
 	public function column_default( $item, $column_name ): string {
-		// bail if item is not an entry-text.
-		if ( ! ( $item instanceof Text ) ) {
-			return '';
-		}
-
 		// get languages-object.
 		$languages_obj = Languages::get_instance();
 
@@ -144,7 +139,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 		$column_name = apply_filters( 'easy_language_simplification_table_used_in', $column_name, $item );
 
 		// bail if column-name is not set.
-		if ( false === $column_name ) {
+		if ( empty( $column_name ) ) {
 			return '';
 		}
 
@@ -244,7 +239,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 	/**
 	 * Define filter for languages.
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	protected function get_views(): array {
 		// get main url.
@@ -260,7 +255,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 			'state'            => 'in_use',
 			'object_not_state' => 'trash',
 		);
-		$entries         = DB::get_instance()->get_entries( $query );
+		$entries         = Db::get_instance()->get_entries( $query );
 		$languages_array = array();
 		foreach ( $entries as $item ) {
 			// get object of the used api.
@@ -275,9 +270,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 				}
 			}
 			foreach ( $item->get_target_languages() as $language_code => $target_language ) {
-				if ( empty( $language_code[ $language_code ] ) ) {
-					$languages_array[ $language_code ] = $target_language;
-				}
+				$languages_array[ $language_code ] = $target_language;
 			}
 		}
 

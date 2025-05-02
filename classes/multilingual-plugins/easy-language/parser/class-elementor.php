@@ -51,11 +51,11 @@ class Elementor extends Parser_Base implements Parser {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Elementor {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
@@ -125,7 +125,7 @@ class Elementor extends Parser_Base implements Parser {
 	 *
 	 * Get the elementor-content and parse its widgets to get the content of flow-text-widgets.
 	 *
-	 * @return array
+	 * @return array<array<string,mixed>>
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if elementor is not active.

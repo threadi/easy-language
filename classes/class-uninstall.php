@@ -42,17 +42,17 @@ class Uninstall {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Uninstall {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
 	 * Get list of blogs in a multisite-installation.
 	 *
-	 * @return array
+	 * @return array<array<string>>
 	 */
 	private function get_blogs(): array {
 		if ( false === is_multisite() ) {
@@ -64,14 +64,15 @@ class Uninstall {
 
 		// get blogs in this site-network.
 		return $wpdb->get_results(
-			"
+			'
             SELECT blog_id
-            FROM {$wpdb->blogs}
-            WHERE site_id = '{$wpdb->siteid}'
+            FROM ' . $wpdb->blogs . "
+            WHERE site_id = '" . $wpdb->siteid . "'
             AND spam = '0'
             AND deleted = '0'
             AND archived = '0'
-        "
+            ",
+			ARRAY_A
 		);
 	}
 
@@ -88,7 +89,7 @@ class Uninstall {
 			// loop through the blogs.
 			foreach ( $this->get_blogs() as $blog_id ) {
 				// switch to the blog.
-				switch_to_blog( $blog_id->blog_id );
+				switch_to_blog( absint( $blog_id['blog_id'] ) );
 
 				// run tasks for uninstalling in this blog.
 				$this->deactivation_tasks();
@@ -120,10 +121,11 @@ class Uninstall {
 					'compare' => '=',
 				),
 			),
+			'fields'         => 'ids',
 		);
 		$attachments_with_language_marker = new WP_Query( $query );
-		foreach ( $attachments_with_language_marker->posts as $attachment ) {
-			wp_delete_attachment( $attachment->ID );
+		foreach ( $attachments_with_language_marker->posts as $attachment_id ) {
+			wp_delete_attachment( absint( $attachment_id ) );
 		}
 
 		// delete all post-meta 'easy_language_code' on images.
@@ -137,10 +139,11 @@ class Uninstall {
 					'compare' => 'EXIST',
 				),
 			),
+			'fields'         => 'ids',
 		);
 		$attachments_with_language_marker = new WP_Query( $query );
-		foreach ( $attachments_with_language_marker->posts as $attachment ) {
-			delete_post_meta( $attachment->ID, 'easy_language_code' );
+		foreach ( $attachments_with_language_marker->posts as $attachment_id ) {
+			delete_post_meta( absint( $attachment_id ), 'easy_language_code' );
 		}
 
 		/**
@@ -202,7 +205,7 @@ class Uninstall {
 			$role = get_role( $role_name );
 
 			// bail if role could not be loaded.
-			if( ! $role instanceof WP_Role ) {
+			if ( ! $role instanceof WP_Role ) {
 				continue;
 			}
 
@@ -216,7 +219,7 @@ class Uninstall {
 	/**
 	 * Return list of options this plugin is using.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	private function get_options(): array {
 		return array(

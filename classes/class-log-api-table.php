@@ -19,7 +19,7 @@ class Log_Api_Table extends WP_List_Table {
 	/**
 	 * Override the parent columns method. Defines the columns to use in your listing table
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function get_columns(): array {
 		return array(
@@ -34,7 +34,7 @@ class Log_Api_Table extends WP_List_Table {
 	/**
 	 * Get the table data
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	private function table_data(): array {
 		// check nonce.
@@ -95,7 +95,7 @@ class Log_Api_Table extends WP_List_Table {
 	/**
 	 * Define which columns are hidden
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function get_hidden_columns(): array {
 		return array();
@@ -104,7 +104,7 @@ class Log_Api_Table extends WP_List_Table {
 	/**
 	 * Define the sortable columns
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_sortable_columns(): array {
 		return array( 'date' => array( 'time', false ) );
@@ -113,8 +113,8 @@ class Log_Api_Table extends WP_List_Table {
 	/**
 	 * Define what data to show on each column of the table.
 	 *
-	 * @param  array  $item        Data.
-	 * @param  String $column_name - Current column name.
+	 * @param  array<string,mixed> $item        Data.
+	 * @param  String              $column_name - Current column name.
 	 *
 	 * @return string
 	 */
@@ -144,7 +144,7 @@ class Log_Api_Table extends WP_List_Table {
 	/**
 	 * Define filter for languages.
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	protected function get_views(): array {
 		global $wpdb;

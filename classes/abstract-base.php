@@ -75,14 +75,14 @@ abstract class Base {
 	/**
 	 * Language-specific support-URL.
 	 *
-	 * @var array
+	 * @var array<string,string>
 	 */
 	protected array $support_url = array(
 		'de_DE' => 'https://laolaweb.com/',
 	);
 
 	/**
-	 * Return the internal name of the API.
+	 * Return the internal name of the object.
 	 *
 	 * @return string
 	 */
@@ -130,7 +130,7 @@ abstract class Base {
 	/**
 	 * Get quota as array containing 'character_spent' and 'character_limit'.
 	 *
-	 * @return array<string,int>
+	 * @return array<string,mixed>
 	 */
 	public function get_quota(): array {
 		return array(
@@ -187,17 +187,16 @@ abstract class Base {
 	/**
 	 * Return request object.
 	 *
-	 * @return bool
-	 * @noinspection PhpMissingReturnTypeInspection
+	 * @return Api_Requests
 	 */
-	public function get_request_object() {
-		return false;
+	public function get_request_object(): Api_Requests {
+		return new Apis\No_Api\Request();
 	}
 
 	/**
 	 * Return list of active language-mappings.
 	 *
-	 * @return array<string>
+	 * @return array<string,list<mixed>>
 	 */
 	public function get_active_language_mapping(): array {
 		$result = array();
@@ -233,7 +232,7 @@ abstract class Base {
 	/**
 	 * Return active source languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string,string>>
 	 */
 	public function get_active_source_languages(): array {
 		return array();
@@ -242,7 +241,7 @@ abstract class Base {
 	/**
 	 * Return active target languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string,string>>
 	 */
 	public function get_active_target_languages(): array {
 		return array();
@@ -251,7 +250,7 @@ abstract class Base {
 	/**
 	 * Return all by this API simplified post type objects.
 	 *
-	 * @return array
+	 * @return array<integer>
 	 */
 	public function get_simplified_post_type_objects(): array {
 		$post_types       = \easyLanguage\Multilingual_plugins\Easy_Language\Init::get_instance()->get_supported_post_types();
@@ -276,12 +275,18 @@ abstract class Base {
 		$results = new WP_Query( $query );
 
 		// bail if no results returned.
-		if( 0 === $results->found_posts ) {
+		if ( 0 === $results->found_posts ) {
 			return array();
 		}
 
+		// get the list.
+		$list = array();
+		foreach ( $results->get_posts() as $post_id ) {
+			$list[] = absint( $post_id );
+		}
+
 		// return the resulting list.
-		return $results->get_posts();
+		return $list;
 	}
 
 	/**
@@ -350,7 +355,7 @@ abstract class Base {
 	 *
 	 * Any active source language must be translatable to any active target-language.
 	 *
-	 * @param array $target_languages List of target languages to check.
+	 * @param array<string,string> $target_languages List of target languages to check.
 	 * @return bool true if valid language-combination exist
 	 */
 	protected function is_language_set( array $target_languages = array() ): bool {
@@ -359,24 +364,17 @@ abstract class Base {
 			$target_languages = $this->get_active_target_languages();
 		}
 
-		if ( ! is_array( $target_languages ) ) {
-			$target_languages = array();
-		}
-
 		// get mappings.
 		$mappings = $this->get_mapping_languages();
 
 		// get actual enabled source-languages.
 		$source_languages = $this->get_active_source_languages();
-		if ( ! is_array( $source_languages ) ) {
-			$source_languages = array();
-		}
 
 		// check if all source-languages mapping all target-languages.
 		$match = array();
 		foreach ( $source_languages as $source_language => $enabled ) {
 			foreach ( $target_languages as $value => $enabled2 ) {
-				if ( 1 === absint( $enabled ) && 1 === absint( $enabled2 ) && ! empty( $mappings[ $source_language ] ) && false !== in_array( $value, $mappings[ $source_language ], true ) ) {
+				if ( ! empty( $mappings[ $source_language ] ) && 1 === absint( $enabled ) && 1 === absint( $enabled2 ) && false !== in_array( $value, $mappings[ $source_language ], true ) ) {
 					$match[] = $source_language;
 				}
 			}
@@ -416,7 +414,7 @@ abstract class Base {
 	/**
 	 * Return supported languages.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_supported_languages(): array {
 		return array();
@@ -425,32 +423,16 @@ abstract class Base {
 	/**
 	 * Return the log entries of this API.
 	 *
-	 * @return array
+	 * @return array<int,mixed>
 	 */
 	public function get_log_entries(): array {
 		return array();
 	}
 
 	/**
-	 * Delete the log entries.
-	 *
-	 * @return void
-	 */
-	public function delete_log_entries(): void {}
-
-	/**
-	 * Return simplifications-object.
-	 *
-	 * @return object|false
-	 */
-	public function get_simplifications_obj(): object|false {
-		return false;
-	}
-
-	/**
 	 * Return mapping languages.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_mapping_languages(): array {
 		return array();
@@ -513,4 +495,63 @@ abstract class Base {
 	public function get_token_field_name(): string {
 		return $this->token_field_name;
 	}
+
+	/**
+	 * Get the API-specific simplifications-object (used to run simplifications).
+	 *
+	 * @return Api_Simplifications
+	 */
+	public function get_simplifications_obj(): Api_Simplifications {
+		return Apis\No_Api\Simplifications::get_instance();
+	}
+
+	/**
+	 * Enable-routines for the API, called on the new API if another API is chosen.
+	 *
+	 * @return void
+	 */
+	public function enable(): void {}
+
+	/**
+	 * Return list of supported source-languages.
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	public function get_supported_source_languages(): array {
+		return array();
+	}
+
+	/**
+	 * Return the languages this API supports.
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	public function get_supported_target_languages(): array {
+		return array();
+	}
+
+	/**
+	 * Get the token.
+	 *
+	 * @return string
+	 */
+	public function get_token(): string {
+		return '';
+	}
+
+	/**
+	 * Return the API url.
+	 *
+	 * @return string
+	 */
+	public function get_api_url(): string {
+		return '';
+	}
+
+	/**
+	 * Disable free requests.
+	 *
+	 * @return void
+	 */
+	public function disable_free_requests(): void {}
 }

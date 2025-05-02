@@ -6,6 +6,7 @@
 
 - Using PHPStan to check for potential PHP errors in plugin
 - Optimized WordPress Coding Standard check
+- Updates Avada support
 - Some code optimizations
 
 ### Fixed
@@ -13,6 +14,7 @@
 - Fixed potential error on select field validation
 - Fixed error in saving simplified titles of pages or posts
 - Fixed error in reading inner blocks in Block Editor
+- Fixed missing run of triggers after simplification has been saved
 
 ## [2.7.0] - 07.04.2025
 

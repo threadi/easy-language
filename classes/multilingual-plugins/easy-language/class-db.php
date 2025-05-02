@@ -28,14 +28,14 @@ class Db {
 	/**
 	 * List of text-objects.
 	 *
-	 * @var array
+	 * @var array<string,Text>
 	 */
 	private array $texts = array();
 
 	/**
 	 * List of simplification-objects.
 	 *
-	 * @var array
+	 * @var array<string,Text>
 	 */
 	private array $simplifications = array();
 
@@ -99,10 +99,11 @@ class Db {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Db {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
@@ -190,7 +191,7 @@ class Db {
 
 		// if no language is set, get the WP-language.
 		if ( empty( $source_language ) ) {
-			$source_language = helper::get_wp_lang();
+			$source_language = Helper::get_wp_lang();
 		}
 
 		// save the text in db and return the resulting text-object.
@@ -224,11 +225,11 @@ class Db {
 	/**
 	 * Return all actual entries as Easy_Language_Text-object-array.
 	 *
-	 * @param array $filter Set filter (optional).
-	 * @param array $order Order list (optional).
-	 * @param int   $limit Limit the list (optional).
+	 * @param array<string,mixed> $filter Set filter (optional).
+	 * @param array<string,mixed> $order Order list (optional).
+	 * @param int                 $limit Limit the list (optional).
 	 *
-	 * @return array Array of Text-objects
+	 * @return array<Text> Array of Text-objects
 	 */
 	public function get_entries( array $filter = array(), array $order = array(), int $limit = 0 ): array {
 		global $wpdb;
@@ -243,12 +244,16 @@ class Db {
 
 		// set ordering: default goes for title first, then other fields (to show fast proceed as titles are smaller than other texts).
 		$sql_order = " ORDER BY IF( o.field = 'title', 0, 1 ) ASC";
-		if ( ! empty( $order['order_by'] ) && 'date' === $order['order_by'] && ! empty( $order ) && ! empty( $order['order'] ) && in_array( $order['order'], array(
+		if ( ! empty( $order ) && ! empty( $order['order_by'] ) && 'date' === $order['order_by'] && ! empty( $order['order'] ) && in_array(
+			$order['order'],
+			array(
 				'asc',
-				'desc'
-			), true ) ) {
+				'desc',
+			),
+			true
+		) ) {
 				$sql_order = ' ORDER BY o.time ' . sanitize_text_field( $order['order'] );
-			}
+		}
 
 		// init vars-array for prepared statement.
 		$vars = array( '1' );

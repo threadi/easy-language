@@ -1,25 +1,24 @@
 <?php
 /**
- * File for hooks regarding the translatePress-plugin.
+ * File to add TranslatePress as supported multilingual plugin.
  *
  * @package easy-language
  */
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Apis;
-use easyLanguage\helper;
+use easyLanguage\Helper;
 use easyLanguage\Languages;
 use easyLanguage\Multilingual_plugins\TranslatePress\Init;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+use easyLanguage\Multilingual_Plugins_Base;
 
 /**
  * Register the TranslatePress service in this plugin.
  *
- * @param array $plugin_list List of available multilingual-plugins.
- * @return array
+ * @param array<int,Multilingual_Plugins_Base> $plugin_list List of available multilingual-plugins.
+ * @return array<int,Multilingual_Plugins_Base>
  */
 function easy_language_register_plugin_translate_press( array $plugin_list ): array {
 	// bail if plugin is not active.
@@ -28,7 +27,7 @@ function easy_language_register_plugin_translate_press( array $plugin_list ): ar
 	}
 
 	// get plugin-object and add it to list.
-	$plugin_list[] = Init::get_instance();
+	$plugin_list[] = Init::get_instance(); // @phpstan-ignore class.notFound
 
 	// return resulting list.
 	return $plugin_list;
@@ -38,8 +37,8 @@ add_filter( 'easy_language_register_plugin', 'easy_language_register_plugin_tran
 /**
  * Add our languages to list of all languages from translatepress.
  *
- * @param array $supported_languages_list List of supported languages.
- * @return array
+ * @param array<string,array<string,mixed>> $supported_languages_list List of supported languages.
+ * @return array<string,array<string,mixed>>
  */
 function easy_language_trp_add_to_wp_list( array $supported_languages_list ): array {
 	// remove our own filter to prevent loop.
@@ -73,15 +72,27 @@ add_filter( 'trp_wp_languages', 'easy_language_trp_add_to_wp_list' );
 /**
  * Add our automatic machine as functions.
  *
- * @param array $api_list List of supported languages.
- * @return array
+ * @param array<string,string> $api_list List of supported languages.
+ * @return array<string,string>
  */
 function easy_language_trp_add_automatic_machine( array $api_list ): array {
 	// get active API and add it if they support this plugin.
 	$api_obj = Apis::get_instance()->get_active_api();
-	if ( $api_obj->is_supporting_translatepress() ) {
-		$api_list[ $api_obj->get_name() ] = $api_obj->get_translatepress_machine_class();
+
+	// bail if no active API is set.
+	if( ! $api_obj ) {
+		return $api_list;
 	}
+
+	// bail if API does not support translatepress.
+	if ( ! $api_obj->is_supporting_translatepress() ) {
+		return $api_list;
+	}
+
+	// add the translatepress class to the list.
+	$api_list[ $api_obj->get_name() ] = $api_obj->get_translatepress_machine_class();
+
+	// return resulting list.
 	return $api_list;
 }
 add_filter( 'trp_automatic_translation_engines_classes', 'easy_language_trp_add_automatic_machine' );
@@ -89,18 +100,30 @@ add_filter( 'trp_automatic_translation_engines_classes', 'easy_language_trp_add_
 /**
  * Add the automatic machine to the list in translatePress-backend.
  *
- * @param array $engines List of supported simplify engines.
- * @return mixed
+ * @param array<int,array<string,string>> $engines List of supported simplify engines.
+ * @return array<int,array<string,string>>
  */
 function easy_language_trp_add_automatic_engine( array $engines ): array {
 	// get active API and add it if they support this plugin.
 	$api_obj = Apis::get_instance()->get_active_api();
-	if ( $api_obj->is_supporting_translatepress() ) {
-		$engines[] = array(
-			'value' => $api_obj->get_name(),
-			'label' => $api_obj->get_title(),
-		);
+
+	// bail if no active API is set.
+	if( ! $api_obj ) {
+		return $engines;
 	}
+
+	// bail if API does not support translatepress.
+	if ( ! $api_obj->is_supporting_translatepress() ) {
+		return $engines;
+	}
+
+	// add the engine settings.
+	$engines[] = array(
+		'value' => $api_obj->get_name(),
+		'label' => $api_obj->get_title(),
+	);
+
+	// return the resulting list.
 	return $engines;
 }
 add_filter( 'trp_machine_translation_engines', 'easy_language_trp_add_automatic_engine', 30 );
@@ -113,6 +136,13 @@ add_filter( 'trp_machine_translation_engines', 'easy_language_trp_add_automatic_
 function easy_language_trp_reset_simplifications(): void {
 	global $wpdb;
 	$trp       = TRP_Translate_Press::get_trp_instance();
+
+	// bail if class could not be loaded.
+	if( is_null( $trp ) ) {
+		return;
+	}
+
+	// get the query.
 	$trp_query = $trp->get_component( 'query' );
 
 	// get possible target-languages.
@@ -123,8 +153,8 @@ function easy_language_trp_reset_simplifications(): void {
 		// check if table exist.
 		if ( ! empty( $wpdb->get_results( $wpdb->prepare( 'SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = %s', array( $trp_query->get_table_name( strtolower( $language_code ) ) ) ) ) ) ) {
 			// truncate tables.
-			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $trp_query->get_table_name( strtolower( $language_code ) ) ) ) );
-			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $trp_query->get_gettext_table_name( strtolower( $language_code ) ) ) ) );
+			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $trp_query->get_table_name( strtolower( $language_code ) ) ) ) ); // @phpstan-ignore argument.type
+			$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $trp_query->get_gettext_table_name( strtolower( $language_code ) ) ) ) ); // @phpstan-ignore argument.type
 		}
 	}
 }
@@ -133,8 +163,8 @@ function easy_language_trp_reset_simplifications(): void {
  * Check for supported languages.
  *
  * @param bool  $all_are_available Whether all languages are available.
- * @param array $trp_languages List of languages in translatepress.
- * @param array $settings List of settings.
+ * @param array<string,string> $trp_languages List of languages in translatepress.
+ * @param array<string,array<string,mixed>> $settings List of settings.
  * @return bool
  */
 function easy_language_trp_get_supported_languages( bool $all_are_available, array $trp_languages, array $settings ): bool {
@@ -166,10 +196,10 @@ add_filter( 'trp_mt_available_supported_languages', 'easy_language_trp_get_suppo
 /**
  * Add settings for our individual language for language-switcher in frontend.
  *
- * @param array  $current_language The current language.
- * @param array  $trp_published_languages The list of published languages.
+ * @param array<string>  $current_language The current language.
+ * @param array<string>  $trp_published_languages The list of published languages.
  * @param string $trp_language The translatePress-language.
- * @return array
+ * @return array<string>
  */
 function easy_language_trp_set_current_language_fields( array $current_language, array $trp_published_languages, string $trp_language ): array {
 	// get possible target-languages.

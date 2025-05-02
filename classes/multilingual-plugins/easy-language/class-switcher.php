@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Helper;
 use easyLanguage\Languages;
+use WP_Post;
 
 /**
  * Object which handles the language switcher.
@@ -48,11 +49,11 @@ class Switcher {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Switcher {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
@@ -175,7 +176,7 @@ class Switcher {
 	/**
 	 * Return switcher for output in frontend via Block Editor/FSE.
 	 *
-	 * @param array $attributes The settings as array.
+	 * @param array<string,array<string>|bool> $attributes The settings as array.
 	 *
 	 * @return string
 	 */
@@ -228,13 +229,21 @@ class Switcher {
 			}
 		}
 
+		// get the permalinks.
+		$permalink = get_permalink( $object->get_id() );
+
+		// bail if permalink is unavailable.
+		if ( ! $permalink ) {
+			return '';
+		}
+
 		// variable to collect the output.
 		$html = '';
 
 		// loop through active languages and set their links.
 		foreach ( $languages as $language_code => $settings ) {
 			// get URL.
-			$url = $object->get_language_specific_url( empty( $settings['url'] ) ? get_permalink( $object->get_id() ) : $settings['url'], $language_code );
+			$url = $object->get_language_specific_url( empty( $settings['url'] ) ? $permalink : $settings['url'], $language_code );
 
 			// define title or icon.
 			/* translators: %1$s will be replaced by the name of the language */
@@ -257,9 +266,9 @@ class Switcher {
 	/**
 	 * Change the menu items if they are language switcher-items for classic themes.
 	 *
-	 * @param array $items List of menu-items.
+	 * @param array<string,mixed> $items List of menu-items.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function set_menu_items( array $items ): array {
 		// do nothing in wp-admin.
@@ -291,6 +300,9 @@ class Switcher {
 			$object_id = $object->get_original_object_as_int();
 			// get new object as base for the listing.
 			$object = $this->init->get_object_by_wp_object( get_post( $object_id ), $object_id );
+			if ( false === $object ) {
+				return $items;
+			}
 		}
 
 		// bail if post type is not supported.
@@ -303,6 +315,14 @@ class Switcher {
 
 		// bail if no active languages are set.
 		if ( empty( $languages ) ) {
+			return $items;
+		}
+
+		// get the permalinks.
+		$permalink = get_permalink( $object->get_id() );
+
+		// bail if permalink is unavailable.
+		if ( ! $permalink ) {
 			return $items;
 		}
 
@@ -347,7 +367,7 @@ class Switcher {
 					$new_item->title      = $show_icons ? Helper::get_icon_img_for_language_code( $language_code ) : $settings['label'];
 					$new_item->menu_order = $items[ $index ]->menu_order + $language_counter;
 					// set URL for menu item.
-					$new_item->url = $object->get_language_specific_url( empty( $settings['url'] ) ? get_permalink( $object->get_id() ) : $settings['url'], $language_code );
+					$new_item->url = $object->get_language_specific_url( empty( $settings['url'] ) ? $permalink : $settings['url'], $language_code );
 
 					// merge items.
 					array_splice( $items, $new_index, 1, array( $new_item ) );
@@ -422,7 +442,7 @@ class Switcher {
 	/**
 	 * Use shortcode to output the language switcher.
 	 *
-	 * @param array $attributes Attribute on the shortcode.
+	 * @param array<string,string> $attributes Attribute on the shortcode.
 	 *
 	 * @return string
 	 */

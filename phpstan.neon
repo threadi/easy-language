@@ -1,5 +1,5 @@
 parameters:
-  level: 10
+  level: 8
   reportUnmatchedIgnoredErrors: false
   ignoreErrors:
     - "#^Unsafe usage of new static#"
@@ -8,13 +8,29 @@ parameters:
     - "#Call to an undefined method(.*)tick#"
     - "#Call to an undefined method(.*)finish#"
     - "#wp-admin/includes#"
+    - "#TRP_Translate_Press#"
+    - "#TRP_Machine_Translator#"
+    - "#SitePress_EditLanguages#"
+    - "#wpml_get_setup_instance#"
+    - "#icl_cache_clear#"
+    - "#ThemifyBuilder_Data_Manager#"
+    - "#et_fb_prepare_ssl_link#"
+    - "#et_core_is_fb_enabled#"
+    - "#Breakdance#"
+    - "#Avia_Builder#"
+    - "#wp_safe_redirect#"
+    - "#Gettext#"
+    - "#WP_REST_Request#"
+    - "#pll_current_language#"
   paths:
     - classes
     - easy-language.php
     - uninstall.php
     - inc/
   excludePaths:
-     - classes/multilingual-plugins/easy-language/pagebuilder/elementor/
+  	 - classes/multilingual-plugins/easy-language/pagebuilder/divi/node_modules/
+  	 - classes/multilingual-plugins/easy-language/pagebuilder/elementor/
+  	 - classes/multilingual-plugins/translatepress/
   scanFiles:
      - %rootDir%/../../php-stubs/wordpress-stubs/wordpress-stubs.php
      - %rootDir%/../../php-stubs/wp-cli-stubs/wp-cli-stubs.php

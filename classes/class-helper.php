@@ -10,6 +10,8 @@ namespace easyLanguage;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Multilingual_plugins\Easy_Language\Objects;
+use easyLanguage\Multilingual_plugins\Easy_Language\Parser_Base;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 use WP_Admin_Bar;
 use WP_Post;
@@ -61,7 +63,7 @@ class Helper {
 
 		// if there is no language in query-var, use the WP-locale.
 		if ( empty( $lang ) ) {
-			$lang = helper::get_wp_lang();
+			$lang = self::get_wp_lang();
 		}
 
 		// return the current language as language-code (e.g. "de_de").
@@ -115,7 +117,7 @@ class Helper {
 		/**
 		 * Consider the main language set in Polylang for the web page.
 		 */
-		if ( self::is_plugin_active( 'polylang/polylang.php' ) && function_exists( 'pll_default_language' ) ) {
+		if ( function_exists( 'pll_default_language' ) && self::is_plugin_active( 'polylang/polylang.php' ) ) {
 			$wp_language = pll_current_language( 'locale' );
 		}
 
@@ -149,11 +151,27 @@ class Helper {
 			return;
 		}
 
+		// get the post type of the old entry.
+		$post_type = get_post_type( $old_id );
+
+		// bail if post type could not be read.
+		if ( ! $post_type ) {
+			return;
+		}
+
 		// copy all assigned taxonomies.
-		$taxonomies = get_object_taxonomies( get_post_type( $old_id ) );
+		$taxonomies = get_object_taxonomies( $post_type );
 		if ( $taxonomies ) {
 			foreach ( $taxonomies as $taxonomy ) {
+				// get the terms of the old entry.
 				$post_terms = wp_get_object_terms( $old_id, $taxonomy, array( 'fields' => 'slugs' ) );
+
+				// bail if terms could not be read.
+				if ( ! is_array( $post_terms ) ) {
+					continue;
+				}
+
+				// save the terms on new entry.
 				wp_set_object_terms( $new_id, $post_terms, $taxonomy );
 			}
 		}
@@ -197,9 +215,9 @@ class Helper {
 	/**
 	 * Check if settings-errors-entry already exists in array.
 	 *
-	 * @param string $entry The search entry.
-	 * @param array  $error_list The list of errors.
-	 * @return false
+	 * @param string                  $entry The search entry.
+	 * @param array<string|int,mixed> $error_list The list of errors.
+	 * @return bool
 	 */
 	public static function check_if_setting_error_entry_exists_in_array( string $entry, array $error_list ): bool {
 		foreach ( $error_list as $item ) {
@@ -213,8 +231,9 @@ class Helper {
 	/**
 	 * Validate multiple checkboxes.
 	 *
-	 * @param ?array $values The list of values.
-	 * @return array|null
+	 * @param array<string,mixed>|null $values The list of values.
+	 *
+	 * @return array<string,mixed>|null
 	 */
 	public static function settings_validate_multiple_checkboxes( ?array $values ): ?array {
 		$filter = current_filter();
@@ -223,7 +242,11 @@ class Helper {
 			if ( empty( $values ) ) {
 				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_SANITIZE_NUMBER_INT, FILTER_FORCE_ARRAY );
 				if ( ! empty( $pre_values ) ) {
-					$values = array_map( 'sanitize_text_field', $pre_values );
+					// set the callback for array_map.
+					$callback = 'sanitize_text_field';
+
+					// run the sanitizing.
+					$values = array_map( $callback, $pre_values ); // @phpstan-ignore argument.type
 				}
 			}
 		}
@@ -233,8 +256,9 @@ class Helper {
 	/**
 	 * Validate multiple select fields.
 	 *
-	 * @param ?array $values The list of values.
-	 * @return array|null
+	 * @param array<string,mixed>|null $values The list of values.
+	 *
+	 * @return array<string,mixed>|null
 	 */
 	public static function settings_validate_multiple_select_fields( ?array $values ): ?array {
 		$filter = current_filter();
@@ -243,7 +267,11 @@ class Helper {
 			if ( empty( $values ) ) {
 				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_FORCE_ARRAY );
 				if ( ! empty( $pre_values ) ) {
-					$values = array_map( 'sanitize_text_field', $pre_values );
+					// set the callback for array_map.
+					$callback = 'sanitize_text_field';
+
+					// run the sanitizing.
+					$values = array_map( $callback, $pre_values );
 				}
 			}
 		}
@@ -253,9 +281,9 @@ class Helper {
 	/**
 	 * Validate multiple text fields.
 	 *
-	 * @param ?array $values The list of values.
+	 * @param array<string,mixed>|null $values The list of values.
 	 *
-	 * @return array|null
+	 * @return array<string,mixed>|null
 	 * @noinspection PhpUnused
 	 */
 	public static function settings_validate_multiple_text_field( ?array $values ): ?array {
@@ -278,6 +306,7 @@ class Helper {
 	 * Validate multiple radio-fields.
 	 *
 	 * @param ?string $values The list of values.
+	 *
 	 * @return string|null
 	 */
 	public static function settings_validate_multiple_radios( ?string $values ): ?string {
@@ -298,6 +327,7 @@ class Helper {
 	 * Validate select field.
 	 *
 	 * @param ?string $value The value as string.
+	 *
 	 * @return string|null
 	 */
 	public static function settings_validate_select_field( ?string $value ): ?string {
@@ -334,20 +364,29 @@ class Helper {
 	 * @return WP_Post|false
 	 */
 	public static function get_attachment_by_post_name( string $post_name ): WP_Post|false {
-		$query          = array(
+		$query      = array(
 			'posts_per_page' => 1,
 			'post_type'      => 'attachment',
 			'name'           => trim( $post_name ),
 			'post_status'    => 'inherit',
 		);
-		$get_attachment = new WP_Query( $query );
+		$attachment = new WP_Query( $query );
 
-		if ( ! $get_attachment || ! isset( $get_attachment->posts, $get_attachment->posts[0] ) ) {
+		// bail on no results.
+		if ( 0 === $attachment->post_count ) {
+			return false;
+		}
+
+		// get first result.
+		$post = $attachment->posts[0];
+
+		// bail if attachment is not WP_Post.
+		if ( ! $post instanceof WP_Post ) {
 			return false;
 		}
 
 		// return resulting object.
-		return $get_attachment->posts[0];
+		return $post;
 	}
 
 	/**
@@ -358,7 +397,7 @@ class Helper {
 	 * @return WP_Post|false
 	 */
 	public static function get_attachment_by_language_code( string $language_code ): WP_Post|false {
-		$query          = array(
+		$query      = array(
 			'posts_per_page' => 1,
 			'post_type'      => 'attachment',
 			'post_status'    => 'inherit',
@@ -370,14 +409,23 @@ class Helper {
 				),
 			),
 		);
-		$get_attachment = new WP_Query( $query );
+		$attachment = new WP_Query( $query );
 
-		if ( 0 === $get_attachment->post_count ) {
+		// bail on no results.
+		if ( 0 === $attachment->post_count ) {
+			return false;
+		}
+
+		// get first result.
+		$post = $attachment->posts[0];
+
+		// bail if attachment is not WP_Post.
+		if ( ! $post instanceof WP_Post ) {
 			return false;
 		}
 
 		// return resulting object.
-		return $get_attachment->posts[0];
+		return $post;
 	}
 
 	/**
@@ -416,24 +464,34 @@ class Helper {
 	/**
 	 * Generate the admin menu bar for supported languages.
 	 *
-	 * @param string       $id The ID of the object.
-	 * @param WP_Admin_Bar $admin_bar The admin-bar-object.
-	 * @param array        $target_languages The array of languages.
-	 * @param Post_Object  $my_object The object itself.
-	 * @param string       $object_type_name The type name of the object.
+	 * @param string                            $id The ID of the object.
+	 * @param WP_Admin_Bar                      $admin_bar The admin-bar-object.
+	 * @param array<string,array<string,mixed>> $target_languages The array of languages.
+	 * @param Objects                           $my_object The object itself.
+	 * @param string                            $object_type_name The type name of the object.
 	 *
 	 * @return void
 	 */
-	public static function generate_admin_bar_language_menu( string $id, WP_Admin_Bar $admin_bar, array $target_languages, Post_Object $my_object, string $object_type_name ): void {
+	public static function generate_admin_bar_language_menu( string $id, WP_Admin_Bar $admin_bar, array $target_languages, Objects $my_object, string $object_type_name ): void {
 		foreach ( $target_languages as $language_code => $target_language ) {
 			/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
 			$title = sprintf( __( 'Show this %1$s in %2$s ', 'easy-language' ), esc_html( $object_type_name ), esc_html( $target_language['label'] ) );
 
 			// check if this object is already translated in this language.
 			if ( false !== $my_object->is_simplified_in_language( $language_code ) ) {
-				// generate link-target to default editor with language-marker.
+				// get the post object.
 				$simplified_post_object = new Post_Object( $my_object->get_simplification_in_language( $language_code ) );
-				$url                    = $simplified_post_object->get_page_builder()->get_edit_link();
+
+				// get its page builder.
+				$page_builder_obj = $simplified_post_object->get_page_builder();
+
+				// bail if pagebuilder could not be read.
+				if ( ! $page_builder_obj ) {
+					continue;
+				}
+
+				// get the URL.
+				$url = $page_builder_obj->get_edit_link();
 			} else {
 				// create link to generate a new simplification for this object.
 				$url = $my_object->get_simplification_link( $language_code );
@@ -466,11 +524,24 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_icon_path_for_language_code( string $language_code ): string {
+		// get the attachment by given language code.
 		$attachment = self::get_attachment_by_language_code( $language_code );
-		if ( false !== $attachment ) {
-			return wp_get_attachment_image_url( $attachment->ID );
+
+		// bail if no attachment could be read.
+		if ( ! $attachment ) {
+			return '';
 		}
-		return '';
+
+		// get the URL.
+		$url = wp_get_attachment_image_url( $attachment->ID );
+
+		// bail if URL is empty.
+		if ( ! $url ) {
+			return '';
+		}
+
+		// return the URL.
+		return $url;
 	}
 
 	/**
@@ -478,9 +549,9 @@ class Helper {
 	 *
 	 * @param int    $object_id The object-ID.
 	 * @param string $object_type The object-type (optional).
-	 * @return object|false
+	 * @return Objects|false
 	 */
-	public static function get_object( int $object_id, string $object_type = '' ): object|false {
+	public static function get_object( int $object_id, string $object_type = '' ): Objects|false {
 		$false = false;
 
 		/**
@@ -491,8 +562,10 @@ class Helper {
 		 * @param bool $false Return false as default.
 		 * @param int $object_id The ID of the object.
 		 * @param string $object_type The type of the object.
+		 *
+		 * @noinspection PhpConditionAlreadyCheckedInspection
 		 */
-		return apply_filters( 'easy_language_get_object', $false, $object_id, $object_type );
+		return apply_filters( 'easy_language_get_object', $false, $object_id, $object_type ); // @phpstan-ignore return.type
 	}
 
 	/**
@@ -506,6 +579,11 @@ class Helper {
 	public static function get_lang_of_object( int $object_id, string $object_type ): string {
 		// get object.
 		$object = self::get_object( $object_id, $object_type );
+
+		// bail if object could not be loaded.
+		if ( ! $object ) {
+			return '';
+		}
 
 		/**
 		 * Consider the main language set in WPML for the web page
@@ -589,12 +667,12 @@ class Helper {
 	 * Return dialog for not available page builder.
 	 *
 	 * @param Post_Object $post_object The post object.
-	 * @param object      $page_builder The page builder object.
+	 * @param Parser_Base $page_builder The page builder object.
 	 *
-	 * @return array
+	 * @return string
 	 */
-	public static function get_dialog_for_unavailable_page_builder( Post_Object $post_object, object $page_builder ): array {
-		return array(
+	public static function get_dialog_for_unavailable_page_builder( Post_Object $post_object, Parser_Base $page_builder ): string {
+		$dialog = array(
 			/* translators: %1$s will be replaced by the object-title */
 			'title'   => sprintf( __( 'Used page builder is not available', 'easy-language' ), esc_html( $post_object->get_title() ) ),
 			'texts'   => array(
@@ -609,6 +687,7 @@ class Helper {
 				),
 			),
 		);
+		return self::get_dialog_for_attribute( $dialog );
 	}
 
 	/**
@@ -626,7 +705,7 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_current_url(): string {
-		if ( is_admin() && ! empty( $_SERVER['REQUEST_URI'] ) ) {
+		if ( ! empty( $_SERVER['REQUEST_URI'] ) && is_admin() ) {
 			return admin_url( basename( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) );
 		}
 
@@ -640,6 +719,11 @@ class Helper {
 		}
 		if ( $object instanceof WP_Post ) {
 			$page_url = get_permalink( $object->ID );
+		}
+
+		// bail if no page url could be read.
+		if ( ! $page_url ) {
+			return '';
 		}
 
 		// return result.
@@ -675,7 +759,7 @@ class Helper {
 		// Case #4.
 		$rest_url    = wp_parse_url( trailingslashit( rest_url() ) );
 		$current_url = wp_parse_url( add_query_arg( array() ) );
-		if ( is_array( $current_url ) && isset( $current_url['path'] ) ) {
+		if ( is_array( $current_url ) && is_array( $rest_url ) && isset( $current_url['path'], $rest_url['path'] ) ) {
 			return str_starts_with( $current_url['path'], $rest_url['path'] );
 		}
 		return false;
@@ -694,14 +778,15 @@ class Helper {
 	public static function get_file_version( string $filepath ): string {
 		// check for WP_DEBUG.
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			return filemtime( $filepath );
+			return (string) filemtime( $filepath );
 		}
 
 		// check for own debug.
 		if ( 1 === absint( get_option( 'easy_language_debug_mode', 0 ) ) ) {
-			return filemtime( $filepath );
+			return (string) filemtime( $filepath );
 		}
 
+		// get the plugin version which as been set in release.
 		$plugin_version = EASY_LANGUAGE_VERSION;
 
 		/**
@@ -730,5 +815,23 @@ class Helper {
 		 * @param array $keys List of keys to ignore.
 		 */
 		return apply_filters( 'easy_language_post_meta_keys_to_ignore', $keys );
+	}
+
+	/**
+	 * Return dialog for attribute-usage.
+	 *
+	 * @param array<string,mixed> $dialog The dialog configuration.
+	 *
+	 * @return string
+	 */
+	public static function get_dialog_for_attribute( array $dialog ): string {
+		// get dialog as JSON.
+		$dialog_json = wp_json_encode( $dialog );
+		if ( ! $dialog_json ) {
+			return '';
+		}
+
+		// return the dialog as JSON-string.
+		return $dialog_json;
 	}
 }

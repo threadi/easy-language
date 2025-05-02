@@ -29,7 +29,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	/**
 	 * Override the parent columns method. Defines the columns to use in your listing table
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function get_columns(): array {
 		return array(
@@ -45,12 +45,12 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	/**
 	 * Get the table data.
 	 *
-	 * @return array
+	 * @return array<Text>
 	 */
 	private function table_data(): array {
 		// order table.
 		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( ! in_array( $order_by, array_keys( $this->get_sortable_columns() ), true ) ) {
+		if ( ! array_key_exists( $order_by, $this->get_sortable_columns() ) ) {
 			$order_by = 'date';
 		}
 		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
@@ -59,7 +59,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 		}
 
 		// get results.
-		return DB::get_instance()->get_entries(
+		return Db::get_instance()->get_entries(
 			Init::get_instance()->get_filter_for_entries_to_simplify(),
 			array(
 				'order_by' => $order_by,
@@ -85,7 +85,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	/**
 	 * Define which columns are hidden.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_hidden_columns(): array {
 		return array();
@@ -94,7 +94,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	/**
 	 * Define the sortable columns.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_sortable_columns(): array {
 		return array( 'date' => array( 'date', false ) );
@@ -103,17 +103,12 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	/**
 	 * Define what data to show on each column of the table.
 	 *
-	 * @param  array|object $item        Data.
-	 * @param  String       $column_name - Current column name.
+	 * @param  Text   $item        Data.
+	 * @param  String $column_name - Current column name.
 	 *
 	 * @return string
 	 */
 	public function column_default( $item, $column_name ): string {
-		// bail if item is not an entry-text.
-		if ( ! ( $item instanceof Text ) ) {
-			return '';
-		}
-
 		// get languages-object.
 		$languages_obj = Languages::get_instance();
 
@@ -128,7 +123,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 		$column_name = apply_filters( 'easy_language_simplification_table_to_simplify', $column_name, $item );
 
 		// bail if column-name is not set.
-		if ( false === $column_name ) {
+		if ( empty( $column_name ) ) {
 			return '';
 		}
 
@@ -162,12 +157,17 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 			),
 		);
 
+		$dialog = wp_json_encode( $dialog_simplification );
+		if ( ! $dialog ) {
+			$dialog = '';
+		}
+
 		// show content depending on column.
 		switch ( $column_name ) {
 			case 'options':
 				$options = array(
 					'<span class="dashicons dashicons-translation" title="' . __( 'Simplify now only with Easy Language Pro.', 'easy-language' ) . '">&nbsp;</span>',
-					'<a href="' . esc_url( $delete_link ) . '" class="dashicons dashicons-trash easy-dialog-for-wordpress" data-dialog="' . esc_attr( wp_json_encode( $dialog_simplification ) ) . '" title="' . __( 'Delete this text.', 'easy-language' ) . '">&nbsp;</a>',
+					'<a href="' . esc_url( $delete_link ) . '" class="dashicons dashicons-trash easy-dialog-for-wordpress" data-dialog="' . esc_attr( $dialog ) . '" title="' . __( 'Delete this text.', 'easy-language' ) . '">&nbsp;</a>',
 				);
 
 				$item_id = $item->get_id();

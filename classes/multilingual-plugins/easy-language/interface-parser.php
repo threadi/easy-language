@@ -39,7 +39,7 @@ interface Parser {
 	/**
 	 * Return parsed texts.
 	 *
-	 * @return array
+	 * @return array<array<string,mixed>>
 	 */
 	public function get_parsed_texts(): array;
 

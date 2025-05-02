@@ -37,11 +37,11 @@ class Languages {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Languages {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
@@ -50,7 +50,7 @@ class Languages {
 	 * If an API is active, use their supported languages if they can be configured.
 	 * If no API is active, use plugin settings.
 	 *
-	 * @return array
+	 * @return array<string,array<string,string>>
 	 */
 	public function get_active_languages(): array {
 		// get active api.
@@ -80,7 +80,7 @@ class Languages {
 	/**
 	 * Return possible source languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string,string>>
 	 */
 	public function get_possible_source_languages(): array {
 		$source_languages = array(
@@ -126,7 +126,7 @@ class Languages {
 	 *
 	 * @param bool $without_img True if the setting should load without image.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_possible_target_languages( bool $without_img = false ): array {
 		$target_languages = array(
@@ -155,7 +155,7 @@ class Languages {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $target_languages List of target languages.
+		 * @param array<string,array<string,mixed>> $target_languages List of target languages.
 		 */
 		return apply_filters( 'easy_language_supported_target_languages', $target_languages );
 	}

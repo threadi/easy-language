@@ -6,7 +6,9 @@
  */
 
 // prevent direct access.
-defined( 'ABSPATH' ) || exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * SUMM AI API URL.

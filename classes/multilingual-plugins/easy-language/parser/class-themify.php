@@ -50,17 +50,17 @@ class Themify extends Parser_Base implements Parser {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Themify {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
 	 * Define flow-text-widgets.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	private function get_flow_text_widgets(): array {
 		$widgets = array(
@@ -83,7 +83,7 @@ class Themify extends Parser_Base implements Parser {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $widgets List of widgets.
+		 * @param array<string,mixed> $widgets List of widgets.
 		 */
 		return apply_filters( 'easy_language_themify_text_widgets', $widgets );
 	}
@@ -117,7 +117,7 @@ class Themify extends Parser_Base implements Parser {
 	 *
 	 * Get the themify-content and parse its widgets to get the content of flow-text-widgets.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if themify is not active.
@@ -222,9 +222,9 @@ class Themify extends Parser_Base implements Parser {
 	/**
 	 * Loop through the container to get the flow-text-modules.
 	 *
-	 * @param array $container The container to parse.
-	 * @param array $resulting_texts The resulting list of texts.
-	 * @return array
+	 * @param array<string,mixed> $container The container to parse.
+	 * @param array<string,mixed> $resulting_texts The resulting list of texts.
+	 * @return array<string,mixed>
 	 */
 	private function get_widgets( array $container, array $resulting_texts ): array {
 		foreach ( $container as $name => $sub_container ) {
@@ -262,9 +262,9 @@ class Themify extends Parser_Base implements Parser {
 	/**
 	 * Replace simplified content in widgets.
 	 *
-	 * @param array  $container The container to parse.
-	 * @param string $simplified_part The simplified text.
-	 * @return array
+	 * @param array<string,mixed> $container The container to parse.
+	 * @param string              $simplified_part The simplified text.
+	 * @return array<string,mixed>
 	 */
 	private function replace_content_in_widgets( array $container, string $simplified_part ): array {
 		// loop through the entries in this container.

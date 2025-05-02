@@ -39,7 +39,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	/**
 	 * Return the object language depending on object type.
 	 *
-	 * @return array
+	 * @return array<string,array<string,string>>
 	 */
 	public function get_language(): array {
 		$languages = Languages::get_instance()->get_active_languages();
@@ -68,7 +68,16 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 * @return string
 	 */
 	public function get_type(): string {
-		return get_post_type( $this->get_id() );
+		// get the post type.
+		$post_type = get_post_type( $this->get_id() );
+
+		// bail if post type could not be returned.
+		if ( ! $post_type ) {
+			return '';
+		}
+
+		// return the post type.
+		return $post_type;
 	}
 
 	/**
@@ -117,19 +126,37 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	/**
 	 * Get WP-own post object as array.
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function get_object_as_array(): array {
-		return get_post( $this->get_id(), ARRAY_A );
+		// get post as array.
+		$post = get_post( $this->get_id(), ARRAY_A );
+
+		// bail if returned value is not an array.
+		if ( ! $post ) {
+			return array();
+		}
+
+		// return the post as array.
+		return $post;
 	}
 
 	/**
 	 * Get WP-own post object as WP-object.
 	 *
-	 * @return WP_Post
+	 * @return WP_Post|false
 	 */
-	public function get_object_as_object(): WP_Post {
-		return get_post( $this->get_id() );
+	public function get_object_as_object(): WP_Post|false {
+		// get post as object.
+		$post = get_post( $this->get_id() );
+
+		// bail if returned value is not an object.
+		if ( ! $post ) {
+			return false;
+		}
+
+		// return the post as object.
+		return $post;
 	}
 
 	/**
@@ -179,6 +206,11 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		} elseif ( in_array( get_option( 'easy_language_switcher_link', '' ), array( 'hide_not_translated', 'link_translated' ), true ) ) {
 			// if this page is not simplified, link to the homepage.
 			$url = get_home_url();
+		}
+
+		// bail if no URL could be found.
+		if ( ! $url ) {
+			return '';
 		}
 
 		// return resulting url.
@@ -281,14 +313,14 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	/**
 	 * Get pagebuilder of this object.
 	 *
-	 * @return object|false
+	 * @return Parser_Base|false
 	 */
-	public function get_page_builder(): object|false {
+	public function get_page_builder(): Parser_Base|false {
 		// check the list of supported pagebuilder for compatibility.
 		// the first one which matches will be used.
 		foreach ( apply_filters( 'easy_language_pagebuilder', array() ) as $page_builder_obj ) {
 			// bail if object is not of type Parser_Base.
-			if( ! $page_builder_obj instanceof Parser_Base ) {
+			if ( ! $page_builder_obj instanceof Parser_Base ) {
 				continue;
 			}
 
@@ -350,7 +382,16 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 * @return string
 	 */
 	public function get_status(): string {
-		return get_post_status( $this->get_id() );
+		// get post status.
+		$post_status = get_post_status( $this->get_id() );
+
+		// bail if no post status is found.
+		if ( ! $post_status ) {
+			return '';
+		}
+
+		// return the post status.
+		return $post_status;
 	}
 
 	/**
@@ -374,10 +415,10 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	/**
 	 * Return entries which are assigned to this post-object.
 	 *
-	 * @return array
+	 * @return array<Text>
 	 */
 	public function get_entries(): array {
-		return DB::get_instance()->get_entries(
+		return Db::get_instance()->get_entries(
 			array(
 				'object_id'   => $this->get_id(),
 				'object_type' => $this->get_type(),
@@ -394,7 +435,17 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		if ( ! function_exists( 'wp_check_post_lock' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/post.php';
 		}
-		return wp_check_post_lock( $this->get_id() );
+
+		// get lock status.
+		$lock = wp_check_post_lock( $this->get_id() );
+
+		// if lock is an integer, it is locked.
+		if ( ! is_bool( $lock ) ) {
+			return true;
+		}
+
+		// return the lock value.
+		return $lock;
 	}
 
 	/**
@@ -417,7 +468,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 */
 	public function add_simplification_object( string $target_language, Base $api_object, bool $prevent_automatic_mode ): bool|Post_Object {
 		// get DB-object.
-		$db = DB::get_instance();
+		$db = Db::get_instance();
 
 		// check if this object is already simplified in this language.
 		if ( false === $this->is_simplified_in_language( $target_language ) ) {
@@ -439,10 +490,15 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			$post_array['post_author'] = get_current_user_id();
 
 			// add the copy.
-			$copied_post_id = wp_insert_post( $post_array );
+			$copied_post_id = wp_insert_post( $post_array ); // @phpstan-ignore argument.type
+
+			// bail if post could not be created.
+			if ( is_wp_error( $copied_post_id ) ) { // @phpstan-ignore function.impossibleType
+				return false;
+			}
 
 			// copy taxonomies and post-metas of this post type object.
-			helper::copy_cpt( $this->get_id(), $copied_post_id );
+			Helper::copy_cpt( $this->get_id(), $copied_post_id );
 
 			// mark the copied post as simplified-object of the original.
 			update_post_meta( $copied_post_id, 'easy_language_simplification_original_id', $this->get_id() );
@@ -464,6 +520,13 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 
 			// parse text depending on used pagebuilder for this object.
 			$pagebuilder_obj = $this->get_page_builder();
+
+			// bail if page builder could not be loaded.
+			if ( ! $pagebuilder_obj ) {
+				return false;
+			}
+
+			// set settings on page builder object.
 			$pagebuilder_obj->set_object_id( $copied_post_id );
 			$pagebuilder_obj->set_title( $this->get_title() );
 			$pagebuilder_obj->set_text( $this->get_content() );
@@ -482,21 +545,27 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 
 				// check if the text is already saved as original text for simplification.
 				$original_text_obj = $db->get_entry_by_text( $text['text'], $source_language );
-				if ( false === $original_text_obj ) {
+				if ( ! $original_text_obj instanceof Text ) {
 					// save the text for simplification.
 					$original_text_obj = $db->add( $text['text'], $source_language, 'post_content', $text['html'] );
+					if ( ! $original_text_obj instanceof Text ) {
+						return false;
+					}
 				}
-				$original_text_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, $index, $pagebuilder_obj->get_name() );
+				$original_text_obj->set_object( $this->get_type(), $copied_post_id, $index, $pagebuilder_obj->get_name() );
 				$original_text_obj->set_state( 'to_simplify' );
 			}
 
 			// check if the title has already saved as original text for simplification.
 			$original_title_obj = $db->get_entry_by_text( $pagebuilder_obj->get_title(), $source_language );
-			if ( false === $original_title_obj ) {
+			if ( ! $original_title_obj instanceof Text ) {
 				// save the text for simplification.
 				$original_title_obj = $db->add( $pagebuilder_obj->get_title(), $source_language, 'title', false );
+				if ( ! $original_title_obj instanceof Text ) {
+					return false;
+				}
 			}
-			$original_title_obj->set_object( get_post_type( $copied_post_id ), $copied_post_id, 0, $pagebuilder_obj->get_name() );
+			$original_title_obj->set_object( $this->get_type(), $copied_post_id, 0, $pagebuilder_obj->get_name() );
 			$original_title_obj->set_state( 'to_simplify' );
 
 			// add this language as simplified language to original post.
@@ -562,16 +631,23 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		}
 
 		// return the default edit link as fallback.
-		return get_edit_post_link( $this->get_id() );
+		$edit_post_link = get_edit_post_link( $this->get_id() );
+
+		// bail if post link could not be loaded.
+		if ( ! is_string( $edit_post_link ) ) {
+			return '';
+		}
+
+		// return the post edit link.
+		return $edit_post_link;
 	}
 
 	/**
 	 * Call object-specific trigger after processed simplification.
 	 *
 	 * @return void
-	 * @noinspection PhpUnusedPrivateMethodInspection
 	 */
-	private function process_simplification_trigger_on_end(): void {
+	protected function process_simplification_trigger_on_end(): void {
 		$type = $this->get_type();
 		// trigger object-update.
 		do_action( 'save_post_' . $type, $this->get_id(), $this->get_object_as_object(), true );

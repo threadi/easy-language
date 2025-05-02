@@ -41,10 +41,11 @@ class Log {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Log {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
@@ -53,7 +54,7 @@ class Log {
 	 * @return string
 	 */
 	public function get_table_name(): string {
-		return DB::get_instance()->get_wpdb_prefix() . 'easy_language_log';
+		return Db::get_instance()->get_wpdb_prefix() . 'easy_language_log';
 	}
 
 	/**
@@ -113,7 +114,7 @@ class Log {
 		 */
 		$user_id = 0;
 		$user    = wp_get_current_user();
-		if ( $user instanceof WP_User ) {
+		if ( $user instanceof WP_User ) { // @phpstan-ignore instanceof.alwaysTrue
 			$user_id = $user->ID;
 		}
 

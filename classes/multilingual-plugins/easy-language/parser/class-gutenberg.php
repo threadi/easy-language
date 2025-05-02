@@ -50,17 +50,17 @@ class Gutenberg extends Parser_Base implements Parser {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Gutenberg {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
 	 * Define flow-text-blocks.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	private function get_flow_text_blocks(): array {
 		$blocks = array(
@@ -80,7 +80,7 @@ class Gutenberg extends Parser_Base implements Parser {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $blocks List of Blocks.
+		 * @param array<string,mixed> $blocks List of Blocks.
 		 */
 		return apply_filters( 'easy_language_gutenberg_blocks', $blocks );
 	}
@@ -90,7 +90,7 @@ class Gutenberg extends Parser_Base implements Parser {
 	 *
 	 * Loop through the blocks and save their flow-text-elements (e.g. paragraphs and headings) to list.
 	 *
-	 * @return array
+	 * @return array<array<string,mixed>>
 	 */
 	public function get_parsed_texts(): array {
 		$resulting_texts = array();
@@ -105,9 +105,9 @@ class Gutenberg extends Parser_Base implements Parser {
 	/**
 	 * Loop through the block and get its texts.
 	 *
-	 * @param array $block The block as array.
-	 * @param array $resulting_texts The resulting texts as array.
-	 * @return array
+	 * @param array<string,mixed>     $block The block as array.
+	 * @param array<int|string,mixed> $resulting_texts The resulting texts as array.
+	 * @return array<string,mixed>
 	 */
 	private function get_block_text( array $block, array $resulting_texts ): array {
 		// get possible flow blocks.

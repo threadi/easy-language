@@ -8,6 +8,8 @@
 namespace easyLanguage\Multilingual_plugins\Easy_Language;
 
 // prevent direct access.
+use easyLanguage\Api_Simplifications;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -18,7 +20,7 @@ interface Easy_Language_Interface {
 	/**
 	 * Return the object language depending on object type.
 	 *
-	 * @return array
+	 * @return array<string,array<string,string>>
 	 */
 	public function get_language(): array;
 
@@ -74,15 +76,16 @@ interface Easy_Language_Interface {
 	public function get_page_builder(): object|false;
 
 	/**
-	 * Process multiple simplification of a single post-object.
+	 * Process multiple text-simplification of a single object-object (like a post).
 	 *
-	 * @param Object $simplification_obj The simplification-object.
-	 * @param array  $language_mappings The language-mappings.
+	 * @param Api_Simplifications $simplification_obj The simplification-object of the used API.
+	 * @param array<string,mixed> $language_mappings The language-mappings.
+	 * @param int                 $limit Limit the entries processed during this request.
+	 * @param bool                $initialization Mark if this is the initialization of a simplification.
 	 *
 	 * @return int
-	 * @noinspection PhpUnused
 	 */
-	public function process_simplifications( object $simplification_obj, array $language_mappings ): int;
+	public function process_simplifications( Api_Simplifications $simplification_obj, array $language_mappings, int $limit = 0, bool $initialization = true ): int;
 
 	/**
 	 * Return whether this object is locked or not.
