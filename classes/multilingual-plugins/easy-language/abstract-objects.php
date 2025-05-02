@@ -10,9 +10,9 @@ namespace easyLanguage\Multilingual_plugins\Easy_Language;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Api_Base;
 use easyLanguage\Api_Simplifications;
 use easyLanguage\Apis;
-use easyLanguage\Base;
 use easyLanguage\Helper;
 
 /**
@@ -715,11 +715,11 @@ abstract class Objects {
 	 * - above_text_limit => if one text is above the text-limit from used API
 	 * - exceeded => if quota is exceeded
 	 *
-	 * @param Base $api_obj The Api-object.
+	 * @param Api_Base $api_obj The Api-object.
 	 *
 	 * @return array<string,mixed>
 	 */
-	public function get_quota_state( Base $api_obj ): array {
+	public function get_quota_state( Api_Base $api_obj ): array {
 		// define return-array.
 		$return_array = array(
 			'status'        => 'ok',
@@ -842,12 +842,12 @@ abstract class Objects {
 	/**
 	 * Add simplification object to this object if it is a not simplifiable object.
 	 *
-	 * @param string $target_language The target-language.
-	 * @param Base   $api_object The API to use.
-	 * @param bool   $prevent_automatic_mode True if automatic mode is prevented.
+	 * @param string   $target_language The target-language.
+	 * @param Api_Base $api_object The API to use.
+	 * @param bool     $prevent_automatic_mode True if automatic mode is prevented.
 	 * @return bool|Post_Object
 	 */
-	public function add_simplification_object( string $target_language, Base $api_object, bool $prevent_automatic_mode ): bool|Post_Object {
+	public function add_simplification_object( string $target_language, Api_Base $api_object, bool $prevent_automatic_mode ): bool|Post_Object {
 		if ( empty( $target_language ) ) {
 			return false;
 		}

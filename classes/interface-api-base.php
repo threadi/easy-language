@@ -247,4 +247,46 @@ interface Api_Base {
 	 * @return void
 	 */
 	public function disable_free_requests(): void;
+
+	/**
+	 * Return the token field name.
+	 *
+	 * @return string
+	 */
+	public function get_token_field_name(): string;
+
+	/**
+	 * Return max requests per minute for this API.
+	 *
+	 * @return int
+	 */
+	public function get_max_requests_per_minute(): int;
+
+	/**
+	 * Return false whether this API would support translatepress-plugin.
+	 *
+	 * @return bool
+	 */
+	public function is_supporting_translatepress(): bool;
+
+	/**
+	 * Return class-name for translatepress-machine.
+	 *
+	 * @return string
+	 */
+	public function get_translatepress_machine_class(): string;
+
+	/**
+	 * Return list of active language-mappings.
+	 *
+	 * @return array<string,list<mixed>>
+	 */
+	public function get_active_language_mapping(): array;
+
+	/**
+	 * Return max text length for this API.
+	 *
+	 * @return int
+	 */
+	public function get_max_text_length(): int;
 }

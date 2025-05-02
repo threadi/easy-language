@@ -22,6 +22,9 @@ parameters:
     - "#Gettext#"
     - "#WP_REST_Request#"
     - "#pll_current_language#"
+    - "#WP_PLUGIN_DIR#"
+    - "#ARRAY_A#"
+    - "#ABSPATH#"
   paths:
     - classes
     - easy-language.php
