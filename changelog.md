@@ -8,6 +8,7 @@
 - Optimized WordPress Coding Standard check
 - Updates Avada support
 - Some code optimizations
+- Updated dependencies
 
 ### Fixed
 
