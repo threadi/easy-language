@@ -20,12 +20,11 @@ class Cli {
 	 *  [--not-light]
 	 *  : Prevent reset of light plugin.
 	 *
-	 * @param array $attributes Marker to delete all data or not.
-	 * @param array $options List of options.
+	 * @param array<string,string> $attributes Marker to delete all data or not.
+	 * @param array<string,string> $options List of options.
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
-	 * @noinspection PhpUndefinedClassInspection
 	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function reset_plugin( array $attributes = array(), array $options = array() ): void {
@@ -37,7 +36,7 @@ class Cli {
 		 *
 		 * @since 2.3.0 Available since 2.3.0.
 		 *
-		 * @param array $options Options used to call this command.
+		 * @param array<string,string> $options Options used to call this command.
 		 */
 		do_action( 'easy_language_uninstaller', $options );
 

@@ -12,6 +12,7 @@ namespace easyLanguage\Apis\Summ_Ai;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Api_Requests;
 use easyLanguage\Log;
 use easyLanguage\Log_Api;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
@@ -20,12 +21,12 @@ use WP_Error;
 /**
  * Create and send request to summ-ai API. Gets the response.
  */
-class Request {
+class Request implements Api_Requests {
 
 	/**
 	 * HTTP-header for the request.
 	 *
-	 * @var array
+	 * @var array<string,string>
 	 */
 	private array $header = array(
 		'Accept'       => '*/*',
@@ -70,7 +71,7 @@ class Request {
 	/**
 	 * Complete result of the request.
 	 *
-	 * @var array|WP_Error
+	 * @var array<string,mixed>|WP_Error
 	 */
 	private array|WP_Error $result;
 
@@ -133,7 +134,7 @@ class Request {
 	/**
 	 * The content of this request.
 	 *
-	 * @var array
+	 * @var array<string,mixed>
 	 */
 	private array $request;
 
@@ -156,7 +157,7 @@ class Request {
 	 */
 	public function __construct() {
 		// table for requests and responses.
-		$this->table_requests = DB::get_instance()->get_wpdb_prefix() . 'easy_language_summ_ai';
+		$this->table_requests = Db::get_instance()->get_wpdb_prefix() . 'easy_language_summ_ai';
 	}
 
 	/**
@@ -263,7 +264,15 @@ class Request {
 			$data['embolden_negative']     = 1 === $this->get_embolden_negative();
 			$data['translation_language']  = $source_language;
 			$data['is_test']               = $this->is_test();
-			$args['body']                  = wp_json_encode( $data );
+
+			// get the body as JSON.
+			$body = wp_json_encode( $data );
+			if ( ! $body ) {
+				$body = '';
+			}
+
+			// add the body.
+			$args['body'] = $body;
 		}
 
 		// secure request.
@@ -300,7 +309,11 @@ class Request {
 
 			// log the request (with anonymized token).
 			$args['headers']['Authorization'] = 'anonymized';
-			Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, wp_json_encode( $args ), 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
+			$args_json                        = wp_json_encode( $args );
+			if ( ! $args_json ) {
+				$args_json = '';
+			}
+			Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, $args_json, 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
 
 			// save request and result in db.
 			$this->save_in_db();
@@ -348,7 +361,7 @@ class Request {
 	/**
 	 * Get the complete request results.
 	 *
-	 * @return array|WP_Error
+	 * @return array<string>|WP_Error
 	 */
 	public function get_result(): WP_Error|array {
 		return $this->result;
@@ -421,13 +434,13 @@ class Request {
 	/**
 	 * Set source-language for this request.
 	 *
-	 * @param string $lang The source language as string (e.g. "de_EL").
+	 * @param string $language The source language as string (e.g. "de_EL").
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
 	 */
-	public function set_source_language( string $lang ): void {
-		$this->source_language = $lang;
+	public function set_source_language( string $language ): void {
+		$this->source_language = $language;
 	}
 
 	/**
@@ -460,7 +473,7 @@ class Request {
 	/**
 	 * Return the request-content.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	private function get_request(): array {
 		return $this->request;
@@ -541,11 +554,11 @@ class Request {
 	/**
 	 * Set embolden negative settings.
 	 *
-	 * @param int $embolden_negative 1 if embolden negative should be used, 0 if not.
+	 * @param int $embolden 1 if embolden negative should be used, 0 if not.
 	 *
 	 * @return void
 	 */
-	public function set_embolden_negative( int $embolden_negative ): void {
-		$this->embolden_negative = $embolden_negative;
+	public function set_embolden_negative( int $embolden ): void {
+		$this->embolden_negative = $embolden;
 	}
 }

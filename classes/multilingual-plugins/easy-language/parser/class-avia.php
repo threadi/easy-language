@@ -48,17 +48,17 @@ class Avia extends Parser_Base implements Parser {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Avia {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
 	 * Define flow-text-shortcodes.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	private function get_flow_text_shortcodes(): array {
 		$shortcodes = array(
@@ -73,7 +73,7 @@ class Avia extends Parser_Base implements Parser {
 		 *
 		 * @since 2.6.0 Available since 2.6.0.
 		 *
-		 * @param array $shortcodes List of shortcodes.
+		 * @param array<string,mixed> $shortcodes List of shortcodes.
 		 */
 		return apply_filters( 'easy_language_avia_text_widgets', $shortcodes );
 	}
@@ -95,7 +95,7 @@ class Avia extends Parser_Base implements Parser {
 		 *
 		 * @since 2.6.0 Available since 2.6.0.
 		 *
-		 * @param array $html_support_widgets List of widgets with HTML-support.
+		 * @param array<string,mixed> $html_support_widgets List of widgets with HTML-support.
 		 */
 		$html_widgets = apply_filters( 'easy_language_avia_html_widgets', $html_support_widgets );
 
@@ -107,7 +107,7 @@ class Avia extends Parser_Base implements Parser {
 	 *
 	 * Get the Avia-content and parse its widgets to get the content of flow-text-widgets.
 	 *
-	 * @return array
+	 * @return array<array<string,mixed>>
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if Avia is not active.
@@ -163,12 +163,20 @@ class Avia extends Parser_Base implements Parser {
 			return $original_complete;
 		}
 
+		// get the avia builder object.
+		$avia_builder = Avia_Builder();
+
+		// bail if builder is not available.
+		if ( is_null( $avia_builder ) ) {
+			return $original_complete;
+		}
+
 		$text = str_replace( $this->get_text(), $simplified_part, $original_complete );
 		$text = str_replace( '<!-- wp:shortcode -->', '', $text );
 		$text = str_replace( '<!-- /wp:shortcode -->', '', $text );
 
 		// save the updated Avia content.
-		Avia_Builder()->update_post_content( $this->get_object_id(), $text );
+		$avia_builder->update_post_content( $this->get_object_id(), $text );
 
 		// return the content for post_content.
 		return str_replace( $this->get_text(), $simplified_part, $original_complete );

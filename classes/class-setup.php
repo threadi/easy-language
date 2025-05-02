@@ -27,7 +27,7 @@ class Setup {
 	/**
 	 * Define setup as array with steps.
 	 *
-	 * @var array
+	 * @var array<int,array<string,mixed>>
 	 */
 	private array $setup = array();
 
@@ -47,11 +47,11 @@ class Setup {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Setup {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
@@ -167,7 +167,7 @@ class Setup {
 	/**
 	 * Return the configured setup.
 	 *
-	 * @return array
+	 * @return array<int,array<string,mixed>>
 	 */
 	private function get_setup(): array {
 		$setup = $this->setup;
@@ -181,7 +181,7 @@ class Setup {
 		 *
 		 * @since 2.2.0 Available since 2.2.0.
 		 *
-		 * @param array $setup The setup-configuration.
+		 * @param array<int,array<string,mixed>> $setup The setup-configuration.
 		 */
 		return apply_filters( 'easy_language_setup', $setup );
 	}
@@ -205,9 +205,9 @@ class Setup {
 	/**
 	 * Convert options array to react-compatible array-list with label and value.
 	 *
-	 * @param array $options The list of options to convert.
+	 * @param array<string,string> $options The list of options to convert.
 	 *
-	 * @return array
+	 * @return array<int,array<string,string>>
 	 */
 	public function convert_options_for_react( array $options ): array {
 		// define resulting list.
@@ -230,7 +230,7 @@ class Setup {
 	 *
 	 * Here we define which steps and texts are used by easy-setup-for-wordpress.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	private function get_config(): array {
 		// get setup.
@@ -251,7 +251,7 @@ class Setup {
 		 * Filter the setup configuration.
 		 *
 		 * @since 3.0.0 Available since 3.0.0.
-		 * @param array $config List of configuration for the setup.
+		 * @param array<string,mixed> $config List of configuration for the setup.
 		 */
 		return apply_filters( 'easy_language_setup_config', $config );
 	}
@@ -485,13 +485,13 @@ class Setup {
 	/**
 	 * Update steps depending on configuration.
 	 *
-	 * @param array $steps The steps with its fields as array.
+	 * @param array<int,array<string,mixed>> $steps The steps with its fields as array.
 	 *
-	 * @return array
+	 * @return array<int,array<string,mixed>>
 	 */
 	public function update_steps( array $steps ): array {
 		// if API is configured, add the API key configuration field for this API as second step.
-		$api_obj = APIs::get_instance()->get_active_api();
+		$api_obj = Apis::get_instance()->get_active_api();
 		if ( $api_obj ) {
 			$token_field_name = $api_obj->get_token_field_name();
 			if ( ! empty( $token_field_name ) ) {

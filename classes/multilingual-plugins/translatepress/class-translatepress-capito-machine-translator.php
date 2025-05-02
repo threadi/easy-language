@@ -155,7 +155,7 @@ class Translatepress_Capito_Machine_Translator extends TRP_Machine_Translator {
 	/**
 	 * Return supported languages.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_supported_languages(): array {
 		return array(

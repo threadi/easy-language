@@ -7,14 +7,12 @@
 
 namespace easyLanguage\Apis\No_Api;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
+use easyLanguage\Api_Simplifications;
 use easyLanguage\Base;
 use easyLanguage\Api_Base;
-use stdClass;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Define what No-API supports and what not.
@@ -58,10 +56,11 @@ class No_Api extends Base implements Api_Base {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): No_Api {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
@@ -76,7 +75,7 @@ class No_Api extends Base implements Api_Base {
 	/**
 	 * Return list of supported source-languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 * @noinspection DuplicatedCode
 	 */
 	public function get_supported_source_languages(): array {
@@ -124,7 +123,7 @@ class No_Api extends Base implements Api_Base {
 	/**
 	 * Return target languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_supported_target_languages(): array {
 		return array();
@@ -133,7 +132,7 @@ class No_Api extends Base implements Api_Base {
 	/**
 	 * Set mapping languages.
 	 *
-	 * @return array[]
+	 * @return array<string,mixed>
 	 */
 	public function get_mapping_languages(): array {
 		return array(
@@ -201,15 +200,6 @@ class No_Api extends Base implements Api_Base {
 	public function uninstall(): void {}
 
 	/**
-	 * Get simplification object for this API: none for this one.
-	 *
-	 * @return stdClass
-	 */
-	public function get_simplifications_obj(): object {
-		return new stdClass();
-	}
-
-	/**
 	 * Add cli options: none for this API.
 	 *
 	 * @return void
@@ -232,5 +222,25 @@ class No_Api extends Base implements Api_Base {
 	 */
 	public function enable(): void {
 		// nothing to do.
+	}
+
+	/**
+	 * Return the simplifications-object.
+	 *
+	 * @return Api_Simplifications
+	 */
+	public function get_simplifications_obj(): Api_Simplifications {
+		return Simplifications::get_instance();
+	}
+
+	/**
+	 * Return language-specific request text for the API.
+	 *
+	 * @param string $target_language The target-language.
+	 *
+	 * @return string
+	 */
+	public function get_request_text_by_language( string $target_language ): string {
+		return '';
 	}
 }

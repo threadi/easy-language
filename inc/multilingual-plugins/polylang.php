@@ -1,23 +1,22 @@
 <?php
 /**
- * File to handle polylang-hooks.
+ * File to add Polylang as supported multilingual plugin.
  *
  * @package easy-language
  */
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Helper;
 use easyLanguage\Multilingual_plugins\Polylang\Init;
-
-// prevent direct access.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
+use easyLanguage\Multilingual_Plugins_Base;
 
 /**
  * Register the Polylang service in this plugin.
  *
- * @param array $plugin_list List of available multilingual-plugins.
- * @return array
+ * @param array<int,Multilingual_Plugins_Base> $plugin_list List of available multilingual-plugins.
+ * @return array<int,Multilingual_Plugins_Base>
  */
 function easy_language_register_plugin_polylang( array $plugin_list ): array {
 	// bail if plugin is not active.

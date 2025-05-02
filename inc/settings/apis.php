@@ -95,7 +95,7 @@ add_action( 'easy_language_settings_add_settings', 'easy_language_admin_add_sett
 /**
  * Show selection of supported APIs.
  *
- * @param array $attr List of attributes for this field.
+ * @param array<string,mixed> $attr List of attributes for this field.
  *
  * @return void
  */
@@ -213,7 +213,7 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 
 	// Check if API has been saved first time and the new API is already configured (or no configuration at all),
 	// to show intro part 2.
-	if ( ! get_option( 'easy_language_intro_step_2' ) && ( false !== $new_api->is_configured() || false === $new_api->has_settings() ) ) {
+	if ( $new_api && ! get_option( 'easy_language_intro_step_2' ) && ( false !== $new_api->is_configured() || false === $new_api->has_settings() ) ) {
 		update_option( 'easy_language_intro_step_2', 1 );
 	}
 

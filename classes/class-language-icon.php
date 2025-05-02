@@ -8,6 +8,8 @@
 namespace easyLanguage;
 
 // prevent direct access.
+use WP_Post;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -69,7 +71,7 @@ class Language_Icon {
 		$img_path = apply_filters( 'easy_language_icon_path', $path, $file );
 
 		// bail if file does not exist.
-		if ( ! ( false !== $img_path && file_exists( $img_path ) ) ) {
+		if ( ! ( ! empty( $img_path ) && file_exists( $img_path ) ) ) {
 			return;
 		}
 		// check if file exist in db.
@@ -102,7 +104,7 @@ class Language_Icon {
 
 				// get attachment as object.
 				if ( absint( $attachment_id ) > 0 ) {
-					$attachment = get_post( $attachment_id );
+					$attachment = get_post( absint( $attachment_id ) );
 				}
 			}
 
@@ -111,7 +113,7 @@ class Language_Icon {
 		}
 
 		// bail if attachment does still not exist.
-		if ( false === $attachment ) {
+		if ( ! $attachment instanceof WP_Post ) {
 			return;
 		}
 
@@ -133,16 +135,17 @@ class Language_Icon {
 			update_post_meta( $attachment->ID, 'easy_language_code', $language_list );
 		}
 
+		$instance = $this;
 		/**
 		 * Hook for further infos for the icon.
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $this The language icon object.
+		 * @param Language_Icon $instance The language icon object.
 		 */
-		do_action( 'easy_language_update_icon', $this );
+		do_action( 'easy_language_update_icon', $instance );
 
-		// delete icon cache in DB.
+		// clear icon cache in DB.
 		delete_option( 'easy_language_icons' );
 	}
 
@@ -168,9 +171,9 @@ class Language_Icon {
 	/**
 	 * Allow SVG as file-type.
 	 *
-	 * @param array $file_types List of allowed file types.
+	 * @param array<string,string> $file_types List of allowed file types.
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function allow_svg( array $file_types ): array {
 		$new_filetypes        = array();

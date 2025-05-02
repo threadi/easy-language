@@ -200,8 +200,13 @@ function easy_language_admin_delete_data_now(): void {
 		),
 	);
 
+	$dialog = wp_json_encode( $dialog_config );
+	if ( ! $dialog ) {
+		$dialog = '';
+	}
+
 	?>
-	<p><a href="#" class="button button-primary easy-dialog-for-wordpress" data-dialog="<?php echo esc_attr( wp_json_encode( $dialog_config ) ); ?>"><?php echo esc_html__( 'Delete ALL simplification texts', 'easy-language' ); ?></a></p>
+	<p><a href="#" class="button button-primary easy-dialog-for-wordpress" data-dialog="<?php echo esc_attr( $dialog ); ?>"><?php echo esc_html__( 'Delete ALL simplification texts', 'easy-language' ); ?></a></p>
 	<p><i><?php echo esc_html__( 'Hint', 'easy-language' ); ?>:</i> <?php echo esc_html__( 'After click on this button the intro for this plugin will be re-initialized.', 'easy-language' ); ?></p>
 	<?php
 }

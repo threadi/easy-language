@@ -15,9 +15,9 @@ use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Undetected;
  *
  * Must be last index in list of supported pagebuilder, so we use PHP_INT_MAX for position.
  *
- * @param array $pagebuilder_list List of supported pagebuilder.
+ * @param array<int,mixed> $pagebuilder_list List of supported pagebuilder.
  *
- * @return array
+ * @return array<int,mixed>
  */
 function easy_language_pagebuilder_undetected( array $pagebuilder_list ): array {
 	$pagebuilder_list[] = Undetected::get_instance();

@@ -1,11 +1,14 @@
 <?php
 /**
- * File for initializing the easy-language-own simplifications.
+ * File for initializing the support for TranslatePress.
  *
  * @package easy-language
  */
 
 namespace easyLanguage\Multilingual_plugins\TranslatePress;
+
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Base;
 use easyLanguage\Multilingual_Plugins_Base;
@@ -13,7 +16,7 @@ use easyLanguage\Transients;
 use TRP_Translate_Press;
 
 /**
- * Rewrite-Handling for this plugin.
+ * Object to handle the support for TranslatePress.
  */
 class Init extends Base implements Multilingual_Plugins_Base {
 	/**
@@ -67,11 +70,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Init {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
@@ -140,7 +143,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Return list of active languages this plugin is using atm.
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function get_active_languages(): array {
 		// get settings from translatepress.

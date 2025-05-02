@@ -13,8 +13,8 @@ use easyLanguage\Apis\ChatGpt\ChatGpt;
 /**
  * Register the ChatGpt Api in this plugin.
  *
- * @param array $api_list List of available APIs.
- * @return array
+ * @param array<int,mixed> $api_list List of available APIs.
+ * @return array<int,mixed>
  */
 function easy_language_register_chatgpt( array $api_list ): array {
 	$api_list[] = ChatGpt::get_instance();

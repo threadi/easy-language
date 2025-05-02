@@ -19,7 +19,6 @@ class Cli {
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
-	 * @noinspection PhpUndefinedClassInspection
 	 */
 	public function reset_simplifications(): void {
 		// get db-object.
@@ -37,7 +36,6 @@ class Cli {
 	 *
 	 * @return void
 	 * @noinspection PhpUnused
-	 * @noinspection PhpUndefinedClassInspection
 	 */
 	public function process_simplifications(): void {
 		// run the simplifications as if they were scheduled.

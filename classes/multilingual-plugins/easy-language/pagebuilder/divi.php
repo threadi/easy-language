@@ -16,9 +16,9 @@ use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Divi;
  * Add Undetected-object to list of supported pagebuilder.
  * Only if divi is active.
  *
- * @param array $pagebuilder_list List of supported pagebuilder.
+ * @param array<int,mixed> $pagebuilder_list List of supported pagebuilder.
  *
- * @return array
+ * @return array<int,mixed>
  */
 function easy_language_pagebuilder_divi( array $pagebuilder_list ): array {
 	// add divi to list.
@@ -32,9 +32,9 @@ add_filter( 'easy_language_pagebuilder', 'easy_language_pagebuilder_divi', 2000 
 /**
  * Add our custom toggle.
  *
- * @param array $toggles The list of toggles.
+ * @param array<string> $toggles The list of toggles.
  *
- * @return array
+ * @return array<string>
  */
 function easy_language_divi_add_toggle( array $toggles ): array {
 	$toggles['easy-language-simplifications'] = __( 'Simplify texts', 'easy-language' );
@@ -45,9 +45,9 @@ add_filter( 'et_builder_page_settings_modal_toggles', 'easy_language_divi_add_to
 /**
  * Add fields to our custom toggle.
  *
- * @param array $fields The list of fields.
+ * @param array<string,mixed> $fields The list of fields.
  *
- * @return array
+ * @return array<string,mixed>
  */
 function easy_language_divi_add_fields( array $fields ): array {
 	$post_types = array();

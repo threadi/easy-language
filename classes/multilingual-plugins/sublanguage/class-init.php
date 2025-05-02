@@ -7,10 +7,14 @@
 
 namespace easyLanguage\Multilingual_plugins\Sublanguage;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Base;
 use easyLanguage\Languages;
 use easyLanguage\Multilingual_Plugins_Base;
 use easyLanguage\Transients;
+use WP_Post;
 use WP_Query;
 
 /**
@@ -55,11 +59,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Init {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
@@ -141,7 +145,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Return list of active languages this plugin is using atm.
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function get_active_languages(): array {
 		// define return array-list.
@@ -155,7 +159,13 @@ class Init extends Base implements Multilingual_Plugins_Base {
 		$results = new WP_Query( $query );
 
 		// loop through them.
-		foreach ( $results->posts as $language ) {
+		foreach ( $results->get_posts() as $language ) {
+			// bail if object is not WP_Post.
+			if ( ! $language instanceof WP_Post ) {
+				continue;
+			}
+
+			// add the language.
 			$languages[ $language->post_content ] = '1';
 		}
 

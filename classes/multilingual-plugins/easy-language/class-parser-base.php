@@ -161,7 +161,15 @@ class Parser_Base {
 
 		// get the post_id.
 		if ( 0 === $post_id ) {
-			$post_id = get_the_ID();
+			$requested_post_id = get_the_ID();
+
+			// bail if requested post ID is not known.
+			if ( ! is_int( $requested_post_id ) ) {
+				return;
+			}
+
+			// use the requested post ID.
+			$post_id = $requested_post_id;
 		}
 
 		// get the post-object.
@@ -257,9 +265,22 @@ class Parser_Base {
 							),
 						),
 					);
+
+					$dialog = wp_json_encode( $dialog_config );
+					if ( ! $dialog ) {
+						$dialog = '';
+					}
+
+					// get permalink.
+					$permalink = get_permalink( $post_id );
+					if( ! $permalink ) {
+						$permalink = '';
+					}
+
 					?>
-					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary easy-dialog-for-wordpress elementor-button" data-dialog="<?php echo esc_attr( wp_json_encode( $dialog_config ) ); ?>" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( $title ); ?>">
-						<?php
+					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary easy-dialog-for-wordpress elementor-button" data-dialog="<?php echo esc_attr( $dialog ); ?>" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( $permalink ); ?>" title="<?php echo esc_attr( $title ); ?>">
+					<?php
+					// @phpstan-ignore argument.type
 							$min_percent = 0.8;
 							/**
 							 * Hook for minimal quota percent.
@@ -273,11 +294,11 @@ class Parser_Base {
 							/* translators: %1$s will be replaced by the API-title */
 							printf( esc_html__( 'Simplify with %1$s.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
 
-						if ( $quota_state['quota_percent'] > $min_percent ) {
-							/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
-							echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';
-						}
-						?>
+					if ( $quota_state['quota_percent'] > $min_percent ) {
+						/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
+						echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';
+					}
+					?>
 						</a>
 					</p>
 					<?php
@@ -326,11 +347,20 @@ class Parser_Base {
 			}
 		}
 
+		// get page builder.
+		$page_builder_obj = $original_post_object->get_page_builder();
+
+		// bail if page builder could no be loaded.
+		if ( ! $page_builder_obj ) {
+			return;
+		}
+
 		// loop through the languages to show them as selection.
 		if ( ! empty( $languages ) ) {
 			?>
 			<table>
 			<?php
+
 			foreach ( $languages as $language_code => $settings ) {
 				// set link to add simplification for this language.
 				$link = $original_post_object->get_simplification_link( $language_code );
@@ -340,7 +370,7 @@ class Parser_Base {
 
 				// get translated post for this language (if it is not the original).
 				if ( empty( $settings['url'] ) ) {
-					$link = $original_post_object->get_page_builder()->get_edit_link();
+					$link = $page_builder_obj->get_edit_link();
 					/* translators: %1$s will be replaced by the page-title where the original content resides */
 					$link_title   = __( 'Original content in %1$s.', 'easy-language' );
 					$link_content = '<span class="dashicons dashicons-admin-home"></span>';
@@ -368,8 +398,20 @@ class Parser_Base {
 					);
 					$results = new WP_Query( $query );
 					if ( 1 === $results->post_count ) {
-						$post_obj = new Post_Object( $results->posts[0] );
-						$link     = $post_obj->get_page_builder()->get_edit_link();
+						// get post as our own object.
+						$post_obj = new Post_Object( absint( $results->posts[0] ) );
+
+						// get page builder.
+						$new_page_builder_obj = $post_obj->get_page_builder();
+
+						// bail if page builder could not be loaded.
+						if ( ! $new_page_builder_obj ) {
+							continue;
+						}
+
+						// get link of this object.
+						$link = $new_page_builder_obj->get_edit_link();
+
 						/* translators: %1$s is the name of the language */
 						$link_title   = __( 'Edit simplification in %1$s.', 'easy-language' );
 						$link_content = '<span class="dashicons dashicons-edit"></span>';
@@ -426,4 +468,28 @@ class Parser_Base {
 	 * @return void
 	 */
 	public function update_object( Post_Object $post_object ): void {}
+
+	/**
+	 * Return the parsed texts from pagebuilder.
+	 *
+	 * @return array<array<string,mixed>>
+	 */
+	public function get_parsed_texts(): array {
+		return array();
+	}
+
+	/**
+	 * Replace original text with translation.
+	 *
+	 * @param string $original_complete Complete original content.
+	 * @param string $simplified_part The translated content.
+	 *
+	 * @return string
+	 */
+	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
+		if ( empty( $simplified_part ) ) {
+			return $original_complete;
+		}
+		return $original_complete;
+	}
 }

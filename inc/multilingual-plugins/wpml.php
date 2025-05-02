@@ -16,8 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Register the WPML service in this plugin.
  *
- * @param array $plugin_list List of available multilingual-plugins.
- * @return array
+ * @param array<int,mixed> $plugin_list List of available multilingual-plugins.
+ * @return array<int,mixed>
  */
 function easy_language_register_plugin_wpml( array $plugin_list ): array {
 	// bail if plugin is not active.

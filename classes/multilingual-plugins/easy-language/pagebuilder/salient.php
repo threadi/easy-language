@@ -13,9 +13,9 @@ use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Salients_WpBakery;
 /**
  * Add WPBakery-object to list of supported PageBuilder.
  *
- * @param array $pagebuilder_list List of supported PageBuilder.
+ * @param array<int,mixed> $pagebuilder_list List of supported PageBuilder.
  *
- * @return array
+ * @return array<int,mixed>
  */
 function easy_language_pagebuilder_salient_wp_bakery( array $pagebuilder_list ): array {
 	// add wpBakery to list.

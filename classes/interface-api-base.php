@@ -17,35 +17,35 @@ interface Api_Base {
 	/**
 	 * Return list of supported source-languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_supported_source_languages(): array;
 
 	/**
 	 * Return list of supported target-languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_supported_target_languages(): array;
 
 	/**
 	 * Get the list of active source languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_active_source_languages(): array;
 
 	/**
 	 * Get the list of active target languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_active_target_languages(): array;
 
 	/**
 	 * Return the list of supported languages which could be simplified with this API into each other.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_mapping_languages(): array;
 
@@ -123,14 +123,14 @@ interface Api_Base {
 	/**
 	 * Get the API-specific simplifications-object (used to run simplifications).
 	 *
-	 * @return object
+	 * @return Api_Simplifications
 	 */
-	public function get_simplifications_obj(): object;
+	public function get_simplifications_obj(): Api_Simplifications;
 
 	/**
 	 * Get quota as array containing 'character_spent' and 'character_limit'.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_quota(): array;
 
@@ -165,14 +165,14 @@ interface Api_Base {
 	/**
 	 * Return the request-object for this API.
 	 *
-	 * @return mixed
+	 * @return Api_Requests
 	 */
-	public function get_request_object();
+	public function get_request_object(): Api_Requests;
 
 	/**
 	 * Return all by this API simplified post type objects.
 	 *
-	 * @return array
+	 * @return array<integer>
 	 */
 	public function get_simplified_post_type_objects(): array;
 
@@ -200,7 +200,51 @@ interface Api_Base {
 	/**
 	 * Return the log entries of this API.
 	 *
-	 * @return array
+	 * @return array<int,mixed>
 	 */
 	public function get_log_entries(): array;
+
+	/**
+	 * Return the title.
+	 *
+	 * @return string
+	 */
+	public function get_title(): string;
+
+	/**
+	 * Get the token.
+	 *
+	 * @return string
+	 */
+	public function get_token(): string;
+
+	/**
+	 * Return the internal name of the object.
+	 *
+	 * @return string
+	 */
+	public function get_name(): string;
+
+	/**
+	 * Return language-specific request text for the API.
+	 *
+	 * @param string $target_language The target-language.
+	 *
+	 * @return string
+	 */
+	public function get_request_text_by_language( string $target_language ): string;
+
+	/**
+	 * Return if test mode for this API is active or not.
+	 *
+	 * @return bool
+	 */
+	public function is_test_mode_active(): bool;
+
+	/**
+	 * Disable free requests.
+	 *
+	 * @return void
+	 */
+	public function disable_free_requests(): void;
 }

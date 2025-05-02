@@ -59,7 +59,7 @@ class Transients {
 	/**
 	 * Get all known transients as objects.
 	 *
-	 * @return array
+	 * @return array<string,Transient>
 	 */
 	public function get_transients(): array {
 		$transients = array();

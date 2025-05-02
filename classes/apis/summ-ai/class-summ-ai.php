@@ -10,6 +10,8 @@ namespace easyLanguage\Apis\Summ_Ai;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Api_Requests;
+use easyLanguage\Api_Simplifications;
 use easyLanguage\Apis;
 use easyLanguage\Base;
 use easyLanguage\Api_Base;
@@ -19,7 +21,6 @@ use easyLanguage\Log;
 use easyLanguage\Multilingual_Plugins;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
 use easyLanguage\Transients;
-use WP_User;
 use wpdb;
 
 /**
@@ -86,7 +87,7 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Language-specific support-URL.
 	 *
-	 * @var array
+	 * @var array<string,string>
 	 */
 	protected array $support_url = array(
 		'de_DE' => 'https://summ-ai.com/unsere-schnittstelle/',
@@ -111,7 +112,7 @@ class Summ_AI extends Base implements Api_Base {
 		$this->wpdb = $wpdb;
 
 		// table for requests and responses.
-		$this->table_requests = DB::get_instance()->get_wpdb_prefix() . 'easy_language_summ_ai';
+		$this->table_requests = Db::get_instance()->get_wpdb_prefix() . 'easy_language_summ_ai';
 
 		// add settings.
 		add_action( 'easy_language_settings_add_settings', array( $this, 'add_settings' ), 30 );
@@ -146,10 +147,11 @@ class Summ_AI extends Base implements Api_Base {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Summ_AI {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
@@ -215,7 +217,7 @@ class Summ_AI extends Base implements Api_Base {
 	 *
 	 * @param bool $without_img True to load without images.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_supported_source_languages( bool $without_img = false ): array {
 		$source_languages = array(
@@ -281,7 +283,7 @@ class Summ_AI extends Base implements Api_Base {
 	 *
 	 * @param bool $without_img True to load without images.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_supported_target_languages( bool $without_img = false ): array {
 		$target_languages = array(
@@ -328,7 +330,7 @@ class Summ_AI extends Base implements Api_Base {
 	 *
 	 * Left source, right possible target languages.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_mapping_languages(): array {
 		$languages_mapping = array(
@@ -497,7 +499,7 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Return list of options this plugin is using, e.g. for clean uninstalling.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	private function get_options(): array {
 		return array(
@@ -523,7 +525,7 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Return list of transients this plugin is using, e.g. for clean uninstalling.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	private function get_transients(): array {
 		return array(
@@ -542,14 +544,14 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Return the simplifications-object.
 	 *
-	 * @return object
+	 * @return Api_Simplifications
 	 */
-	public function get_simplifications_obj(): object {
+	public function get_simplifications_obj(): Api_Simplifications {
 		// get the object.
 		$obj = Simplifications::get_instance();
 
-		// initialize it.
-		$obj->init( $this );
+		// set the API.
+		$obj->set_api( $this );
 
 		// return resulting object.
 		return $obj;
@@ -558,7 +560,7 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Return supported target languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_active_target_languages(): array {
 		// get actual enabled target-languages, if token is given.
@@ -599,7 +601,7 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Get quota as array containing 'character_spent' and 'character_limit'.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_quota(): array {
 		// return free quota if used.
@@ -635,16 +637,16 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Return request object.
 	 *
-	 * @return Request
+	 * @return Api_Requests
 	 */
-	public function get_request_object(): Request {
+	public function get_request_object(): Api_Requests {
 		return new Request();
 	}
 
 	/**
 	 * Return active source languages of this API.
 	 *
-	 * @return array
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_active_source_languages(): array {
 		// get actual enabled source-languages.
@@ -717,10 +719,10 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Return the log entries of this API.
 	 *
-	 * @return array
+	 * @return array<int,mixed>
 	 */
 	public function get_log_entries(): array {
-		$results = $this->wpdb->get_results( $this->wpdb->prepare( 'SELECT `time`, `request`, `response` FROM ' . $this->table_requests . ' WHERE 1 = %d', array( 1 ) ) );
+		$results = $this->wpdb->get_results( $this->wpdb->prepare( 'SELECT `time`, `request`, `response` FROM ' . $this->table_requests . ' WHERE 1 = %d', array( 1 ) ) ); // @phpstan-ignore argument.type
 		if ( is_null( $results ) ) {
 			return array();
 		}
@@ -1087,9 +1089,9 @@ class Summ_AI extends Base implements Api_Base {
 	 *
 	 * The source-language must be possible to simplify in the target-language.
 	 *
-	 * @param ?array $values The settings to check.
+	 * @param ?array<string,mixed> $values The settings to check.
 	 *
-	 * @return array|null
+	 * @return array<string,mixed>|null
 	 */
 	public function validate_target_language_settings( ?array $values ): ?array {
 		$values = Helper::settings_validate_multiple_checkboxes( $values );
@@ -1106,9 +1108,9 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Validate the target language separator settings.
 	 *
-	 * @param array|null $values The settings to check.
+	 * @param array<string,mixed>|null $values The settings to check.
 	 *
-	 * @return array|null
+	 * @return array<string,mixed>|null
 	 */
 	public function validate_target_language_separator_settings( ?array $values ): ?array {
 		return Helper::settings_validate_multiple_select_fields( $values );
@@ -1117,9 +1119,9 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Validate the target language new_lines settings.
 	 *
-	 * @param array|null $values The settings to check.
+	 * @param array<string,mixed>|null $values The settings to check.
 	 *
-	 * @return array|null
+	 * @return array<string,mixed>|null
 	 */
 	public function validate_target_language_new_lines_settings( ?array $values ): ?array {
 		return Helper::settings_validate_multiple_checkboxes( $values );
@@ -1128,9 +1130,9 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Validate the target language embolden negatives settings.
 	 *
-	 * @param array|null $values The settings to check.
+	 * @param array<string,mixed>|null $values The settings to check.
 	 *
-	 * @return array|null
+	 * @return array<string,mixed>|null
 	 */
 	public function validate_target_language_embolden_negatives_settings( ?array $values ): ?array {
 		return Helper::settings_validate_multiple_checkboxes( $values );
@@ -1141,9 +1143,9 @@ class Summ_AI extends Base implements Api_Base {
 	 *
 	 * @param string $token The optional token.
 	 *
-	 * @return array
+	 * @return void
 	 */
-	public function get_quota_from_api( string $token = '' ): array {
+	public function get_quota_from_api( string $token = '' ): void {
 		// get quota from api.
 		$quota = $this->request_quota( $token );
 
@@ -1193,9 +1195,6 @@ class Summ_AI extends Base implements Api_Base {
 			$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_summ_ai_quota' );
 			$transient_obj->delete();
 		}
-
-		// return quota.
-		return $quota;
 	}
 
 	/**
@@ -1205,7 +1204,7 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function get_quota_from_api_via_link(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-summ-ai-get-quota', 'nonce' );
+		check_admin_referer( 'easy-language-summ-ai-get-quota', 'nonce' );
 
 		// get quota in paid mode.
 		$mode = $this->get_mode();
@@ -1223,7 +1222,7 @@ class Summ_AI extends Base implements Api_Base {
 	 *
 	 * @param string $token The token.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function request_quota( string $token = '' ): array {
 		// send request.
@@ -1266,7 +1265,7 @@ class Summ_AI extends Base implements Api_Base {
 				return $email;
 			case 'editor':
 				$user = wp_get_current_user();
-				if ( $user instanceof WP_User && ! empty( $user->user_email ) ) {
+				if ( ! empty( $user->user_email ) ) {
 					return $user->user_email;
 				}
 				return get_option( 'admin_email' );
@@ -1304,7 +1303,7 @@ class Summ_AI extends Base implements Api_Base {
 		}
 
 		// output tab.
-		echo '<a href="' . esc_url( helper::get_settings_page_url() ) . '&tab=summ_ai" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'SUMM AI', 'easy-language' ) . '</a>';
+		echo '<a href="' . esc_url( Helper::get_settings_page_url() ) . '&tab=summ_ai" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'SUMM AI', 'easy-language' ) . '</a>';
 	}
 
 	/**
@@ -1313,8 +1312,16 @@ class Summ_AI extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function add_settings_page(): void {
+		// get the active API object.
+		$api_obj = Apis::get_instance()->get_active_api();
+
+		// bail if API could not be loaded.
+		if ( ! $api_obj ) {
+			return;
+		}
+
 		// bail if this API is not enabled.
-		if ( Apis::get_instance()->get_active_api()->get_name() !== $this->get_name() ) {
+		if ( $api_obj->get_name() !== $this->get_name() ) {
 			return;
 		}
 
@@ -1583,7 +1590,7 @@ class Summ_AI extends Base implements Api_Base {
 	/**
 	 * Show the possible target languages with its additional settings as table.
 	 *
-	 * @param array $attr List of attributes for this field-list.
+	 * @param array<string,mixed> $attr List of attributes for this field-list.
 	 *
 	 * @return void
 	 */
@@ -1704,5 +1711,16 @@ class Summ_AI extends Base implements Api_Base {
 	 */
 	public function is_test_mode_active(): bool {
 		return $this->is_summ_api_token_set() && 1 === absint( get_option( 'easy_language_summ_ai_test' ) );
+	}
+
+	/**
+	 * Return language-specific request text for the API.
+	 *
+	 * @param string $target_language The target-language.
+	 *
+	 * @return string
+	 */
+	public function get_request_text_by_language( string $target_language ): string {
+		return '';
 	}
 }

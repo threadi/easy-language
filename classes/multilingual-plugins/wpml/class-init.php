@@ -59,11 +59,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Init {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
@@ -120,7 +120,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Return list of active languages this plugin is using atm.
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function get_active_languages(): array {
 		global $sitepress;
@@ -178,7 +178,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 
 		// check if our languages does already exist in wpml-db.
 		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
-			$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `id` FROM ' . DB::get_instance()->get_wpdb_prefix() . 'icl_languages WHERE code = %s', array( $language_code ) ) );
+			$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `id` FROM ' . Db::get_instance()->get_wpdb_prefix() . 'icl_languages WHERE code = %s', array( $language_code ) ) );
 			if ( empty( $result ) ) {
 				// copy flag in uploads-directory for WPML-flags.
 				$wp_upload_dir = wp_upload_dir();

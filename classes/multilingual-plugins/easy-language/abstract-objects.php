@@ -10,12 +10,13 @@ namespace easyLanguage\Multilingual_plugins\Easy_Language;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Api_Simplifications;
 use easyLanguage\Apis;
 use easyLanguage\Base;
 use easyLanguage\Helper;
 
 /**
- * Parser for texts.
+ * Definition of our Objects object.
  */
 abstract class Objects {
 	/**
@@ -24,6 +25,13 @@ abstract class Objects {
 	 * @var int
 	 */
 	protected int $id;
+
+	/**
+	 * The init object.
+	 *
+	 * @var Init
+	 */
+	public Init $init;
 
 	/**
 	 * The simplification-type of the object:
@@ -72,6 +80,66 @@ abstract class Objects {
 	}
 
 	/**
+	 * Get simplification type.
+	 *
+	 * @return string
+	 */
+	protected function get_simplification_type(): string {
+		return '';
+	}
+
+	/**
+	 * Return whether this original object has simplifications.
+	 *
+	 * @return bool
+	 */
+	public function has_simplifications(): bool {
+		return false;
+	}
+
+	/**
+	 * Return edit link for pagebuilder-object.
+	 *
+	 * @return string
+	 */
+	public function get_edit_link(): string {
+		return '';
+	}
+
+	/**
+	 * Return whether this object should not be used during automatic simplification.
+	 *
+	 * @return bool true if it should not be used
+	 * @noinspection PhpUnused
+	 */
+	public function is_automatic_mode_prevented(): bool {
+		return true;
+	}
+
+	/**
+	 * Return language-specific title for the type of the given object.
+	 *
+	 * @return string
+	 */
+	public function get_type_name(): string {
+		return '';
+	}
+
+	/**
+	 * Return the post_id of the simplification of this object in a given language.
+	 *
+	 * @param string $language_code The language we search.
+	 *
+	 * @return int
+	 */
+	public function get_simplification_in_language( string $language_code ): int {
+		if ( empty( $language_code ) ) {
+			return 0;
+		}
+		return 0;
+	}
+
+	/**
 	 * Return whether a given object is simplified in given language.
 	 *
 	 * @param string $language The language to check.
@@ -97,8 +165,8 @@ abstract class Objects {
 	/**
 	 * Set marker during simplification.
 	 *
-	 * @param string           $option The option to change.
-	 * @param string|int|array $value The value to set.
+	 * @param string                                                  $option The option to change.
+	 * @param array<string,array<array<string,string>|string>|string> $value The value to set.
 	 *
 	 * @return void
 	 */
@@ -135,16 +203,25 @@ abstract class Objects {
 	}
 
 	/**
-	 * Process multiple text-simplification of a single object-object.
+	 * Return the post-status.
 	 *
-	 * @param Object $simplification_obj The simplification-object of the used API.
-	 * @param array  $language_mappings The language-mappings.
-	 * @param int    $limit Limit the entries processed during this request.
-	 * @param bool   $initialization Mark if this is the initialization of a simplification.
+	 * @return string
+	 */
+	public function get_status(): string {
+		return '';
+	}
+
+	/**
+	 * Process multiple text-simplification of a single object-object (like a post).
+	 *
+	 * @param Api_Simplifications $simplification_obj The simplification-object of the used API.
+	 * @param array<string,mixed> $language_mappings The language-mappings.
+	 * @param int                 $limit Limit the entries processed during this request.
+	 * @param bool                $initialization Mark if this is the initialization of a simplification.
 	 *
 	 * @return int
 	 */
-	public function process_simplifications( object $simplification_obj, array $language_mappings, int $limit = 0, bool $initialization = true ): int {
+	public function process_simplifications( Api_Simplifications $simplification_obj, array $language_mappings, int $limit = 0, bool $initialization = true ): int {
 		// get object-hash.
 		$hash = $this->get_md5();
 
@@ -335,7 +412,7 @@ abstract class Objects {
 					'title'     => __( 'Simplification canceled', 'easy-language' ),
 					'texts'     => array(
 						/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
-						'<p>' . sprintf( __( '<strong>The texts in this %1$s are already simplified.</strong><br>%2$s was not used. Nothing has been changed.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->init->get_title() ) ) . '</p>',
+						'<p>' . sprintf( __( '<strong>The texts in this %1$s are already simplified.</strong><br>%2$s was not used. Nothing has been changed.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->get_api()->get_title() ) ) . '</p>',
 					),
 					'buttons'   => array(
 						array(
@@ -361,7 +438,7 @@ abstract class Objects {
 					'title'     => __( 'Simplification canceled', 'easy-language' ),
 					'texts'     => array(
 						/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
-						'<p>' . sprintf( __( '<strong>Some texts in this %1$s are already simplified.</strong><br>Other missing simplifications has been run via %2$s and are insert into the text.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->init->get_title() ) ) . '</p>',
+						'<p>' . sprintf( __( '<strong>Some texts in this %1$s are already simplified.</strong><br>Other missing simplifications has been run via %2$s and are insert into the text.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->get_api()->get_title() ) ) . '</p>',
 					),
 					'buttons'   => array(
 						array(
@@ -402,7 +479,7 @@ abstract class Objects {
 
 			// update counter for simplification of texts.
 			$simplification_count_in_loop = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, array() );
-			if( is_array( $simplification_count_in_loop ) ) {
+			if ( is_array( $simplification_count_in_loop ) ) {
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, ++$simplification_count_in_loop[ $hash ] );
 			}
 
@@ -421,7 +498,7 @@ abstract class Objects {
 				'title'     => __( 'Simplification processed', 'easy-language' ),
 				'texts'     => array(
 					/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
-					'<p>' . sprintf( __( '<strong>Simplifications have been returned from %2$s.</strong><br>They were inserted into the %1$s.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->init->get_title() ) ) . '</p>',
+					'<p>' . sprintf( __( '<strong>Simplifications have been returned from %2$s.</strong><br>They were inserted into the %1$s.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->get_api()->get_title() ) ) . '</p>',
 				),
 				'buttons'   => array(
 					array(
@@ -464,13 +541,13 @@ abstract class Objects {
 	/**
 	 * Process simplification of single text.
 	 *
-	 * @param Object $simplification_obj The simplification-object.
-	 * @param array  $language_mappings The language-mappings.
-	 * @param Text   $entry The text-object.
+	 * @param Api_Simplifications $simplification_obj The simplification-object.
+	 * @param array<string,mixed> $language_mappings The language-mappings.
+	 * @param Text                $entry The text-object.
 	 *
 	 * @return int
 	 */
-	public function process_simplification( object $simplification_obj, array $language_mappings, Text $entry ): int {
+	public function process_simplification( Api_Simplifications $simplification_obj, array $language_mappings, Text $entry ): int {
 		// counter for simplifications.
 		$c = 0;
 
@@ -493,7 +570,7 @@ abstract class Objects {
 
 					// save simplification if results are available.
 					if ( ! empty( $results ) ) {
-						$entry->set_simplification( $results['translated_text'], $target_language, $simplification_obj->init->get_name(), absint( $results['jobid'] ) );
+						$entry->set_simplification( (string) $results['translated_text'], $target_language, $simplification_obj->get_api()->get_name(), absint( $results['jobid'] ) );
 						++$c;
 					} else {
 						$api_errors = true;
@@ -611,7 +688,7 @@ abstract class Objects {
 	 *
 	 * @return void
 	 */
-	private function process_simplification_trigger_on_end() {}
+	protected function process_simplification_trigger_on_end() {}
 
 	/**
 	 * Set error marker for running simplification.
@@ -640,7 +717,7 @@ abstract class Objects {
 	 *
 	 * @param Base $api_obj The Api-object.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_quota_state( Base $api_obj ): array {
 		// define return-array.
@@ -705,5 +782,148 @@ abstract class Objects {
 
 		// return ok.
 		return $return_array;
+	}
+
+	/**
+	 * Return the languages of this object.
+	 *
+	 * @return array<string,array<string,string>>
+	 */
+	public function get_language(): array {
+		return array();
+	}
+
+	/**
+	 * Get post-ID of the original post.
+	 *
+	 * @return int
+	 */
+	public function get_original_object_as_int(): int {
+		return 0;
+	}
+
+	/**
+	 * Return the post-type of this object.
+	 *
+	 * @return string
+	 */
+	public function get_type(): string {
+		return '';
+	}
+
+	/**
+	 * Get language specific URL for this object.
+	 *
+	 * @param string $slug The slug of the language.
+	 * @param string $language_code The language-code.
+	 *
+	 * @return string
+	 * @noinspection PhpUnused
+	 */
+	public function get_language_specific_url( string $slug, string $language_code ): string {
+		if ( empty( $slug ) ) {
+			return '';
+		}
+		if ( empty( $language_code ) ) {
+			return '';
+		}
+		return '';
+	}
+
+	/**
+	 * Return the used page builder.
+	 *
+	 * @return Parser_Base|false
+	 */
+	public function get_page_builder(): Parser_Base|false {
+		return false;
+	}
+
+	/**
+	 * Add simplification object to this object if it is a not simplifiable object.
+	 *
+	 * @param string $target_language The target-language.
+	 * @param Base   $api_object The API to use.
+	 * @param bool   $prevent_automatic_mode True if automatic mode is prevented.
+	 * @return bool|Post_Object
+	 */
+	public function add_simplification_object( string $target_language, Base $api_object, bool $prevent_automatic_mode ): bool|Post_Object {
+		if ( empty( $target_language ) ) {
+			return false;
+		}
+		if ( $api_object->is_active() ) {
+			return false;
+		}
+		if ( $prevent_automatic_mode ) {
+			return false;
+		}
+		return false;
+	}
+
+	/**
+	 * Set automatic mode prevention on object.
+	 *
+	 * @param bool $prevent_automatic_mode True if the automatic mode should be prevented for this object.
+	 *
+	 * @return void
+	 * @noinspection PhpUnused
+	 **/
+	public function set_automatic_mode_prevented( bool $prevent_automatic_mode ): void {}
+
+	/**
+	 * Return the public title of the object.
+	 *
+	 * @return string
+	 */
+	public function get_title(): string {
+		return '';
+	}
+
+	/**
+	 * Call API to simplify single text.
+	 *
+	 * @param string $text_to_translate The text to translate.
+	 * @param string $source_language The source language of the text.
+	 * @param string $target_language The target language of the text.
+	 * @param bool   $is_html Marker if the text contains HTML-Code.
+	 * @return array<string,int|string> The result as array.
+	 */
+	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html ): array {
+		if ( empty( $text_to_translate ) ) {
+			return array();
+		}
+		if ( empty( $source_language ) ) {
+			return array();
+		}
+		if ( empty( $target_language ) ) {
+			return array();
+		}
+		if ( empty( $is_html ) ) {
+			return array();
+		}
+		return array();
+	}
+
+	/**
+	 * Return whether this object is locked or not.
+	 *
+	 * @return bool true if object is locked.
+	 */
+	public function is_locked(): bool {
+		return false;
+	}
+
+	/**
+	 * Get link to create a simplification of the actual object with given language.
+	 *
+	 * @param string $language_code The language we search.
+	 *
+	 * @return string
+	 */
+	public function get_simplification_link( string $language_code ): string {
+		if ( empty( $language_code ) ) {
+			return '';
+		}
+		return '';
 	}
 }

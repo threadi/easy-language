@@ -10,6 +10,7 @@ namespace easyLanguage\Apis\ChatGpt;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Api_Requests;
 use easyLanguage\Log;
 use easyLanguage\Log_Api;
 use easyLanguage\Multilingual_plugins\Easy_Language\Db;
@@ -18,12 +19,12 @@ use WP_Error;
 /**
  * Create and send request to ChatGpt API. Gets the response.
  */
-class Request {
+class Request implements Api_Requests {
 
 	/**
 	 * HTTP-header for the request.
 	 *
-	 * @var array
+	 * @var array<string,string>
 	 */
 	private array $header = array(
 		'Accept'       => '*/*',
@@ -61,7 +62,7 @@ class Request {
 	/**
 	 * Complete result of the request.
 	 *
-	 * @var array|WP_Error
+	 * @var array<string,mixed>|WP_Error
 	 */
 	private array|WP_Error $result;
 
@@ -73,13 +74,6 @@ class Request {
 	private string $method = 'POST';
 
 	/**
-	 * Target-language for this request.
-	 *
-	 * @var string
-	 */
-	private string $target_language;
-
-	/**
 	 * Name for database-table with request-response.
 	 *
 	 * @var string
@@ -89,7 +83,7 @@ class Request {
 	/**
 	 * The content of this request.
 	 *
-	 * @var array
+	 * @var array<string,mixed>
 	 */
 	private array $request;
 
@@ -119,7 +113,7 @@ class Request {
 	 */
 	public function __construct() {
 		// table for requests and responses.
-		$this->table_requests = DB::get_instance()->get_wpdb_prefix() . 'easy_language_chatgpt';
+		$this->table_requests = Db::get_instance()->get_wpdb_prefix() . 'easy_language_chatgpt';
 	}
 
 	/**
@@ -191,14 +185,17 @@ class Request {
 
 		// set request-data for PUT.
 		if ( 'POST' === $this->get_method() ) {
-			$data['messages']                  = array(
+			$data['messages'] = array(
 				array(
 					'role'    => 'user',
 					'content' => $this->get_text(),
 				),
 			);
-			$data['model']                     = get_option( 'easy_language_chatgpt_model', 'gpt-4o' );
-			$payload                           = wp_json_encode( $data );
+			$data['model']    = get_option( 'easy_language_chatgpt_model', 'gpt-4o' );
+			$payload          = wp_json_encode( $data );
+			if ( ! $payload ) {
+				$payload = '';
+			}
 			$args['body']                      = $payload;
 			$args['headers']['Content-Length'] = strlen( $payload );
 		}
@@ -226,7 +223,11 @@ class Request {
 
 		// log the request (with anonymized token).
 		$args['headers']['Authorization'] = 'anonymized';
-		Log_Api::get_instance()->add_log( $chatgpt_obj->get_name(), $this->http_status, wp_json_encode( $args ), 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
+		$args_json                        = wp_json_encode( $args );
+		if ( ! $args_json ) {
+			$args_json = '';
+		}
+		Log_Api::get_instance()->add_log( $chatgpt_obj->get_name(), $this->http_status, $args_json, 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
 
 		// save request and result in db.
 		$this->save_in_db();
@@ -263,7 +264,7 @@ class Request {
 	/**
 	 * Get the complete request results.
 	 *
-	 * @return array|WP_Error
+	 * @return array<string,mixed>|WP_Error
 	 */
 	public function get_result(): WP_Error|array {
 		return $this->result;
@@ -279,17 +280,6 @@ class Request {
 	}
 
 	/**
-	 * Set target-language for this request.
-	 *
-	 * @param string $lang The target language.
-	 *
-	 * @return void
-	 */
-	public function set_target_language( string $lang ): void {
-		$this->target_language = $lang;
-	}
-
-	/**
 	 * Get source-language for this request.
 	 *
 	 * @return string
@@ -301,12 +291,12 @@ class Request {
 	/**
 	 * Set source-language for this request.
 	 *
-	 * @param string $lang The source language as string (e.g. "de_EL").
+	 * @param string $language The source language as string (e.g. "de_EL").
 	 *
 	 * @return void
 	 */
-	public function set_source_language( string $lang ): void {
-		$this->source_language = $lang;
+	public function set_source_language( string $language ): void {
+		$this->source_language = $language;
 	}
 
 	/**
@@ -339,20 +329,10 @@ class Request {
 	/**
 	 * Return the request-content.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	private function get_request(): array {
 		return $this->request;
-	}
-
-	/**
-	 * Return the target language for this request.
-	 *
-	 * @return string
-	 * @noinspection PhpUnusedPrivateMethodInspection
-	 */
-	private function get_target_language(): string {
-		return $this->target_language;
 	}
 
 	/**
@@ -375,4 +355,58 @@ class Request {
 	public function set_method( string $method ): void {
 		$this->method = $method;
 	}
+
+	/**
+	 * Set the text type.
+	 *
+	 * @param string $type The type to use.
+	 *
+	 * @return void
+	 */
+	public function set_text_type( string $type ): void {}
+
+	/**
+	 * Set the separator.
+	 *
+	 * @param string $separator The separator to use.
+	 *
+	 * @return void
+	 */
+	public function set_separator( string $separator ): void {}
+
+	/**
+	 * Set new lines.
+	 *
+	 * @param int $new_lines The setting for new lines.
+	 *
+	 * @return void
+	 */
+	public function set_new_lines( int $new_lines ): void {}
+
+	/**
+	 * Set embolden setting.
+	 *
+	 * @param int $embolden The setting for embolden.
+	 *
+	 * @return void
+	 */
+	public function set_embolden_negative( int $embolden ): void {}
+
+	/**
+	 * Set if this is a test.
+	 *
+	 * @param bool $is_test The setting.
+	 *
+	 * @return void
+	 */
+	public function set_is_test( bool $is_test ): void {}
+
+	/**
+	 * Set the target language.
+	 *
+	 * @param string $language The language.
+	 *
+	 * @return void
+	 */
+	public function set_target_language( string $language ): void {}
 }

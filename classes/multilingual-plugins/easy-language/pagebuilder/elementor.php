@@ -23,9 +23,9 @@ use Elementor\Plugin;
 /**
  * Add Elementor-object to list of supported pagebuilder.
  *
- * @param array $pagebuilder_list List of supported pagebuilder.
+ * @param array<int,mixed> $pagebuilder_list List of supported pagebuilder.
  *
- * @return array
+ * @return array<int,mixed>
  */
 function easy_language_pagebuilder_elementor( array $pagebuilder_list ): array {
 	// add Elementor as PageBuilder.
@@ -150,11 +150,11 @@ add_action( 'elementor/element/wp-page/document_settings/after_section_end', 'ea
 /**
  * Register custom controls for elementor.
  *
- * @param object $controls_manager Object of Controls Manager from Elementor.
+ * @param Controls_Manager $controls_manager Object of Controls Manager from Elementor.
  *
  * @return void
  */
-function easy_language_pagebuilder_elementor_add_custom_control( object $controls_manager ): void {
+function easy_language_pagebuilder_elementor_add_custom_control( Controls_Manager $controls_manager ): void {
 	$controls_manager->register( new Languages() );
 }
 add_action( 'elementor/controls/register', 'easy_language_pagebuilder_elementor_add_custom_control' );

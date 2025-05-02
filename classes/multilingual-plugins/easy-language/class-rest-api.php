@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Apis;
 use easyLanguage\Helper;
+use WP_Post;
 use WP_REST_Request;
 use WP_REST_Server;
 
@@ -42,11 +43,11 @@ class REST_Api {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): REST_Api {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
@@ -119,7 +120,7 @@ class REST_Api {
 	 *
 	 * @param WP_REST_Request $data The data from the request.
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function get_language_options_for_page( WP_REST_Request $data ): array {
 		// get ID of requested object.
@@ -133,6 +134,11 @@ class REST_Api {
 		// get WP_Post-object.
 		$wp_post_object = get_post( $post_id );
 
+		// bail if post is not WP_Post.
+		if ( ! $wp_post_object instanceof WP_Post ) {
+			return array();
+		}
+
 		// register the requested post-object global.
 		$GLOBALS['post'] = $wp_post_object;
 		setup_postdata( $wp_post_object );
@@ -141,6 +147,11 @@ class REST_Api {
 		ob_start();
 		Pagebuilder_Support::get_instance()->render_meta_box_content( $wp_post_object );
 		$contents = ob_get_clean();
+
+		// bail if no content returned.
+		if ( ! $contents ) {
+			return array();
+		}
 
 		// return possible options.
 		return array(
@@ -151,7 +162,7 @@ class REST_Api {
 	/**
 	 * Run check of our own automatic simplification cron for Tools > Site Health.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function check_automatic_cron(): array {
 		// define default results.
@@ -205,7 +216,7 @@ class REST_Api {
 	/**
 	 * Check the active API.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function check_api(): array {
 		// get actual API.

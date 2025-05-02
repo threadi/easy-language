@@ -45,7 +45,7 @@ interface Multilingual_Plugins_Base {
 	/**
 	 * Return languages this plugin will support.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	public function get_supported_languages(): array;
 
@@ -54,7 +54,7 @@ interface Multilingual_Plugins_Base {
 	 *
 	 * Format example: array( "de_LS" => 1 )
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function get_active_languages(): array;
 
@@ -71,4 +71,42 @@ interface Multilingual_Plugins_Base {
 	 * @return void
 	 */
 	public function cli(): void;
+
+	/**
+	 * Return whether this plugin is a foreign plugin.
+	 *
+	 * @return bool
+	 * @noinspection PhpUnused
+	 */
+	public function is_foreign_plugin(): bool;
+
+	/**
+	 * Return whether this plugin has its own api config.
+	 *
+	 * @return bool
+	 * @noinspection PhpUnused
+	 */
+	public function has_own_api_config(): bool;
+
+	/**
+	 * Return whether this plugin supports our APIs.
+	 *
+	 * @return bool
+	 * @noinspection PhpUnused
+	 */
+	public function is_supporting_apis(): bool;
+
+	/**
+	 * Return the internal name of the object.
+	 *
+	 * @return string
+	 */
+	public function get_name(): string;
+
+	/**
+	 * Return the title.
+	 *
+	 * @return string
+	 */
+	public function get_title(): string;
 }

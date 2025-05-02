@@ -54,11 +54,11 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Init {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
@@ -86,9 +86,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Add predefined languages.
 	 *
-	 * @param array $languages List of languages.
+	 * @param array<string,array<string>> $languages List of languages.
 	 *
-	 * @return array
+	 * @return array<string,array<string>>
 	 */
 	public function add_predefined_language( array $languages ): array {
 		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
@@ -144,9 +144,9 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Add our custom flags for supported languages.
 	 *
-	 * @param array $flags List of flags.
+	 * @param array<string> $flags List of flags.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function add_flag( array $flags ): array {
 		foreach ( Languages::get_instance()->get_possible_target_languages() as $language_code => $language ) {
@@ -158,10 +158,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Get our custom flags for supported languages.
 	 *
-	 * @param array  $flags List of flags.
-	 * @param string $code Language-code.
+	 * @param array<string> $flags List of flags.
+	 * @param string        $code Language-code.
 	 *
-	 * @return array
+	 * @return array<string>
 	 */
 	public function get_flag( array $flags, string $code ): array {
 		// short-return if it is not one of our own language-codes.
@@ -199,7 +199,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	/**
 	 * Return list of active languages in polylang.
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function get_active_languages(): array {
 		// bail if polylang is not active.

@@ -40,10 +40,11 @@ class Init {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Init {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
@@ -55,23 +56,39 @@ class Init {
 		// include admin-related files.
 		if ( is_admin() ) {
 			include_once Helper::get_plugin_path() . '/inc/admin.php';
+
+			// get the files in the settings directory.
+			$files = glob( Helper::get_plugin_path() . '/inc/settings/*.php' );
+
 			// include all settings-files.
-			foreach ( glob( Helper::get_plugin_path() . '/inc/settings/*.php' ) as $filename ) {
-				include $filename;
+			if ( is_array( $files ) ) {
+				foreach ( $files as $filename ) {
+					include $filename;
+				}
 			}
 		}
 
 		// run updates.
 		Update::get_instance()->init();
 
+		// get the files in the API directory.
+		$files = glob( Helper::get_plugin_path() . '/inc/apis/*.php' );
+
 		// include all API-files.
-		foreach ( glob( Helper::get_plugin_path() . '/inc/apis/*.php' ) as $filename ) {
-			require_once $filename;
+		if ( is_array( $files ) ) {
+			foreach ( $files as $filename ) {
+				require_once $filename;
+			}
 		}
 
-		// include all settings-files.
-		foreach ( glob( Helper::get_plugin_path() . '/inc/multilingual-plugins/*.php' ) as $filename ) {
-			require_once $filename;
+		// get the files in the plugin directory.
+		$files = glob( Helper::get_plugin_path() . '/inc/multilingual-plugins/*.php' );
+
+		// include all plugin-files.
+		if ( is_array( $files ) ) {
+			foreach ( $files as $filename ) {
+				require_once $filename;
+			}
 		}
 
 		// initialize our installer.
@@ -202,7 +219,7 @@ class Init {
 	/**
 	 * Return list of internal singular-plural-names for post-types (not the translated names).
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function get_post_type_names(): array {
 		$post_type_names = array(
@@ -215,7 +232,7 @@ class Init {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $post_type_names List of post type names.
+		 * @param array<string,string> $post_type_names List of post type names.
 		 */
 		return apply_filters( 'easy_language_post_type_names', $post_type_names );
 	}
@@ -223,7 +240,7 @@ class Init {
 	/**
 	 * Return list of settings for supported post-types.
 	 *
-	 * @return array
+	 * @return array<string,array<string,string>>
 	 */
 	public function get_post_type_settings(): array {
 		$post_type_settings = array(
@@ -252,7 +269,7 @@ class Init {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $post_type_settings List of post type settings.
+		 * @param array<string,array<string,string>> $post_type_settings List of post type settings.
 		 */
 		return apply_filters( 'easy_language_post_type_settings', $post_type_settings );
 	}
@@ -411,10 +428,10 @@ class Init {
 	/**
 	 * Add links in row meta.
 	 *
-	 * @param array  $links List of links.
-	 * @param string $file The requested plugin file name.
+	 * @param array<string,string> $links List of links.
+	 * @param string               $file The requested plugin file name.
 	 *
-	 * @return array
+	 * @return array<string,string>
 	 */
 	public function add_row_meta_links( array $links, string $file ): array {
 		// bail if this is not our plugin.
@@ -431,7 +448,7 @@ class Init {
 		 * Filter the links in row meta of our plugin in plugin list.
 		 *
 		 * @since 2.6.0 Available since 2.6.0.
-		 * @param array $row_meta List of links.
+		 * @param array<string,string> $row_meta List of links.
 		 */
 		$row_meta = apply_filters( 'easy_language_plugin_row_meta', $row_meta );
 

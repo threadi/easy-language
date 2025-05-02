@@ -49,17 +49,17 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Salients_WpBakery {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
 
-		return static::$instance;
+		return self::$instance;
 	}
 
 	/**
 	 * Define flow-text-shortcodes.
 	 *
-	 * @return array
+	 * @return array<string,mixed>
 	 */
 	private function get_flow_text_shortcodes(): array {
 		$shortcodes = array(
@@ -80,7 +80,7 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 		 *
 		 * @since 2.7.0 Available since 2.7.0.
 		 *
-		 * @param array $shortcodes List of shortcodes.
+		 * @param array<string,mixed> $shortcodes List of shortcodes.
 		 */
 		return apply_filters( 'easy_language_salient_wpbakery_text_widgets', $shortcodes );
 	}
@@ -114,7 +114,7 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	 *
 	 * Get the wp bakery-content and parse its widgets to get the content of flow-text-widgets.
 	 *
-	 * @return array
+	 * @return array<array<string,mixed>>
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if wp bakery is not active.

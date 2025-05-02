@@ -13,9 +13,9 @@ use easyLanguage\Multilingual_plugins\Easy_Language\Parser\Gutenberg;
 /**
  * Add Gutenberg-object to list of supported pagebuilder.
  *
- * @param array $pagebuilder_list List of supported pagebuilder.
+ * @param array<int,mixed> $pagebuilder_list List of supported pagebuilder.
  *
- * @return array
+ * @return array<int,mixed>
  */
 function easy_language_pagebuilder_gutenberg( array $pagebuilder_list ): array {
 	$pagebuilder_list[] = Gutenberg::get_instance();

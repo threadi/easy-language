@@ -42,16 +42,17 @@ class Apis {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Apis {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
 	 * Return available APIs for simplifications with this plugin.
 	 *
-	 * @return array
+	 * @return array<int,Api_Base>
 	 */
 	public function get_available_apis(): array {
 		$apis = array();
@@ -61,7 +62,7 @@ class Apis {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $apis List of APIs
+		 * @param array<int,Api_Base> $apis List of APIs
 		 */
 		return apply_filters( 'easy_language_register_api', $apis );
 	}
@@ -164,6 +165,9 @@ class Apis {
 		header( 'Content-type: application/csv' );
 		header( 'Content-Disposition: attachment; filename=' . sanitize_file_name( gmdate( 'YmdHi' ) . '_' . get_option( 'blogname' ) . '.csv' ) );
 		$fp = fopen( 'php://output', 'w' );
+		if ( ! $fp ) {
+			exit;
+		}
 		foreach ( $entries as $row ) {
 			fputcsv( $fp, $row );
 		}
