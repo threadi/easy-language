@@ -273,7 +273,7 @@ class Log_Api_Table extends WP_List_Table {
 		 *
 		 * @since 2.8.0 Available since 2.8.0.
 		 *
-		 * @param array<string,string> The list of possible states.
+		 * @param array<string,string> $list The list of possible states.
 		 */
 		$list = apply_filters( 'easy_language_status_list', $list );
 

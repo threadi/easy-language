@@ -203,7 +203,7 @@ class Request implements Api_Requests {
 			if ( ! $body ) {
 				$body = '';
 			}
-			$args['body']        = $body;
+			$args['body'] = $body;
 		}
 
 		// secure request.
