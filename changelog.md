@@ -17,6 +17,7 @@
 - Fixed error in reading inner blocks in Block Editor
 - Fixed missing run of triggers after simplification has been saved
 - Fixed missing Divi support if Block Editor is also active
+- Fixed missing WpBakery support as Salient WpBakery get used even if it is not available
 
 ## [2.7.0] - 07.04.2025
 

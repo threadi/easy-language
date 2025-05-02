@@ -150,7 +150,7 @@ class WPBakery extends Parser_Base implements Parser {
 				}
 				foreach ( $matches[2] as $key => $value ) {
 					foreach ( shortcode_parse_atts( $matches[3][ $key ] ) as $attribute => $attribute_value ) {
-						if ( in_array( $attribute, $attributes, true ) && ! empty( $attribute_value ) ) {
+						if ( ! empty( $attribute_value ) && in_array( $attribute, $attributes, true ) ) {
 							$resulting_texts[] = array(
 								'text' => $attribute_value,
 								'html' => $this->is_flow_text_widget_html( $shortcode ),
@@ -200,7 +200,7 @@ class WPBakery extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return 'true' === get_post_meta( $post_object->get_id(), '_wpb_vc_js_status', true );
+		return $this->is_active() && 'true' === get_post_meta( $post_object->get_id(), '_wpb_vc_js_status', true );
 	}
 
 	/**
