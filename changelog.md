@@ -16,6 +16,7 @@
 - Fixed error in saving simplified titles of pages or posts
 - Fixed error in reading inner blocks in Block Editor
 - Fixed missing run of triggers after simplification has been saved
+- Fixed missing Divi support if Block Editor is also active
 
 ## [2.7.0] - 07.04.2025
 

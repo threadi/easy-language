@@ -16,7 +16,7 @@ use easyLanguage\Multilingual_plugins\Easy_Language\Parser_Base;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 
 /**
- * Handler for parsing divi-content.
+ * Handler for parsing Divi-content.
  */
 class Divi extends Parser_Base implements Parser {
 	/**
@@ -107,12 +107,12 @@ class Divi extends Parser_Base implements Parser {
 	/**
 	 * Return parsed texts.
 	 *
-	 * Get the divi-content and parse its widgets to get the content of flow-text-widgets.
+	 * Get the Divi-content and parse its widgets to get the content of flow-text-widgets.
 	 *
 	 * @return array<array<string,mixed>>
 	 */
 	public function get_parsed_texts(): array {
-		// do nothing if divi is not active.
+		// do nothing if Divi is not active.
 		if ( false === $this->is_divi_active() ) {
 			return array();
 		}
@@ -135,7 +135,7 @@ class Divi extends Parser_Base implements Parser {
 			} elseif ( ! empty( $attributes ) && ! empty( $matches[2] ) && ! empty( $matches[3] ) ) {
 				foreach ( $matches[2] as $key => $value ) {
 					foreach ( shortcode_parse_atts( $matches[3][ $key ] ) as $attribute => $attribute_value ) {
-						if ( in_array( $attribute, $attributes, true ) && ! empty( $attribute_value ) ) {
+						if ( ! empty( $attribute_value ) && in_array( $attribute, $attributes, true ) ) {
 							$resulting_texts[] = array(
 								'text' => $attribute_value,
 								'html' => $this->is_flow_text_widget_html( $shortcode ),
@@ -160,7 +160,7 @@ class Divi extends Parser_Base implements Parser {
 	 * @return string
 	 */
 	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
-		// do nothing if divi is not active.
+		// do nothing if Divi is not active.
 		if ( false === $this->is_divi_active() ) {
 			return $original_complete;
 		}
@@ -197,7 +197,7 @@ class Divi extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return edit link for divi-object.
+	 * Return edit link for Divi-object.
 	 *
 	 * @return string
 	 */
