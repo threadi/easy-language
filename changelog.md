@@ -7,7 +7,8 @@
 - Using PHPStan to check for potential PHP errors in plugin
 - Optimized WordPress Coding Standard check
 - Updates Avada support
-- Some code optimizations
+- Multiple code optimizations to eliminate potential errors from the very beginning
+- Optimized styling of API log table
 - Updated dependencies
 
 ### Fixed

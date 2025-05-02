@@ -131,12 +131,11 @@ class Log_Api_Table extends WP_List_Table {
 				return '';
 
 			case 'state':
-				// TODO ersetzen durch Icon.
-				return wp_kses_post( __( $item[ $column_name ], 'easy-language' ) );
+				return $this->get_status_icon( $item[ $column_name ] );
 
 			case 'request':
 			case 'response':
-				return wp_kses_post( nl2br( $item[ $column_name ] ) );
+				return '<code>' . wp_kses_post( nl2br( $item[ $column_name ] ) ) . '</code>';
 		}
 		return '';
 	}
@@ -253,5 +252,37 @@ class Log_Api_Table extends WP_List_Table {
 	 */
 	private function get_base_sql(): string {
 		return 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM `' . Log_Api::get_instance()->get_table_name() . '` WHERE 1 = %1$d';
+	}
+
+	/**
+	 * Return HTML-code for icon of the given status.
+	 *
+	 * @param string $status The requested status.
+	 *
+	 * @return string
+	 */
+	private function get_status_icon( string $status ): string {
+		$list = array(
+			'success' => '<span class="dashicons dashicons-yes" title="' . __( 'Ended successfully', 'easy-language' ) . '"></span>',
+			'info'    => '<span class="dashicons dashicons-info-outline" title="' . __( 'Just an info', 'easy-language' ) . '"></span>',
+			'error'   => '<span class="dashicons dashicons-no" title="' . __( 'Error occurred', 'easy-language' ) . '"></span>',
+		);
+
+		/**
+		 * Filter the list of possible states in log table.
+		 *
+		 * @since 2.8.0 Available since 2.8.0.
+		 *
+		 * @param array<string,string> The list of possible states.
+		 */
+		$list = apply_filters( 'easy_language_status_list', $list );
+
+		// bail if status is unknown.
+		if ( empty( $list[ $status ] ) ) {
+			return '';
+		}
+
+		// return the HTML-code for the icon of this status.
+		return $list[ $status ];
 	}
 }
