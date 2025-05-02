@@ -488,7 +488,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					 * @since 2.0.0 Available since 2.0.0.
 					 *
 					 * @param array<mixed> $dialog The dialog configuration.
-					 * @param Base $api_obj The used API as object.
+					 * @param Api_Base $api_obj The used API as object.
 					 * @param Post_Object $post_object The Post as object.
 					 */
 					$dialog = apply_filters( 'easy_language_first_simplify_dialog', $dialog, $api_obj, $post_object );
@@ -1470,7 +1470,7 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				 * @since 2.0.0 Available since 2.0.0.
 				 *
 				 * @param array $dialog The dialog configuration.
-				 * @param Base $api_obj The used API as object.
+				 * @param Api_Base $api_obj The used API as object.
 				 * @param Post_Object $post_object The Post as object.
 				 */
 				$dialog = apply_filters( 'easy_language_first_simplify_dialog', $dialog, $api_obj, $post_object );
