@@ -9,6 +9,7 @@
 - Updates Avada support
 - Multiple code optimizations to eliminate potential errors from the very beginning
 - Optimized styling of API log table
+- Added composer.json in plugin release to fulfill actual WordPress repository requirements
 - Updated dependencies
 
 ### Fixed

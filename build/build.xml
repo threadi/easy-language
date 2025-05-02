@@ -169,6 +169,7 @@
 			<zipfileset dir="${src.dir}/vendor/threadi/react-dialog/build/" prefix="${plugin.slug}/vendor/threadi/react-dialog/build/" />
             <zipfileset dir="${src.dir}" includes="uninstall.php,wpml-config.xml" prefix="${plugin.slug}" />
 			<zipfileset dir="${src.dir}" includes="readme-release.txt" fullpath="${plugin.slug}/readme.txt" />
+			<zipfileset dir="${src.dir}" includes="composer.json" fullpath="${plugin.slug}/composer.json" />
             <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
         </zip>
 		<for list="${apis}" param="api">
