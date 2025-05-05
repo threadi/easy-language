@@ -95,14 +95,18 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added support for theme Salient WpBakery
-- Added support for PageBuilder Breakdance
-- Optimized usage of file versions for each enqueued file for better performance during loading
-- Optimized handling of SUMM AI free simplification requests
-- Speedup detection of used PageBuilder
-- Extended security checks during plugin build by using WP VIP recommendations
-- Small optimisation regarding security of inputs and outputs
-- Set compatibility with WordPress 6.8
-- Removed support link targeting the contact page of laOlaWeb
+- Using PHPStan to check for potential PHP errors in plugin
+- Optimized WordPress Coding Standard check
+- Updates Avada support
+- Multiple code optimizations to eliminate potential errors from the very beginning
+- Optimized styling of API log table
+- Added composer.json in plugin release to fulfill actual WordPress repository requirements
+- Updated dependencies
+- Fixed potential error on select field validation
+- Fixed error in saving simplified titles of pages or posts
+- Fixed error in reading inner blocks in Block Editor
+- Fixed missing run of triggers after simplification has been saved
+- Fixed missing Divi support if Block Editor is also active
+- Fixed missing WpBakery support as Salient WpBakery get used even if it is not available
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)

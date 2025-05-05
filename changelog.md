@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.8.0] - 05.05.2025
 
 ### Changed
 
