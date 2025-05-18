@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.8.1] - 18.05.2025
+
+### Changed
+
+- Optimized detection of actual WordPress language for better support of WordPress Playground
+
 ## [2.8.0] - 05.05.2025
 
 ### Changed
