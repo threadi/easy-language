@@ -96,5 +96,7 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 
 = @@VersionNumber@@ =
 - Optimized detection of actual WordPress language for better support of WordPress Playground
+- Updated dependencies
+- Check if dirty script exists to prevent JS-error on loading
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
