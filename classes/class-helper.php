@@ -109,10 +109,10 @@ class Helper {
 	/**
 	 * Return the active Wordpress-language.
 	 *
-	 * @return string The language in locale-format, e.g. "ab_CD").
+	 * @return string The language in locale-format (e.g. "ab_CD").
 	 */
 	public static function get_wp_lang(): string {
-		$wp_language = get_option( 'WPLANG' );
+		$wp_language = get_locale();
 
 		/**
 		 * Consider the main language set in Polylang for the web page.

@@ -95,18 +95,8 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Using PHPStan to check for potential PHP errors in plugin
-- Optimized WordPress Coding Standard check
-- Updates Avada support
-- Multiple code optimizations to eliminate potential errors from the very beginning
-- Optimized styling of API log table
-- Added composer.json in plugin release to fulfill actual WordPress repository requirements
+- Optimized detection of actual WordPress language for better support of WordPress Playground
 - Updated dependencies
-- Fixed potential error on select field validation
-- Fixed error in saving simplified titles of pages or posts
-- Fixed error in reading inner blocks in Block Editor
-- Fixed missing run of triggers after simplification has been saved
-- Fixed missing Divi support if Block Editor is also active
-- Fixed missing WpBakery support as Salient WpBakery get used even if it is not available
+- Check if dirty script exists to prevent JS-error on loading
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
