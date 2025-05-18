@@ -78,7 +78,9 @@ jQuery(document).ready(function($) {
 	});
 
 	// prevent leaving of posts-form if it has changes.
-	$("body.settings_page_easy_language_settings form").dirty({preventLeaving: true});
+	if ( $.isFunction($.fn.dirty) ) {
+		$("body.settings_page_easy_language_settings form").dirty({preventLeaving: true});
+	}
 
 	/**
 	 * Image handling: choose new icon vor language.
