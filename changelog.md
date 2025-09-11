@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Optimized the prevention to load files directly
+
+### Fixed
+
+- Fixed potential error during WPML initialization for the language icons
+
 ## [2.8.1] - 18.05.2025
 
 ### Changed
