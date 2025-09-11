@@ -7,6 +7,9 @@
 
 namespace easyLanguage\Multilingual_plugins\Wpml;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Base;
 use easyLanguage\Helper;
 use easyLanguage\Languages;
@@ -189,7 +192,17 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					if ( ! file_exists( dirname( $flag_path ) ) ) {
 						$wp_filesystem->mkdir( dirname( $flag_path ) );
 					}
-					copy( Helper::get_icon_path_for_language_code( $language_code ), $flag_path );
+
+					// get the icon path.
+					$icon_path = Helper::get_icon_path_for_language_code( (string)$language_code );
+
+					// bail if no icon path is given.
+					if( empty( $icon_path ) ) {
+						continue;
+					}
+
+					// copy the file.
+					copy( $icon_path, $flag_path );
 				}
 
 				// collect possible simplifications.

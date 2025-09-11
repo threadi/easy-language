@@ -7,6 +7,9 @@
 
 namespace easyLanguage\Multilingual_plugins\TranslatePress;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Handler for CLI-operations.
  */

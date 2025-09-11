@@ -7,15 +7,13 @@
 
 namespace easyLanguage\Multilingual_plugins\TranslatePress;
 
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 use easyLanguage\Apis;
 use easyLanguage\Apis\Summ_Ai\Request;
 use TRP_Machine_Translator;
 use WP_Error;
-
-// Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 /**
  * Define our own translate-machine as extension for the translatePress-plugin.
