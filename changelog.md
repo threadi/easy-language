@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [2.8.2] - 15.09.2025
 
 ### Changed
 
