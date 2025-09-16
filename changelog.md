@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Added new gpt-5 to list of available ChatGpt models
+
 ## [2.8.2] - 15.09.2025
 
 ### Changed
