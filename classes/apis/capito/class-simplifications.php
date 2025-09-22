@@ -95,10 +95,10 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 			$response = $request_obj->get_response();
 
 			// transform it to array.
-			$request_array = json_decode( $response, true );
+			$response_array = json_decode( $response, true );
 
 			// get the simplified text.
-			$simplified_text = $request_array['content'];
+			$simplified_text = $response_array['content'];
 
 			$instance = $this;
 			/**
@@ -107,10 +107,10 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 			 * @since 2.0.0 Available since 2.0.0.
 			 *
 			 * @param string $simplified_text The simplified text.
-			 * @param array $request_array The complete response array from the API.
+			 * @param array $response_array The complete response array from the API.
 			 * @param Simplifications $instance The simplification object.
 			 */
-			$simplified_text = apply_filters( 'easy_language_simplified_text', $simplified_text, $request_array, $instance );
+			$simplified_text = apply_filters( 'easy_language_simplified_text', $simplified_text, $response_array, $instance );
 
 			// return simplification to plugin which will save it.
 			return array(

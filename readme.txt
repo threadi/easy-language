@@ -95,7 +95,8 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Optimized the prevention to load files directly
-- Fixed potential error during WPML initialization for the language icons
+- Added support for teams in capito API
+- Added new gpt-5 to list of available ChatGpt models
+- Optimizations for updated PHPStan rules to prevent errors
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
