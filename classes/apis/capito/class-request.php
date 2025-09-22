@@ -229,6 +229,7 @@ class Request implements Api_Requests {
 
 		// log the request (with anonymized token).
 		$args['headers']['Authorization'] = 'anonymized';
+		$args['url']                      = $this->url;
 		$args                             = wp_json_encode( $args );
 		if ( ! $args ) {
 			$args = '';

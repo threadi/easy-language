@@ -14,7 +14,6 @@ defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Api_Requests;
 use easyLanguage\Api_Simplifications;
-use easyLanguage\Apis\Summ_Ai\Request;
 use easyLanguage\Simplification_Base;
 use easyLanguage\Base;
 

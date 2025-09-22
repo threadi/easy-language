@@ -266,9 +266,9 @@ class Switcher {
 	/**
 	 * Change the menu items if they are language switcher-items for classic themes.
 	 *
-	 * @param array<string,mixed> $items List of menu-items.
+	 * @param array<int|string,mixed> $items List of menu-items.
 	 *
-	 * @return array<string,mixed>
+	 * @return array<int|string,mixed>
 	 */
 	public function set_menu_items( array $items ): array {
 		// do nothing in wp-admin.

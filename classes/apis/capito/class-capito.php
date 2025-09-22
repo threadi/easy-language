@@ -692,6 +692,96 @@ class Capito extends Base implements Api_Base {
 			)
 		);
 
+		// choose account type.
+		add_settings_field(
+			'easy_language_capito_account_type',
+			__( 'Account type', 'easy-language' ),
+			'easy_language_admin_select_field',
+			'easyLanguageCapitoPage',
+			'settings_section_capito',
+			array(
+				'label_for'     => 'easy_language_capito_account_type',
+				'fieldId'       => 'easy_language_capito_account_type',
+				'values'        => array(
+					'user' => __( 'User', 'easy-language' ),
+					'team' => __( 'Team', 'easy-language' ),
+				),
+				'disable_empty' => true,
+				'readonly'      => false === $this->is_capito_token_set(),
+			)
+		);
+		register_setting(
+			'easyLanguageCapitoFields',
+			'easy_language_capito_account_type',
+			array(
+				'sanitize_callback' => array( $this, 'clean_team_cache' ),
+			)
+		);
+
+		// get list of teams for given token.
+		$teams = array();
+		if ( $this->is_team_account() ) {
+			// use cached value.
+			$teams = get_transient( 'easy_language_capito_teams' );
+
+			if ( empty( $teams ) ) {
+				$teams = array();
+
+				// send request to get list of teams for this token.
+				$request_obj = $this->get_request_object();
+				$request_obj->set_url( 'https://api.capito.ai/v2/account/me/member-of' );
+				$request_obj->set_method( 'GET' );
+				$request_obj->set_token( $this->get_token() );
+				$request_obj->send();
+
+				// return result depending on http-status.
+				if ( 200 === $request_obj->get_http_status() ) {
+					// get the response.
+					$response = $request_obj->get_response();
+
+					// transform it to array.
+					$response_array = json_decode( $response, true );
+
+					// add entries to list for select field.
+					if ( ! empty( $response_array['accounts'] ) ) {
+						foreach ( $response_array['accounts'] as $team ) {
+							// bail if ID is not given.
+							if ( ! isset( $team['id'] ) ) {
+								continue;
+							}
+
+							// add team to the list.
+							$teams[ $team['id'] ] = $team['id'];
+						}
+					}
+
+					// save this list, if it is not empty.
+					if ( ! empty( $teams ) ) {
+						set_transient( 'easy_language_capito_teams', $teams, WEEK_IN_SECONDS );
+					}
+				}
+			}
+		}
+
+		// choose team (if enabled).
+		add_settings_field(
+			'easy_language_capito_team',
+			__( 'Choose team', 'easy-language' ),
+			'team' === get_option( 'easy_language_capito_account_type' ) ? 'easy_language_admin_select_field' : array( $this, 'team_hint' ),
+			'easyLanguageCapitoPage',
+			'settings_section_capito',
+			array(
+				'label_for' => 'easy_language_capito_team',
+				'fieldId'   => 'easy_language_capito_team',
+				'values'    => $teams,
+				'readonly'  => false === $this->is_capito_token_set() || ! $this->is_team_account(),
+			)
+		);
+		register_setting(
+			'easyLanguageCapitoFields',
+			'easy_language_capito_team'
+		);
+
 		// Enable source-languages.
 		// -> defaults to WP-locale.
 		// -> if WPML, Polylang or TranslatePress is available, show additional languages.
@@ -793,7 +883,11 @@ class Capito extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_api_url(): string {
-		return EASY_LANGUAGE_CAPITO_API_URL;
+		$url = EASY_LANGUAGE_CAPITO_API_URL;
+		if ( $this->is_team_account() ) {
+			return $url . get_option( 'easy_language_capito_team', '' );
+		}
+		return $url . 'me';
 	}
 
 	/**
@@ -1251,5 +1345,35 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_request_text_by_language( string $target_language ): string {
 		return '';
+	}
+
+	/**
+	 * Show hint for team usage.
+	 *
+	 * @return void
+	 */
+	public function team_hint(): void {
+		echo esc_html__( 'Choose team as account type.', 'easy-language' );
+	}
+
+	/**
+	 * Return whether this is a team account (true) or not (false).
+	 *
+	 * @return bool
+	 */
+	private function is_team_account(): bool {
+		return 'team' === get_option( 'easy_language_capito_account_type' );
+	}
+
+	/**
+	 * Clean the team cache to load actual list on switch of account type.
+	 *
+	 * @param mixed $value The value to save.
+	 *
+	 * @return mixed
+	 */
+	public function clean_team_cache( mixed $value ): mixed {
+		delete_transient( 'easy_language_capito_teams' );
+		return $value;
 	}
 }

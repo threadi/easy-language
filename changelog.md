@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.9.0] - 23.09.2025
+
+### Added
+
+- Added support for teams in capito API
+- Added new gpt-5 to list of available ChatGpt models
+
+### Changed
+
+- Optimizations for updated PHPStan rules to prevent errors
+
 ## [2.8.2] - 15.09.2025
 
 ### Changed

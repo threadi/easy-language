@@ -28,7 +28,7 @@ const EASY_LANGUAGE_SUMM_AI_API_URL_QUOTA = 'https://backend.summ-ai.com/api/v1/
 /**
  * The capito API URL for simplifications.
  */
-const EASY_LANGUAGE_CAPITO_API_URL = 'https://api.capito.ai/v2/translation/me';
+const EASY_LANGUAGE_CAPITO_API_URL = 'https://api.capito.ai/v2/translation/';
 
 /**
  * The capito API URL for quotas.

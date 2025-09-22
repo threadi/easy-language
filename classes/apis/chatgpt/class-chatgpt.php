@@ -450,6 +450,7 @@ class ChatGpt extends Base implements Api_Base {
 
 		// Define list of models this plugin supports atm.
 		$models = array(
+			'gpt-5'         => 'gpt-5',
 			'gpt-4o'        => 'gpt-4o',
 			'gpt-4'         => 'gpt-4',
 			'gpt-3.5-turbo' => 'gpt-3.5-turbo',

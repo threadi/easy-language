@@ -85,6 +85,7 @@ class Update {
 			$this->version230();
 			$this->version240();
 			$this->version250();
+			$this->version290();
 
 			// save new plugin-version in DB.
 			delete_option( 'easyLanguageVersion' );
@@ -208,5 +209,15 @@ class Update {
 			}
 			update_option( 'easy_language_summ_ai_target_languages_embolden_negative', $embolden_negatives );
 		}
+	}
+
+	/**
+	 * On update to version 2.9.0 or newer.
+	 *
+	 * @return void
+	 */
+	public function version290(): void {
+		// set new option to "user".
+		update_option( 'easy_language_capito_account_type', 'user' );
 	}
 }
