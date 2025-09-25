@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Mark the active entry in language switcher with class
+
 ### Fixed
 
 - Fixed double slash in simplified URL for some permalink settings
