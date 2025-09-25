@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed double slash in simplified URL for some permalink settings
+
 ## [2.9.0] - 23.09.2025
 
 ### Added
