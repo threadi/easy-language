@@ -12,7 +12,6 @@ defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Helper;
 use easyLanguage\Languages;
-use WP_Post;
 
 /**
  * Object which handles the language switcher.
@@ -202,6 +201,9 @@ class Switcher {
 			return '';
 		}
 
+		// secure the simplified object.
+		$simplified_obj = $object;
+
 		// check if this object is a simplified object.
 		if ( $object->is_simplified() ) {
 			$object_id = $object->get_original_object_as_int();
@@ -223,7 +225,7 @@ class Switcher {
 		// remove actual language if set.
 		if ( false !== $attributes['hide_actual_language'] ) {
 			foreach ( $languages as $language_code => $settings ) {
-				if ( 0 === strcasecmp( Helper::get_current_language(), $language_code ) ) {
+				if ( 0 === strcasecmp( array_key_first( $simplified_obj->get_language() ), $language_code ) ) {
 					unset( $languages[ $language_code ] );
 				}
 			}
