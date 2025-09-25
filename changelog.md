@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Mark the active entry in language switcher with class
+
+### Fixed
+
+- Fixed double slash in simplified URL for some permalink settings
+- Fixed wrong hidden language in language switcher
+
 ## [2.9.0] - 23.09.2025
 
 ### Added

@@ -224,7 +224,13 @@ class Rewrite {
 			return $url;
 		}
 
+		// check for "/"-separator.
+		$separator = '/';
+		if( str_starts_with( $url, '/' ) ) {
+			$separator = '';
+		}
+
 		// return the URL prefixed with the language part.
-		return $languages[ $language ]['url'] . '/' . $url;
+		return $languages[ $language ]['url'] . $separator . $url;
 	}
 }

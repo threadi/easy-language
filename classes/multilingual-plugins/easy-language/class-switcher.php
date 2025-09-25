@@ -12,7 +12,6 @@ defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Helper;
 use easyLanguage\Languages;
-use WP_Post;
 
 /**
  * Object which handles the language switcher.
@@ -202,6 +201,9 @@ class Switcher {
 			return '';
 		}
 
+		// secure the simplified object.
+		$simplified_obj = $object;
+
 		// check if this object is a simplified object.
 		if ( $object->is_simplified() ) {
 			$object_id = $object->get_original_object_as_int();
@@ -220,10 +222,13 @@ class Switcher {
 			return '';
 		}
 
+		// get the active language marker from requested (potentiell simplified) object.
+		$active_language = array_key_first( $simplified_obj->get_language() );
+
 		// remove actual language if set.
 		if ( false !== $attributes['hide_actual_language'] ) {
 			foreach ( $languages as $language_code => $settings ) {
-				if ( 0 === strcasecmp( Helper::get_current_language(), $language_code ) ) {
+				if ( 0 === strcasecmp( $active_language, $language_code ) ) {
 					unset( $languages[ $language_code ] );
 				}
 			}
@@ -254,6 +259,21 @@ class Switcher {
 				$class = 'easy-language-switcher-icon';
 				$title = Helper::get_icon_img_for_language_code( $language_code );
 			}
+
+			// add active marker.
+			if( $active_language === $language_code ) {
+				$class .= ' easy-language-switcher-active';
+			}
+
+			/**
+			 * Filter the classes for single switcher entry.
+			 *
+			 * @since 2.9.1 Available since 2.9.1.
+			 * @param string $class The classes.
+			 * @param string $language_code The language code.
+			 * @param array $settings The language settings.
+			 */
+			$class = apply_filters( 'easy_language_switcher_entry_classes', $class, $language_code, $settings );
 
 			// add item to menu.
 			$html .= '<a href="' . esc_url( $url ) . '" class="' . esc_attr( $class ) . '" title="' . esc_attr( $attribute_title ) . '">' . wp_kses_post( $title ) . '</a>';
