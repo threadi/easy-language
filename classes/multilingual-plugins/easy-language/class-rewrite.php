@@ -226,7 +226,7 @@ class Rewrite {
 
 		// check for "/"-separator.
 		$separator = '/';
-		if( str_starts_with( $url, '/' ) ) {
+		if ( str_starts_with( $url, '/' ) ) {
 			$separator = '';
 		}
 

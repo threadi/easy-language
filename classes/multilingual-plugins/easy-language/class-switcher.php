@@ -261,7 +261,7 @@ class Switcher {
 			}
 
 			// add active marker.
-			if( $active_language === $language_code ) {
+			if ( $active_language === $language_code ) {
 				$class .= ' easy-language-switcher-active';
 			}
 

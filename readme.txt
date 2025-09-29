@@ -95,8 +95,8 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added support for teams in capito API
-- Added new gpt-5 to list of available ChatGpt models
-- Optimizations for updated PHPStan rules to prevent errors
+- Mark the active entry in language switcher with class
+- Fixed double slash in simplified URL for some permalink settings
+- Fixed wrong hidden language in language switcher
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
