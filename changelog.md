@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Added support for PageBuilder SiteOrigin
+
+### Changed
+
+- Updated setup components
+
 ## [2.9.1] - 28.09.2925
 
 ### Changed
