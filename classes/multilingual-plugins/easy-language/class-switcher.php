@@ -223,7 +223,7 @@ class Switcher {
 		}
 
 		// get the active language marker from requested (potentiell simplified) object.
-		$active_language = array_key_first( $simplified_obj->get_language() );
+		$active_language = (string) array_key_first( $simplified_obj->get_language() );
 
 		// remove actual language if set.
 		if ( false !== $attributes['hide_actual_language'] ) {
