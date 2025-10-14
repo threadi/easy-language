@@ -18,7 +18,7 @@ use easyLanguage\Multilingual_plugins\Easy_Language\Parser\SiteOrigin;
  * @return array<int,mixed>
  */
 function easy_language_pagebuilder_site_origin( array $pagebuilder_list ): array {
-	// add themify to list.
+	// add SiteOrigin to list.
 	$pagebuilder_list[] = SiteOrigin::get_instance();
 
 	// return resulting list of page-builders.

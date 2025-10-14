@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added support for PageBuilder SiteOrigin
+- Added support for the PageBuilders SiteOrigin and SeedProd
 
 ### Changed
 
