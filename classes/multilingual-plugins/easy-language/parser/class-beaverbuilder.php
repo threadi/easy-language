@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling SeedProd pagebuilder for simplifications.
+ * File for handling BeaverBuilder pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -14,24 +14,25 @@ use easyLanguage\Helper;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser;
 use easyLanguage\Multilingual_plugins\Easy_Language\Parser_Base;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
+use stdClass;
 
 /**
- * Handler for parsing SeedProd-content.
+ * Handler for parsing BeaverBuilder-content.
  */
-class SeedProd extends Parser_Base implements Parser {
+class BeaverBuilder extends Parser_Base implements Parser {
 	/**
 	 * Internal name of the parser.
 	 *
 	 * @var string
 	 */
-	protected string $name = 'SeedProd';
+	protected string $name = 'BeaverBuilder';
 
 	/**
 	 * Instance of this object.
 	 *
-	 * @var ?SeedProd
+	 * @var ?BeaverBuilder
 	 */
-	private static ?SeedProd $instance = null;
+	private static ?BeaverBuilder $instance = null;
 
 	/**
 	 * Constructor for this object.
@@ -48,7 +49,7 @@ class SeedProd extends Parser_Base implements Parser {
 	/**
 	 * Return the instance of this Singleton object.
 	 */
-	public static function get_instance(): SeedProd {
+	public static function get_instance(): BeaverBuilder {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
 		}
@@ -63,22 +64,25 @@ class SeedProd extends Parser_Base implements Parser {
 	 */
 	private function get_flow_text_widgets(): array {
 		$widgets = array(
-			'header' => array(
-				'headerTxt',
+			'heading' => array(
+				'heading',
 			),
-			'text' => array(
-				'txt',
+			'callout' => array(
+				'text'
+			),
+			'rich-text' => array(
+				'text',
 			),
 		);
 
 		/**
-		 * Filter the possible SeedProd widgets.
+		 * Filter the possible BeaverBuilder widgets.
 		 *
 		 * @since 2.10.0 Available since 2.10.0.
 		 *
 		 * @param array<string,mixed> $widgets List of widgets.
 		 */
-		return apply_filters( 'easy_language_seedprod_text_widgets', $widgets );
+		return apply_filters( 'easy_language_beaverbuilder_text_widgets', $widgets );
 	}
 
 	/**
@@ -90,17 +94,18 @@ class SeedProd extends Parser_Base implements Parser {
 	 */
 	private function is_flow_text_widget_html( string $widget_name ): bool {
 		$html_support_widgets = array(
-			'text' => true,
+			'callout' => true,
+			'rich-text' => true,
 		);
 
 		/**
-		 * Filter the possible SeedProd widgets with HTML-support.
+		 * Filter the possible BeaverBuilder widgets with HTML-support.
 		 *
 		 * @since 2.10.0 Available since 2.10.0.
 		 *
 		 * @param array $html_support_widgets List of widgets with HTML-support.
 		 */
-		$html_widgets = apply_filters( 'easy_language_seedprod_html_widgets', $html_support_widgets );
+		$html_widgets = apply_filters( 'easy_language_beaverbuilder_html_widgets', $html_support_widgets );
 
 		return isset( $html_widgets[ $widget_name ] );
 	}
@@ -108,13 +113,13 @@ class SeedProd extends Parser_Base implements Parser {
 	/**
 	 * Return parsed texts.
 	 *
-	 * Get the SeedProd-content and parse its widgets to get the content of flow-text-widgets.
+	 * Get the BeaverBuilder-content and parse its widgets to get the content of flow-text-widgets.
 	 *
 	 * @return array<string,mixed>
 	 */
 	public function get_parsed_texts(): array {
-		// do nothing if SeedProd is not active.
-		if ( false === $this->is_seedprod_active() ) {
+		// do nothing if BeaverBuilder is not active.
+		if ( false === $this->is_beaverbuilder_active() ) {
 			return array();
 		}
 
@@ -122,19 +127,9 @@ class SeedProd extends Parser_Base implements Parser {
 		$resulting_texts = array();
 
 		// get editor contents and loop through its array.
-		$data_json = get_post_field( 'post_content_filtered', $this->get_object_id() );
-
-		// bail if it is not a string.
-		if( ! is_string( $data_json ) ) {
-			return array();
-		}
-
-		// decode the JSON-string to an array.
-		$data = json_decode( $data_json, true );
-
-		// get its texts.
-		if ( is_array( $data ) && ! empty( $data['document'] ) ) {
-			$resulting_texts = $this->get_widgets( $data['document'], $resulting_texts );
+		$data = get_post_meta( $this->get_object_id(), '_fl_builder_data', true );
+		if ( is_array( $data ) && ! empty( $data ) ) {
+			$resulting_texts = $this->get_widgets( $data, $resulting_texts );
 		}
 
 		// return resulting list.
@@ -151,45 +146,31 @@ class SeedProd extends Parser_Base implements Parser {
 	 * @return string
 	 */
 	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
-		// do nothing if SeedProd is not active.
-		if ( false === $this->is_seedprod_active() ) {
+		// do nothing if BeaverBuilder is not active.
+		if ( false === $this->is_beaverbuilder_active() ) {
 			return $original_complete;
 		}
 
 		// get editor contents and loop through its array.
-		$data_json = get_post_field( 'post_content_filtered', $this->get_object_id() );
-
-		// bail if it is not a string.
-		if( ! is_string( $data_json ) ) {
-			return $original_complete;
+		$data = get_post_meta( $this->get_object_id(), '_fl_builder_data', true );
+		if ( is_array( $data ) && ! empty( $data ) ) {
+			$data['document'] = $this->replace_content_in_widgets( $data, $simplified_part );
 		}
 
-		// decode the JSON-string to an array.
-		$data = json_decode( $data_json, true );
-
-		// get its texts.
-		if ( is_array( $data ) && ! empty( $data['document'] ) ) {
-			$data['document'] = $this->replace_content_in_widgets( $data['document'], $simplified_part );
-		}
-
-		// save the data for SeedProd.
-		$query = array(
-			'ID' => $this->get_object_id(),
-			'post_content_filtered' => (string)wp_json_encode( $data )
-		);
-		wp_insert_post( $query );
+		// save the data for BeaverBuilder.
+		update_post_meta( $this->get_object_id(), '_fl_builder_data', $data );
 
 		// return the string for post_content.
 		return str_replace( $this->get_text(), $simplified_part, $original_complete );
 	}
 
 	/**
-	 * Return whether SeedProd is active.
+	 * Return whether BeaverBuilder is active.
 	 *
 	 * @return bool
 	 */
-	private function is_seedprod_active(): bool {
-		return Helper::is_plugin_active( 'coming-soon/coming-soon.php' );
+	private function is_beaverbuilder_active(): bool {
+		return Helper::is_plugin_active( 'beaver-builder-lite-version/fl-builder.php' );
 	}
 
 	/**
@@ -200,7 +181,7 @@ class SeedProd extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return ! empty( get_post_field( 'post_content_filtered', $post_object->get_id() ) );
+		return ! empty( get_post_meta( $post_object->get_id(), '_fl_builder_enabled', true ) );
 	}
 
 	/**
@@ -209,7 +190,7 @@ class SeedProd extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_active(): bool {
-		return $this->is_seedprod_active();
+		return $this->is_beaverbuilder_active();
 	}
 
 	/**
@@ -231,30 +212,36 @@ class SeedProd extends Parser_Base implements Parser {
 	private function get_widgets( array $container, array $resulting_texts ): array {
 		foreach ( $container as $section ) {
 			// bail if section is not an array.
-			if( ! is_array( $section ) ) {
+			if( ! $section instanceof stdClass ) {
 				continue;
 			}
 
-			// if section is of element type "block", get its contents.
-			if( isset( $section['elType'] ) && 'block' === $section['elType'] ) {
+			// if section is of element type "module", get its contents.
+			if( 'module' === $section->type ) {
 				foreach( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-					if( $flow_text_name !== $section['type'] ) {
+					if( $flow_text_name !== $section->settings->type ) {
 						continue;
 					}
 					foreach( $flow_text_settings as $entry_name ) {
-						if( empty( $section['settings'][$entry_name] ) ) {
+						if( empty( $section->settings->{$entry_name} ) ) {
 							continue;
 						}
+
+						// get the content.
+						$content = $section->settings->{$entry_name};
+
+						// bail if trimmed content is empty.
+						if( empty( trim( $content ) ) ) {
+							continue;
+						}
+
+						// add the content to the list.
 						$resulting_texts[] = array(
-							'text' => $section['settings'][$entry_name],
+							'text' => $content,
 							'html' => $this->is_flow_text_widget_html($flow_text_name),
 						);
 					}
 				}
-			}
-			else {
-				// loop through the deeper arrays.
-				$resulting_texts = $this->get_widgets( $section, $resulting_texts );
 			}
 		}
 
@@ -272,22 +259,31 @@ class SeedProd extends Parser_Base implements Parser {
 	private function replace_content_in_widgets( array $container, string $simplified_part ): array {
 		foreach ( $container as $index => $section ) {
 			// bail if section is not an array.
-			if( ! is_array( $section ) ) {
+			if( ! $section instanceof stdClass ) {
 				continue;
 			}
 
-			// if section is of element type "block", get its contents.
-			if( isset( $section['elType'] ) && 'block' === $section['elType'] ) {
+			// if section is of element type "module", get its contents.
+			if( 'module' === $section->type ) {
 				foreach( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-					if( $flow_text_name !== $section['type'] ) {
+					if( $flow_text_name !== $section->settings->type ) {
 						continue;
 					}
 					foreach( $flow_text_settings as $entry_name ) {
-						if( empty( $section['settings'][$entry_name] ) ) {
+						if( empty( $section->settings->{$entry_name} ) ) {
 							continue;
 						}
-						if ( $this->get_text() === $section['settings'][$entry_name] ) {
-							$container[$index]['settings'][$entry_name] = $simplified_part;
+
+						// get the content.
+						$content = $section->settings->{$entry_name};
+
+						// bail if trimmed content is empty.
+						if( empty( trim( $content ) ) ) {
+							continue;
+						}
+
+						if ( $this->get_text() === $content ) {
+							$container[$index]->settings->{$entry_name} = $simplified_part;
 						}
 					}
 				}
