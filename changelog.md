@@ -10,6 +10,10 @@
 
 - Updated setup components
 
+### Fixed
+
+- Fixed filter for simplified posts or pages in their tables if another API as SUMM AI is used
+
 ## [2.9.1] - 28.09.2925
 
 ### Changed

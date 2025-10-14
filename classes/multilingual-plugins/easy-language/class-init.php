@@ -536,6 +536,14 @@ class Init extends Base implements Multilingual_Plugins_Base {
 	 */
 	public function hide_simplified_posts( WP_Query $query ): void {
 		if ( is_admin() && '' === $query->get( 'do_not_use_easy_language_filter' ) && $query->get( 'post_status' ) !== 'trash' ) {
+			// get the active API.
+			$api = Apis::get_instance()->get_active_api();
+
+			// bail if no API is enabled.
+			if( ! $api instanceof Api_Base ) {
+				return;
+			}
+
 			// get our supported post-types.
 			$post_types = $this->get_supported_post_types();
 
@@ -568,24 +576,29 @@ class Init extends Base implements Multilingual_Plugins_Base {
 				}
 
 				// check if requested language is supported by our plugin.
-				$languages = Languages::get_instance()->get_possible_target_languages();
-				if ( ! empty( $languages[ $language ] ) ) {
-					$query->set(
-						'meta_query',
-						array(
-							'relation' => 'AND',
-							array(
-								'key'     => 'easy_language_simplified_in',
-								'value'   => $language,
-								'compare' => 'LIKE',
-							),
-							array(
-								'key'     => 'easy_language_simplification_original_id',
-								'compare' => 'NOT EXISTS',
-							),
-						)
-					);
+				$languages = $api->get_active_target_languages();
+
+				// bail if requested language is not supported by this API.
+				if ( empty( $languages[ $language ] ) ) {
+					return;
 				}
+
+				// change the request for post to show only them who are simplified in the given language.
+				$query->set(
+					'meta_query',
+					array(
+						'relation' => 'AND',
+						array(
+							'key'     => 'easy_language_simplified_in',
+							'value'   => $language,
+							'compare' => 'LIKE',
+						),
+						array(
+							'key'     => 'easy_language_simplification_original_id',
+							'compare' => 'NOT EXISTS',
+						),
+					)
+				);
 			}
 		}
 	}
