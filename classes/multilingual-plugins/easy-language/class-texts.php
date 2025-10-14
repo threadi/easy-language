@@ -530,6 +530,8 @@ class Texts {
 	/**
 	 * If simplified object is moved to trash, update the settings on its original object.
 	 *
+	 * If an original object is moved to trash, also trash any simplified object from this object.
+	 *
 	 * @param int $post_id The post-ID.
 	 *
 	 * @return void
@@ -537,6 +539,11 @@ class Texts {
 	public function trash_object( int $post_id ): void {
 		// get the object.
 		$post_obj = new Post_Object( $post_id );
+
+		// bail if post type is not supported.
+		if( ! Init::get_instance()->is_post_type_supported( $post_obj->get_type() ) ) {
+			return;
+		}
 
 		// if this is a simplified object, reset the changed-marker on its original and cleanup db.
 		if ( $post_obj->is_simplified() ) {
@@ -555,6 +562,12 @@ class Texts {
 			/* translators: %1$s will be replaced by a title. */
 			Log::get_instance()->add_log( sprintf( __( '%1$s has been moved to trash and cleaned up.', 'easy-language' ), '<i>' . $post_obj->get_title() . '</i>' ), 'success' );
 		}
+		else {
+			// get all simplified objects for this original and move them also to trash.
+			foreach( $post_obj->get_simplifications() as $simplified_post_id ) {
+				wp_delete_post( $simplified_post_id );
+			}
+		}
 	}
 
 	/**
@@ -568,6 +581,11 @@ class Texts {
 		// get the object.
 		$post_obj = new Post_Object( $post_id );
 
+		// bail if post type is not supported.
+		if( ! Init::get_instance()->is_post_type_supported( $post_obj->get_type() ) ) {
+			return;
+		}
+
 		// if this is a simplified object, reset the changed-marker on its original and cleanup db.
 		if ( $post_obj->is_simplified() ) {
 			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
@@ -580,6 +598,15 @@ class Texts {
 
 			// Log event.
 			Log::get_instance()->add_log( $post_obj->get_title() . ' has been removed from trash.', 'success' );
+
+
+		}
+
+		// if this is a simplifiable object, untrash all simplified object of this object.
+		if( $post_obj->is_simplifiable() ) {
+			foreach( $post_obj->get_simplifications( true ) as $simplified_post_id ) {
+				wp_untrash_post( $simplified_post_id );
+			}
 		}
 	}
 

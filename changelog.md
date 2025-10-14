@@ -8,6 +8,7 @@
 
 ### Changed
 
+- Optimized untrash handling for objects
 - Updated setup components
 
 ### Fixed
