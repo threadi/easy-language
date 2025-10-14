@@ -52,6 +52,7 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 - Classic Editor
 - Divi
 - Elementor
+- Kubio
 - Salient
 - SeedProd
 - SiteOrigin
