@@ -382,7 +382,7 @@ class Texts {
 							'object_type' => $post_obj->get_type(),
 							'hash'        => $this->db->get_string_hash( $text['text'] ),
 						);
-						if ( empty( Db::get_instance()->get_entries( $filter ) ) ) {
+						if ( ! empty( Db::get_instance()->get_entries( $filter ) ) ) {
 							// mark the object as changed as translated content has been changed or new content has been added in the given language.
 							$post_obj->mark_as_changed_in_language( $language_code );
 						}
