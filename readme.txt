@@ -49,6 +49,7 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 - Beaver Builder
 - Block Editor (Gutenberg)
 - Breakdance Builder
+- Brizy
 - Classic Editor
 - Divi
 - Elementor
