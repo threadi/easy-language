@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added support for the PageBuilders Beaver Builder, Bold Page Builder, Brizy, Kubio, SiteOrigin and SeedProd
+- Added support for the PageBuilders Beaver Builder, Bold Page Builder, Brizy, Kubio, SiteOrigin, SeedProd and Visual Composer
 
 ### Changed
 

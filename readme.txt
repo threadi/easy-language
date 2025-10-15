@@ -59,6 +59,7 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 - SeedProd
 - SiteOrigin
 - Themify
+- Visual Composer
 - WPBakery
 
 #### Compatible with multilingual-plugins ####
