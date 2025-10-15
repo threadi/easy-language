@@ -181,7 +181,7 @@ class BeaverBuilder extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return ! empty( get_post_meta( $post_object->get_id(), '_fl_builder_enabled', true ) );
+		return $this->is_active() && ! empty( get_post_meta( $post_object->get_id(), '_fl_builder_enabled', true ) );
 	}
 
 	/**

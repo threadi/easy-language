@@ -48,6 +48,7 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 - Avia
 - Beaver Builder
 - Block Editor (Gutenberg)
+- Bold Page Builder
 - Breakdance Builder
 - Brizy
 - Classic Editor
