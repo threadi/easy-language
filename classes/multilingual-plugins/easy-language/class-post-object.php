@@ -124,6 +124,52 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
+	 * Return the post_id of the simplification of this object in any languages.
+	 *
+	 * @return array<int,int>
+	 */
+	public function get_simplifications( bool $with_trashed = false ): array {
+		// define state we search.
+		$post_status = array( 'any' );
+		if( $with_trashed ) {
+			$post_status[] = 'trash';
+		}
+
+		// create the list.
+		$list = array();
+
+		// get the simplifications of the given object.
+		$query  = array(
+			'post_type'                       => $this->get_type(),
+			'post_status'                     => $post_status,
+			'meta_query'                      => array(
+				array(
+					'key'     => 'easy_language_simplification_original_id',
+					'value'   => $this->get_id(),
+					'compare' => '=',
+				),
+			),
+			'fields'                          => 'ids',
+			'do_not_use_easy_language_filter' => '1',
+		);
+		$result = new WP_Query( $query );
+		var_dump(wp_json_encode( $result ));
+
+		// bail on no results.
+		if ( 0 === $result->post_count ) {
+			return array();
+		}
+
+		// collect the list.
+		foreach( $result->get_posts() as $post_id ) {
+			$list[] = absint( $post_id );
+		}
+
+		// return the list.
+		return $list;
+	}
+
+	/**
 	 * Get WP-own post object as array.
 	 *
 	 * @return array<int|string,mixed>

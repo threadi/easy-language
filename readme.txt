@@ -42,6 +42,26 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 - Multisite support
 - Own role for users to only simplify texts
 
+#### Compatible with many page builders ####
+
+- Avada
+- Avia
+- Beaver Builder
+- Block Editor (Gutenberg)
+- Bold Page Builder
+- Breakdance Builder
+- Brizy
+- Classic Editor
+- Divi
+- Elementor
+- Kubio
+- Salient
+- SeedProd
+- SiteOrigin
+- Themify
+- Visual Composer
+- WPBakery
+
 #### Compatible with multilingual-plugins ####
 
 - WPML
@@ -49,18 +69,7 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 - Sublanguage
 - TranslatePress
 
-#### Compatible with major page builders ####
-
-- Block Editor (Gutenberg)
-- Avada
-- Avia
-- Breakdance Builder
-- Classic Editor
-- Divi
-- Elementor
-- Salient
-- Themify
-- WPBakery
+#### More Information ####
 
 We also provide Shortcodes as documented [here](https://github.com/threadi/easy-language/blob/master/doc/shortcodes.md).
 
@@ -68,7 +77,7 @@ Please Note: The plugin was tested in a broad variety of WordPress-pages, but we
 
 The development repository is on [GitHub](https://github.com/threadi/easy-language).
 
-#### the Pro license includes:
+#### the Pro license includes: ####
 
 * Support for English (simplify to easy or plain language)
 * Support for French (simplify to FALC)

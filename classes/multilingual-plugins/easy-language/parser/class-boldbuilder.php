@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Salients WPBakery PageBuilder for simplifications.
+ * File for handling BoldBuilder pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -16,22 +16,22 @@ use easyLanguage\Multilingual_plugins\Easy_Language\Parser_Base;
 use easyLanguage\Multilingual_plugins\Easy_Language\Post_Object;
 
 /**
- * Handler for parsing Salients WP Bakery-content.
+ * Handler for parsing wp bakery-content.
  */
-class Salients_WpBakery extends Parser_Base implements Parser {
+class BoldBuilder extends Parser_Base implements Parser {
 	/**
 	 * Internal name of the parser.
 	 *
 	 * @var string
 	 */
-	protected string $name = 'SalientWPBakery';
+	protected string $name = 'BoldBuilder';
 
 	/**
 	 * Instance of this object.
 	 *
-	 * @var ?Salients_WpBakery
+	 * @var ?BoldBuilder
 	 */
-	private static ?Salients_WpBakery $instance = null;
+	private static ?BoldBuilder $instance = null;
 
 	/**
 	 * Constructor for this object.
@@ -48,7 +48,7 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	/**
 	 * Return the instance of this Singleton object.
 	 */
-	public static function get_instance(): Salients_WpBakery {
+	public static function get_instance(): BoldBuilder {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
 		}
@@ -63,26 +63,17 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	 */
 	private function get_flow_text_shortcodes(): array {
 		$shortcodes = array(
-			'vc_column_text' => array(),
-			'vc_btn'         => array(
-				'title',
-			),
-			'block_title'    => array(
-				'title',
-			),
-			'vc_toggle'      => array(
-				'title',
-			),
+			'bt_bb_text' => array(),
 		);
 
 		/**
 		 * Filter the shortcodes.
 		 *
-		 * @since 2.7.0 Available since 2.7.0.
+		 * @since 2.10.0 Available since 2.10.0.
 		 *
 		 * @param array<string,mixed> $shortcodes List of shortcodes.
 		 */
-		return apply_filters( 'easy_language_salient_wpbakery_text_widgets', $shortcodes );
+		return apply_filters( 'easy_language_boldbuilder_text_widgets', $shortcodes );
 	}
 
 	/**
@@ -94,17 +85,17 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	 */
 	private function is_flow_text_widget_html( string $widget_name ): bool {
 		$html_support_widgets = array(
-			'vc_column_text' => true,
+			'bt_bb_text' => true,
 		);
 
 		/**
-		 * Filter the possible WP Bakery widgets with HTML-support.
+		 * Filter the possible Bold Builder widgets with HTML-support.
 		 *
-		 * @since 2.0.0 Available since 2.0.0.
+		 * @since 2.10.0 Available since 2.10.0.
 		 *
-		 * @param array $html_support_widgets List of widgets with HTML-support.
+		 * @param array<string,mixed> $html_support_widgets List of widgets with HTML-support.
 		 */
-		$html_widgets = apply_filters( 'easy_language_salient_wpbakery_html_widgets', $html_support_widgets );
+		$html_widgets = apply_filters( 'easy_language_boldbuilder_html_widgets', $html_support_widgets );
 
 		return isset( $html_widgets[ $widget_name ] );
 	}
@@ -118,7 +109,7 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if wp bakery is not active.
-		if ( false === $this->is_salient_wp_bakery_active() ) {
+		if ( false === $this->is_bold_builder_active() ) {
 			return array();
 		}
 
@@ -176,7 +167,7 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	 */
 	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
 		// do nothing if wp bakery is not active.
-		if ( false === $this->is_salient_wp_bakery_active() ) {
+		if ( false === $this->is_bold_builder_active() ) {
 			return $original_complete;
 		}
 
@@ -188,8 +179,8 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	 *
 	 * @return bool
 	 */
-	private function is_salient_wp_bakery_active(): bool {
-		return Helper::is_plugin_active( 'js_composer_salient/js_composer.php' );
+	private function is_bold_builder_active(): bool {
+		return Helper::is_plugin_active( 'bold-page-builder/bold-builder.php' );
 	}
 
 	/**
@@ -200,32 +191,16 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return $this->is_active() && 'true' === get_post_meta( $post_object->get_id(), '_wpb_vc_js_status', true );
+		return $this->is_active() && str_contains( get_post_field( 'post_content', $post_object->get_id() ), '[bt_bb_section' );
 	}
 
 	/**
-	 * Return edit link for wp bakery-object.
-	 *
-	 * @return string
-	 */
-	public function get_edit_link(): string {
-		return add_query_arg(
-			array(
-				'vc_action' => 'vc_inline',
-				'post_id'   => $this->get_object_id(),
-				'post_type' => 'page',
-			),
-			get_admin_url() . 'post.php'
-		);
-	}
-
-	/**
-	 * Return whether this PageBuilder plugin is active.
+	 * Return whether this pagebuilder plugin is active.
 	 *
 	 * @return bool
 	 */
 	public function is_active(): bool {
-		return $this->is_salient_wp_bakery_active();
+		return $this->is_bold_builder_active();
 	}
 
 	/**
@@ -238,13 +213,13 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Run Salients WPBakery-specific updates on object.
+	 * Run page builder specific updates on object.
 	 *
 	 * @param Post_Object $post_object The object.
 	 *
 	 * @return void
 	 */
 	public function update_object( Post_Object $post_object ): void {
-		do_action( 'save_post', $post_object->get_id(), $post_object->get_object_as_object(), true );
+		do_action( 'save_post' );
 	}
 }
