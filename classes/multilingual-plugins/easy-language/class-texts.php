@@ -169,6 +169,11 @@ class Texts {
 		// get the object.
 		$post_obj = new Post_Object( $post_id );
 
+		// bail if post type is not supported.
+		if( ! Init::get_instance()->is_post_type_supported( $post_obj->get_type() ) ) {
+			return;
+		}
+
 		// secure the title.
 		$post_title = $post_obj->get_title();
 
@@ -189,15 +194,21 @@ class Texts {
 			if ( false === $original_post->has_simplifications() ) {
 				delete_post_meta( $original_post->get_id(), 'easy_language_text_language' );
 			}
-		}
 
-		// delete the text-entries of the deleted object.
-		foreach ( $post_obj->get_entries() as $entry ) {
-			$entry->delete( $post_id );
-		}
+			// delete the text-entries of the deleted object.
+			foreach ( $post_obj->get_entries() as $entry ) {
+				$entry->delete( $post_id );
+			}
 
-		// Log event.
-		Log::get_instance()->add_log( __( 'Deleted simplified object ', 'easy-language' ) . '<i>' . $post_title . '</i>', 'success' );
+			// Log event.
+			Log::get_instance()->add_log( __( 'Deleted simplified object ', 'easy-language' ) . '<i>' . $post_title . '</i>', 'success' );
+		}
+		else {
+			// get all simplified objects for this original and delete them also.
+			foreach( $post_obj->get_simplifications( true ) as $simplified_post_id ) {
+				wp_delete_post( $simplified_post_id, true );
+			}
+		}
 	}
 
 	/**
