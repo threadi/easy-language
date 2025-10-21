@@ -5,8 +5,8 @@
  * @package easy-language
  */
 
-use easyLanguage\Helper;
-use easyLanguage\Log_Api_Table;
+use easyLanguage\Plugin\Helper;
+use easyLanguage\Plugin\Tables\Log_Api_Table;
 
 /**
  * Add tab in settings for logs of the API.

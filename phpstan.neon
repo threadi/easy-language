@@ -26,14 +26,14 @@ parameters:
     - "#ARRAY_A#"
     - "#ABSPATH#"
   paths:
-    - classes
+    - app
     - easy-language.php
     - uninstall.php
     - inc/
   excludePaths:
-  	 - classes/multilingual-plugins/easy-language/pagebuilder/divi/node_modules/
-  	 - classes/multilingual-plugins/easy-language/pagebuilder/elementor/
-  	 - classes/multilingual-plugins/translatepress/
+  	 - app/PageBuilder/Elementor/
+  	 - app/ThirdPartySupport/TranslatePress/TranslatePress_Capito_Machine_Translator.php
+  	 - app/ThirdPartySupport/TranslatePress/TranslatePress_Summ_Ai_Machine_Translator.php
   scanFiles:
      - %rootDir%/../../php-stubs/wordpress-stubs/wordpress-stubs.php
      - %rootDir%/../../php-stubs/wp-cli-stubs/wp-cli-stubs.php

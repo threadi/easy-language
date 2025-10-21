@@ -5,8 +5,8 @@
  * @package easy-language
  */
 
-use easyLanguage\Helper;
-use easyLanguage\Setup;
+use easyLanguage\Plugin\Helper;
+use easyLanguage\Plugin\Setup;
 
 /**
  * Add settings in options menu.

@@ -8,9 +8,9 @@
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Helper;
-use easyLanguage\Multilingual_Plugins;
-use easyLanguage\Transients;
+use easyLanguage\Plugin\Helper;
+use easyLanguage\Plugin\ThirdPartySupports;
+use easyLanguage\Plugin\Transients;
 
 /**
  * Add own CSS and JS for backend.
@@ -56,7 +56,7 @@ function easy_language_add_styles_and_js_admin(): void {
 	);
 
 	// add scripts and styles of enabled plugins.
-	foreach ( Multilingual_Plugins::get_instance()->get_available_plugins() as $plugin_obj ) {
+	foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
 		$plugin_obj->get_simplifications_scripts();
 	}
 }

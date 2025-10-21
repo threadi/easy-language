@@ -1,6 +1,6 @@
 {
   "name": "@easy-language/easy-language",
-  "version": "2.7.0",
+  "version": "3.0.0",
   "description": "Provides Blocks for WordPress.",
   "author": "laOlaWeb GmbH",
   "license": "GPL-2.0-or-later",
@@ -11,13 +11,13 @@
     "lint:js": "wp-scripts lint-js",
     "start": "concurrently --kill-others \"npm run start:switcher\" \"npm run start:navigation-switcher\" \"npm run start:divi-language-field\"",
     "packages-update": "wp-scripts packages-update",
-    "start:switcher": "wp-scripts start classes/multilingual-plugins/easy-language/blocks/switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/switcher/build/",
-    "build:switcher": "wp-scripts build classes/multilingual-plugins/easy-language/blocks/switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/switcher/build/",
-    "start:divi-language-field": "wp-scripts start classes/multilingual-plugins/easy-language/pagebuilder/divi/src/language_field.js --output-path=classes/multilingual-plugins/easy-language/pagebuilder/divi/build/",
-    "build:divi-language-field": "wp-scripts build classes/multilingual-plugins/easy-language/pagebuilder/divi/src/language_field.js --output-path=classes/multilingual-plugins/easy-language/pagebuilder/divi/build/",
-    "start:navigation-switcher": "wp-scripts start classes/multilingual-plugins/easy-language/blocks/navigation-switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/",
-    "build:navigation-switcher": "wp-scripts build classes/multilingual-plugins/easy-language/blocks/navigation-switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/",
-    "make-pot": "wp i18n make-pot . languages/easy-language.pot --exclude=classes/multilingual-plugins/easy-language/blocks/switcher/src/,classes/multilingual-plugins/easy-language/blocks/navigation-switcher/src/,svn/",
+    "start:switcher": "wp-scripts start blocks/switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/switcher/build/",
+    "build:switcher": "wp-scripts build blocks/switcher/src/index.js --output-path=classes/multilingual-plugins/easy-language/blocks/switcher/build/",
+    "start:divi-language-field": "wp-scripts start legacy-classes/Divi/src/language_field.js --output-path=legacy-classes/Divi/build/",
+    "build:divi-language-field": "wp-scripts build legacy-classes/Divi/src/language_field.js --output-path=legacy-classes/Divi/build/",
+    "start:navigation-switcher": "wp-scripts start blocks/navigation-switcher/src/index.js --output-path=blocks/navigation-switcher/build/",
+    "build:navigation-switcher": "wp-scripts build blocks/navigation-switcher/src/index.js --output-path=blocks/navigation-switcher/build/",
+    "make-pot": "wp i18n make-pot . languages/easy-language.pot --exclude=blocks/switcher/src/,blocks/navigation-switcher/src/,svn/",
     "make-json": "wp i18n make-json languages"
   },
   "devDependencies": {

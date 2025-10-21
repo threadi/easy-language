@@ -4,7 +4,12 @@
 
 ### Added
 
+- Revamped plugin for a more robust and sustainable structure
 - Added support for the PageBuilders Beaver Builder, Bold Page Builder, Brizy, Kubio, SiteOrigin, SeedProd and Visual Composer
+
+### Changed
+
+- Now requires PHP 8.1 or higher
 
 ## [2.9.2] - 21.10.2025
 

@@ -5,8 +5,8 @@
  * @package easy-language
  */
 
-use easyLanguage\Helper;
-use easyLanguage\Log_Table;
+use easyLanguage\Plugin\Helper;
+use easyLanguage\Plugin\Tables\Log_Table;
 
 /**
  * Add tab in settings for logs.

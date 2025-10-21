@@ -5,8 +5,8 @@
  * @package easy-language
  */
 
-use easyLanguage\Helper;
-use easyLanguage\Language_Icons_Table;
+use easyLanguage\Plugin\Helper;
+use easyLanguage\Plugin\Tables\Language_Icons_Table;
 
 /**
  * Add settings-tab for this plugin.

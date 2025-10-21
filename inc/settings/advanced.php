@@ -5,7 +5,7 @@
  * @package easy-language
  */
 
-use easyLanguage\Helper;
+use easyLanguage\Plugin\Helper;
 
 /**
  * Add tab in advanced settings.

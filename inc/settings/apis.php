@@ -5,9 +5,9 @@
  * @package easy-language
  */
 
-use easyLanguage\Apis;
-use easyLanguage\Multilingual_plugins\Easy_Language\Init;
-use easyLanguage\Transients;
+use easyLanguage\Plugin\Apis;
+use easyLanguage\EasyLanguage\Init;
+use easyLanguage\Plugin\Transients;
 
 /**
  * Page for API settings.
@@ -238,10 +238,10 @@ function easy_language_admin_validate_chosen_api( string $value ): string {
 			delete_post_meta( $post_type_object_id, 'easy_language_simplification_state_changed_from' );
 		}
 
-		// Enable hint if user has not configured the new API yet and if this API has no translation-objects.
+		// Enable a hint if the user has not configured the new API yet and if this API has no translation-objects.
 		if ( empty( $post_type_objects ) && false === $new_api->is_configured() ) {
 			$links              = '';
-			$post_type_settings = \easyLanguage\Init::get_instance()->get_post_type_settings();
+			$post_type_settings = \easyLanguage\Plugin\Init::get_instance()->get_post_type_settings();
 			$post_types         = Init::get_instance()->get_supported_post_types();
 			$post_types_count   = count( $post_types );
 			$post_types_counter = 0;

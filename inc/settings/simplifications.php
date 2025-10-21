@@ -5,10 +5,10 @@
  * @package easy-language
  */
 
-use easyLanguage\Apis;
-use easyLanguage\Helper;
-use easyLanguage\Multilingual_plugins\Easy_Language\Texts_In_Use_Table;
-use easyLanguage\Multilingual_plugins\Easy_Language\Texts_To_Simplify_Table;
+use easyLanguage\Plugin\Apis;
+use easyLanguage\Plugin\Helper;
+use easyLanguage\EasyLanguage\Tables\Texts_In_Use_Table;
+use easyLanguage\EasyLanguage\Tables\Texts_To_Simplify_Table;
 
 /**
  * Add settings-tab for simplification overview.

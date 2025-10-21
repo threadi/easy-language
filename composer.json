@@ -1,6 +1,6 @@
 {
 	"name": "threadi/easy-language",
-	"version": "2.10.0",
+	"version": "3.0.0",
 	"description": "This plugin adds easy language support to WordPress.",
 	"authors": [
 		{
@@ -27,7 +27,13 @@
 		"optimize-autoloader": true,
 		"classmap-authoritative": true,
 		"apcu-autoloader": true,
-		"prepend-autoloader": false
+		"prepend-autoloader": false,
+		"platform-check": false
+	},
+	"autoload": {
+		"psr-4": {
+			"easyLanguage\\": "app/"
+		}
 	},
 	"require": {
 		"php": "^8.0",

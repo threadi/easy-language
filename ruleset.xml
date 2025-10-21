@@ -16,10 +16,9 @@
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 	<exclude-pattern>*/svn/*</exclude-pattern>
 	<exclude-pattern>*/gettext-helper.php</exclude-pattern>
-	<exclude-pattern>*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/</exclude-pattern>
-	<exclude-pattern>*/classes/multilingual-plugins/easy-language/blocks/*/build/</exclude-pattern>
-	<exclude-pattern>*/classes/multilingual-plugins/easy-language/parser/class-brizy.php</exclude-pattern>
-	<exclude-pattern>*translatepress</exclude-pattern>
+	<exclude-pattern>*/legacy-classes/Divi/build/</exclude-pattern>
+	<exclude-pattern>*/blocks/*/build/</exclude-pattern>
+	<exclude-pattern>*TranslatePress</exclude-pattern>
 
 	<!--
 		Require WordPress 6.2.
@@ -33,14 +32,20 @@
 		<!-- Exclude direkt db query warnings -->
 		<exclude name="WordPress.DB.DirectDatabaseQuery"/>
 		<exclude name="WordPress.DB.PreparedSQL.NotPrepared"/>
+
 		<!-- Exclude slow query -->
 		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_meta_query"/>
 		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_meta_key"/>
 		<exclude name="WordPress.DB.SlowDBQuery.slow_db_query_tax_query"/>
+
 		<!-- Exclude override of globals -->
 		<exclude name="WordPress.WP.GlobalVariablesOverride"/>
-		<!-- Exclude base64 -->
-		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode"/>
+
+		<!-- Excluded in favour to match PSR-4-namings of classes. -->
+		<exclude name="WordPress.Files.FileName"/>
+
+		<!-- Exclude base64-warnings. -->
+		<exclude name="WordPress.PHP.DiscouragedPHPFunctions"/>
 		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
 		<exclude name="WordPress.WP.I18n.NonSingularStringLiteralText" />
 	</rule>
