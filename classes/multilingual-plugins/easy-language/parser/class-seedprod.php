@@ -66,7 +66,7 @@ class SeedProd extends Parser_Base implements Parser {
 			'header' => array(
 				'headerTxt',
 			),
-			'text' => array(
+			'text'   => array(
 				'txt',
 			),
 		);
@@ -125,7 +125,7 @@ class SeedProd extends Parser_Base implements Parser {
 		$data_json = get_post_field( 'post_content_filtered', $this->get_object_id() );
 
 		// bail if it is not a string.
-		if( ! is_string( $data_json ) ) {
+		if ( ! is_string( $data_json ) ) {
 			return array();
 		}
 
@@ -160,7 +160,7 @@ class SeedProd extends Parser_Base implements Parser {
 		$data_json = get_post_field( 'post_content_filtered', $this->get_object_id() );
 
 		// bail if it is not a string.
-		if( ! is_string( $data_json ) ) {
+		if ( ! is_string( $data_json ) ) {
 			return $original_complete;
 		}
 
@@ -174,8 +174,8 @@ class SeedProd extends Parser_Base implements Parser {
 
 		// save the data for SeedProd.
 		$query = array(
-			'ID' => $this->get_object_id(),
-			'post_content_filtered' => (string)wp_json_encode( $data )
+			'ID'                    => $this->get_object_id(),
+			'post_content_filtered' => (string) wp_json_encode( $data ),
 		);
 		wp_insert_post( $query );
 
@@ -231,28 +231,27 @@ class SeedProd extends Parser_Base implements Parser {
 	private function get_widgets( array $container, array $resulting_texts ): array {
 		foreach ( $container as $section ) {
 			// bail if section is not an array.
-			if( ! is_array( $section ) ) {
+			if ( ! is_array( $section ) ) {
 				continue;
 			}
 
 			// if section is of element type "block", get its contents.
-			if( isset( $section['elType'] ) && 'block' === $section['elType'] ) {
-				foreach( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-					if( $flow_text_name !== $section['type'] ) {
+			if ( isset( $section['elType'] ) && 'block' === $section['elType'] ) {
+				foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
+					if ( $flow_text_name !== $section['type'] ) {
 						continue;
 					}
-					foreach( $flow_text_settings as $entry_name ) {
-						if( empty( $section['settings'][$entry_name] ) ) {
+					foreach ( $flow_text_settings as $entry_name ) {
+						if ( empty( $section['settings'][ $entry_name ] ) ) {
 							continue;
 						}
 						$resulting_texts[] = array(
-							'text' => $section['settings'][$entry_name],
-							'html' => $this->is_flow_text_widget_html($flow_text_name),
+							'text' => $section['settings'][ $entry_name ],
+							'html' => $this->is_flow_text_widget_html( $flow_text_name ),
 						);
 					}
 				}
-			}
-			else {
+			} else {
 				// loop through the deeper arrays.
 				$resulting_texts = $this->get_widgets( $section, $resulting_texts );
 			}
@@ -272,22 +271,22 @@ class SeedProd extends Parser_Base implements Parser {
 	private function replace_content_in_widgets( array $container, string $simplified_part ): array {
 		foreach ( $container as $index => $section ) {
 			// bail if section is not an array.
-			if( ! is_array( $section ) ) {
+			if ( ! is_array( $section ) ) {
 				continue;
 			}
 
 			// if section is of element type "block", get its contents.
-			if( isset( $section['elType'] ) && 'block' === $section['elType'] ) {
-				foreach( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-					if( $flow_text_name !== $section['type'] ) {
+			if ( isset( $section['elType'] ) && 'block' === $section['elType'] ) {
+				foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
+					if ( $flow_text_name !== $section['type'] ) {
 						continue;
 					}
-					foreach( $flow_text_settings as $entry_name ) {
-						if( empty( $section['settings'][$entry_name] ) ) {
+					foreach ( $flow_text_settings as $entry_name ) {
+						if ( empty( $section['settings'][ $entry_name ] ) ) {
 							continue;
 						}
-						if ( $this->get_text() === $section['settings'][$entry_name] ) {
-							$container[$index]['settings'][$entry_name] = $simplified_part;
+						if ( $this->get_text() === $section['settings'][ $entry_name ] ) {
+							$container[ $index ]['settings'][ $entry_name ] = $simplified_part;
 						}
 					}
 				}

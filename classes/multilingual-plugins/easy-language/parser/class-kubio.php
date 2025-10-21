@@ -67,7 +67,7 @@ class Kubio extends Parser_Base implements Parser {
 		$blocks = array(
 			'kubio/text' => array(
 				'html' => true,
-			)
+			),
 		);
 
 		/**

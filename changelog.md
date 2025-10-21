@@ -6,6 +6,8 @@
 
 - Added support for the PageBuilders Beaver Builder, Bold Page Builder, Brizy, Kubio, SiteOrigin, SeedProd and Visual Composer
 
+## [2.9.2] - 21.10.2025
+
 ### Changed
 
 - Optimized untrash and real trash handling for objects
@@ -14,7 +16,7 @@
 ### Fixed
 
 - Fixed filter for simplified posts or pages in their tables if another API as SUMM AI is used
-- Fixed mark for changed original objects (has been marked only not simplified objects)
+- Fixed mark for changed original objects (has been marked just not simplified objects)
 
 ## [2.9.1] - 28.09.2925
 

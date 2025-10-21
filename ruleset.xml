@@ -18,6 +18,7 @@
 	<exclude-pattern>*/gettext-helper.php</exclude-pattern>
 	<exclude-pattern>*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/</exclude-pattern>
 	<exclude-pattern>*/classes/multilingual-plugins/easy-language/blocks/*/build/</exclude-pattern>
+	<exclude-pattern>*/classes/multilingual-plugins/easy-language/parser/class-brizy.php</exclude-pattern>
 	<exclude-pattern>*translatepress</exclude-pattern>
 
 	<!--

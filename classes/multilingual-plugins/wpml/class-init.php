@@ -194,10 +194,10 @@ class Init extends Base implements Multilingual_Plugins_Base {
 					}
 
 					// get the icon path.
-					$icon_path = Helper::get_icon_path_for_language_code( (string)$language_code );
+					$icon_path = Helper::get_icon_path_for_language_code( (string) $language_code );
 
 					// bail if no icon path is given.
-					if( empty( $icon_path ) ) {
+					if ( empty( $icon_path ) ) {
 						continue;
 					}
 
