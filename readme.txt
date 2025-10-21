@@ -104,8 +104,9 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Mark the active entry in language switcher with class
-- Fixed double slash in simplified URL for some permalink settings
-- Fixed wrong hidden language in language switcher
+- Optimized untrash and real trash handling for objects
+- Updated setup components
+- Fixed filter for simplified posts or pages in their tables if another API as SUMM AI is used
+- Fixed mark for changed original objects (has been marked just not simplified objects)
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)

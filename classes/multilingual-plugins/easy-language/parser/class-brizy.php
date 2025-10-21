@@ -120,12 +120,12 @@ class Brizy extends Parser_Base implements Parser {
 
 		// get editor contents and loop through its array.
 		$data = get_post_meta( $this->get_object_id(), 'brizy', true );
-		if ( ! empty( $data["brizy-post"]['editor_data'] ) ) {
+		if ( ! empty( $data['brizy-post']['editor_data'] ) ) {
 			// decode the data as JSON-string.
-			$json = base64_decode( $data["brizy-post"]['editor_data'] );
+			$json = base64_decode( $data['brizy-post']['editor_data'] );
 
 			// bail if decoded data is not a string.
-			if( ! is_string( $json ) ) {
+			if ( ! is_string( $json ) ) {
 				return array();
 			}
 
@@ -133,12 +133,12 @@ class Brizy extends Parser_Base implements Parser {
 			$editor_data = json_decode( $json, true );
 
 			// bail if result is not an array.
-			if( ! is_array( $editor_data ) ) {
+			if ( ! is_array( $editor_data ) ) {
 				return array();
 			}
 
 			// bail if items is missing.
-			if( empty( $editor_data['items'] ) ) {
+			if ( empty( $editor_data['items'] ) ) {
 				return array();
 			}
 
@@ -167,12 +167,12 @@ class Brizy extends Parser_Base implements Parser {
 
 		// get editor contents and loop through its array.
 		$data = get_post_meta( $this->get_object_id(), 'brizy', true );
-		if ( ! empty( $data["brizy-post"]['editor_data'] ) ) {
+		if ( ! empty( $data['brizy-post']['editor_data'] ) ) {
 			// decode the data as JSON-string.
-			$json = base64_decode( $data["brizy-post"]['editor_data'] );
+			$json = base64_decode( $data['brizy-post']['editor_data'] );
 
 			// bail if decoded data is not a string.
-			if( ! is_string( $json ) ) {
+			if ( ! is_string( $json ) ) {
 				return $original_complete;
 			}
 
@@ -180,12 +180,12 @@ class Brizy extends Parser_Base implements Parser {
 			$editor_data = json_decode( $json, true );
 
 			// bail if result is not an array.
-			if( ! is_array( $editor_data ) ) {
+			if ( ! is_array( $editor_data ) ) {
 				return $original_complete;
 			}
 
 			// bail if items is missing.
-			if( empty( $editor_data['items'] ) ) {
+			if ( empty( $editor_data['items'] ) ) {
 				return $original_complete;
 			}
 
@@ -193,10 +193,10 @@ class Brizy extends Parser_Base implements Parser {
 			$text = $this->replace_content_in_widgets( $editor_data['items'], $simplified_part );
 
 			// encode as JSON.
-			$data["brizy-post"]['editor_data'] = wp_json_encode( $text );
+			$data['brizy-post']['editor_data'] = wp_json_encode( $text );
 
 			// encode editor data.
-			$data["brizy-post"]['editor_data'] = base64_encode( $data["brizy-post"]['editor_data'] );
+			$data['brizy-post']['editor_data'] = base64_encode( $data['brizy-post']['editor_data'] );
 
 			// save the data for Brizy.
 			update_post_meta( $this->get_object_id(), 'brizy', $data );
@@ -257,23 +257,22 @@ class Brizy extends Parser_Base implements Parser {
 
 		foreach ( $container as $section ) {
 			// bail if section is not an array.
-			if( ! is_array( $section ) ) {
+			if ( ! is_array( $section ) ) {
 				continue;
 			}
 
 			// if section is of element type "block", get its contents.
-			if( isset( $section['type'] ) && ! empty( $flow_text_widgets[$section['type']] ) ) {
-				foreach( $flow_text_widgets[$section['type']] as $entry_name ) {
-					if( empty( $section['value'][$entry_name] ) ) {
+			if ( isset( $section['type'] ) && ! empty( $flow_text_widgets[ $section['type'] ] ) ) {
+				foreach ( $flow_text_widgets[ $section['type'] ] as $entry_name ) {
+					if ( empty( $section['value'][ $entry_name ] ) ) {
 						continue;
 					}
 					$resulting_texts[] = array(
-						'text' => $section['value'][$entry_name],
-						'html' => $this->is_flow_text_widget_html($section['type']),
+						'text' => $section['value'][ $entry_name ],
+						'html' => $this->is_flow_text_widget_html( $section['type'] ),
 					);
 				}
-			}
-			else {
+			} else {
 				// loop through the deeper arrays.
 				$resulting_texts = $this->get_widgets( $section['value']['items'], $resulting_texts );
 			}
@@ -296,21 +295,20 @@ class Brizy extends Parser_Base implements Parser {
 
 		foreach ( $container as $index => $section ) {
 			// bail if section is not an array.
-			if( ! is_array( $section ) ) {
+			if ( ! is_array( $section ) ) {
 				continue;
 			}
 
 			// if section is of element type "block", get its contents.
-			if( isset( $section['type'] ) && ! empty( $flow_text_widgets[$section['type']] ) ) {
-				foreach( $flow_text_widgets[$section['type']] as $entry_name ) {
-					if( empty( $section['value'][$entry_name] ) ) {
+			if ( isset( $section['type'] ) && ! empty( $flow_text_widgets[ $section['type'] ] ) ) {
+				foreach ( $flow_text_widgets[ $section['type'] ] as $entry_name ) {
+					if ( empty( $section['value'][ $entry_name ] ) ) {
 						continue;
 
 					}
 					$container[ $index ]['value'][ $entry_name ] = $simplified_part;
 				}
-			}
-			else {
+			} else {
 				// loop through the deeper arrays.
 				$container = $this->replace_content_in_widgets( $section['value']['items'], $simplified_part );
 			}

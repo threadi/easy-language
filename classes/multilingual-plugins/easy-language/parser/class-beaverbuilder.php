@@ -64,11 +64,11 @@ class BeaverBuilder extends Parser_Base implements Parser {
 	 */
 	private function get_flow_text_widgets(): array {
 		$widgets = array(
-			'heading' => array(
+			'heading'   => array(
 				'heading',
 			),
-			'callout' => array(
-				'text'
+			'callout'   => array(
+				'text',
 			),
 			'rich-text' => array(
 				'text',
@@ -94,7 +94,7 @@ class BeaverBuilder extends Parser_Base implements Parser {
 	 */
 	private function is_flow_text_widget_html( string $widget_name ): bool {
 		$html_support_widgets = array(
-			'callout' => true,
+			'callout'   => true,
 			'rich-text' => true,
 		);
 
@@ -212,18 +212,18 @@ class BeaverBuilder extends Parser_Base implements Parser {
 	private function get_widgets( array $container, array $resulting_texts ): array {
 		foreach ( $container as $section ) {
 			// bail if section is not an array.
-			if( ! $section instanceof stdClass ) {
+			if ( ! $section instanceof stdClass ) {
 				continue;
 			}
 
 			// if section is of element type "module", get its contents.
-			if( 'module' === $section->type ) {
-				foreach( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-					if( $flow_text_name !== $section->settings->type ) {
+			if ( 'module' === $section->type ) {
+				foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
+					if ( $flow_text_name !== $section->settings->type ) {
 						continue;
 					}
-					foreach( $flow_text_settings as $entry_name ) {
-						if( empty( $section->settings->{$entry_name} ) ) {
+					foreach ( $flow_text_settings as $entry_name ) {
+						if ( empty( $section->settings->{$entry_name} ) ) {
 							continue;
 						}
 
@@ -231,14 +231,14 @@ class BeaverBuilder extends Parser_Base implements Parser {
 						$content = $section->settings->{$entry_name};
 
 						// bail if trimmed content is empty.
-						if( empty( trim( $content ) ) ) {
+						if ( empty( trim( $content ) ) ) {
 							continue;
 						}
 
 						// add the content to the list.
 						$resulting_texts[] = array(
 							'text' => $content,
-							'html' => $this->is_flow_text_widget_html($flow_text_name),
+							'html' => $this->is_flow_text_widget_html( $flow_text_name ),
 						);
 					}
 				}
@@ -259,18 +259,18 @@ class BeaverBuilder extends Parser_Base implements Parser {
 	private function replace_content_in_widgets( array $container, string $simplified_part ): array {
 		foreach ( $container as $index => $section ) {
 			// bail if section is not an array.
-			if( ! $section instanceof stdClass ) {
+			if ( ! $section instanceof stdClass ) {
 				continue;
 			}
 
 			// if section is of element type "module", get its contents.
-			if( 'module' === $section->type ) {
-				foreach( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-					if( $flow_text_name !== $section->settings->type ) {
+			if ( 'module' === $section->type ) {
+				foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
+					if ( $flow_text_name !== $section->settings->type ) {
 						continue;
 					}
-					foreach( $flow_text_settings as $entry_name ) {
-						if( empty( $section->settings->{$entry_name} ) ) {
+					foreach ( $flow_text_settings as $entry_name ) {
+						if ( empty( $section->settings->{$entry_name} ) ) {
 							continue;
 						}
 
@@ -278,12 +278,12 @@ class BeaverBuilder extends Parser_Base implements Parser {
 						$content = $section->settings->{$entry_name};
 
 						// bail if trimmed content is empty.
-						if( empty( trim( $content ) ) ) {
+						if ( empty( trim( $content ) ) ) {
 							continue;
 						}
 
 						if ( $this->get_text() === $content ) {
-							$container[$index]->settings->{$entry_name} = $simplified_part;
+							$container[ $index ]->settings->{$entry_name} = $simplified_part;
 						}
 					}
 				}

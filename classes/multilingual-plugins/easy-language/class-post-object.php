@@ -126,12 +126,14 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	/**
 	 * Return the post_id of the simplification of this object in any languages.
 	 *
+	 * @param bool $with_trashed True if the trashed posts should be searched.
+	 *
 	 * @return array<int,int>
 	 */
 	public function get_simplifications( bool $with_trashed = false ): array {
 		// define state we search.
 		$post_status = array( 'any' );
-		if( $with_trashed ) {
+		if ( $with_trashed ) {
 			$post_status[] = 'trash';
 		}
 
@@ -153,7 +155,6 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			'do_not_use_easy_language_filter' => '1',
 		);
 		$result = new WP_Query( $query );
-		var_dump(wp_json_encode( $result ));
 
 		// bail on no results.
 		if ( 0 === $result->post_count ) {
@@ -161,7 +162,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		}
 
 		// collect the list.
-		foreach( $result->get_posts() as $post_id ) {
+		foreach ( $result->get_posts() as $post_id ) {
 			$list[] = absint( $post_id );
 		}
 
