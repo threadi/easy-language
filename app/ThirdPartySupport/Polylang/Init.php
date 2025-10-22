@@ -13,7 +13,7 @@ defined( 'ABSPATH' ) || exit;
 use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Languages;
 use easyLanguage\Plugin\ThirdPartySupport_Base;
-use easyLanguage\Plugin\Transients;
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 
 /**
  * Object to handle polylang support.

@@ -16,7 +16,7 @@ use easyLanguage\Plugin\Languages;
 use easyLanguage\Plugin\Log;
 use easyLanguage\EasyLanguage\Db;
 use easyLanguage\Plugin\ThirdPartySupport_Base;
-use easyLanguage\Plugin\Transients;
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use SitePress_EditLanguages;
 use WPML_Flags_Factory;
 

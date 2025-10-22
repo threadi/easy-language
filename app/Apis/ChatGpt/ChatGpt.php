@@ -22,7 +22,7 @@ use easyLanguage\Plugin\Language_Icon;
 use easyLanguage\Plugin\Log;
 use easyLanguage\Plugin\ThirdPartySupports;
 use easyLanguage\EasyLanguage\Db;
-use easyLanguage\Plugin\Transients;
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use wpdb;
 
 /**

@@ -11,6 +11,7 @@ namespace easyLanguage\Plugin;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Apis\Summ_Ai\Summ_Ai;
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Texts;
 
 /**
@@ -149,7 +150,7 @@ class Update {
 	 * @return void
 	 */
 	public function version230(): void {
-		// get actual value for setup and save it in new field, if not already set.
+		// get the actual value for setup and save it in new field, if not already set.
 		if ( ! get_option( 'esfw_completed' ) ) {
 			update_option( 'esfw_completed', get_option( 'wp_easy_setup_completed' ) );
 		}
@@ -218,7 +219,7 @@ class Update {
 	 * @return void
 	 */
 	public function version290(): void {
-		// set new option to "user".
+		// set the new option to "user".
 		update_option( 'easy_language_capito_account_type', 'user' );
 	}
 }

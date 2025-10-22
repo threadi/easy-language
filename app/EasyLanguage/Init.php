@@ -18,7 +18,7 @@ use easyLanguage\Plugin\Languages;
 use easyLanguage\Plugin\Log;
 use easyLanguage\Plugin\Setup;
 use easyLanguage\Plugin\ThirdPartySupport_Base;
-use easyLanguage\Plugin\Transients;
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use WP_Admin_Bar;
 use WP_Post;
 use WP_Post_Type;

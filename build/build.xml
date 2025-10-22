@@ -163,6 +163,7 @@
 				<exclude name="**/Divi/*/.gitkeep" />
 			</zipfileset>
 			<zipfileset dir="${src.dir}/libs" prefix="${plugin.slug}/libs" />
+			<zipfileset dir="${src.dir}/templates" prefix="${plugin.slug}/templates" />
 			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
 			<zipfileset dir="${src.dir}/vendor/gettext" prefix="${plugin.slug}/vendor/gettext" />
 			<zipfileset dir="${src.dir}/vendor/composer" prefix="${plugin.slug}/vendor/composer" />

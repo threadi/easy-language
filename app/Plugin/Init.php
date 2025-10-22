@@ -1,6 +1,6 @@
 <?php
 /**
- * File for initialisation of this plugin.
+ * File for initialization of this plugin.
  *
  * @package easy-language
  */
@@ -10,10 +10,11 @@ namespace easyLanguage\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
+use easyLanguage\Plugin\Admin\Admin;
+
 /**
- * Init the plugin.
- * This object is minify on purpose as the main functions are handled in own objects
- * depending on WordPress-settings.
+ * Object to initialize this plugin.
  */
 class Init {
 
@@ -55,8 +56,6 @@ class Init {
 	public function init(): void {
 		// include admin-related files.
 		if ( is_admin() ) {
-			include_once Helper::get_plugin_path() . '/inc/admin.php';
-
 			// get the files in the settings directory.
 			$files = glob( Helper::get_plugin_path() . '/inc/settings/*.php' );
 
@@ -80,6 +79,9 @@ class Init {
 		// initialize the setup.
 		Setup::get_instance()->init();
 
+		// initialize the admin tasks.
+		Admin::get_instance()->init();
+
 		// general hooks.
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'cli_init', array( $this, 'cli' ) );
@@ -93,7 +95,7 @@ class Init {
 	}
 
 	/**
-	 * Initialize our main CLI-functions.
+	 * Initialize our main CLI functions.
 	 *
 	 * @return void
 	 * @noinspection PhpFullyQualifiedNameUsageInspection

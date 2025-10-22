@@ -21,7 +21,7 @@ use easyLanguage\Plugin\Languages;
 use easyLanguage\Plugin\Log;
 use easyLanguage\EasyLanguage\Db;
 use easyLanguage\Plugin\ThirdPartySupports;
-use easyLanguage\Plugin\Transients;
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use wpdb;
 
 /**

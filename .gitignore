@@ -1,6 +1,7 @@
 /.idea
 *.zip
 languages/*.json
+/app/Dependencies/
 /build/languages/
 /build/languages/.gitkeep
 /build/languages/index.php

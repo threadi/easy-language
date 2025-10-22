@@ -13,11 +13,26 @@
 	"minimum-stability": "stable",
 	"scripts": {
 		"post-install-cmd": [
-			"\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra,vendor/sirbrillig/phpcs-variable-analysis,vendor/automattic/vipwpcs"
+			"\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra,vendor/sirbrillig/phpcs-variable-analysis,vendor/automattic/vipwpcs",
+			"\"vendor/bin/mozart\" compose",
+			"composer dump-autoload"
 		],
 		"post-update-cmd": [
-			"\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra,vendor/sirbrillig/phpcs-variable-analysis,vendor/automattic/vipwpcs"
+			"\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra,vendor/sirbrillig/phpcs-variable-analysis,vendor/automattic/vipwpcs",
+			"\"vendor/bin/mozart\" compose",
+			"composer dump-autoload"
 		]
+	},
+	"extra": {
+		"mozart": {
+			"dep_namespace": "easyLanguage\\Dependencies\\",
+			"dep_directory": "/app/Dependencies/",
+			"classmap_directory": "/libs/classes/dependencies/",
+			"classmap_prefix": "easyLanguage",
+			"packages": [
+				"threadi/easy-transients-for-wordpress"
+			]
+		}
 	},
 	"config": {
 		"allow-plugins": {
@@ -40,6 +55,7 @@
 		"gettext/gettext": "^5.7",
 		"threadi/easy-dialog-for-wordpress": "^1.0.1",
 		"threadi/easy-setup-for-wordpress": "^1.2.1",
+		"threadi/easy-transients-for-wordpress": "^1.2.1",
 		"threadi/react-dialog": "dev-master"
 	},
 	"require-dev": {
@@ -49,6 +65,7 @@
 		"phpstan/phpstan": "^2.1",
 		"szepeviktor/phpstan-wordpress": "^2.0",
 		"phpstan/extension-installer": "^1.4",
-		"php-stubs/wp-cli-stubs": "^2.11"
+		"php-stubs/wp-cli-stubs": "^2.11",
+		"coenjacobs/mozart": "^0.7.1"
 	}
 }

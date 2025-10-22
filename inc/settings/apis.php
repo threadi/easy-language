@@ -5,9 +5,9 @@
  * @package easy-language
  */
 
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\Plugin\Apis;
 use easyLanguage\EasyLanguage\Init;
-use easyLanguage\Plugin\Transients;
 
 /**
  * Page for API settings.

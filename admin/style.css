@@ -62,21 +62,9 @@ td[class^="easy-language"] a, td[class^="easy-language"] span, .text-translation
 
 .text-translations-table .options { white-space: nowrap }
 
-.easy-language-transient {
-    position: relative;
-    z-index: 1;
-}
+.etfw-transient h3 img { width: 32px; }
 
-.easy-language-transient h3 img {
-    vertical-align: middle;
-    display: inline-block;
-    margin-right: 8px;
-    width: 32px;
-}
-
-.easy-language-transient p { line-height: 2 }
-
-.easy-language-transient ul {
+.etfw-transient ul {
 	list-style: disc;
 	margin-left: 14px;
 	margin-top: 0;

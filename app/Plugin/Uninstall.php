@@ -10,6 +10,7 @@ namespace easyLanguage\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Db;
 use WP_Query;
 use WP_Role;
@@ -50,7 +51,7 @@ class Uninstall {
 	}
 
 	/**
-	 * Get list of blogs in a multisite-installation.
+	 * Return the list of blogs in a multisite-installation.
 	 *
 	 * @return array<array<string>>
 	 */

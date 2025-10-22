@@ -10,6 +10,7 @@ namespace easyLanguage\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Objects;
 use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
@@ -855,5 +856,19 @@ class Helper {
 
 		// return resulting JSON-string.
 		return $json;
+	}
+
+	/**
+	 * Return the logo as img
+	 *
+	 * @param bool $big_logo True to output the big logo.
+	 *
+	 * @return string
+	 */
+	public static function get_logo_img( bool $big_logo = false ): string {
+		if ( $big_logo ) {
+			return '<img src="' . self::get_plugin_url() . 'gfx/easy-language-icon.png" alt="Easy Language Logo" class="logo">';
+		}
+		return '<img src="' . self::get_plugin_url() . 'gfx/easy-language-icon.png" alt="Easy Language Logo" class="logo">';
 	}
 }
