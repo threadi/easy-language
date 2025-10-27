@@ -54,24 +54,17 @@ class Init {
 	 * @return void
 	 */
 	public function init(): void {
-		// include admin-related files.
-		if ( is_admin() ) {
-			// get the files in the settings directory.
-			$files = glob( Helper::get_plugin_path() . '/inc/settings/*.php' );
-
-			// include all settings-files.
-			if ( is_array( $files ) ) {
-				foreach ( $files as $filename ) {
-					include $filename;
-				}
-			}
-		}
+		// initialize the settings.
+		Settings::get_instance()->init();
 
 		// run updates.
 		Update::get_instance()->init();
 
 		// initialize our installer.
 		Installer::get_instance()->init();
+
+		// initialize the main simplification functions.
+		\easyLanguage\EasyLanguage\Init::get_instance()->init();
 
 		// initialize the third party support.
 		ThirdPartySupports::get_instance()->get_available_plugins();

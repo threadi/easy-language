@@ -58,6 +58,8 @@ class Admin {
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_styles_and_js_admin' ), PHP_INT_MAX );
 		add_filter( 'plugin_action_links_' . plugin_basename( EASY_LANGUAGE ), array( $this, 'add_setting_link' ) );
 		add_action( 'init', array( $this, 'configure_transients' ), 5 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), PHP_INT_MAX );
+		add_action( 'admin_enqueue_scripts', array( $this, 'add_dialog' ), PHP_INT_MAX );
 	}
 
 	/**
@@ -146,5 +148,89 @@ class Admin {
 			)
 		);
 		$transients_obj->init();
+	}
+
+	/**
+	 * Embed our own backend-scripts.
+	 *
+	 * @return void
+	 */
+	public function admin_enqueue_scripts(): void {
+		// Enabled the pointer-scripts.
+		wp_enqueue_style( 'wp-pointer' );
+		wp_enqueue_script( 'wp-pointer' );
+
+		// backend-JS.
+		wp_enqueue_script(
+			'easy-language-plugin-admin',
+			plugins_url( '/admin/js.js', EASY_LANGUAGE ),
+			array( 'jquery', 'easy-dialog', 'wp-i18n' ),
+			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/admin/js.js' ),
+			true
+		);
+
+		// add php-vars to our backend-js-script.
+		wp_localize_script(
+			'easy-language-plugin-admin',
+			'easyLanguagePluginJsVars',
+			array(
+				'ajax_url'            => admin_url( 'admin-ajax.php' ),
+				'dismiss_intro_nonce' => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),
+				/* translators: %1$s will be replaced by the path to the easy language icon */
+				'intro_step_2'        => sprintf( __( '<p><img src="%1$s" alt="Easy Language Logo"><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
+			)
+		);
+
+		if ( function_exists( 'wp_set_script_translations' ) ) {
+			wp_set_script_translations(
+				'easy-language-plugin-admin',
+				'easy-language',
+				plugin_dir_path( EASY_LANGUAGE ) . '/languages/'
+			);
+		}
+	}
+
+	/**
+	 * Add the dialog-scripts and -styles.
+	 *
+	 * @return void
+	 */
+	public function add_dialog(): void {
+		// embed the necessary scripts for dialog.
+		$path = Helper::get_plugin_path() . 'vendor/threadi/easy-dialog-for-wordpress/';
+		$url  = Helper::get_plugin_url() . 'vendor/threadi/easy-dialog-for-wordpress/';
+
+		// bail if path does not exist.
+		if ( ! file_exists( $path ) ) {
+			return;
+		}
+
+		// embed the dialog-components JS script.
+		$script_asset_path = $path . 'build/index.asset.php';
+
+		// bail if the script does not exist.
+		if ( ! file_exists( $script_asset_path ) ) {
+			return;
+		}
+
+		// embed script.
+		$script_asset = require $script_asset_path;
+		wp_enqueue_script(
+			'easy-dialog',
+			$url . 'build/index.js',
+			$script_asset['dependencies'],
+			$script_asset['version'],
+			true
+		);
+
+		// embed the dialog-components CSS file.
+		$admin_css      = $url . 'build/style-index.css';
+		$admin_css_path = $path . 'build/style-index.css';
+		wp_enqueue_style(
+			'easy-dialog',
+			$admin_css,
+			array( 'wp-components' ),
+			Helper::get_file_version( $admin_css_path )
+		);
 	}
 }

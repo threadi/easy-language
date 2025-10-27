@@ -14,7 +14,7 @@ Simplify your website into easy or plain language - supported by AI.
 
 Simplify your website into easy or plain language - supported by AI.
 
-The Plugin Easy Language adds the functionality to simplify and display your pages and posts into easy or plain language. The translation process can be manually or support by an AI-engine.
+The Plugin Easy Language adds the functionality to simplify and display your pages and posts into easy or plain language. The translation process can be manual or support by an AI-engine.
 
 #### Automatic simplification with AI ####
 
@@ -73,7 +73,7 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 
 We also provide Shortcodes as documented [here](https://github.com/threadi/easy-language/blob/master/doc/shortcodes.md).
 
-Please Note: The plugin was tested in a broad variety of WordPress-pages, but we highly recommend to install and test the plugin in a development environment first.
+Please Note: The plugin was tested in a broad variety of WordPress pages, but we highly recommend to install and test the plugin in a development environment first.
 
 The development repository is on [GitHub](https://github.com/threadi/easy-language).
 
@@ -81,8 +81,8 @@ The development repository is on [GitHub](https://github.com/threadi/easy-langua
 
 * Support for English (simplify to easy or plain language)
 * Support for French (simplify to FALC)
-* Support for more post-types, e.g. for WooCommerce
-* Support for any taxonomies (e.g. category descriptions)
+* Support for more post-types, e.g., for WooCommerce
+* Support for any taxonomies (e.g., category descriptions)
 * Simplification of single texts
 * Show where any simplified text is used in your website
 
@@ -92,7 +92,7 @@ More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://lao
 
 1. Upload "easy-language" to the "/wp-content/plugins/" directory.
 2. Activate the plugin through the "Plugins" menu in WordPress.
-3. Go to the plugins settings and choose the API you want to use.
+3. Go to the plugin settings and choose the API you want to use.
 4. Start to simplify your website.
 
 == Screenshots ==

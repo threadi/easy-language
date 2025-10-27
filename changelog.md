@@ -10,6 +10,8 @@
 ### Changed
 
 - Now requires PHP 8.1 or higher
+- Changed handling of transients
+- Updated dependencies
 
 ## [2.9.2] - 21.10.2025
 

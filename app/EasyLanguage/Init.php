@@ -10,6 +10,13 @@ namespace easyLanguage\EasyLanguage;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Checkbox;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Checkboxes;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Number;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Radio;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Select;
+use easyLanguage\Dependencies\easySettingsForWordPress\Page;
+use easyLanguage\Dependencies\easySettingsForWordPress\Settings;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Base;
@@ -112,13 +119,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		Rest_Api::get_instance()->init();
 
 		// add settings.
-		add_action( 'easy_language_settings_add_settings', array( $this, 'add_settings' ), 15 );
-
-		// add settings tab.
-		add_action( 'easy_language_settings_add_tab', array( $this, 'add_settings_tab' ), 15 );
-
-		// add settings page.
-		add_action( 'easy_language_settings_general_page', array( $this, 'add_settings_page' ) );
+		add_action( 'init', array( $this, 'add_settings' ), 20 );
 
 		// backend simplification-hooks to show or hide simplified pages.
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
@@ -135,8 +136,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		add_action( 'wp_ajax_easy_language_set_simplification_prevention_on_object', array( $this, 'ajax_set_simplification_prevention' ) );
 
 		// embed files.
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ), PHP_INT_MAX );
-		add_action( 'admin_enqueue_scripts', array( $this, 'add_dialog' ), PHP_INT_MAX );
 		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), PHP_INT_MAX );
 
 		// schedule hook.
@@ -1076,74 +1075,63 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function add_settings(): void {
-		/**
-		 * Easy Language Section
-		 */
-		add_settings_section(
-			'settings_section_easy_language',
-			__( 'General Settings', 'easy-language' ),
-			'__return_true',
-			'easyLanguageEasyLanguagePage'
-		);
+		// get the settings object.
+		$settings_obj = Settings::get_instance();
+
+		// get the settings page.
+		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
+
+		// bail if the page is not available.
+		if( ! $settings_page instanceof Page ) {
+			return;
+		}
+
+		// add tab.
+		$general_tab = $settings_page->add_tab( 'general', 20 );
+		$general_tab->set_title( __( 'General Settings', 'easy-language' ) );
+
+		// add section.
+		$general_main_section = $general_tab->add_section( 'general_main_section', 10 );
+		$general_main_section->set_title( __( 'General Settings', 'easy-language' ) );
 
 		// get all actual post-types in this project.
 		$post_types_array = array( 'post', 'page' );
 		$post_types       = array();
 		foreach ( $post_types_array as $post_type ) {
-			// get the post type object.
+			// get the post-type object.
 			$post_type_obj = get_post_type_object( $post_type );
 
-			// bail if post type object could not be loaded.
+			// bail if post-type object could not be loaded.
 			if ( ! $post_type_obj instanceof WP_Post_Type ) {
 				continue;
 			}
 
 			// add label.
 			if ( false !== $post_type_obj->show_ui && false !== $post_type_obj->public && 'attachment' !== $post_type_obj->name ) {
-				$post_types[ $post_type ] = array(
-					'label' => $post_type_obj->label,
-				);
+				$post_types[ $post_type ] = $post_type_obj->label;
 			}
 		}
 
 		/**
-		 * Filter possible post types.
+		 * Filter possible post-types.
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array<string,mixed> $post_types The list of possible post types.
+		 * @param array<string,mixed> $post_types The list of possible post-types.
 		 */
-		$options = apply_filters( 'easy_language_possible_post_types', $post_types );
+		$post_types = apply_filters( 'easy_language_possible_post_types', $post_types );
 
-		// Choose supported post-types.
-		add_settings_field(
-			'easy_language_post_types',
-			__( 'Choose supported post-types', 'easy-language' ),
-			'easy_language_admin_multiple_checkboxes_field',
-			'easyLanguageEasyLanguagePage',
-			'settings_section_easy_language',
-			array(
-				'label_for' => 'easy_language_post_types',
-				'fieldId'   => 'easy_language_post_types',
-				'options'   => $options,
-			)
-		);
-		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_post_types', array( 'sanitize_callback' => array( $this, 'validate_post_types' ) ) );
-
-		add_settings_field(
-			'easy_language_advanced_pro_hint',
-			'',
-			'easy_language_admin_advanced_pro_hint',
-			'easyLanguageEasyLanguagePage',
-			'settings_section_easy_language',
-			array(
-				'label_for' => 'easy_language_advanced_pro_hint',
-				'fieldId'   => 'easy_language_advanced_pro_hint',
-			)
-		);
-
-		// add additional settings after post-typs.
-		do_action( 'easy_language_add_settings_after_post_types' );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_api' );
+		$setting->set_section( $general_main_section );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'array' );
+		$setting->set_default( array( 'page', 'post' ) );
+		$field = new Checkboxes();
+		$field->set_title( __( 'Choose supported post-types', 'easy-language' ) );
+		$field->set_options( $post_types );
+		$field->set_sanitize_callback( array( $this, 'validate_post_types' ) );
+		$setting->set_field( $field );
 
 		// get active api for readonly-marker depending on active api.
 		$active_api = Apis::get_instance()->get_active_api();
@@ -1152,225 +1140,143 @@ class Init extends Base implements ThirdPartySupport_Base {
 			$readonly = false;
 		}
 
-		// Choose supported languages for manuel simplifications.
-		add_settings_field(
-			'easy_language_languages',
-			__( 'Choose languages', 'easy-language' ),
-			'easy_language_admin_multiple_checkboxes_field',
-			'easyLanguageEasyLanguagePage',
-			'settings_section_easy_language',
-			array(
-				'label_for'   => 'easy_language_languages',
-				'fieldId'     => 'easy_language_languages',
-				/* translators: %1$s will be replaced by the settings-URL for the active API */
-				'description' => ( $readonly && $active_api ) ? sprintf( __( 'Go to <a href="%1$s">API-settings</a> to choose the languages you want to use.', 'easy-language' ), esc_url( $active_api->get_settings_url() ) ) : __( 'Choose the language you want to use for simplifications of texts.', 'easy-language' ),
-				'options'     => Languages::get_instance()->get_possible_target_languages( true ),
-				'readonly'    => $readonly,
-			)
-		);
-		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_languages', array( 'sanitize_callback' => array( $this, 'change_languages' ) ) );
+		$languages = array();
+		foreach( Languages::get_instance()->get_possible_target_languages( true ) as $key => $settings ) {
+			$languages[ $key ] = $settings['label'];
+		}
 
-		// Set object state on plugin deactivation.
-		add_settings_field(
-			'easy_language_state_on_deactivation',
-			__( 'Set object state on plugin deactivation', 'easy-language' ),
-			'easy_language_admin_select_field',
-			'easyLanguageEasyLanguagePage',
-			'settings_section_easy_language',
-			array(
-				'label_for'     => 'easy_language_state_on_deactivation',
-				'fieldId'       => 'easy_language_state_on_deactivation',
-				'description'   => __( 'If plugin is disabled your simplified objects will get the state set here. If plugin is reactivated they will be set to their state before.<br><strong>Hint:</strong> During uninstallation all simplified objects will be deleted regardless of the setting here.', 'easy-language' ),
-				'values'        => array(
-					'disabled' => __( 'Do not change anything', 'easy-language' ),
-					'draft'    => __( 'Set to draft', 'easy-language' ),
-					'trash'    => __( 'Set to trash', 'easy-language' ),
-				),
-				'disable_empty' => true,
-			)
-		);
-		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_state_on_deactivation' );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_languages' );
+		$setting->set_section( $general_main_section );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'array' );
+		$setting->set_default( array() );
+		$field = new Checkboxes();
+		$field->set_title( __( 'Choose languages', 'easy-language' ) );
+		/* translators: %1$s will be replaced by the settings-URL for the active API */
+		$field->set_description( ( $readonly && $active_api ) ? sprintf( __( 'Go to <a href="%1$s">API-settings</a> to choose the languages you want to use.', 'easy-language' ), esc_url( $active_api->get_settings_url() ) ) : __( 'Choose the language you want to use for simplifications of texts.', 'easy-language' ) );
+		$field->set_options( $languages );
+		$field->set_readonly( $readonly );
+		$field->set_sanitize_callback( array( $this, 'change_languages' ) );
+		$setting->set_field( $field );
 
-		// Set object state on api change.
-		add_settings_field(
-			'easy_language_state_on_api_change',
-			__( 'Set object state on API change', 'easy-language' ),
-			'easy_language_admin_select_field',
-			'easyLanguageEasyLanguagePage',
-			'settings_section_easy_language',
-			array(
-				'label_for'     => 'easy_language_state_on_api_change',
-				'fieldId'       => 'easy_language_state_on_api_change',
-				'description'   => __( 'If the API is changed, set all objects of the former API to the state set here.', 'easy-language' ),
-				'values'        => array(
-					'disabled' => __( 'Do not change anything', 'easy-language' ),
-					'draft'    => __( 'Set to draft', 'easy-language' ),
-					'trash'    => __( 'Set to trash', 'easy-language' ),
-				),
-				'disable_empty' => true,
-			)
-		);
-		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_state_on_api_change' );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_state_on_deactivation' );
+		$setting->set_section( $general_main_section );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( array() );
+		$field = new Select();
+		$field->set_title( __( 'Set object state on plugin deactivation', 'easy-language' ) );
+		$field->set_description( __( 'If the plugin is disabled, your simplified objects will get the state set here. If plugin is reactivated they will be set to their state before.<br><strong>Hint:</strong> During uninstallation all simplified objects will be deleted regardless of the setting here.', 'easy-language' ) );
+		$field->set_options( array(
+			'disabled' => __( 'Do not change anything', 'easy-language' ),
+			'draft'    => __( 'Set to draft', 'easy-language' ),
+			'trash'    => __( 'Set to trash', 'easy-language' ),
+		) );
+		$setting->set_field( $field );
 
-		// Set if translated pages should have a generated permalink.
-		add_settings_field(
-			'easy_language_generate_permalink',
-			__( 'Generate permalink for translated objects', 'easy-language' ),
-			'easy_language_admin_checkbox_field',
-			'easyLanguageEasyLanguagePage',
-			'settings_section_easy_language',
-			array(
-				'label_for'   => 'easy_language_generate_permalink',
-				'fieldId'     => 'easy_language_generate_permalink',
-				'description' => __( 'If enabled an individual permalink will be generated from title after simplification of the title.', 'easy-language' ),
-			)
-		);
-		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_generate_permalink' );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_state_on_api_change' );
+		$setting->set_section( $general_main_section );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( array() );
+		$field = new Select();
+		$field->set_title( __( 'Set object state on API change', 'easy-language' ) );
+		$field->set_description( __( 'If the API is changed, set all objects of the former API to the state set here.', 'easy-language' ) );
+		$field->set_options( array(
+			'disabled' => __( 'Do not change anything', 'easy-language' ),
+			'draft'    => __( 'Set to draft', 'easy-language' ),
+			'trash'    => __( 'Set to trash', 'easy-language' ),
+		) );
+		$setting->set_field( $field );
 
-		/**
-		 * Automatic Section
-		 */
-		add_settings_section(
-			'settings_section_automatic',
-			__( 'Automatic Settings', 'easy-language' ),
-			'__return_true',
-			'easyLanguageEasyLanguagePage'
-		);
+		// add setting.
+		$permalink_setting = $settings_obj->add_setting( 'easy_language_generate_permalink' );
+		$permalink_setting->set_section( $general_main_section );
+		$permalink_setting->set_show_in_rest( true );
+		$permalink_setting->set_type( 'integer' );
+		$permalink_setting->set_default( 1 );
+		$field = new Checkbox();
+		$field->set_title( __( 'Generate permalink for translated objects', 'easy-language' ) );
+		$field->set_description( __( 'If enabled an individual permalink will be generated from title after simplification of the title.', 'easy-language' ) );
+		$permalink_setting->set_field( $field );
 
-		// Set if translated pages should have a generated permalink.
-		add_settings_field(
-			'easy_language_automatic_simplification_enabled',
-			__( 'Enable automatic simplifications', 'easy-language' ),
-			'easy_language_admin_checkbox_field',
-			'easyLanguageEasyLanguagePage',
-			'settings_section_automatic',
-			array(
-				'label_for'   => 'easy_language_automatic_simplification_enabled',
-				'fieldId'     => 'easy_language_automatic_simplification_enabled',
-				'description' => __( 'If enabled open simplifications will be run automatically in the intervall set below.', 'easy-language' ),
-			)
-		);
-		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_automatic_simplification_enabled' );
+		// add section.
+		$automatic_section = $general_tab->add_section( 'general_automatic_section', 20 );
+		$automatic_section->set_title( __( 'Automatic Settings', 'easy-language' ) );
 
-		// Set items to simplify per run.
-		add_settings_field(
-			'easy_language_automatic_item_count',
-			__( 'Number of items per run', 'easy-language' ),
-			'easy_language_admin_number_field',
-			'easyLanguageEasyLanguagePage',
-			'settings_section_automatic',
-			array(
-				'label_for'   => 'easy_language_automatic_item_count',
-				'fieldId'     => 'easy_language_automatic_item_count',
-				'description' => __( 'The amount of items per automatic simplification run.', 'easy-language' ),
-			)
-		);
-		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_automatic_item_count' );
+		// add setting.
+		$automatic_simplification_setting = $settings_obj->add_setting( 'easy_language_automatic_simplification_enabled' );
+		$automatic_simplification_setting->set_section( $automatic_section );
+		$automatic_simplification_setting->set_show_in_rest( true );
+		$automatic_simplification_setting->set_type( 'integer' );
+		$automatic_simplification_setting->set_default( 1 );
+		$field = new Checkbox();
+		$field->set_title( __( 'Enable automatic simplifications', 'easy-language' ) );
+		$field->set_description( __( 'If enabled open simplifications will be run automatically in the intervall set below.', 'easy-language' ) );
+		$automatic_simplification_setting->set_field( $field );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_automatic_item_count' );
+		$setting->set_section( $automatic_section );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 6 );
+		$field = new Number();
+		$field->set_title( __( 'Number of items per run', 'easy-language' ) );
+		$field->set_description( __( 'The amount of items per automatic simplification run.', 'easy-language' ) );
+		$field->add_depend( $automatic_simplification_setting, 1 );
+		$setting->set_field( $field );
 
 		// get possible intervals.
-		$intervals = array();
+		$intervals = array(); // TODO nur eigene Intervalle verwenden.
 		foreach ( wp_get_schedules() as $name => $schedule ) {
 			$intervals[ $name ] = $schedule['display'];
 		}
 
-		// Interval for automatic simplifications.
-		add_settings_field(
-			'easy_language_automatic_simplification',
-			__( 'Interval for automatic simplification', 'easy-language' ),
-			'easy_language_admin_select_field',
-			'easyLanguageEasyLanguagePage',
-			'settings_section_automatic',
-			array(
-				'label_for'     => 'easy_language_automatic_simplification',
-				'fieldId'       => 'easy_language_automatic_simplification',
-				'values'        => $intervals,
-				'disable_empty' => true,
-				'description'   => __( 'Simplification are run automatically in this intervall.', 'easy-language' ),
-			)
-		);
-		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_automatic_simplification', array( 'sanitize_callback' => array( $this, 'set_automatic_interval' ) ) );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_automatic_simplification' );
+		$setting->set_section( $automatic_section );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( array() );
+		$field = new Select();
+		$field->set_title( __( 'Interval for automatic simplification', 'easy-language' ) );
+		$field->set_description( __( 'Simplification are run automatically in this intervall.', 'easy-language' ) );
+		$field->set_options( $intervals );
+		$field->set_sanitize_callback( array( $this, 'set_automatic_interval' ) );
+		$field->add_depend( $automatic_simplification_setting, 1 );
+		$setting->set_field( $field );
 
-		/**
-		 * Frontend Section
-		 */
-		add_settings_section(
-			'settings_section_frontend',
-			__( 'Frontend Settings', 'easy-language' ),
-			'__return_true',
-			'easyLanguageEasyLanguagePage'
-		);
+		// add section.
+		$frontend_section = $general_tab->add_section( 'settings_section_frontend', 30 );
+		$frontend_section->set_title( __( 'Frontend Settings', 'easy-language' ) );
 
-		// Choose link-mode for language-switcher.
-		add_settings_field(
-			'easy_language_switcher_link',
-			__( 'Choose link-mode for language switcher', 'easy-language' ),
-			'easy_language_admin_multiple_radio_field',
-			'easyLanguageEasyLanguagePage',
-			'settings_section_frontend',
-			array(
-				'label_for' => 'easy_language_switcher_link',
-				'fieldId'   => 'easy_language_switcher_link',
-				'options'   => array(
-					'do_not_link'         => array(
-						'label'       => __( 'do not link translated pages', 'easy-language' ),
-						'enabled'     => true,
-						'description' => __( 'The links in the switcher will general link to the language-specific homepage.', 'easy-language' ),
-					),
-					'link_translated'     => array(
-						'label'       => __( 'link translated pages', 'easy-language' ),
-						'enabled'     => true,
-						'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will target the language-specific homepage.', 'easy-language' ),
-					),
-					'hide_not_translated' => array(
-						'label'       => __( 'do not link not translated pages', 'easy-language' ),
-						'enabled'     => true,
-						'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will not be visible.', 'easy-language' ),
-					),
-				),
-			)
-		);
-		register_setting( 'easyLanguageEasyLanguageFields', 'easy_language_switcher_link' );
-	}
-
-	/**
-	 * Add settings-tab for this plugin.
-	 *
-	 * @param string $tab The actually called tab.
-	 *
-	 * @return void
-	 */
-	public function add_settings_tab( string $tab ): void {
-		// check active tab.
-		$active_class = '';
-		if ( 'general' === $tab ) {
-			$active_class = ' nav-tab-active';
-		}
-
-		// output tab.
-		echo '<a href="' . esc_url( Helper::get_settings_page_url() ) . '&tab=general" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'General Settings', 'easy-language' ) . '</a>';
-	}
-
-	/**
-	 * Add settings page for this plugin.
-	 *
-	 * @return void
-	 */
-	public function add_settings_page(): void {
-		// check user capabilities.
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		// output.
-		?>
-		<form method="POST" action="<?php echo esc_url( get_admin_url() ); ?>options.php">
-			<?php
-			settings_fields( 'easyLanguageEasyLanguageFields' );
-			do_settings_sections( 'easyLanguageEasyLanguagePage' );
-			submit_button();
-			?>
-		</form>
-		<?php
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_switcher_link' );
+		$setting->set_section( $frontend_section );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( array() );
+		$field = new Radio();
+		$field->set_title( __( 'Choose link-mode for language switcher', 'easy-language' ) );
+		$field->set_options( array(
+			'do_not_link'         => array(
+				'label'       => __( 'do not link translated pages', 'easy-language' ),
+				'description' => __( 'The links in the switcher will general link to the language-specific homepage.', 'easy-language' ),
+			),
+			'link_translated'     => array(
+				'label'       => __( 'link translated pages', 'easy-language' ),
+				'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will target the language-specific homepage.', 'easy-language' ),
+			),
+			'hide_not_translated' => array(
+				'label'       => __( 'do not link not translated pages', 'easy-language' ),
+				'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will not be visible.', 'easy-language' ),
+			),
+		) );
+		$setting->set_field( $field );
 	}
 
 	/**
@@ -1964,90 +1870,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Embed our own backend-scripts.
-	 *
-	 * @return void
-	 */
-	public function admin_enqueue_scripts(): void {
-		// Enabled the pointer-scripts.
-		wp_enqueue_style( 'wp-pointer' );
-		wp_enqueue_script( 'wp-pointer' );
-
-		// backend-JS.
-		wp_enqueue_script(
-			'easy-language-plugin-admin',
-			plugins_url( '/admin/js.js', EASY_LANGUAGE ),
-			array( 'jquery', 'easy-dialog', 'wp-i18n' ),
-			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/admin/js.js' ),
-			true
-		);
-
-		// add php-vars to our backend-js-script.
-		wp_localize_script(
-			'easy-language-plugin-admin',
-			'easyLanguagePluginJsVars',
-			array(
-				'ajax_url'            => admin_url( 'admin-ajax.php' ),
-				'dismiss_intro_nonce' => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),
-				/* translators: %1$s will be replaced by the path to the easy language icon */
-				'intro_step_2'        => sprintf( __( '<p><img src="%1$s" alt="Easy Language Logo"><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
-			)
-		);
-
-		if ( function_exists( 'wp_set_script_translations' ) ) {
-			wp_set_script_translations(
-				'easy-language-plugin-admin',
-				'easy-language',
-				plugin_dir_path( EASY_LANGUAGE ) . '/languages/'
-			);
-		}
-	}
-
-	/**
-	 * Add the dialog-scripts and -styles.
-	 *
-	 * @return void
-	 */
-	public function add_dialog(): void {
-		// embed necessary scripts for dialog.
-		$path = Helper::get_plugin_path() . 'vendor/threadi/easy-dialog-for-wordpress/';
-		$url  = Helper::get_plugin_url() . 'vendor/threadi/easy-dialog-for-wordpress/';
-
-		// bail if path does not exist.
-		if ( ! file_exists( $path ) ) {
-			return;
-		}
-
-		// embed the dialog-components JS-script.
-		$script_asset_path = $path . 'build/index.asset.php';
-
-		// bail if script does not exist.
-		if ( ! file_exists( $script_asset_path ) ) {
-			return;
-		}
-
-		// embed script.
-		$script_asset = require $script_asset_path;
-		wp_enqueue_script(
-			'easy-dialog',
-			$url . 'build/index.js',
-			$script_asset['dependencies'],
-			$script_asset['version'],
-			true
-		);
-
-		// embed the dialog-components CSS-file.
-		$admin_css      = $url . 'build/style-index.css';
-		$admin_css_path = $path . 'build/style-index.css';
-		wp_enqueue_style(
-			'easy-dialog',
-			$admin_css,
-			array( 'wp-components' ),
-			Helper::get_file_version( $admin_css_path )
-		);
-	}
-
-	/**
 	 * Embed styles in frontend (for classic themes).
 	 *
 	 * @return void
@@ -2128,7 +1950,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Add marker for free version on body-element
+	 * Add marker on body-element.
 	 *
 	 * @param string $classes List of classes as string.
 	 * @return string
@@ -2156,7 +1978,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Remove intro step 2 if one of our supported post type table views are loaded.
+	 * Remove the intro step 2 if one of our supported post type table views are loaded.
 	 *
 	 * @param WP_Screen $screen The requested wp backend screen.
 	 *

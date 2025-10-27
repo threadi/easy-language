@@ -10,6 +10,14 @@ namespace easyLanguage\Apis\Summ_Ai;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Checkbox;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Checkboxes;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\FieldTable;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Radio;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Select;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Text;
+use easyLanguage\Dependencies\easySettingsForWordPress\Page;
+use easyLanguage\Dependencies\easySettingsForWordPress\Settings;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Apis;
@@ -115,13 +123,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$this->table_requests = Db::get_instance()->get_wpdb_prefix() . 'easy_language_summ_ai';
 
 		// add settings.
-		add_action( 'easy_language_settings_add_settings', array( $this, 'add_settings' ), 30 );
-
-		// add settings tab.
-		add_action( 'easy_language_settings_add_tab', array( $this, 'add_settings_tab' ), 30 );
-
-		// add settings page.
-		add_action( 'easy_language_settings_summ_ai_page', array( $this, 'add_settings_page' ) );
+		add_action( 'init', array( $this, 'add_settings' ), 20 );
 
 		// add hook für schedule.
 		add_action( 'easy_language_summ_ai_request_quota', array( $this, 'get_quota_from_api' ) );
@@ -753,15 +755,24 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function add_settings(): void {
-		/**
-		 * SUMM AI Section.
-		 */
-		add_settings_section(
-			'settings_section_summ_ai',
-			__( 'SUMM AI Settings', 'easy-language' ),
-			'__return_true',
-			'easyLanguageSummAIPage'
-		);
+		// get the settings object.
+		$settings_obj = Settings::get_instance();
+
+		// get the settings page.
+		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
+
+		// bail if the page is not available.
+		if( ! $settings_page instanceof Page ) {
+			return;
+		}
+
+		// add tab.
+		$summ_ai_tab = $settings_page->add_tab( 'summ_ai', 30 );
+		$summ_ai_tab->set_title( __( 'SUMM AI', 'easy-language' ) );
+
+		// add section.
+		$summ_ai_tab_main = $summ_ai_tab->add_section( 'summ_ai_main', 10 );
+		$summ_ai_tab_main->set_title( __( 'SUMM AI settings', 'easy-language' ) );
 
 		// Set description for token field if it has not been set.
 		$description = '';
@@ -772,7 +783,7 @@ class Summ_Ai extends Base implements Api_Base {
 		/* translators: %1$s will be replaced by the SUMM AI URL */
 		$description .= sprintf( __( '<strong>If you want more <a href="%1$s" target="_blank">get your SUMM AI API key now (opens new window)</a></strong>.<br>If you have any questions about the key provided by SUMM AI, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_summ_api_token_set() ) {
-			// Set link to test the entered token.
+			// set the link to test the entered token.
 			$url = add_query_arg(
 				array(
 					'action' => 'easy_language_summ_ai_test_token',
@@ -781,7 +792,7 @@ class Summ_Ai extends Base implements Api_Base {
 				get_admin_url() . 'admin.php'
 			);
 
-			// set link to remove the token.
+			// set the link to remove the token.
 			$remove_token_url = add_query_arg(
 				array(
 					'action' => 'easy_language_summ_ai_remove_token',
@@ -804,29 +815,18 @@ class Summ_Ai extends Base implements Api_Base {
 			}
 		}
 
-		// SUMM API Token.
-		add_settings_field(
-			'easy_language_summ_ai_api_key',
-			__( 'SUMM AI API Key', 'easy-language' ),
-			'easy_language_admin_text_field',
-			'easyLanguageSummAIPage',
-			'settings_section_summ_ai',
-			array(
-				'label_for'   => 'easy_language_summ_ai_api_key',
-				'fieldId'     => 'easy_language_summ_ai_api_key',
-				'description' => $description,
-				'placeholder' => __( 'Enter your key here', 'easy-language' ),
-				'highlight'   => false === $this->is_summ_api_token_set(),
-			)
-		);
-		register_setting(
-			'easyLanguageSummAiFields',
-			'easy_language_summ_ai_api_key',
-			array(
-				'sanitize_callback' => array( $this, 'validate_api_key' ),
-				'show_in_rest'      => true,
-			)
-		);
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_summ_ai_api_key' );
+		$setting->set_section( $summ_ai_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( '' );
+		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
+		$field = new Text();
+		$field->set_title( __( 'SUMM AI API Key', 'easy-language' ) );
+		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
+		$field->set_description( $description );
+		$setting->set_field( $field );
 
 		// define url for general wp-settings.
 		$wp_settings_url = add_query_arg(
@@ -841,78 +841,108 @@ class Summ_Ai extends Base implements Api_Base {
 			$hint = sprintf( __( 'You can change the admin-email in <a href="%1$s">General Settings for your WordPress</a>.', 'easy-language' ), esc_url( $wp_settings_url ) );
 		}
 
-		// Set email-mode.
-		add_settings_field(
-			'easy_language_summ_ai_email_mode',
-			__( 'Choose email-mode', 'easy-language' ),
-			'easy_language_admin_multiple_radio_field',
-			'easyLanguageSummAIPage',
-			'settings_section_summ_ai',
-			array(
-				'label_for'         => 'easy_language_summ_ai_email_mode',
-				'fieldId'           => 'easy_language_summ_ai_email_mode',
-				'options'           => array(
-					'custom' => array(
-						'label'       => __( 'Custom', 'easy-language' ),
-						'enabled'     => true,
-						'description' => __( 'Enter a custom email in the field bellow.', 'easy-language' ),
-					),
-					'admin'  => array(
-						'label'       => __( 'Use the admin-email', 'easy-language' ),
-						'enabled'     => true,
-						/* translators: %1$s is replaced with a hint for admins only. */
-						'description' => sprintf( __( 'The WordPress-Admin-email will be used. %1$s', 'easy-language' ), $hint ),
-					),
-					'editor' => array(
-						'label'       => __( 'Use editor email', 'easy-language' ),
-						'enabled'     => true,
-						'description' => __( 'The email of the actual user, which requests the simplification, will be used.', 'easy-language' ),
-					),
+		// add setting.
+		$email_mode_setting = $settings_obj->add_setting( 'easy_language_summ_ai_email_mode' );
+		$email_mode_setting->set_section( $summ_ai_tab_main );
+		$email_mode_setting->set_show_in_rest( true );
+		$email_mode_setting->set_type( 'string' );
+		$email_mode_setting->set_default( 'summ_ai' );
+		$field = new Radio();
+		$field->set_title( __( 'Choose email-mode', 'easy-language' ) );
+		$field->set_description( __( 'An email will be used for each request to the SUMM AI API. It is used as contact or identifier email for SUMM AI if question for simplifications arise.', 'easy-language' ) );
+		$field->set_readonly( ! $this->is_summ_api_token_set() );
+		$field->set_sanitize_callback( array( $this, 'validate_multiple_radios') );
+		$field->set_options( array(
+				'custom' => array(
+					'label'       => __( 'Custom', 'easy-language' ),
+					'description' => __( 'Enter a custom email in the field bellow.', 'easy-language' ),
 				),
-				'readonly'          => false === $this->is_summ_api_token_set(),
-				'description_above' => true,
-				'description'       => __( 'An email will be used for each request to the SUMM AI API. It is used as contact or identifier email for SUMM AI if question for simplifications arise.', 'easy-language' ),
+				'admin'  => array(
+					'label'       => __( 'Use the admin-email', 'easy-language' ),
+					/* translators: %1$s is replaced with a hint for admins only. */
+					'description' => sprintf( __( 'The WordPress-Admin-email will be used. %1$s', 'easy-language' ), $hint ),
+				),
+				'editor' => array(
+					'label'       => __( 'Use editor email', 'easy-language' ),
+					'description' => __( 'The email of the actual user, which requests the simplification, will be used.', 'easy-language' ),
+				)
 			)
 		);
-		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_email_mode', array( 'sanitize_callback' => array( $this, 'validate_multiple_radios' ) ) );
+		$email_mode_setting->set_field( $field );
 
-		// Contact email for SUMM AI API-requests.
-		add_settings_field(
-			'easy_language_summ_api_email',
-			__( 'Contact email for SUMM AI', 'easy-language' ),
-			'easy_language_admin_email_field',
-			'easyLanguageSummAIPage',
-			'settings_section_summ_ai',
-			array(
-				'label_for'   => 'easy_language_summ_api_email',
-				'fieldId'     => 'easy_language_summ_api_email',
-				'description' => __( 'This field is only enabled if the setting above is set to "Custom".', 'easy-language' ),
-				'placeholder' => __( 'Enter contact email here', 'easy-language' ),
-				'readonly'    => 'custom' !== get_option( 'easy_language_summ_ai_email_mode', 'editor' ),
-			)
-		);
-		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_api_email', array( 'sanitize_callback' => array( $this, 'validate_api_email' ) ) );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_summ_api_email' );
+		$setting->set_section( $summ_ai_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( '' );
+		$setting->set_save_callback( array( $this, 'validate_api_email' ) );
+		$field = new Text();
+		$field->set_title( __( 'Contact email for SUMM AI', 'easy-language' ) );
+		$field->set_placeholder( __( 'Enter contact email here', 'easy-language' ) );
+		$field->set_description( __( 'This field is only enabled if the setting above is set to "Custom".', 'easy-language' ) );
+		$field->set_readonly( 'custom' !== get_option( 'easy_language_summ_ai_email_mode', 'editor' ) );
+		$field->add_depend( $email_mode_setting, 'custom' ); // TODO möglich machen.
+		$setting->set_field( $field );
 
-		// Enable source-languages
-		// -> defaults to WP-locale
-		// -> if WPML, Polylang or TranslatePress is available, show additional languages
-		// -> but restrict list to languages supported by SUMM AI.
-		add_settings_field(
-			'easy_language_summ_ai_source_languages',
-			__( 'Choose source languages', 'easy-language' ),
-			'easy_language_admin_multiple_checkboxes_field',
-			'easyLanguageSummAIPage',
-			'settings_section_summ_ai',
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_summ_ai_source_languages' );
+		$setting->set_section( $summ_ai_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( '' );
+		$field = new Checkboxes();
+		$field->set_title( __( 'Choose source languages', 'easy-language' ) );
+		$field->set_description( __( 'This field is only enabled if the setting above is set to "Custom".', 'easy-language' ) );
+		$field->set_readonly( false === $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support );
+		$field->set_options( $this->get_supported_source_languages( true ) );
+		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_checkboxes' ) );;
+		$setting->set_field( $field );
+
+		// add setting.
+		// TODO Tabelle nachbauen für alle Einstellungen zu jeder der Zielsprachen.
+		$setting = $settings_obj->add_setting( 'easy_language_summ_ai_target_languages' );
+		$setting->set_section( $summ_ai_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( '' );
+		$field = new FieldTable();
+		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
+		$field->set_description( __( 'These are the possible target languages for SUMM AI-simplifications.', 'easy-language' ) );
+		$field->set_columns(
 			array(
-				'label_for'   => 'easy_language_summ_ai_source_languages',
-				'fieldId'     => 'easy_language_summ_ai_source_languages',
-				'description' => __( 'These are the possible source languages for SUMM AI-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
-				'options'     => $this->get_supported_source_languages( true ),
-				'readonly'    => false === $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support,
-				'pro_hint'    => $this->get_pro_hint(),
+				__( 'Enable your target language', 'easy-language' ),
+				__( 'Choose separator', 'easy-language' ),
 			)
 		);
-		register_setting( 'easyLanguageSummAiFields', 'easy_language_summ_ai_source_languages', array( 'sanitize_callback' => 'easyLanguage\Plugin\Helper::settings_validate_multiple_checkboxes' ) );
+		$row = 0;
+		foreach ( $this->get_supported_target_languages() as $language_code => $settings ) {
+			// add entry as row.
+			$field->add_row();
+
+			// add setting.
+			$language = $settings_obj->add_setting( 'easy_language_summ_ai_target_languages' . $language_code );
+			$language->set_type( 'integer' );
+			$language->set_default( 0 );
+			$language_field = new Checkbox();
+			$language_field->set_title( $settings['label'] );
+			$language_field->set_description( $settings['description'] );
+			$language->set_field( $language_field );
+			$field->add_setting( $language, $row, 0 );
+
+			// add setting.
+			$separator = $settings_obj->add_setting( 'easy_language_summ_ai_target_languages_separator' . $language_code );
+			$separator->set_type( 'string' );
+			$separator->set_default( '' );
+			$separator_field = new Select();
+			$separator_field->set_options( array( 'aaaa', 'bbbb' ) );
+			$separator->set_field( $separator_field );
+			$field->add_setting( $separator, $row, 1 );
+			$row++;
+		}
+		$setting->set_field( $field );
+
+		return;
 
 		// Enable target languages.
 		add_settings_field(

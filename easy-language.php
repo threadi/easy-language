@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Easy Language
- * Description:       Provides the possibility to simplify texts to easy and plain language.
+ * Description:       This plugin adds support for easy language in WordPress.
  * Requires at least: 6.0
  * Requires PHP:      8.1
  * Version:           @@VersionNumber@@

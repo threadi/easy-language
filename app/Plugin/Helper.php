@@ -231,31 +231,6 @@ class Helper {
 	}
 
 	/**
-	 * Validate multiple checkboxes.
-	 *
-	 * @param array<string,mixed>|null $values The list of values.
-	 *
-	 * @return array<string,mixed>|null
-	 */
-	public static function settings_validate_multiple_checkboxes( ?array $values ): ?array {
-		$filter = current_filter();
-		if ( ! empty( $filter ) ) {
-			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) ) {
-				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_SANITIZE_NUMBER_INT, FILTER_FORCE_ARRAY );
-				if ( ! empty( $pre_values ) ) {
-					// set the callback for array_map.
-					$callback = 'sanitize_text_field';
-
-					// run the sanitizing.
-					$values = array_map( $callback, $pre_values ); // @phpstan-ignore argument.type
-				}
-			}
-		}
-		return $values;
-	}
-
-	/**
 	 * Validate multiple select fields.
 	 *
 	 * @param array<string,mixed>|null $values The list of values.
@@ -735,12 +710,12 @@ class Helper {
 	/**
 	 * Checks if the current request is a WP REST API request.
 	 *
-	 * Case #1: After WP_REST_Request initialisation
+	 * Case #1: After WP_REST_Request initialization
 	 * Case #2: Support "plain" permalink settings and check if `rest_route` starts with `/`
 	 * Case #3: It can happen that WP_Rewrite is not yet initialized,
 	 *          so do this (wp-settings.php)
 	 * Case #4: URL Path begins with wp-json/ (your REST prefix)
-	 *          Also supports WP installations in sub-folders
+	 *          Also supports WP installations in subfolders
 	 *
 	 * @returns boolean
 	 * @author matzeeable
@@ -870,5 +845,40 @@ class Helper {
 			return '<img src="' . self::get_plugin_url() . 'gfx/easy-language-icon.png" alt="Easy Language Logo" class="logo">';
 		}
 		return '<img src="' . self::get_plugin_url() . 'gfx/easy-language-icon.png" alt="Easy Language Logo" class="logo">';
+	}
+
+	/**
+	 * Checks if the current request is a WP REST API request.
+	 *
+	 * Case #1: After WP_REST_Request initialization
+	 * Case #2: Support "plain" permalink settings and check if `rest_route` starts with `/`
+	 * Case #3: It can happen that WP_Rewrite is not yet initialized,
+	 *          so do this (wp-settings.php)
+	 * Case #4: URL Path begins with wp-json/ (your REST prefix)
+	 *          Also supports WP installations in sub-folders
+	 *
+	 * @returns boolean
+	 * @author matzeeable
+	 */
+	public static function is_rest_request(): bool {
+		if ( ( defined( 'REST_REQUEST' ) && REST_REQUEST ) // Case #1.
+		     || ( isset( $GLOBALS['wp']->query_vars['rest_route'] ) // (#2)
+		          && str_starts_with( $GLOBALS['wp']->query_vars['rest_route'], '/' ) ) ) {
+			return true;
+		}
+
+		// Case #3.
+		global $wp_rewrite;
+		if ( is_null( $wp_rewrite ) ) {
+			$wp_rewrite = new WP_Rewrite();
+		}
+
+		// Case #4.
+		$rest_url    = wp_parse_url( trailingslashit( rest_url() ) );
+		$current_url = wp_parse_url( add_query_arg( array() ) );
+		if ( is_array( $current_url ) && is_array( $rest_url ) && isset( $current_url['path'], $rest_url['path'] ) ) {
+			return str_starts_with( $current_url['path'], $rest_url['path'] );
+		}
+		return false;
 	}
 }
