@@ -332,6 +332,16 @@ class Settings {
 		$field->set_description( __( 'If enabled the plugin will log every API action.', 'easy-language' ) );
 		$setting->set_field( $field );
 
+		// create a hidden page for hidden settings.
+		$hidden_page = $settings_obj->add_page( 'hidden_page' );
+
+		// create a hidden tab on this page.
+		$hidden_tab = $hidden_page->add_tab( 'hidden_tab', 10 );
+
+		// the hidden section for any not visible settings.
+		$hidden = $hidden_tab->add_section( 'hidden_section', 20 );
+		$hidden->set_setting( $settings_obj );
+
 		// initialize the settings.
 		$settings_obj->init();
 	}

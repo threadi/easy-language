@@ -10,6 +10,9 @@ namespace easyLanguage\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Dependencies\easySettingsForWordPress\Page;
+use easyLanguage\Dependencies\easySettingsForWordPress\Section;
+use easyLanguage\Dependencies\easySettingsForWordPress\Tab;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Objects;
 use easyLanguage\EasyLanguage\Parser_Base;
@@ -880,5 +883,42 @@ class Helper {
 			return str_starts_with( $current_url['path'], $rest_url['path'] );
 		}
 		return false;
+	}
+
+	/**
+	 * Return the hidden section of the settings object.
+	 *
+	 * @return false|Section
+	 */
+	public static function get_hidden_section(): Section|false {
+		// get settings object.
+		$settings_obj = \easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance();
+
+		// create a hidden page for hidden settings.
+		$hidden_page = $settings_obj->get_page( 'hidden_page' );
+
+		// bail if page could not be found.
+		if ( ! $hidden_page instanceof Page ) {
+			return false;
+		}
+
+		// create a hidden tab on this page.
+		$hidden_tab = $hidden_page->get_tab( 'hidden_tab' );
+
+		// bail if tab could not be found.
+		if ( ! $hidden_tab instanceof Tab ) {
+			return false;
+		}
+
+		// the hidden section for any not visible settings.
+		$hidden_section = $hidden_tab->get_section( 'hidden_section' );
+
+		// bail if section could not be found.
+		if ( ! $hidden_section instanceof Section ) {
+			return false;
+		}
+
+		// return the hidden section object.
+		return $hidden_section;
 	}
 }
