@@ -452,7 +452,7 @@ class Setup {
 	 * @return void
 	 */
 	public function add_settings(): void {
-		register_setting(
+		/*register_setting(
 			'easyLanguageApiFields',
 			'easy_language_api',
 			array(
@@ -480,7 +480,7 @@ class Setup {
 				'show_in_rest'      => true,
 				'type'              => 'string',
 			)
-		);
+		);*/
 	}
 
 	/**

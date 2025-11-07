@@ -228,6 +228,7 @@ class Settings {
 		$field->set_title( __( 'Select API', 'easy-language' ) );
 		$field->set_description( __( 'Please choose the API you want to use to simplify texts your website.', 'easy-language' ) );
 		$field->set_options( $apis );
+		$field->set_sanitize_callback( array( $this, 'sanitize_api' ) );
 		$setting->set_field( $field );
 
 		// add setting.
@@ -362,7 +363,7 @@ class Settings {
 		$api = Apis::get_instance()->get_api_by_name( get_option( 'easy_language_api', '' ) );
 
 		// if the actual API is not the new API and changing post-state is not disabled, go further.
-		if ( $api && $value !== $api->get_name() && 'disabled' !== $post_state ) {
+		if ( 'disabled' !== $post_state && $api && $value !== $api->get_name() ) {
 			// get the simplified objects of the former API (all of them).
 			$post_type_objects = $api->get_simplified_post_type_objects();
 
@@ -411,7 +412,7 @@ class Settings {
 				);
 				wp_update_post( $array );
 
-				// delete the setting for previous state.
+				// delete the setting for the previous state.
 				delete_post_meta( $post_type_object_id, 'easy_language_simplification_state_changed_from' );
 			}
 
@@ -419,7 +420,7 @@ class Settings {
 			if ( empty( $post_type_objects ) && false === $new_api->is_configured() ) {
 				$links              = '';
 				$post_type_settings = \easyLanguage\Plugin\Init::get_instance()->get_post_type_settings();
-				$post_types         = Init::get_instance()->get_supported_post_types();
+				$post_types         = \easyLanguage\EasyLanguage\Init::get_instance()->get_supported_post_types();
 				$post_types_count   = count( $post_types );
 				$post_types_counter = 0;
 				foreach ( $post_types as $post_type => $enabled ) {
@@ -570,5 +571,16 @@ class Settings {
 			}
 		}
 		return $values;
+	}
+
+	/**
+	 * Sanitize the API setting.
+	 *
+	 * @param string|null $value The settings value.
+	 *
+	 * @return string
+	 */
+	public function sanitize_api( ?string $value ): string {
+		return (string) $value;
 	}
 }

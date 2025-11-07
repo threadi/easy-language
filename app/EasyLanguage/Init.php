@@ -1122,7 +1122,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$post_types = apply_filters( 'easy_language_possible_post_types', $post_types );
 
 		// add setting.
-		$setting = $settings_obj->add_setting( 'easy_language_api' );
+		$setting = $settings_obj->add_setting( 'easy_language_post_types' );
 		$setting->set_section( $general_main_section );
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'array' );
