@@ -50,21 +50,6 @@ interface Api_Base {
 	public function get_mapping_languages(): array;
 
 	/**
-	 * Add settings-tab for this plugin.
-	 *
-	 * @param string $tab The tab internal name.
-	 * @return void
-	 */
-	public function add_settings_tab( string $tab ): void;
-
-	/**
-	 * Add settings-page for this plugin.
-	 *
-	 * @return void
-	 */
-	public function add_settings_page(): void;
-
-	/**
 	 * Add settings for this plugin.
 	 *
 	 * @return void

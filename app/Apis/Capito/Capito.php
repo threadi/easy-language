@@ -10,11 +10,17 @@ namespace easyLanguage\Apis\Capito;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Checkboxes;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Select;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Text;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\TextInfo;
+use easyLanguage\Dependencies\easySettingsForWordPress\Page;
+use easyLanguage\Dependencies\easySettingsForWordPress\Section;
+use easyLanguage\Dependencies\easySettingsForWordPress\Settings;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Base;
-use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Language_Icon;
 use easyLanguage\Plugin\Languages;
@@ -95,13 +101,7 @@ class Capito extends Base implements Api_Base {
 		$this->table_requests = Db::get_instance()->get_wpdb_prefix() . 'easy_language_capito';
 
 		// add settings.
-		add_action( 'easy_language_settings_add_settings', array( $this, 'add_settings' ), 20 );
-
-		// add settings tab.
-		add_action( 'easy_language_settings_add_tab', array( $this, 'add_settings_tab' ), 20 );
-
-		// add settings page.
-		add_action( 'easy_language_settings_capito_page', array( $this, 'add_settings_page' ) );
+		add_action( 'init', array( $this, 'add_settings' ), 20 );
 
 		// add hook für schedules.
 		add_action( 'easy_language_capito_request_quota', array( $this, 'get_quota_from_api' ) );
@@ -327,38 +327,6 @@ class Capito extends Base implements Api_Base {
 	public function install(): void {
 		global $wpdb;
 
-		// set source language depending on WP-locale and its support.
-		if ( ! get_option( 'easy_language_capito_source_languages' ) ) {
-			$language  = Helper::get_wp_lang();
-			$languages = array( $language => '1' );
-			update_option( 'easy_language_capito_source_languages', $languages );
-		}
-
-		// set target language depending on source-language and if only one target could be possible.
-		if ( ! get_option( 'easy_language_capito_target_languages' ) ) {
-			$language  = Helper::get_wp_lang();
-			$languages = array( 'de_b1' => '1' );
-			if ( false !== str_contains( $language, 'en_' ) ) {
-				$languages = array( 'en_b1' => '1' );
-			}
-			update_option( 'easy_language_capito_target_languages', $languages );
-		}
-
-		// set interval for automatic simplification to daily.
-		if ( ! get_option( 'easy_language_capito_quota_interval' ) ) {
-			update_option( 'easy_language_capito_quota_interval', 'daily' );
-		}
-
-		// set capito api key to nothing but with active autoload.
-		if ( ! get_option( 'easy_language_capito_api_key' ) ) {
-			add_option( 'easy_language_capito_api_key', '', '', true );
-		}
-
-		// set capito quota array.
-		if ( ! get_option( 'easy_language_capito_quota' ) ) {
-			update_option( 'easy_language_capito_quota', array(), true );
-		}
-
 		$charset_collate = $wpdb->get_charset_collate();
 
 		// table for original-texts to translate.
@@ -506,131 +474,29 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Add settings tab.
-	 *
-	 * @param string $tab The tab internal name.
-	 *
-	 * @return void
-	 */
-	public function add_settings_tab( string $tab ): void {
-		// get list of available plugins and check if they support APIs.
-		$supports_api = false;
-		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if ( $plugin_obj->is_supporting_apis() && false === $plugin_obj->has_own_api_config() ) {
-				$supports_api = true;
-			}
-		}
-
-		// bail of plugin does not support api OR this API is not enabled.
-		if ( false === $supports_api || $this->get_name() !== get_option( 'easy_language_api', '' ) ) {
-			return;
-		}
-
-		// check active tab.
-		$active_class = '';
-		if ( $this->get_name() === $tab ) {
-			$active_class = ' nav-tab-active';
-		}
-
-		// output tab.
-		echo '<a href="' . esc_url( Helper::get_settings_page_url() ) . '&tab=' . esc_attr( $this->get_name() ) . '" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'capito', 'easy-language' ) . '</a>';
-	}
-
-	/**
-	 * Add settings page.
-	 *
-	 * @return void
-	 */
-	public function add_settings_page(): void {
-		// get the active API.
-		$api_obj = Apis::get_instance()->get_active_api();
-
-		// bail if no API is active.
-		if ( ! $api_obj ) {
-			return;
-		}
-
-		// bail if this API is not enabled.
-		if ( $api_obj->get_name() !== $this->get_name() ) {
-			return;
-		}
-
-		// get list of available plugins and check if they support APIs.
-		$supports_api = false;
-		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if ( $plugin_obj->is_supporting_apis() ) {
-				$supports_api = true;
-			}
-		}
-
-		// bail if the plugin does not support APIs and also check user capabilities.
-		if ( false === $supports_api || ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		?>
-		<form method="POST" action="<?php echo esc_url( get_admin_url() ); ?>options.php">
-			<?php
-			settings_fields( 'easyLanguageCapitoFields' );
-			do_settings_sections( 'easyLanguageCapitoPage' );
-			submit_button();
-			?>
-		</form>
-		<h2 id="statistics"><?php esc_html_e( 'capito Quota', 'easy-language' ); ?></h2>
-		<?php
-		if ( $this->is_capito_token_set() ) {
-			/**
-			 * Get and show the quota we received from API.
-			 */
-			$api_quota = $this->get_quota();
-			if ( empty( $api_quota ) ) {
-				$quota_text = esc_html__( 'No quota consumed so far', 'easy-language' );
-			} elseif ( -1 === $api_quota['character_limit'] ) {
-				$quota_text = __( 'Update quota now.', 'easy-language' );
-			} elseif ( 0 === $api_quota['character_limit'] ) {
-				$quota_text = __( 'Unlimited.', 'easy-language' );
-			} else {
-				$quota_text = $api_quota['character_spent'] . ' / ' . $api_quota['character_limit'];
-			}
-
-			// get the update quota link.
-			$update_quota_url = add_query_arg(
-				array(
-					'action' => 'easy_language_capito_get_quota',
-					'nonce'  => wp_create_nonce( 'easy-language-capito-get-quota' ),
-				),
-				get_admin_url() . 'admin.php'
-			);
-
-			// output.
-			?>
-			<p>
-				<strong><?php echo esc_html__( 'Quota', 'easy-language' ); ?>:</strong> <?php echo esc_html( $quota_text ); ?>
-				<a href="<?php echo esc_url( $update_quota_url ); ?>#statistics" class="button button-secondary"><?php echo esc_html__( 'Update now', 'easy-language' ); ?></a>
-			</p>
-			<?php
-		} else {
-			?>
-			<p><?php echo esc_html__( 'Info about quota will be available until the API token is set', 'easy-language' ); ?></p>
-			<?php
-		}
-	}
-
-	/**
 	 * Add capito settings.
 	 *
 	 * @return void
 	 */
 	public function add_settings(): void {
-		/**
-		 * The capito settings Section
-		 */
-		add_settings_section(
-			'settings_section_capito',
-			__( 'capito Settings', 'easy-language' ),
-			'__return_true',
-			'easyLanguageCapitoPage'
-		);
+		// get the settings object.
+		$settings_obj = Settings::get_instance();
+
+		// get the settings page.
+		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
+
+		// bail if the page is not available.
+		if( ! $settings_page instanceof Page ) {
+			return;
+		}
+
+		// add tab.
+		$capito_tab = $settings_page->add_tab( 'capito', 30 );
+		$capito_tab->set_title( __( 'capito', 'easy-language' ) );
+
+		// add section.
+		$capito_tab_main = $capito_tab->add_section( 'settings_section_capito', 10 );
+		$capito_tab_main->set_title( __( 'capito settings', 'easy-language' ) );
 
 		// Set description for token field if it has not been set.
 		/* translators: %1$s will be replaced by the capito URL */
@@ -668,59 +534,41 @@ class Capito extends Base implements Api_Base {
 			}
 		}
 
-		// capito token.
-		add_settings_field(
-			'easy_language_capito_api_key',
-			__( 'capito API Key', 'easy-language' ),
-			'easy_language_admin_text_field',
-			'easyLanguageCapitoPage',
-			'settings_section_capito',
-			array(
-				'label_for'   => 'easy_language_capito_api_key',
-				'fieldId'     => 'easy_language_capito_api_key',
-				'description' => $description,
-				'placeholder' => __( 'Enter token here', 'easy-language' ),
-				'highlight'   => false === $this->is_capito_token_set(),
-			)
-		);
-		register_setting(
-			'easyLanguageCapitoFields',
-			'easy_language_capito_api_key',
-			array(
-				'sanitize_callback' => array( $this, 'validate_api_key' ),
-				'show_in_rest'      => true,
-			)
-		);
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_capito_api_key' );
+		$setting->set_section( $capito_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( '' );
+		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
+		$field = new Text();
+		$field->set_title( __( 'capito API Key', 'easy-language' ) );
+		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
+		$field->set_description( $description );
+		$setting->set_field( $field );
 
-		// choose account type.
-		add_settings_field(
-			'easy_language_capito_account_type',
-			__( 'Account type', 'easy-language' ),
-			'easy_language_admin_select_field',
-			'easyLanguageCapitoPage',
-			'settings_section_capito',
-			array(
-				'label_for'     => 'easy_language_capito_account_type',
-				'fieldId'       => 'easy_language_capito_account_type',
-				'values'        => array(
-					'user' => __( 'User', 'easy-language' ),
-					'team' => __( 'Team', 'easy-language' ),
-				),
-				'disable_empty' => true,
-				'readonly'      => false === $this->is_capito_token_set(),
-			)
-		);
-		register_setting(
-			'easyLanguageCapitoFields',
-			'easy_language_capito_account_type',
-			array(
-				'sanitize_callback' => array( $this, 'clean_team_cache' ),
-			)
-		);
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_capito_account_type' );
+		$setting->set_section( $capito_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( '' );
+		$setting->set_save_callback( array( $this, 'clean_team_cache' ) );
+		$field = new Select();
+		$field->set_title( __( 'Account type', 'easy-language' ) );
+		$field->set_options( array(
+			'user' => __( 'User', 'easy-language' ),
+			'team' => __( 'Team', 'easy-language' ),
+		) );
+		$setting->set_field( $field );
 
-		// get list of teams for given token.
-		$teams = array();
-		if ( $this->is_team_account() ) {
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_capito_team' );
+		$setting->set_section( $capito_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( '' );
+		if( $this->is_team_account() ) {
 			// use cached value.
 			$teams = get_transient( 'easy_language_capito_teams' );
 
@@ -761,98 +609,102 @@ class Capito extends Base implements Api_Base {
 					}
 				}
 			}
+
+			if( empty( $teams ) ) {
+				$field = new TextInfo();
+				$field->set_title( __( 'Account type', 'easy-language' ) );
+				$field->set_description( __( 'You are not assigned to any team.', 'easy-language' ) );
+			}
+			else {
+				// create the select field for the teams.
+				$field = new Select();
+				$field->set_title( __( 'Account type', 'easy-language' ) );
+				$field->set_options( $teams );
+			}
+		}
+		else {
+			$field = new TextInfo();
+			$field->set_title( __( 'Account type', 'easy-language' ) );
+			$field->set_description( __( 'Choose team as account type.', 'easy-language' ) );
+		}
+		$setting->set_field( $field );
+
+		// get the actual language of the website for default setting.
+		$language  = Helper::get_wp_lang();
+		$languages = array( $language => '1' );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_capito_source_languages' );
+		$setting->set_section( $capito_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'array' );
+		$setting->set_default( $languages );
+		$field = new Checkboxes();
+		$field->set_title( __( 'Choose source languages', 'easy-language' ) );
+		$field->set_description( __( 'These are the possible source languages for capito-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ) );
+		$field->set_readonly( false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support );
+		$field->set_options( $this->get_supported_source_languages() );
+		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_checkboxes' ) );
+		$setting->set_field( $field );
+
+		// get default translation languages.
+		$language  = Helper::get_wp_lang();
+		$languages = array( 'de_b1' => '1' );
+		if ( false !== str_contains( $language, 'en_' ) ) {
+			$languages = array( 'en_b1' => '1' );
 		}
 
-		// choose team (if enabled).
-		add_settings_field(
-			'easy_language_capito_team',
-			__( 'Choose team', 'easy-language' ),
-			'team' === get_option( 'easy_language_capito_account_type' ) ? 'easy_language_admin_select_field' : array( $this, 'team_hint' ),
-			'easyLanguageCapitoPage',
-			'settings_section_capito',
-			array(
-				'label_for' => 'easy_language_capito_team',
-				'fieldId'   => 'easy_language_capito_team',
-				'values'    => $teams,
-				'readonly'  => false === $this->is_capito_token_set() || ! $this->is_team_account(),
-			)
-		);
-		register_setting(
-			'easyLanguageCapitoFields',
-			'easy_language_capito_team'
-		);
-
-		// Enable source-languages.
-		// -> defaults to WP-locale.
-		// -> if WPML, Polylang or TranslatePress is available, show additional languages.
-		// -> but restrict list to languages supported by capito.
-		add_settings_field(
-			'easy_language_capito_source_languages',
-			__( 'Choose source languages', 'easy-language' ),
-			'easy_language_admin_multiple_checkboxes_field',
-			'easyLanguageCapitoPage',
-			'settings_section_capito',
-			array(
-				'label_for'   => 'easy_language_capito_source_languages',
-				'fieldId'     => 'easy_language_capito_source_languages',
-				'description' => __( 'These are the possible source languages for capito-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
-				'options'     => $this->get_supported_source_languages(),
-				'readonly'    => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
-				'pro_hint'    => $this->get_pro_hint(),
-			)
-		);
-		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_source_languages', array( 'sanitize_callback' => 'easyLanguage\Plugin\Helper::settings_validate_multiple_checkboxes' ) );
-
-		// Enable target languages.
-		add_settings_field(
-			'easy_language_capito_target_languages',
-			__( 'Choose target languages', 'easy-language' ),
-			'easy_language_admin_multiple_checkboxes_field',
-			'easyLanguageCapitoPage',
-			'settings_section_capito',
-			array(
-				'label_for'   => 'easy_language_capito_target_languages',
-				'fieldId'     => 'easy_language_capito_target_languages',
-				'description' => __( 'These are the possible target languages for capito-simplifications.', 'easy-language' ),
-				'options'     => $this->get_supported_target_languages(),
-				'readonly'    => false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support,
-				'pro_hint'    => $this->get_pro_hint(),
-			)
-		);
-		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_target_languages', array( 'sanitize_callback' => array( $this, 'validate_language_settings' ) ) );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_capito_target_languages' );
+		$setting->set_section( $capito_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'array' );
+		$setting->set_default( $languages );
+		$field = new Checkboxes();
+		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
+		$field->set_description( __( 'These are the possible target languages for capito-simplifications.', 'easy-language' ) );
+		$field->set_readonly( false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support );
+		$field->set_options( $this->get_supported_target_languages() );
+		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_checkboxes' ) );
+		$setting->set_field( $field );
 
 		// get possible intervals.
-		$intervals = array();
+		$intervals = array(); // TODO ersetzen durch eigene Intervalle.
 		foreach ( wp_get_schedules() as $name => $schedule ) {
 			$intervals[ $name ] = $schedule['display'];
 		}
 
-		/**
-		 * Hook for capito automatic interval settings.
-		 *
-		 * @since 2.0.0 Available since 2.0.0.
-		 *
-		 * @param array $intervals The possible intervals.
-		 * @param bool $foreign_translation_plugin_with_api_support Whether we support third-party-plugins.
-		 */
-		do_action( 'easy_language_capito_automatic_interval', $intervals, $foreign_translation_plugin_with_api_support );
+		// deprecated action for additional options.
+		do_action_deprecated( 'easy_language_capito_automatic_interval', array( $intervals ), '3.0.0' );
 
-		// Interval for quota-request.
-		add_settings_field(
-			'easy_language_capito_quota_interval',
-			__( 'Interval for quota request', 'easy-language' ),
-			'easy_language_admin_select_field',
-			'easyLanguageCapitoPage',
-			'settings_section_capito',
-			array(
-				'label_for'   => 'easy_language_capito_quota_interval',
-				'fieldId'     => 'easy_language_capito_quota_interval',
-				'values'      => $intervals,
-				'readonly'    => ! $this->is_capito_token_set(),
-				'description' => __( 'The actual API quota will be requested in this interval.', 'easy-language' ),
-			)
-		);
-		register_setting( 'easyLanguageCapitoFields', 'easy_language_capito_quota_interval', array( 'sanitize_callback' => array( $this, 'set_quota_interval' ) ) );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_capito_quota_interval' );
+		$setting->set_section( $capito_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( 'daily' );
+		$setting->set_save_callback( array( $this, 'set_quota_interval' ) );
+		$field = new Select();
+		$field->set_title( __( 'Interval for quota request', 'easy-language' ) );
+		$field->set_description( __( 'The actual API quota will be requested in this interval.', 'easy-language' ) );
+		$field->set_options( $intervals );
+		$field->set_readonly( false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support );
+		$setting->set_field( $field );
+
+		// get the hidden section.
+		$hidden_section = Helper::get_hidden_section();
+
+		// bail if section could not be loaded.
+		if( ! $hidden_section instanceof Section ) {
+			return;
+		}
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_capito_quota' );
+		$setting->set_section( $hidden_section );
+		$setting->prevent_export( true );
+		$setting->set_type( 'array' );
+		$setting->set_default( array() );
 	}
 
 	/**
@@ -982,27 +834,6 @@ class Capito extends Base implements Api_Base {
 
 		// return the entered token.
 		return $value;
-	}
-
-	/**
-	 * Validate the language-settings.
-	 *
-	 * The source-language must be possible to simplify in the target-language.
-	 *
-	 * @param ?array<string> $values The values.
-	 *
-	 * @return array<string>|null
-	 */
-	public function validate_language_settings( ?array $values ): ?array {
-		$values = Helper::settings_validate_multiple_checkboxes( $values );
-		if ( empty( $values ) ) {
-			add_settings_error( 'easy_language_capito_target_languages', 'easy_language_capito_target_languages', __( 'You have to set a target-language for simplifications.', 'easy-language' ) );
-		} elseif ( false === $this->is_language_set( $values ) ) {
-			add_settings_error( 'easy_language_capito_target_languages', 'easy_language_capito_target_languages', __( 'At least one language cannot (currently) be simplified into the selected target languages by the API.', 'easy-language' ) );
-		}
-
-		// return value.
-		return $values;
 	}
 
 	/**
@@ -1287,26 +1118,6 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return whether this API has extended support in Easy Language Pro.
-	 *
-	 * @return bool
-	 */
-	public function is_extended_in_pro(): bool {
-		return true;
-	}
-
-	/**
-	 * Return custom pro-hint for API-chooser.
-	 *
-	 * @return string
-	 * @noinspection PhpUnused
-	 */
-	public function get_pro_hint(): string {
-		/* translators: %1$s will be replaced by the link to laolaweb.com */
-		return sprintf( __( 'More languages and Options with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a>', 'easy-language' ), esc_url( Helper::get_pro_url() ) );
-	}
-
-	/**
 	 * Return true whether this API would support translatepress-plugin.
 	 *
 	 * @return bool
@@ -1345,15 +1156,6 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_request_text_by_language( string $target_language ): string {
 		return '';
-	}
-
-	/**
-	 * Show hint for team usage.
-	 *
-	 * @return void
-	 */
-	public function team_hint(): void {
-		echo esc_html__( 'Choose team as account type.', 'easy-language' );
 	}
 
 	/**

@@ -12,9 +12,14 @@ namespace easyLanguage\Apis\ChatGpt;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Checkboxes;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\FieldTable;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Select;
+use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Text;
+use easyLanguage\Dependencies\easySettingsForWordPress\Page;
+use easyLanguage\Dependencies\easySettingsForWordPress\Settings;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
-use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Helper;
@@ -89,13 +94,7 @@ class ChatGpt extends Base implements Api_Base {
 		$this->table_requests = Db::get_instance()->get_wpdb_prefix() . 'easy_language_chatgpt';
 
 		// add settings.
-		add_action( 'easy_language_settings_add_settings', array( $this, 'add_settings' ), 20 );
-
-		// add settings tab.
-		add_action( 'easy_language_settings_add_tab', array( $this, 'add_settings_tab' ), 20 );
-
-		// add settings page.
-		add_action( 'easy_language_settings_chatgpt_page', array( $this, 'add_settings_page' ) );
+		add_action( 'init', array( $this, 'add_settings' ), 20 );
 
 		// add hook für schedules.
 		$simplifications_obj = Simplifications::get_instance();
@@ -308,105 +307,33 @@ class ChatGpt extends Base implements Api_Base {
 	}
 
 	/**
-	 * Add settings tab.
-	 *
-	 * @param string $tab The tab internal name.
-	 *
-	 * @return void
-	 * @noinspection DuplicatedCode
-	 */
-	public function add_settings_tab( string $tab ): void {
-		// get list of available plugins and check if they support APIs.
-		$supports_api = false;
-		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if ( $plugin_obj->is_supporting_apis() && false === $plugin_obj->has_own_api_config() ) {
-				$supports_api = true;
-			}
-		}
-
-		// bail of plugin does not support API OR this API is not enabled.
-		if ( false === $supports_api || $this->get_name() !== get_option( 'easy_language_api', '' ) ) {
-			return;
-		}
-
-		// check active tab.
-		$active_class = '';
-		if ( $this->get_name() === $tab ) {
-			$active_class = ' nav-tab-active';
-		}
-
-		// output tab.
-		echo '<a href="' . esc_url( Helper::get_settings_page_url() ) . '&tab=' . esc_attr( $this->get_name() ) . '" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'ChatGpt', 'easy-language' ) . '</a>';
-	}
-
-	/**
-	 * Add settings page.
-	 *
-	 * @return void
-	 * @noinspection DuplicatedCode
-	 */
-	public function add_settings_page(): void {
-		// get the active API object.
-		$api_obj = Apis::get_instance()->get_active_api();
-
-		// bail if API could not be loaded.
-		if ( ! $api_obj ) {
-			return;
-		}
-
-		// bail if this API is not enabled.
-		if ( $api_obj->get_name() !== $this->get_name() ) {
-			return;
-		}
-
-		// bail if this API is not enabled.
-		if ( $api_obj->get_name() !== $this->get_name() ) {
-			return;
-		}
-
-		// get list of available plugins and check if they support APIs.
-		$supports_api = false;
-		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if ( $plugin_obj->is_supporting_apis() ) {
-				$supports_api = true;
-			}
-		}
-
-		// bail if the plugin does not support APIs and also check user capabilities.
-		if ( false === $supports_api || ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		?>
-		<form method="POST" action="<?php echo esc_url( get_admin_url() ); ?>options.php">
-			<?php
-			settings_fields( 'easyLanguageChatGptFields' );
-			do_settings_sections( 'easyLanguageChatGptPage' );
-			submit_button();
-			?>
-		</form>
-		<?php
-	}
-
-	/**
 	 * Add chatgpt settings.
 	 *
 	 * @return void
 	 */
 	public function add_settings(): void {
-		/**
-		 * Chatgpt settings Section
-		 */
-		add_settings_section(
-			'settings_section_chatgpt',
-			__( 'Chatgpt Settings', 'easy-language' ),
-			'__return_true',
-			'easyLanguageChatGptPage'
-		);
+		// get the settings object.
+		$settings_obj = Settings::get_instance();
+
+		// get the settings page.
+		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
+
+		// bail if the page is not available.
+		if( ! $settings_page instanceof Page ) {
+			return;
+		}
+
+		// add tab.
+		$chatgpt_tab = $settings_page->add_tab( 'chatgpt', 30 );
+		$chatgpt_tab->set_title( __( 'ChatGPT', 'easy-language' ) );
+
+		// add section.
+		$chatgpt_tab_main = $chatgpt_tab->add_section( 'settings_section_chatgpt', 10 );
+		$chatgpt_tab_main->set_title( __( 'ChatGPT Settings', 'easy-language' ) );
 
 		// Set description for token field if it has not been set.
-		/* translators: %1$s will be replaced by the Chatgpt URL */
-		$description = sprintf( __( 'Get your ChatGpt API Token <a href="%1$s" target="_blank">here (opens new window)</a>.<br>If you have any questions about the token provided by ChatGpt, please contact their support: <a href="%2$s" target="_blank">%2$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_api_management_url() ), esc_url( $this->get_language_specific_support_page() ) );
+		/* translators: %1$s will be replaced by the ChatGPT URL */
+		$description = sprintf( __( 'Get your ChatGPT API Token <a href="%1$s" target="_blank">here (opens new window)</a>.<br>If you have any questions about the token provided by ChatGpt, please contact their support: <a href="%2$s" target="_blank">%2$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_api_management_url() ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_chatgpt_token_set() ) {
 			// set link to remove the token.
 			$remove_token_url = add_query_arg(
@@ -419,7 +346,7 @@ class ChatGpt extends Base implements Api_Base {
 
 			// Show other description if token is set.
 			/* translators: %1$s will be replaced by the Chatgpt URL */
-			$description  = sprintf( __( 'If you have any questions about the token provided by ChatGpt, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+			$description  = sprintf( __( 'If you have any questions about the token provided by ChatGPT, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 			$description .= '<br><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
 		}
 
@@ -431,25 +358,22 @@ class ChatGpt extends Base implements Api_Base {
 			}
 		}
 
-		// Chatgpt token.
-		add_settings_field(
-			'easy_language_chatgpt_api_key',
-			__( 'Chatgpt API Key', 'easy-language' ),
-			'easy_language_admin_text_field',
-			'easyLanguageChatGptPage',
-			'settings_section_chatgpt',
-			array(
-				'label_for'   => 'easy_language_chatgpt_api_key',
-				'fieldId'     => 'easy_language_chatgpt_api_key',
-				'description' => $description,
-				'placeholder' => __( 'Enter token here', 'easy-language' ),
-				'highlight'   => false === $this->is_chatgpt_token_set(),
-			)
-		);
-		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_api_key', array( 'sanitize_callback' => array( $this, 'validate_api_key' ) ) );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_chatgpt_api_key' );
+		$setting->set_section( $chatgpt_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( '' );
+		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
+		$field = new Text();
+		$field->set_title( __( 'ChatGPT API Key', 'easy-language' ) );
+		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
+		$field->set_description( $description );
+		$setting->set_field( $field );
 
 		// Define list of models this plugin supports atm.
 		$models = array(
+			'gpt-5.1'         => 'gpt-5.1',
 			'gpt-5'         => 'gpt-5',
 			'gpt-4o'        => 'gpt-4o',
 			'gpt-4'         => 'gpt-4',
@@ -465,93 +389,106 @@ class ChatGpt extends Base implements Api_Base {
 		 */
 		$models = apply_filters( 'easy_language_chatgpt_models', $models );
 
-		// Choose language model.
-		add_settings_field(
-			'easy_language_chatgpt_model',
-			__( 'Choose language model', 'easy-language' ),
-			'easy_language_admin_select_field',
-			'easyLanguageChatGptPage',
-			'settings_section_chatgpt',
-			array(
-				'label_for'     => 'easy_language_chatgpt_model',
-				'fieldId'       => 'easy_language_chatgpt_model',
-				'values'        => $models,
-				'disable_empty' => true,
-				'readonly'      => ! $this->is_chatgpt_token_set(),
-				'description'   => __( 'The choice of language model determines the quality of the texts generated by ChatGpt.', 'easy-language' ),
-			)
-		);
-		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_model', array( 'sanitize_callback' => 'easyLanguage\Plugin\Helper::settings_validate_select_field' ) );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_chatgpt_model' );
+		$setting->set_section( $chatgpt_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( 'gpt-5.1' );
+		$field = new Select();
+		$field->set_title( __( 'Choose language model', 'easy-language' ) );
+		$field->set_description( __( 'The choice of language model determines the quality of the texts generated by ChatGPT.', 'easy-language' ) );
+		$field->set_options( $models );
+		$field->set_sanitize_callback( array( 'easyLanguage\Plugin\Helper', 'settings_validate_select_field' ) );
+		$setting->set_field( $field );
 
-		// Enable source-languages
-		// -> defaults to WP-locale
-		// -> if WPML, Polylang or TranslatePress is available, show additional languages
-		// -> but restrict list to languages supported by ChatGpt.
-		add_settings_field(
-			'easy_language_chatgpt_source_languages',
-			__( 'Choose source languages', 'easy-language' ),
-			'easy_language_admin_multiple_checkboxes_field',
-			'easyLanguageChatGptPage',
-			'settings_section_chatgpt',
-			array(
-				'label_for'   => 'easy_language_chatgpt_source_languages',
-				'fieldId'     => 'easy_language_chatgpt_source_languages',
-				'description' => __( 'These are the possible source languages for ChatGpt-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ),
-				'options'     => $this->get_supported_source_languages(),
-				'readonly'    => false === $this->is_chatgpt_token_set() || $foreign_translation_plugin_with_api_support,
-			)
-		);
-		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_source_languages', array( 'sanitize_callback' => 'easyLanguage\Plugin\Helper::settings_validate_multiple_checkboxes' ) );
+		// get the actual language of the website for default setting.
+		$language  = Helper::get_wp_lang();
+		$languages = array( $language => '1' );
 
-		// Enable target languages.
-		add_settings_field(
-			'easy_language_chatgpt_target_languages',
-			__( 'Choose target languages', 'easy-language' ),
-			'easy_language_admin_multiple_checkboxes_field',
-			'easyLanguageChatGptPage',
-			'settings_section_chatgpt',
-			array(
-				'label_for'   => 'easy_language_chatgpt_target_languages',
-				'fieldId'     => 'easy_language_chatgpt_target_languages',
-				'description' => __( 'These are the possible target languages for ChatGpt-simplifications.', 'easy-language' ),
-				'options'     => $this->get_supported_target_languages(),
-				'readonly'    => false === $this->is_chatgpt_token_set() || $foreign_translation_plugin_with_api_support,
-			)
-		);
-		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_target_languages', array( 'sanitize_callback' => array( $this, 'validate_language_settings' ) ) );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_chatgpt_source_languages' );
+		$setting->set_section( $chatgpt_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'array' );
+		$setting->set_default( $languages );
+		$field = new Checkboxes();
+		$field->set_title( __( 'Choose source languages', 'easy-language' ) );
+		$field->set_description( __( 'These are the possible source languages for ChatGPT-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ) );
+		$field->set_readonly( false === $this->is_chatgpt_token_set() || $foreign_translation_plugin_with_api_support );
+		$field->set_options( $this->get_supported_source_languages() );
+		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_checkboxes' ) );
+		$setting->set_field( $field );
 
-		// Define target-language-specific prompts.
-		add_settings_field(
-			'easy_language_chatgpt_target_languages_prompts',
-			__( 'Define prompts', 'easy-language' ),
-			'easy_language_admin_multiple_text_field',
-			'easyLanguageChatGptPage',
-			'settings_section_chatgpt',
-			array(
-				'label_for'   => 'easy_language_chatgpt_target_languages_prompts',
-				'fieldId'     => 'easy_language_chatgpt_target_languages_prompts',
-				'description' => __( 'The prompt defines the requirement for the ChatGpt AI to simplify the text that follows.', 'easy-language' ),
-				'options'     => $this->get_supported_target_languages(),
-				'readonly'    => false === $this->is_chatgpt_token_set() || $foreign_translation_plugin_with_api_support,
-			)
-		);
-		register_setting( 'easyLanguageChatGptFields', 'easy_language_chatgpt_target_languages_prompts', array( 'sanitize_callback' => 'easyLanguage\Plugin\Helper::settings_validate_multiple_text_field' ) );
-
-		// get possible intervals.
-		$intervals = array();
-		foreach ( wp_get_schedules() as $name => $schedule ) {
-			$intervals[ $name ] = $schedule['display'];
+		// get default translation languages.
+		$language  = Helper::get_wp_lang();
+		$languages = array( 'de_b1' => '1' );
+		if ( false !== str_contains( $language, 'en_' ) ) {
+			$languages = array( 'en_b1' => '1' );
 		}
 
-		/**
-		 * Hook for ChatGpt automatic interval settings.
-		 *
-		 * @since 2.0.0 Available since 2.0.0.
-		 *
-		 * @param array $intervals The possible intervals.
-		 * @param bool $foreign_translation_plugin_with_api_support Whether we support third-party-plugins.
-		 */
-		do_action( 'easy_language_chatgpt_automatic_interval', $intervals, $foreign_translation_plugin_with_api_support );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_chatgpt_target_languages' );
+		$setting->set_section( $chatgpt_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'array' );
+		$setting->set_default( $languages );
+		$field = new Checkboxes();
+		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
+		$field->set_description( __( 'These are the possible target languages for ChatGPT-simplifications.', 'easy-language' ) );
+		$field->set_readonly( false === $this->is_chatgpt_token_set() || $foreign_translation_plugin_with_api_support );
+		$field->set_options( $this->get_supported_target_languages() );
+		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_checkboxes' ) );
+		$setting->set_field( $field );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_chatgpt_target_languages_prompts' );
+		$setting->set_section( $chatgpt_tab_main );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'array' );
+		$setting->set_default( $languages );
+		$field = new FieldTable();
+		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
+		$field->set_description( __( 'These are the possible target languages for SUMM AI-simplifications.', 'easy-language' ) );
+		$field->set_columns(
+			array(
+				__( 'Define prompts', 'easy-language' ),
+			)
+		);
+
+		// get the hidden section for all settings in this field table.
+		$hidden_section = $chatgpt_tab->add_section( 'summ_ai_main_hidden', 10 );
+		$hidden_section->set_hidden( true );
+
+		// set the default language prompts.
+		$language_prompts = array(
+			'de_EL' => 'Vereinfache bitte den folgenden deutschen Text in Einfache Sprache.',
+			'de_LS' => 'Vereinfache bitte den folgenden deutschen Text in Leichte Sprache. Verwende dabei pro Absatz eine Zeile.',
+		);
+
+		$row = 0;
+		foreach ( $this->get_supported_target_languages() as $language_code => $settings ) {
+			// add entry as a new row.
+			$field->add_row();
+
+			// add setting.
+			$language = $settings_obj->add_setting( 'easy_language_chatgpt_target_languages_prompts_' . $language_code );
+			$language->set_type( 'string' );
+			$language->set_default( $language_prompts[$language_code] );
+			$language->set_section( $hidden_section );
+			$prompt_field = new Text();
+			$prompt_field->set_title( $settings['label'] );
+			$prompt_field->set_description( $settings['description'] );
+			$prompt_field->set_setting( $language );
+			$prompt_field->set_with_label( true );
+			$prompt_field->set_readonly( ! $this->is_chatgpt_token_set() || $foreign_translation_plugin_with_api_support );
+			$language->set_field( $prompt_field );
+			$field->add_setting( $language, $row, 0 );
+
+			// next row.
+			$row++;
+		}
+		$setting->set_field( $field );
 	}
 
 	/**
@@ -570,40 +507,6 @@ class ChatGpt extends Base implements Api_Base {
 	 */
 	public function install(): void {
 		global $wpdb;
-
-		// set source language depending on WP-locale and its support.
-		if ( ! get_option( 'easy_language_chatgpt_source_languages' ) ) {
-			$language  = Helper::get_wp_lang();
-			$languages = array( $language => '1' );
-			update_option( 'easy_language_chatgpt_source_languages', $languages );
-		}
-
-		// set target language depending on source-language and if only one target could be possible.
-		if ( ! get_option( 'easy_language_chatgpt_target_languages' ) ) {
-			$language  = Helper::get_wp_lang();
-			$languages = array( 'de_LS' => '1' ); // set default language for ChatGPT.
-			update_option( 'easy_language_chatgpt_target_languages', $languages );
-		}
-
-		// set target language prompts.
-		if ( ! get_option( 'easy_language_chatgpt_target_languages_prompts' ) ) {
-			$language  = Helper::get_wp_lang();
-			$languages = array(
-				'de_EL' => 'Vereinfache bitte den folgenden deutschen Text in Einfache Sprache.',
-				'de_LS' => 'Vereinfache bitte den folgenden deutschen Text in Leichte Sprache. Verwende dabei pro Absatz eine Zeile.',
-			);
-			update_option( 'easy_language_chatgpt_target_languages_prompts', $languages );
-		}
-
-		// set language model.
-		if ( ! get_option( 'easy_language_chatgpt_model' ) ) {
-			update_option( 'easy_language_chatgpt_model', 'gpt-4' );
-		}
-
-		// set chatgpt api key to nothing but with active autoload.
-		if ( ! get_option( 'easy_language_chatgpt_api_key' ) ) {
-			update_option( 'easy_language_chatgpt_api_key', '', true );
-		}
 
 		$charset_collate = $wpdb->get_charset_collate();
 
@@ -640,33 +543,10 @@ class ChatGpt extends Base implements Api_Base {
 	 */
 	public function uninstall(): void {
 		/**
-		 * Remove settings.
-		 */
-		foreach ( $this->get_options() as $option_name ) {
-			delete_option( $option_name );
-		}
-
-		/**
 		 * Delete our table.
 		 */
 		$sql = 'DROP TABLE IF EXISTS ' . $this->table_requests;
 		$this->wpdb->query( $sql );
-	}
-
-	/**
-	 * Return list of options this plugin is using, e.g. for clean uninstalling.
-	 *
-	 * @return array<string>
-	 */
-	private function get_options(): array {
-		return array(
-			'easy_language_chatgpt_api_key',
-			'easy_language_chatgpt_source_languages',
-			'easy_language_chatgpt_target_languages',
-			'easy_language_chatgpt_interval',
-			'easy_language_chatgpt_model',
-			'easy_language_chatgpt_target_languages_prompts',
-		);
 	}
 
 	/**
@@ -790,27 +670,6 @@ class ChatGpt extends Base implements Api_Base {
 	}
 
 	/**
-	 * Validate the language-settings.
-	 *
-	 * The source-language must be possible to simplify in the target-language.
-	 *
-	 * @param ?array<string,mixed> $values The values to check.
-	 *
-	 * @return array<string,mixed>|null
-	 */
-	public function validate_language_settings( ?array $values ): ?array {
-		$values = Helper::settings_validate_multiple_checkboxes( $values );
-		if ( empty( $values ) ) {
-			add_settings_error( 'easy_language_chatgpt_target_languages', 'easy_language_chatgpt_target_languages', __( 'You have to set a target-language for simplifications.', 'easy-language' ) );
-		} elseif ( false === $this->is_language_set( $values ) ) {
-			add_settings_error( 'easy_language_chatgpt_target_languages', 'easy_language_chatgpt_target_languages', __( 'At least one language cannot (currently) be simplified into the selected target languages by the API.', 'easy-language' ) );
-		}
-
-		// return value.
-		return $values;
-	}
-
-	/**
 	 * Remove token via click.
 	 *
 	 * @return void
@@ -879,7 +738,7 @@ class ChatGpt extends Base implements Api_Base {
 			}
 		}
 
-		// return resulting list.
+		// return the resulting list.
 		return $list;
 	}
 
@@ -891,16 +750,7 @@ class ChatGpt extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_request_text_by_language( string $target_language ): string {
-		// get the settings.
-		$request_texts = get_option( 'easy_language_chatgpt_target_languages_prompts', array() );
-
-		// return language-specific text is it exist.
-		if ( ! empty( $request_texts[ $target_language ] ) ) {
-			return $request_texts[ $target_language ];
-		}
-
-		// return nothing if no language-specific text exist.
-		return '';
+		return get_option( 'easy_language_chatgpt_target_languages_prompts_' . $target_language, '' );
 	}
 
 	/**
@@ -937,26 +787,6 @@ class ChatGpt extends Base implements Api_Base {
 			return array();
 		}
 		return $results;
-	}
-
-	/**
-	 * Return whether this API has extended support in Easy Language Pro.
-	 *
-	 * @return bool
-	 */
-	public function is_extended_in_pro(): bool {
-		return true;
-	}
-
-	/**
-	 * Return custom pro-hint for API-chooser.
-	 *
-	 * @return string
-	 * @noinspection PhpUnused
-	 */
-	public function get_pro_hint(): string {
-		/* translators: %1$s will be replaced by the link to laolaweb.com */
-		return sprintf( __( 'More languages and Options with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a>', 'easy-language' ), esc_url( Helper::get_pro_url() ) );
 	}
 
 	/**

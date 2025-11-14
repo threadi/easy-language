@@ -17,10 +17,10 @@ use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Radio;
 use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Select;
 use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Text;
 use easyLanguage\Dependencies\easySettingsForWordPress\Page;
+use easyLanguage\Dependencies\easySettingsForWordPress\Section;
 use easyLanguage\Dependencies\easySettingsForWordPress\Settings;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
-use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Helper;
@@ -29,6 +29,7 @@ use easyLanguage\Plugin\Log;
 use easyLanguage\Plugin\ThirdPartySupports;
 use easyLanguage\EasyLanguage\Db;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
+use WP_User;
 use wpdb;
 
 /**
@@ -369,80 +370,6 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function install(): void {
 		global $wpdb;
-
-		// set source language depending on WP-locale and its support.
-		if ( ! get_option( 'easy_language_summ_ai_source_languages' ) ) {
-			$language  = Helper::get_wp_lang();
-			$languages = array( $language => '1' );
-			update_option( 'easy_language_summ_ai_source_languages', $languages );
-		}
-
-		// set target language depending on source-language and if only one target could be possible.
-		if ( ! get_option( 'easy_language_summ_ai_target_languages' ) ) {
-			$source_languages = get_option( 'easy_language_summ_ai_source_languages', array() );
-			$languages        = array();
-			$mappings         = $this->get_mapping_languages();
-			foreach ( $source_languages as $source_language => $enabled ) {
-				if ( ! empty( $mappings[ $source_language ] ) ) {
-					foreach ( $mappings[ $source_language ] as $language ) {
-						if ( 'de_LS' === $language ) { // set default language for SUMM AI.
-							$languages[ $language ] = '1';
-						}
-					}
-				}
-			}
-			update_option( 'easy_language_summ_ai_target_languages', $languages );
-		}
-
-		// set separator setting for each activated target language.
-		if ( ! get_option( 'easy_language_summ_ai_target_languages_separator' ) ) {
-			$target_languages = $this->get_supported_target_languages();
-			$separators       = array();
-			foreach ( $target_languages as $target_language => $settings ) {
-				$separators[ $target_language ] = $settings['separator'];
-			}
-			update_option( 'easy_language_summ_ai_target_languages_separator', $separators );
-		}
-
-		// set new_lines setting for each activated target language.
-		if ( ! get_option( 'easy_language_summ_ai_target_languages_new_lines' ) ) {
-			$target_languages = $this->get_supported_target_languages();
-			$new_lines        = array();
-			foreach ( $target_languages as $target_language => $settings ) {
-				$new_lines[ $target_language ] = $settings['new_lines'] ? 1 : 0;
-			}
-			update_option( 'easy_language_summ_ai_target_languages_new_lines', $new_lines );
-		}
-
-		// set embolden negative setting for each activated target language.
-		if ( ! get_option( 'easy_language_summ_ai_target_languages_embolden_negative' ) ) {
-			$target_languages   = $this->get_supported_target_languages();
-			$embolden_negatives = array();
-			foreach ( $target_languages as $target_language => $settings ) {
-				$embolden_negatives[ $target_language ] = $settings['embolden_negative'] ? 1 : 0;
-			}
-			update_option( 'easy_language_summ_ai_target_languages_embolden_negative', $embolden_negatives );
-		}
-
-		// set SUMM AI API as default API, if not already set.
-		if ( ! get_option( 'easy_language_api' ) ) {
-			update_option( 'easy_language_api', $this->get_name() );
-		}
-
-		// set SUMM AI API mode to free, if not already set.
-		if ( ! get_option( 'easy_language_summ_ai_mode' ) ) {
-			update_option( 'easy_language_summ_ai_mode', 'free' );
-		}
-
-		// set interval for quota request interval to daily.
-		if ( ! get_option( 'easy_language_summ_ai_quota_interval' ) ) {
-			update_option( 'easy_language_summ_ai_quota_interval', 'daily' );
-		}
-
-		// set translation mode to editor.
-		if ( ! get_option( 'easy_language_summ_ai_email_mode' ) ) {
-			update_option( 'easy_language_summ_ai_email_mode', 'editor' );
-		}
 
 		// set summ ai api as default API.
 		update_option( 'easy_language_api', $this->get_name() );
@@ -846,7 +773,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$email_mode_setting->set_section( $summ_ai_tab_main );
 		$email_mode_setting->set_show_in_rest( true );
 		$email_mode_setting->set_type( 'string' );
-		$email_mode_setting->set_default( 'summ_ai' );
+		$email_mode_setting->set_default( 'editor' );
 		$field = new Radio();
 		$field->set_title( __( 'Choose email-mode', 'easy-language' ) );
 		$field->set_description( __( 'An email will be used for each request to the SUMM AI API. It is used as contact or identifier email for SUMM AI if question for simplifications arise.', 'easy-language' ) );
@@ -885,12 +812,16 @@ class Summ_Ai extends Base implements Api_Base {
 		$field->add_depend( $email_mode_setting, 'custom' ); // TODO möglich machen.
 		$setting->set_field( $field );
 
+		// get the default language.
+		$language  = Helper::get_wp_lang();
+		$languages = array( $language => '1' );
+
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_summ_ai_source_languages' );
 		$setting->set_section( $summ_ai_tab_main );
 		$setting->set_show_in_rest( true );
-		$setting->set_type( 'string' );
-		$setting->set_default( '' );
+		$setting->set_type( 'array' );
+		$setting->set_default( $languages );
 		$field = new Checkboxes();
 		$field->set_title( __( 'Choose source languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible source languages for SUMM AI-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ) );
@@ -899,13 +830,25 @@ class Summ_Ai extends Base implements Api_Base {
 		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_checkboxes' ) );;
 		$setting->set_field( $field );
 
+		$source_languages = get_option( 'easy_language_summ_ai_source_languages', array() );
+		$languages        = array();
+		$mappings         = $this->get_mapping_languages();
+		foreach ( $source_languages as $source_language => $enabled ) {
+			if ( ! empty( $mappings[ $source_language ] ) ) {
+				foreach ( $mappings[ $source_language ] as $language ) {
+					if ( 'de_LS' === $language ) { // set default language for SUMM AI.
+						$languages[ $language ] = '1';
+					}
+				}
+			}
+		}
+
 		// add setting.
-		// TODO Tabelle nachbauen für alle Einstellungen zu jeder der Zielsprachen.
 		$setting = $settings_obj->add_setting( 'easy_language_summ_ai_target_languages' );
 		$setting->set_section( $summ_ai_tab_main );
 		$setting->set_show_in_rest( true );
-		$setting->set_type( 'string' );
-		$setting->set_default( '' );
+		$setting->set_type( 'array' );
+		$setting->set_default( $languages );
 		$field = new FieldTable();
 		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible target languages for SUMM AI-simplifications.', 'easy-language' ) );
@@ -1006,8 +949,8 @@ class Summ_Ai extends Base implements Api_Base {
 		$setting = $settings_obj->add_setting( 'easy_language_summ_ai_quota_interval' );
 		$setting->set_section( $summ_ai_tab_main );
 		$setting->set_show_in_rest( true );
-		$setting->set_type( 'integer' );
-		$setting->set_default( 0 );
+		$setting->set_type( 'string' );
+		$setting->set_default( 'daily' );
 		$setting->set_save_callback( array( $this, 'set_quota_interval' ) );
 		$field = new Select();
 		$field->set_title( __( 'Interval for quota request', 'easy-language' ) );
@@ -1027,6 +970,21 @@ class Summ_Ai extends Base implements Api_Base {
 		$field->set_description( __( 'If this is enabled no really simplification will be run through the API. No characters will be counted on your quota. Each text will be "simplified" with a given default-text by SUMM AI API.', 'easy-language' ) );
 		$field->set_readonly( false === $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support );
 		$setting->set_field( $field );
+
+		// get the hidden section.
+		$hidden_section = Helper::get_hidden_section();
+
+		// bail if section could not be loaded.
+		if( ! $hidden_section instanceof Section ) {
+			return;
+		}
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_summ_ai_mode' );
+		$setting->set_section( $hidden_section );
+		$setting->prevent_export( true );
+		$setting->set_type( 'string' );
+		$setting->set_default( 'free' );
 	}
 
 	/**
@@ -1120,60 +1078,6 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function validate_multiple_radios( ?string $value ): ?string {
 		return Helper::settings_validate_multiple_radios( $value );
-	}
-
-	/**
-	 * Validate the target language-settings.
-	 *
-	 * The source-language must be possible to simplify in the target-language.
-	 *
-	 * @param ?array<string,mixed> $values The settings to check.
-	 *
-	 * @return array<string,mixed>|null
-	 */
-	public function validate_target_language_settings( ?array $values ): ?array {
-		$values = Helper::settings_validate_multiple_checkboxes( $values );
-		if ( empty( $values ) ) {
-			add_settings_error( 'easy_language_summ_ai_target_languages', 'easy_language_summ_ai_target_languages', __( 'You have to set a target-language for simplifications.', 'easy-language' ) );
-		} elseif ( false === $this->is_language_set( $values ) ) {
-			add_settings_error( 'easy_language_summ_ai_target_languages', 'easy_language_summ_ai_target_languages', __( 'At least one language cannot (currently) be simplified into the selected target languages by the API.', 'easy-language' ) );
-		}
-
-		// return value.
-		return $values;
-	}
-
-	/**
-	 * Validate the target language separator settings.
-	 *
-	 * @param array<string,mixed>|null $values The settings to check.
-	 *
-	 * @return array<string,mixed>|null
-	 */
-	public function validate_target_language_separator_settings( ?array $values ): ?array {
-		return Helper::settings_validate_multiple_select_fields( $values );
-	}
-
-	/**
-	 * Validate the target language new_lines settings.
-	 *
-	 * @param array<string,mixed>|null $values The settings to check.
-	 *
-	 * @return array<string,mixed>|null
-	 */
-	public function validate_target_language_new_lines_settings( ?array $values ): ?array {
-		return Helper::settings_validate_multiple_checkboxes( $values );
-	}
-
-	/**
-	 * Validate the target language embolden negatives settings.
-	 *
-	 * @param array<string,mixed>|null $values The settings to check.
-	 *
-	 * @return array<string,mixed>|null
-	 */
-	public function validate_target_language_embolden_negatives_settings( ?array $values ): ?array {
-		return Helper::settings_validate_multiple_checkboxes( $values );
 	}
 
 	/**
@@ -1303,120 +1207,13 @@ class Summ_Ai extends Base implements Api_Base {
 				return $email;
 			case 'editor':
 				$user = wp_get_current_user();
-				if ( ! empty( $user->user_email ) ) {
+				if ( $user instanceof WP_User && ! empty( $user->user_email ) ) {
 					return $user->user_email;
 				}
 				return get_option( 'admin_email' );
 			case 'admin':
 			default:
 				return get_option( 'admin_email' );
-		}
-	}
-
-	/**
-	 * Add settings-tab.
-	 *
-	 * @param string $tab The tab to use.
-	 *
-	 * @return void
-	 */
-	public function add_settings_tab( string $tab ): void {
-		// get list of available plugins and check if they support APIs.
-		$supports_api = false;
-		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if ( $plugin_obj->is_supporting_apis() && false === $plugin_obj->has_own_api_config() ) {
-				$supports_api = true;
-			}
-		}
-
-		// bail of plugin does not support api OR this API is not enabled.
-		if ( false === $supports_api || $this->get_name() !== get_option( 'easy_language_api', '' ) ) {
-			return;
-		}
-
-		// check active tab.
-		$active_class = '';
-		if ( 'summ_ai' === $tab ) {
-			$active_class = ' nav-tab-active';
-		}
-
-		// output tab.
-		echo '<a href="' . esc_url( Helper::get_settings_page_url() ) . '&tab=summ_ai" class="nav-tab' . esc_attr( $active_class ) . '">' . esc_html__( 'SUMM AI', 'easy-language' ) . '</a>';
-	}
-
-	/**
-	 * Add settings page for this API.
-	 *
-	 * @return void
-	 */
-	public function add_settings_page(): void {
-		// get the active API object.
-		$api_obj = Apis::get_instance()->get_active_api();
-
-		// bail if API could not be loaded.
-		if ( ! $api_obj ) {
-			return;
-		}
-
-		// bail if this API is not enabled.
-		if ( $api_obj->get_name() !== $this->get_name() ) {
-			return;
-		}
-
-		// get list of available plugins and check if they support APIs.
-		$supports_api = false;
-		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if ( $plugin_obj->is_supporting_apis() ) {
-				$supports_api = true;
-			}
-		}
-
-		// bail if the plugin does not support APIs and also check user capabilities.
-		if ( false === $supports_api || ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		?>
-		<form method="POST" action="<?php echo esc_url( get_admin_url() ); ?>options.php">
-			<?php
-			settings_fields( 'easyLanguageSummAiFields' );
-			do_settings_sections( 'easyLanguageSummAIPage' );
-			submit_button();
-			?>
-		</form>
-		<h2 id="statistics"><?php esc_html_e( 'SUMM AI Quota', 'easy-language' ); ?></h2>
-		<?php
-		if ( $this->is_summ_api_token_set() ) {
-			/**
-			 * Get and show the quota we received from API.
-			 */
-			$api_quota = $this->get_quota();
-			if ( empty( $api_quota ) ) {
-				$quota_text = esc_html__( 'No quota consumed so far', 'easy-language' );
-			} else {
-				$quota_text = $api_quota['character_spent'] . ' / ' . $api_quota['character_limit'];
-			}
-
-			// get the update quota link.
-			$update_quota_url = add_query_arg(
-				array(
-					'action' => 'easy_language_summ_ai_get_quota',
-					'nonce'  => wp_create_nonce( 'easy-language-summ-ai-get-quota' ),
-				),
-				get_admin_url() . 'admin.php'
-			);
-
-			// output.
-			?>
-			<p>
-				<strong><?php echo esc_html__( 'Quota', 'easy-language' ); ?>:</strong> <?php echo wp_kses_post( $quota_text ); ?>
-				<a href="<?php echo esc_url( $update_quota_url ); ?>#statistics" class="button button-secondary"><?php echo esc_html__( 'Update now', 'easy-language' ); ?></a>
-			</p>
-			<?php
-		} else {
-			?>
-			<p><?php echo esc_html__( 'Info about quota will be available until the API token is set', 'easy-language' ); ?></p>
-			<?php
 		}
 	}
 
@@ -1495,7 +1292,6 @@ class Summ_Ai extends Base implements Api_Base {
 
 		// redirect user.
 		wp_safe_redirect( wp_get_referer() );
-		exit;
 	}
 
 	/**
@@ -1542,7 +1338,6 @@ class Summ_Ai extends Base implements Api_Base {
 
 		// redirect user.
 		wp_safe_redirect( wp_get_referer() );
-		exit;
 	}
 
 	/**
@@ -1623,123 +1418,6 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function get_translatepress_machine_class(): string {
 		return 'easyLanguage\ThirdPartySupport\TranslatePress\Translatepress_Summ_Ai_Machine_Translator';
-	}
-
-	/**
-	 * Show the possible target languages with its additional settings as table.
-	 *
-	 * @param array<string,mixed> $attr List of attributes for this field-list.
-	 *
-	 * @return void
-	 */
-	public function show_target_language_settings( array $attr ): void {
-		// bail if no options are set.
-		if ( empty( $attr['options'] ) ) {
-			return;
-		}
-
-		// set possible list of separators.
-		$separators = array(
-			'interpunct' => __( 'interpunct', 'easy-language' ),
-			'hyphen'     => __( 'hyphen', 'easy-language' ),
-			'none'       => __( 'do not use separator', 'easy-language' ),
-		);
-
-		// show description, if set.
-		if ( ! empty( $attr['description'] ) ) {
-			echo '<p class="easy-language-checkbox">' . wp_kses_post( $attr['description'] ) . '</p>';
-		}
-
-		// start table.
-		echo '<table class="easy-language-target-language"><thead><tr><th class="title">' . esc_html__( 'Enable your target language', 'easy-language' ) . '</th><th class="separator">' . esc_html__( 'Choose separator', 'easy-language' ) . '</th><th class="new-lines">' . esc_html__( 'Enable new lines', 'easy-language' ) . '</th><th class="embolden-negative">' . esc_html__( 'Embolden negative', 'easy-language' ) . '</th></tr></thead><tbody>';
-
-		// loop through the options (the target languages).
-		foreach ( $attr['options'] as $key => $settings ) {
-			// add row.
-			echo '<tr>';
-
-			// get checked-marker.
-			$actual_values = get_option( $attr['fieldId'], array() );
-			$checked       = ! empty( $actual_values[ $key ] ) ? ' checked' : '';
-
-			// get separator setting for this language.
-			$separator_value = get_option( $attr['fieldId'] . '_separator' );
-			$separator       = ! empty( $separator_value[ $key ] ) ? $separator_value[ $key ] : '';
-
-			// get new line setting for this language.
-			$new_lines_value = get_option( $attr['fieldId'] . '_new_lines' );
-			$new_lines       = ! empty( $new_lines_value[ $key ] ) ? ' checked' : '';
-
-			// get embolden negative for this language.
-			$embolden_negative_value = get_option( $attr['fieldId'] . '_embolden_negative' );
-			$embolden_negative       = ! empty( $embolden_negative_value[ $key ] ) ? ' checked' : '';
-
-			// title.
-			$title = __( 'Check to enable this language.', 'easy-language' );
-
-			// readonly.
-			$readonly = '';
-			if ( isset( $attr['readonly'] ) && false !== $attr['readonly'] ) {
-				$readonly = ' disabled="disabled"';
-				?>
-				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo ! empty( $checked ) ? 1 : 0; ?>">
-				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_separator_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo esc_attr( $separator ); ?>">
-				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_new_lines_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo ! empty( $new_lines ) ? 1 : 0; ?>">
-				<input type="hidden" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_embolden_negative_ro[<?php echo esc_attr( $key ); ?>]" value="<?php echo ! empty( $embolden_negative ) ? 1 : 0; ?>">
-				<?php
-			}
-			if ( isset( $settings['enabled'] ) && false === $settings['enabled'] ) {
-				$readonly = ' disabled="disabled"';
-				$title    = '';
-			}
-
-			// get icon, if set.
-			$icon = '';
-			if ( ! empty( $settings['img_icon'] ) ) {
-				$icon = $settings['img_icon'];
-			}
-
-			// output.
-			?>
-			<td>
-				<div class="easy-language-checkbox">
-					<input type="checkbox" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>" name="<?php echo esc_attr( $attr['fieldId'] ); ?>[<?php echo esc_attr( $key ); ?>]" value="1"<?php echo esc_attr( $checked ) . esc_attr( $readonly ); ?> title="<?php echo esc_attr( $title ); ?>">
-					<label for="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>"><?php echo esc_html( $settings['label'] ) . wp_kses_post( $icon ); ?></label>
-					<?php
-					if ( ! empty( $settings['description'] ) ) {
-						echo '<p>' . wp_kses_post( $settings['description'] ) . '</p>';
-					}
-					?>
-				</div>
-			</td>
-			<td>
-				<select id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>_separator" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_separator[<?php echo esc_attr( $key ); ?>]"<?php echo esc_attr( $readonly ); ?>>
-					<?php
-					foreach ( $separators as $value => $label ) {
-						$selected = $separator === $value ? ' selected' : '';
-						?>
-							<option value="<?php echo esc_attr( $value ); ?>"<?php echo esc_attr( $selected ); ?>><?php echo esc_html( $label ); ?></option>
-							<?php
-					}
-					?>
-				</select>
-			</td>
-			<td>
-				<input type="checkbox" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>_new_line" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_new_lines[<?php echo esc_attr( $key ); ?>]" value="1"<?php echo esc_attr( $new_lines ) . esc_attr( $readonly ); ?> title="<?php echo esc_attr( $title ); ?>">
-			</td>
-			<td>
-				<input type="checkbox" id="<?php echo esc_attr( $attr['fieldId'] . $key ); ?>_embolden_negative" name="<?php echo esc_attr( $attr['fieldId'] ); ?>_embolden_negative[<?php echo esc_attr( $key ); ?>]" value="1"<?php echo esc_attr( $embolden_negative ) . esc_attr( $readonly ); ?> title="<?php echo esc_attr( $title ); ?>">
-			</td>
-			</tr>
-			<?php
-		}
-
-		// end of table.
-		echo '</tbody></table>';
-
-		if ( ! empty( $attr['pro_hint'] ) ) {
-			do_action( 'easy_language_admin_show_pro_hint', $attr['pro_hint'] );
-		}
 	}
 
 	/**

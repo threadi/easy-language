@@ -11,8 +11,6 @@ namespace easyLanguage\Plugin;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
-use easyLanguage\Apis\Capito\Capito;
-use easyLanguage\Apis\Summ_Ai\Summ_Ai;
 
 /**
  * Initialize the setup.

@@ -10,7 +10,6 @@ namespace easyLanguage\Apis\No_Api;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Api_Base;
 
@@ -145,22 +144,6 @@ class No_Api extends Base implements Api_Base {
 	}
 
 	/**
-	 * Add settings tab: none for this API.
-	 *
-	 * @param string $tab The tab internal name.
-	 *
-	 * @return void
-	 */
-	public function add_settings_tab( string $tab ): void {}
-
-	/**
-	 * Add settings page: none for this API.
-	 *
-	 * @return void
-	 */
-	public function add_settings_page(): void {}
-
-	/**
 	 * Add settings: none for this API.
 	 *
 	 * @return void
@@ -207,30 +190,12 @@ class No_Api extends Base implements Api_Base {
 	public function cli(): void {}
 
 	/**
-	 * Return API URL.
-	 *
-	 * @return string
-	 */
-	public function get_api_url(): string {
-		return '';
-	}
-
-	/**
 	 * Enable-routines for the API, called on the new API if another API is chosen.
 	 *
 	 * @return void
 	 */
 	public function enable(): void {
 		// nothing to do.
-	}
-
-	/**
-	 * Return the simplifications-object.
-	 *
-	 * @return Api_Simplifications
-	 */
-	public function get_simplifications_obj(): Api_Simplifications {
-		return Simplifications::get_instance();
 	}
 
 	/**
