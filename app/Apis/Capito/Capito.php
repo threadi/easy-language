@@ -1020,7 +1020,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function enable(): void {
 		// bail if this is run via REST API.
-		if ( ! Helper::is_admin_api_request() ) {
+		if ( ! Helper::is_rest_request() ) {
 			return;
 		}
 

@@ -394,23 +394,17 @@ class Setup {
 			return;
 		}
 
-		// get actual list of completed setups.
-		$actual_completed = get_option( 'esfw_completed', array() );
-
-		// add this setup to the list.
-		$actual_completed[] = $this->get_setup_name();
-
-		// add the actual setup to the list of completed setups.
-		update_option( 'esfw_completed', $actual_completed );
-
-		if ( Helper::is_admin_api_request() ) {
-			// Return JSON with forward-URL.
-			wp_send_json(
-				array(
-					'forward' => add_query_arg( array( 'post_type' => 'page' ), get_admin_url() . 'edit.php' ),
-				)
-			);
+		// bail if this is not a request from API.
+		if ( ! Helper::is_rest_request() ) {
+			return;
 		}
+
+		// Return JSON with forward-URL.
+		wp_send_json(
+			array(
+				'forward' => add_query_arg( array( 'post_type' => 'page' ), get_admin_url() . 'edit.php' ),
+			)
+		);
 	}
 
 	/**
