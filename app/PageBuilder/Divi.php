@@ -80,11 +80,6 @@ class Divi extends PageBuilder_Base {
 	 * @return array<string,mixed>
 	 */
 	public function add_fields( array $fields ): array {
-		$post_types = array();
-		foreach ( Init::get_instance()->get_supported_post_types() as $post_type => $enabled ) {
-			$post_types[] = $post_type;
-		}
-
 		// add our custom fields where user can change language-settings.
 		$fields['easy-language-simplify-texts'] = array(
 			'meta_key'             => 'easy_language_divi_languages',
@@ -93,7 +88,7 @@ class Divi extends PageBuilder_Base {
 			'option_category'      => 'basic_option',
 			'tab_slug'             => 'content',
 			'toggle_slug'          => 'easy-language-simplifications',
-			'depends_on_post_type' => $post_types,
+			'depends_on_post_type' => array_keys(Init::get_instance()->get_supported_post_types()),
 		);
 
 		// return list of fields.

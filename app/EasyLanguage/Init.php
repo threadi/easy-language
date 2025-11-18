@@ -257,7 +257,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$api_obj = Apis::get_instance()->get_active_api();
 
 		// bail if no API could be loaded.
-		if ( ! $api_obj ) {
+		if ( ! $api_obj instanceof Api_Base ) {
 			return;
 		}
 
@@ -408,11 +408,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 					echo '<span class="dashicons dashicons-image-rotate" title="' . esc_attr__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
 				}
 			} else {
-				// create link to simplify this post if used pagebuilder is active.
+				// create the link to simplify this post if used pagebuilder is active.
 				$page_builder = $post_object->get_page_builder();
 
 				// bail if page builder could not be loaded.
-				if ( ! $page_builder ) {
+				if ( ! $page_builder instanceof Parser_Base ) {
 					return;
 				}
 
@@ -421,7 +421,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 					// get simplification-URL.
 					$create_simplification_link = $post_object->get_simplification_link( $language_code );
 
-					// add warning before adding simplified object if used pagebuilder is unknown.
+					// add warning before adding the simplified object if used pagebuilder is unknown.
 					$add_class                 = 'easy-dialog-for-wordpress';
 					$show_page_builder_warning = false;
 					if ( 'Undetected' === $page_builder->get_name() ) {
@@ -471,9 +471,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 					 *
 					 * @since 2.0.0 Available since 2.0.0.
 					 *
-					 * @param array<mixed> $dialog The dialog configuration.
-					 * @param Api_Base $api_obj The used API as object.
-					 * @param Post_Object $post_object The Post as object.
+					 * @param array<string,mixed> $dialog The dialog configuration.
+					 * @param Api_Base $api_obj The used API as an object.
+					 * @param Post_Object $post_object The Post as an object.
 					 */
 					$dialog = apply_filters( 'easy_language_first_simplify_dialog', $dialog, $api_obj, $post_object );
 
@@ -519,71 +519,84 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function hide_simplified_posts( WP_Query $query ): void {
-		if ( is_admin() && '' === $query->get( 'do_not_use_easy_language_filter' ) && $query->get( 'post_status' ) !== 'trash' ) {
-			// get the active API.
-			$api = Apis::get_instance()->get_active_api();
+		// bail if we are not in wp-admin.
+		if( ! is_admin() ) {
+			return;
+		}
 
-			// bail if no API is enabled.
-			if ( ! $api instanceof Api_Base ) {
+		// bail if filter used disabled.
+		if( '' !== $query->get( 'do_not_use_easy_language_filter') ) {
+			return;
+		}
+
+		// bail if we are in trash.
+		if ( $query->get( 'post_status' ) === 'trash' ) {
+			return;
+		}
+
+		// get the active API.
+		$api = Apis::get_instance()->get_active_api();
+
+		// bail if no API is enabled.
+		if ( ! $api instanceof Api_Base ) {
+			return;
+		}
+
+		// get our supported post-types.
+		$post_types = $this->get_supported_post_types();
+
+		// get the requested post-types, if they are a post-type.
+		$hide_simplified_posts = false;
+		if ( is_array( $query->get( 'post_type' ) ) ) {
+			foreach ( $query->get( 'post_type' ) as $post_type ) {
+				if ( ! empty( $post_types[ $post_type ] ) ) {
+					$hide_simplified_posts = true;
+				}
+			}
+		} elseif ( ! empty( $post_types[ $query->get( 'post_type' ) ] ) ) {
+			$hide_simplified_posts = true;
+		}
+		if ( $hide_simplified_posts ) {
+			$query->set(
+				'meta_query',
+				array(
+					array(
+						'key'     => 'easy_language_simplification_original_id',
+						'compare' => 'NOT EXISTS',
+					),
+				)
+			);
+
+			// get language from request.
+			$language = filter_input( INPUT_GET, 'lang', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+			if ( is_null( $language ) ) {
 				return;
 			}
 
-			// get our supported post-types.
-			$post_types = $this->get_supported_post_types();
+			// check if requested language is supported by our plugin.
+			$languages = $api->get_active_target_languages();
 
-			// get requested post-types, if they are a post-type.
-			$hide_simplified_posts = false;
-			if ( is_array( $query->get( 'post_type' ) ) ) {
-				foreach ( $query->get( 'post_type' ) as $post_type ) {
-					if ( ! empty( $post_types[ $post_type ] ) ) {
-						$hide_simplified_posts = true;
-					}
-				}
-			} elseif ( ! empty( $post_types[ $query->get( 'post_type' ) ] ) ) {
-				$hide_simplified_posts = true;
+			// bail if requested language is not supported by this API.
+			if ( empty( $languages[ $language ] ) ) {
+				return;
 			}
-			if ( $hide_simplified_posts ) {
-				$query->set(
-					'meta_query',
+
+			// change the request for post to show only them who are simplified in the given language.
+			$query->set(
+				'meta_query',
+				array(
+					'relation' => 'AND',
 					array(
-						array(
-							'key'     => 'easy_language_simplification_original_id',
-							'compare' => 'NOT EXISTS',
-						),
-					)
-				);
-
-				// get language from request.
-				$language = filter_input( INPUT_GET, 'lang', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-				if ( is_null( $language ) ) {
-					return;
-				}
-
-				// check if requested language is supported by our plugin.
-				$languages = $api->get_active_target_languages();
-
-				// bail if requested language is not supported by this API.
-				if ( empty( $languages[ $language ] ) ) {
-					return;
-				}
-
-				// change the request for post to show only them who are simplified in the given language.
-				$query->set(
-					'meta_query',
+						'key'     => 'easy_language_simplified_in',
+						'value'   => $language,
+						'compare' => 'LIKE',
+					),
 					array(
-						'relation' => 'AND',
-						array(
-							'key'     => 'easy_language_simplified_in',
-							'value'   => $language,
-							'compare' => 'LIKE',
-						),
-						array(
-							'key'     => 'easy_language_simplification_original_id',
-							'compare' => 'NOT EXISTS',
-						),
-					)
-				);
-			}
+						'key'     => 'easy_language_simplification_original_id',
+						'compare' => 'NOT EXISTS',
+					),
+				)
+			);
 		}
 	}
 
@@ -591,11 +604,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * If locale setting changed in WP, change the plugin-settings.
 	 *
 	 * @param string $old_value The old value of the changed option.
-	 * @param string $new_value The new value of the changed option.
+	 * @param null|string $new_value The new value of the changed option.
 	 *
 	 * @return void
 	 */
-	public function option_locale_changed( string $old_value, string $new_value ): void {
+	public function option_locale_changed( string $old_value, null|string $new_value ): void {
 		// if new value is empty, use our fallback.
 		if ( empty( $new_value ) ) {
 			$new_value = EASY_LANGUAGE_LANGUAGE_EMERGENCY;
@@ -631,12 +644,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// update resulting setting.
 		update_option( 'easy_language_source_languages', $languages );
-
-		// validate language support on API.
-		$api_obj = Apis::get_instance()->get_active_api();
-		if ( $api_obj instanceof Api_Base ) {
-			Helper::validate_language_support_on_api( $api_obj );
-		}
 
 		// update SUMM AI setting.
 		$languages = array( Helper::get_wp_lang() => '1' );
@@ -714,7 +721,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// bail if post type is not supported.
-		if ( false === $this->is_post_type_supported( $object->get_type() ) ) {
+		if ( ! $this->is_post_type_supported( $object->get_type() ) ) {
 			return;
 		}
 
@@ -760,7 +767,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 */
 	public function get_supported_post_types(): array {
 		// get the setting.
-		$supported_post_types = get_option( 'easy_language_post_types', array() );
+		$supported_post_types = get_option( 'easy_language_post_types' );
 
 		// if setting is empty, return empty array.
 		if ( ! is_array( $supported_post_types ) ) {
@@ -772,7 +779,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Return supported post-types.
+	 * Return whether the given post-type is supported.
 	 *
 	 * @param string $post_type The name of the requested post-type.
 	 *
@@ -789,37 +796,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function install(): void {
-		// set supported post-types.
-		if ( ! get_option( 'easy_language_post_types' ) ) {
-			update_option(
-				'easy_language_post_types',
-				array(
-					'post' => '1',
-					'page' => '1',
-				)
-			);
-		}
-
-		// set deactivation state for objects.
-		if ( ! get_option( 'easy_language_state_on_deactivation' ) ) {
-			update_option( 'easy_language_state_on_deactivation', 'draft' );
-		}
-
-		// set API state for objects.
-		if ( ! get_option( 'easy_language_state_on_api_change' ) ) {
-			update_option( 'easy_language_state_on_api_change', 'draft' );
-		}
-
-		// set to generate permalinks.
-		if ( ! get_option( 'easy_language_generate_permalink' ) ) {
-			update_option( 'easy_language_generate_permalink', '1' );
-		}
-
-		// set language-switcher-mode.
-		if ( ! get_option( 'easy_language_switcher_link' ) ) {
-			update_option( 'easy_language_switcher_link', 'hide_not_translated' );
-		}
-
 		// set supported language to one matching the project-language.
 		if ( ! get_option( 'easy_language_languages' ) ) {
 			$languages = array();
@@ -1040,7 +1016,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// delete options.
 		$options = array(
-			'easy_language_post_types',
 			'easy_language_languages',
 			'easy_language_switcher_link',
 			EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING,
@@ -1087,11 +1062,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// add tab.
-		$general_tab = $settings_page->add_tab( 'general', 20 );
+		$general_tab = $settings_page->add_tab( 'easy_language_general', 20 );
 		$general_tab->set_title( __( 'General Settings', 'easy-language' ) );
 
 		// add section.
-		$general_main_section = $general_tab->add_section( 'general_main_section', 10 );
+		$general_main_section = $general_tab->add_section( 'easy_language_general_section', 10 );
 		$general_main_section->set_title( __( 'General Settings', 'easy-language' ) );
 
 		// get all actual post-types in this project.
@@ -1124,9 +1099,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_post_types' );
 		$setting->set_section( $general_main_section );
-		$setting->set_show_in_rest( true );
 		$setting->set_type( 'array' );
-		$setting->set_default( array( 'page', 'post' ) );
+		$setting->set_default( array( 'page' => '1', 'post' => '1' ) );
 		$field = new Checkboxes();
 		$field->set_title( __( 'Choose supported post-types', 'easy-language' ) );
 		$field->set_options( $post_types );
@@ -1148,7 +1122,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_languages' );
 		$setting->set_section( $general_main_section );
-		$setting->set_show_in_rest( true );
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
 		$field = new Checkboxes();
@@ -1163,9 +1136,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_state_on_deactivation' );
 		$setting->set_section( $general_main_section );
-		$setting->set_show_in_rest( true );
 		$setting->set_type( 'string' );
-		$setting->set_default( array() );
+		$setting->set_default( 'draft' );
 		$field = new Select();
 		$field->set_title( __( 'Set object state on plugin deactivation', 'easy-language' ) );
 		$field->set_description( __( 'If the plugin is disabled, your simplified objects will get the state set here. If plugin is reactivated they will be set to their state before.<br><strong>Hint:</strong> During uninstallation all simplified objects will be deleted regardless of the setting here.', 'easy-language' ) );
@@ -1179,9 +1151,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_state_on_api_change' );
 		$setting->set_section( $general_main_section );
-		$setting->set_show_in_rest( true );
 		$setting->set_type( 'string' );
-		$setting->set_default( array() );
+		$setting->set_default( 'draft' );
 		$field = new Select();
 		$field->set_title( __( 'Set object state on API change', 'easy-language' ) );
 		$field->set_description( __( 'If the API is changed, set all objects of the former API to the state set here.', 'easy-language' ) );
@@ -1195,7 +1166,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add setting.
 		$permalink_setting = $settings_obj->add_setting( 'easy_language_generate_permalink' );
 		$permalink_setting->set_section( $general_main_section );
-		$permalink_setting->set_show_in_rest( true );
 		$permalink_setting->set_type( 'integer' );
 		$permalink_setting->set_default( 1 );
 		$field = new Checkbox();
@@ -1210,7 +1180,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add setting.
 		$automatic_simplification_setting = $settings_obj->add_setting( 'easy_language_automatic_simplification_enabled' );
 		$automatic_simplification_setting->set_section( $automatic_section );
-		$automatic_simplification_setting->set_show_in_rest( true );
 		$automatic_simplification_setting->set_type( 'integer' );
 		$automatic_simplification_setting->set_default( 1 );
 		$field = new Checkbox();
@@ -1239,9 +1208,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_automatic_simplification' );
 		$setting->set_section( $automatic_section );
-		$setting->set_show_in_rest( true );
 		$setting->set_type( 'string' );
-		$setting->set_default( array() );
+		$setting->set_default( '10minutly' );
 		$field = new Select();
 		$field->set_title( __( 'Interval for automatic simplification', 'easy-language' ) );
 		$field->set_description( __( 'Simplification are run automatically in this intervall.', 'easy-language' ) );
@@ -1259,7 +1227,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $frontend_section );
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'string' );
-		$setting->set_default( array() );
+		$setting->set_default( 'hide_not_translated' );
 		$field = new Radio();
 		$field->set_title( __( 'Choose link-mode for language switcher', 'easy-language' ) );
 		$field->set_options( array(
@@ -1935,7 +1903,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return array<string>|null
 	 */
 	public function change_languages( array|null $value ): array|null {
-		$value = Helper::settings_validate_multiple_checkboxes( $value );
+		$value = \easyLanguage\Plugin\Settings::get_instance()->sanitize_checkboxes( $value );
 		Rewrite::get_instance()->set_refresh();
 		return $value;
 	}
@@ -1950,7 +1918,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Add marker on body-element.
+	 * Add marker on the body-element.
 	 *
 	 * @param string $classes List of classes as string.
 	 * @return string
@@ -1985,12 +1953,17 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function screen_actions( WP_Screen $screen ): void {
-		// delete the api change and intro hint if one of the supported post type pages is called.
-		if ( ! empty( $this->get_supported_post_types()[ $screen->post_type ] ) ) {
-			Transients::get_instance()->get_transient_by_name( 'easy_language_api_changed' )->delete();
-			if ( 1 === absint( get_option( 'easy_language_intro_step_2', 0 ) ) ) {
-				update_option( 'easy_language_intro_step_2', 2 );
-			}
+		// bail if none of our supported post types is called.
+		if ( ! $this->is_post_type_supported( $screen->post_type ) ) {
+			return;
+		}
+
+		// delete the transient for API change.
+		Transients::get_instance()->get_transient_by_name( 'easy_language_api_changed' )->delete();
+
+		// if step 2 of the intro is run, set it to has been run.
+		if ( 1 === absint( get_option( 'easy_language_intro_step_2', 0 ) ) ) {
+			update_option( 'easy_language_intro_step_2', 2 );
 		}
 	}
 

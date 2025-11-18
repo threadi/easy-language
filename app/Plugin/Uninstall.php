@@ -110,6 +110,17 @@ class Uninstall {
 	 * @return void
 	 */
 	private function deactivation_tasks(): void {
+		// initialize the plugin.
+		Init::get_instance()->init();
+
+		/**
+		 * Run the global init to initialize all components.
+		 */
+		do_action( 'init' );
+
+		// enable the settings.
+		\easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance()->activation();
+
 		// get all images which have assigned 'easy_language_icon' post meta and delete them.
 		$query                            = array(
 			'posts_per_page' => -1,
@@ -185,8 +196,11 @@ class Uninstall {
 		// remove setup-options.
 		Setup::get_instance()->uninstall();
 
+		// delete all settings.
+		\easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance()->delete_settings();
+
 		/**
-		 * Remove settings.
+		 * Remove custom settings.
 		 */
 		foreach ( $this->get_options() as $option_name ) {
 			delete_option( $option_name );

@@ -68,11 +68,8 @@ class PageBuilders {
 	 * @return void
 	 */
 	public function add_meta_box( string $post_type ): void {
-		// get supported post-types.
-		$post_types = Init::get_instance()->get_supported_post_types();
-
-		// bail if post type is not supported.
-		if ( empty( $post_types[ $post_type ] ) ) {
+		// bail if the given post-type is not supported.
+		if ( ! Init::get_instance()->is_post_type_supported( $post_type) ) {
 			return;
 		}
 

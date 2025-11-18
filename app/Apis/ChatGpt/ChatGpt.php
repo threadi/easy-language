@@ -409,7 +409,6 @@ class ChatGpt extends Base implements Api_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_chatgpt_source_languages' );
 		$setting->set_section( $chatgpt_tab_main );
-		$setting->set_show_in_rest( true );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
 		$field = new Checkboxes();
@@ -430,7 +429,6 @@ class ChatGpt extends Base implements Api_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_chatgpt_target_languages' );
 		$setting->set_section( $chatgpt_tab_main );
-		$setting->set_show_in_rest( true );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
 		$field = new Checkboxes();
@@ -444,7 +442,6 @@ class ChatGpt extends Base implements Api_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_chatgpt_target_languages_prompts' );
 		$setting->set_section( $chatgpt_tab_main );
-		$setting->set_show_in_rest( true );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
 		$field = new FieldTable();

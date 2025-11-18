@@ -552,7 +552,7 @@ class Capito extends Base implements Api_Base {
 		$setting->set_section( $capito_tab_main );
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'string' );
-		$setting->set_default( '' );
+		$setting->set_default( 'user' );
 		$setting->set_save_callback( array( $this, 'clean_team_cache' ) );
 		$field = new Select();
 		$field->set_title( __( 'Account type', 'easy-language' ) );
@@ -636,7 +636,6 @@ class Capito extends Base implements Api_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_capito_source_languages' );
 		$setting->set_section( $capito_tab_main );
-		$setting->set_show_in_rest( true );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
 		$field = new Checkboxes();
@@ -657,7 +656,6 @@ class Capito extends Base implements Api_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_capito_target_languages' );
 		$setting->set_section( $capito_tab_main );
-		$setting->set_show_in_rest( true );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
 		$field = new Checkboxes();

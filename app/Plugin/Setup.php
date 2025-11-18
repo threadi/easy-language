@@ -59,8 +59,7 @@ class Setup {
 	 * @return void
 	 */
 	public function init(): void {
-		add_action( 'init', array( $this, 'init_setup' ) );
-		add_action( 'init', array( $this, 'add_settings' ) );
+		add_action( 'init', array( $this, 'init_setup' ), 20 );
 	}
 
 	/**
@@ -69,7 +68,7 @@ class Setup {
 	 * @return void
 	 */
 	public function init_setup(): void {
-		// check to show hint if setup should be run.
+		// check to show a hint if setup should be run.
 		$this->show_hint();
 
 		// only load setup if it is not completed.
@@ -125,7 +124,7 @@ class Setup {
 	}
 
 	/**
-	 * Check if setup should be run and show hint for it.
+	 * Check if setup should be run and show a hint for it.
 	 *
 	 * @return void
 	 */
@@ -135,7 +134,7 @@ class Setup {
 
 		// check if setup should be run.
 		if ( ! $this->is_completed() ) {
-			// bail if hint is already set.
+			// bail if a hint is already set.
 			if ( $transients_obj->get_transient_by_name( 'easy_language_start_setup_hint' )->is_set() ) {
 				return;
 			}
@@ -145,7 +144,7 @@ class Setup {
 				$transient_obj->delete();
 			}
 
-			// add hint to run setup.
+			// add a hint to run setup.
 			$transient_obj = Transients::get_instance()->add();
 			$transient_obj->set_name( 'easy_language_start_setup_hint' );
 			$transient_obj->set_message( __( '<strong>You have installed Easy Language - nice and thank you!</strong> Now run the setup to expand your website with the possibilities of this plugin to simplify the texts of your website.', 'easy-language' ) . '<br><br>' . sprintf( '<a href="%1$s" class="button button-primary">' . __( 'Start setup', 'easy-language' ) . '</a>', esc_url( $this->get_setup_link() ) ) );
@@ -439,46 +438,6 @@ class Setup {
 			array( $this, 'display' ),
 			1
 		);
-	}
-
-	/**
-	 * Add settings.
-	 *
-	 * TODO cleanup.
-	 * TODO show callback-result direct in setup.
-	 *
-	 * @return void
-	 */
-	public function add_settings(): void {
-		/*register_setting(
-			'easyLanguageApiFields',
-			'easy_language_api',
-			array(
-				'default'      => '',
-				'show_in_rest' => true,
-				'type'         => 'string',
-			)
-		);
-		register_setting(
-			'easyLanguageCapitoFields',
-			'easy_language_capito_api_key',
-			array(
-				'sanitize_callback' => array( Capito::get_instance(), 'validate_api_key' ),
-				'default'           => '',
-				'show_in_rest'      => true,
-				'type'              => 'string',
-			)
-		);
-		register_setting(
-			'easyLanguageSummAiFields',
-			'easy_language_summ_ai_api_key',
-			array(
-				'sanitize_callback' => array( Summ_Ai::get_instance(), 'validate_api_key' ),
-				'default'           => '',
-				'show_in_rest'      => true,
-				'type'              => 'string',
-			)
-		);*/
 	}
 
 	/**

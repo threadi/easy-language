@@ -117,14 +117,20 @@ class Installer {
 	 * @return void
 	 */
 	private function activation_tasks(): void {
-		// create log table if it does not exist.
+		// run normal plugin init.
+		Init::get_instance()->init();
+
+		// create the log table if it does not exist.
 		Log::get_instance()->create_table();
 
-		// create API-log table if it does not exist.
+		// create the API-log table if it does not exist.
 		Log_Api::get_instance()->create_table();
 
 		// create simplification tables if they do not exist.
 		Db::get_instance()->create_table();
+
+		// initiate the settings.
+		\EasyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance()->activation();
 
 		// set debug-mode to disabled per default.
 		if ( false === get_option( 'easy_language_debug_mode' ) ) {

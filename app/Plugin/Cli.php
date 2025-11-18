@@ -32,7 +32,7 @@ class Cli {
 		Uninstall::get_instance()->run();
 
 		/**
-		 * Run additional tasks for uninstallation via WP CLI.
+		 * Run additional tasks for uninstallation.
 		 *
 		 * @since 2.3.0 Available since 2.3.0.
 		 *
@@ -44,7 +44,7 @@ class Cli {
 		Installer::get_instance()->activation();
 
 		/**
-		 * Run additional tasks for installation via WP CLI.
+		 * Run additional tasks for installation.
 		 *
 		 * @since 2.3.0 Available since 2.3.0.
 		 */

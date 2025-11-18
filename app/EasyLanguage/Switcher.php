@@ -212,7 +212,7 @@ class Switcher {
 		}
 
 		// bail if post type is not supported.
-		if ( false === $object || false === $this->init->is_post_type_supported( $object->get_type() ) ) {
+		if ( ! $object || ! $this->init->is_post_type_supported( $object->get_type() ) ) {
 			return '';
 		}
 
@@ -325,8 +325,8 @@ class Switcher {
 			}
 		}
 
-		// bail if post type is not supported.
-		if ( false === $this->init->is_post_type_supported( $object->get_type() ) ) {
+		// bail if the post-type is not supported.
+		if ( ! $this->init->is_post_type_supported( $object->get_type() ) ) {
 			return $items;
 		}
 

@@ -57,7 +57,7 @@ class ThirdPartySupports {
 			// create the classname.
 			$classname = $plugin_class_name . '::get_instance';
 
-			// bail if classname is not callable.
+			// bail if the classname is not callable.
 			if ( ! is_callable( $classname ) ) {
 				continue;
 			}
@@ -86,6 +86,7 @@ class ThirdPartySupports {
 	private function get_plugins(): array {
 		// create the list of plugins.
 		$plugins = array(
+			'easyLanguage\EasyLanguage\Init',
 			'easyLanguage\ThirdPartySupport\Polylang\Polylang',
 			'easyLanguage\ThirdPartySupport\Sublanguage\Sublanguage',
 			'easyLanguage\ThirdPartySupport\TranslatePress\TranslatePress',

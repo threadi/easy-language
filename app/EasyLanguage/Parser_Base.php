@@ -115,9 +115,8 @@ class Parser_Base {
 		return $this->object_id;
 	}
 
-
 	/**
-	 * Return whether the given object is using this page builder.
+	 * Return whether the given object is using the page builder this parser is assigned to.
 	 *
 	 * @param Post_Object $post_object The object which is parsed.
 	 *
@@ -136,7 +135,7 @@ class Parser_Base {
 		// get the edit-link by object-id.
 		$link = get_edit_post_link( $this->get_object_id(), 'edit' );
 
-		// return empty string if link does not exist.
+		// return empty string if the link does not exist.
 		if ( is_null( $link ) ) {
 			return '';
 		}
@@ -154,7 +153,7 @@ class Parser_Base {
 	 * @noinspection PhpUnused
 	 */
 	public function get_language_switch( int $post_id = 0 ): void {
-		// bail if user has no simplification capabilities.
+		// bail if the user has no simplification capabilities.
 		if ( false === current_user_can( 'edit_el_simplifier' ) ) {
 			return;
 		}
@@ -168,7 +167,7 @@ class Parser_Base {
 				return;
 			}
 
-			// use the requested post ID.
+			// use the requested the post ID.
 			$post_id = $requested_post_id;
 		}
 
@@ -197,7 +196,7 @@ class Parser_Base {
 				// get quota-state for this object.
 				$quota_state = $post_object->get_quota_state( $api_obj );
 
-				// do not show simplify-button if characters to simplify are more than quota characters.
+				// do not show the simplify-button if characters to simplify are more than quota characters.
 				if ( 'above_limit' === $quota_state['status'] && $api_obj->is_configured() ) {
 					?>
 					<p class="alert">
@@ -439,7 +438,7 @@ class Parser_Base {
 	}
 
 	/**
-	 * Prevent translate-option in frontend.
+	 * Prevent the translate-option in frontend.
 	 *
 	 * @return bool
 	 */
@@ -448,7 +447,7 @@ class Parser_Base {
 	}
 
 	/**
-	 * Replace original title with simplification.
+	 * Replace the original title with simplification.
 	 *
 	 * @param string $original_complete Complete original content.
 	 * @param string $translated_part The translated content.

@@ -2,7 +2,7 @@
 /**
  * File for our own parser-support.
  *
- * This file handles which page-builders are supported to get and simplify content in these page-builders.
+ * This file handles which parsers are supported to get and simplify content in supported page-builders.
  *
  * @package easy-language
  */
@@ -13,7 +13,7 @@ namespace easyLanguage\EasyLanguage;
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Helper for support for different parsers.
+ * Object for handle support for different parsers.
  */
 class Parsers {
 
@@ -96,23 +96,23 @@ class Parsers {
 	private function get_parsers(): array {
 		// create the list.
 		$list = array(
-			'\easyLanguage\Parsers\Avada',
-			'\easyLanguage\Parsers\Avia',
-			'\easyLanguage\Parsers\BeaverBuilder',
-			'\easyLanguage\Parsers\BoldBuilder',
-			'\easyLanguage\Parsers\Breakdance',
-			'\easyLanguage\Parsers\Brizy',
-			'\easyLanguage\Parsers\Divi',
-			'\easyLanguage\Parsers\Elementor',
-			'\easyLanguage\Parsers\Gutenberg',
-			'\easyLanguage\Parsers\Kubio',
-			'\easyLanguage\Parsers\Salients_WpBakery',
-			'\easyLanguage\Parsers\SeedProd',
-			'\easyLanguage\Parsers\SiteOrigin',
-			'\easyLanguage\Parsers\Themify',
-			'\easyLanguage\Parsers\Undetected',
-			'\easyLanguage\Parsers\VisualComposer',
-			'\easyLanguage\Parsers\WpBakery',
+			'\easyLanguage\Parser\Avada',
+			'\easyLanguage\Parser\Avia',
+			'\easyLanguage\Parser\BeaverBuilder',
+			'\easyLanguage\Parser\BoldBuilder',
+			'\easyLanguage\Parser\Breakdance',
+			'\easyLanguage\Parser\Brizy',
+			'\easyLanguage\Parser\Divi',
+			'\easyLanguage\Parser\Elementor',
+			'\easyLanguage\Parser\Gutenberg',
+			'\easyLanguage\Parser\Kubio',
+			'\easyLanguage\Parser\Salients_WpBakery',
+			'\easyLanguage\Parser\SeedProd',
+			'\easyLanguage\Parser\SiteOrigin',
+			'\easyLanguage\Parser\Themify',
+			'\easyLanguage\Parser\Undetected',
+			'\easyLanguage\Parser\VisualComposer',
+			'\easyLanguage\Parser\WpBakery',
 		);
 
 		/**

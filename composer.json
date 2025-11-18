@@ -55,9 +55,9 @@
 		"php": "^8.0",
 		"gettext/gettext": "^5.7",
 		"threadi/easy-dialog-for-wordpress": "^1.0.1",
-		"threadi/easy-setup-for-wordpress": "^1.2.1",
+		"threadi/easy-setup-for-wordpress": "^1.2.3",
 		"threadi/easy-settings-for-wordpress": "^1.16.0",
-		"threadi/easy-transients-for-wordpress": "^1.2.1",
+		"threadi/easy-transients-for-wordpress": "^1.3.0",
 		"threadi/react-dialog": "dev-master"
 	},
 	"require-dev": {

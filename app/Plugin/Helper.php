@@ -589,7 +589,7 @@ class Helper {
 	}
 
 	/**
-	 * Validate the language support of given API.
+	 * Validate the language support of the active API.
 	 *
 	 * @param Api_Base $api The API to check.
 	 *
@@ -602,13 +602,13 @@ class Helper {
 		// get the actual language in WordPress.
 		$language = self::get_wp_lang();
 
-		// if actual language is not supported as possible source language, show hint.
+		// if the actual language is not supported as a possible source language, show a hint.
 		$source_languages = $api->get_supported_source_languages();
 		if ( empty( $source_languages[ $language ] ) ) {
-			// create list of languages this API supports as HTML-list.
+			// create a list of languages this API supports as the HTML list.
 			$language_list = '<ul>';
 			foreach ( $source_languages as $settings ) {
-				$language_list .= '<li>' . esc_html( $settings['label'] ) . '</li>';
+				$language_list .= '<li>' . $settings['label'] . '</li>';
 			}
 			$language_list .= '</ul>';
 
@@ -628,7 +628,7 @@ class Helper {
 			$transient_obj->set_dismissible_days( 2 );
 			$transient_obj->set_name( 'easy_language_source_language_not_supported' );
 			/* translators: %1$s will be replaced by name of the actual language, %2$s by the API-title, %3$s by the URL for WordPress-settings, %5$s by a list of languages, %6$s by the URL for the API-settings, %7$s by the Pro-link. */
-			$transient_obj->set_message( sprintf( __( '<strong>The language of your website (%1$s) is not supported as source language for simplifications via %2$s!</strong><br>You will not be able to use %3$s.<br>You will not be able to simplify any texts.<br>You have to <a href="%4$s">switch the language</a> in WordPress to one of the following supported source languages: %5$s Or <a href="%6$s">choose another API</a> which supports the language.<br><strong>Hint:</strong> We support more languages for each API with <a href="%7$s" target="_blank">Easy Language Pro (opens new window)</a>.', 'easy-language' ), esc_html( $language_name ), esc_html( $api->get_title() ), esc_html( $api->get_title() ), esc_url( self::get_wp_settings_url() ), wp_kses_post( $language_list ), esc_url( self::get_settings_page_url() ), esc_url( self::get_pro_url() ) ) );
+			$transient_obj->set_message( sprintf( __( '<strong>The language of your website (%1$s) is not supported as source language for simplifications via %2$s!</strong><br>You will not be able to use %3$s.<br>You will not be able to simplify any texts.<br>You have to <a href="%4$s">switch the language</a> in WordPress to one of the following supported source languages: %5$s Or <a href="%6$s">choose another API</a> which supports the language.<br><strong>Hint:</strong> We support more languages for each API with <a href="%7$s" target="_blank">Easy Language Pro (opens new window)</a>.', 'easy-language' ), '<em>' . esc_html( $language_name ) . '</em>', esc_html( $api->get_title() ), esc_html( $api->get_title() ), esc_url( self::get_wp_settings_url() ), wp_kses_post( $language_list ), esc_url( self::get_settings_page_url() ), esc_url( self::get_pro_url() ) ) );
 			$transient_obj->set_type( 'error' );
 			$transient_obj->set_hide_on( array( Setup::get_instance()->get_setup_link() ) );
 			$transient_obj->save();
@@ -832,7 +832,7 @@ class Helper {
 			return '';
 		}
 
-		// return resulting JSON-string.
+		// return the resulting JSON-string.
 		return $json;
 	}
 
@@ -913,7 +913,7 @@ class Helper {
 		// the hidden section for any not visible settings.
 		$hidden_section = $hidden_tab->get_section( 'hidden_section' );
 
-		// bail if section could not be found.
+		// bail if the section could not be found.
 		if ( ! $hidden_section instanceof Section ) {
 			return false;
 		}

@@ -10,10 +10,12 @@ namespace easyLanguage\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Dependencies\easySettingsForWordPress\Export;
 use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Button;
 use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Checkbox;
 use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Number;
 use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Radio;
+use easyLanguage\Dependencies\easySettingsForWordPress\Import;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Tables\Texts_In_Use_Table;
 use easyLanguage\EasyLanguage\Tables\Texts_To_Simplify_Table;
@@ -63,6 +65,9 @@ class Settings {
 	public function init(): void {
 		// set all settings for this plugin.
 		add_action( 'init', array( $this, 'add_the_settings' ) );
+
+		// misc.
+		add_action( 'admin_action_easy_language_reset', array( $this, 'reset_plugin_by_request' ) );
 	}
 
 	/**
@@ -333,6 +338,61 @@ class Settings {
 		$field->set_description( __( 'If enabled the plugin will log every API action.', 'easy-language' ) );
 		$setting->set_field( $field );
 
+		// create reset URL.
+		$reset_url = add_query_arg(
+			array(
+				'action' => 'easy_language_reset',
+				'nonce'  => wp_create_nonce( 'easy-language-reset' ),
+			),
+			get_admin_url() . 'admin.php'
+		);
+
+		// create dialog.
+		$reset_dialog = array(
+			'title'   => __( 'Reset plugin', 'easy-language' ),
+			'texts'   => array(
+				'<p><strong>' . __( 'Do you really want to reset any settings and data for the plugin Easy Language?', 'easy-language' ) . '</strong></p>',
+				'<p>' . __( 'This will not only reset all settings, but also remove all simplifications.', 'easy-language' ) . '</p>',
+				'<p>' . __( 'You can then setup the plugin again.', 'easy-language' ) . '</p>',
+				'<p><strong>' . __( 'We recommend creating a backup before resetting the plugin.', 'easy-language' ) . '</strong></p>',
+			),
+			'buttons' => array(
+				array(
+					'action'  => 'location.href="' . $reset_url . '";',
+					'variant' => 'primary',
+					'text'    => __( 'Yes, reset it', 'easy-language' ),
+				),
+				array(
+					'action'  => 'closeDialog();',
+					'variant' => 'primary',
+					'text'    => __( 'Cancel', 'easy-language' ),
+				),
+			),
+		);
+
+		// the advanced plugin-handling section.
+		$advanced_plugin = $advanced_tab->add_section( 'settings_section_advanced_plugin', 10 );
+		$advanced_plugin->set_title( __( 'Plugin handling', 'easy-language' ) );
+		$advanced_plugin->set_setting( $settings_obj );
+
+		// add import.
+		Import::get_instance()->add_settings( $settings_obj, $advanced_plugin );
+
+		// add export.
+		Export::get_instance()->add_settings( $settings_obj, $advanced_plugin );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easyLanguageReset' );
+		$setting->set_section( $advanced_plugin );
+		$setting->prevent_export( true );
+		$field = new Button();
+		$field->set_title( __( 'Reset plugin', 'easy-language' ) );
+		$field->set_button_title( __( 'Reset plugin', 'easy-language' ) );
+		$field->set_button_url( $reset_url );
+		$field->add_data( 'dialog', Helper::get_json( $reset_dialog ) );
+		$field->add_class( 'easy-dialog-for-wordpress' );
+		$setting->set_field( $field );
+
 		// create a hidden page for hidden settings.
 		$hidden_page = $settings_obj->add_page( 'hidden_page' );
 
@@ -582,5 +642,41 @@ class Settings {
 	 */
 	public function sanitize_api( ?string $value ): string {
 		return (string) $value;
+	}
+
+	/**
+	 * Reset the plugin by request.
+	 *
+	 * @return void
+	 */
+	public function reset_plugin_by_request(): void {
+		// check nonce.
+		check_admin_referer( 'easy-language-reset', 'nonce' );
+
+		// uninstall all.
+		Uninstall::get_instance()->run();
+
+		$options = array();
+		/**
+		 * Run additional tasks for uninstallation.
+		 *
+		 * @since 2.3.0 Available since 2.3.0.
+		 *
+		 * @param array<string,string> $options Options used to call this command.
+		 */
+		do_action( 'easy_language_uninstaller', $options );
+
+		// run installer tasks.
+		Installer::get_instance()->activation();
+
+		/**
+		 * Run additional tasks for installation.
+		 *
+		 * @since 2.3.0 Available since 2.3.0.
+		 */
+		do_action( 'easy_language_installer' );
+
+		// forward user to dashboard.
+		wp_safe_redirect( get_admin_url() );
 	}
 }
