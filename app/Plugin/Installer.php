@@ -130,7 +130,7 @@ class Installer {
 		Db::get_instance()->create_table();
 
 		// initiate the settings.
-		\EasyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance()->activation();
+		\easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance()->activation();
 
 		// set debug-mode to disabled per default.
 		if ( false === get_option( 'easy_language_debug_mode' ) ) {
