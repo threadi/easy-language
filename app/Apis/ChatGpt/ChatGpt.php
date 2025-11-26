@@ -21,6 +21,7 @@ use easyLanguage\Dependencies\easySettingsForWordPress\Settings;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Api_Base;
+use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Language_Icon;
@@ -160,7 +161,7 @@ class ChatGpt extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_logo_url(): string {
-		return Helper::get_plugin_url() . 'classes/apis/chatgpt/gfx/logo.png';
+		return Helper::get_plugin_url() . 'app/Apis/ChatGpt/gfx/logo.png';
 	}
 
 	/**
@@ -324,8 +325,9 @@ class ChatGpt extends Base implements Api_Base {
 		}
 
 		// add tab.
-		$chatgpt_tab = $settings_page->add_tab( 'chatgpt', 30 );
+		$chatgpt_tab = $settings_page->add_tab( 'chatgpt', 20 );
 		$chatgpt_tab->set_title( __( 'ChatGPT', 'easy-language' ) );
+		$chatgpt_tab->set_tab_class( ! $this->is_active() ? 'hidden' : '' );
 
 		// add section.
 		$chatgpt_tab_main = $chatgpt_tab->add_section( 'settings_section_chatgpt', 10 );

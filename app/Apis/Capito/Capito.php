@@ -166,7 +166,7 @@ class Capito extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_logo_url(): string {
-		return Helper::get_plugin_url() . 'classes/apis/capito/gfx/2025_logo.svg';
+		return Helper::get_plugin_url() . 'app/Apis/Capito/gfx/2025_logo.svg';
 	}
 
 	/**
@@ -491,8 +491,9 @@ class Capito extends Base implements Api_Base {
 		}
 
 		// add tab.
-		$capito_tab = $settings_page->add_tab( 'capito', 30 );
+		$capito_tab = $settings_page->add_tab( 'capito', 20 );
 		$capito_tab->set_title( __( 'capito', 'easy-language' ) );
+		$capito_tab->set_tab_class( ! $this->is_active() ? 'hidden' : '' );
 
 		// add section.
 		$capito_tab_main = $capito_tab->add_section( 'settings_section_capito', 10 );

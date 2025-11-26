@@ -1062,7 +1062,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// add tab.
-		$general_tab = $settings_page->add_tab( 'easy_language_general', 20 );
+		$general_tab = $settings_page->add_tab( 'easy_language_general', 30 );
 		$general_tab->set_title( __( 'General Settings', 'easy-language' ) );
 
 		// add section.

@@ -142,20 +142,20 @@ class Settings {
 		$settings_page->set_default_tab( $api_tab );
 
 		// the advanced tab.
-		$advanced_tab = $settings_page->add_tab( 'advanced', 40 );
-		$advanced_tab->set_title( __( 'Advanced', 'easy-language' ) );
+		$advanced_tab = $settings_page->add_tab( 'advanced', 60 );
+		$advanced_tab->set_title( __( 'Advanced settings', 'easy-language' ) );
 
 		// the simplified texts tab.
-		$simplified_texts_tab = $settings_page->add_tab( 'simplified_texts', 50 );
+		$simplified_texts_tab = $settings_page->add_tab( 'simplified_texts', 40 );
 		$simplified_texts_tab->set_title( __( 'Simplified texts', 'easy-language' ) );
 		$simplified_texts_tab->set_hide_save( true );
 
 		// the API logs tab.
-		$api_logs_tab = $settings_page->add_tab( 'api_logs', 60 );
+		$api_logs_tab = $settings_page->add_tab( 'api_logs', 70 );
 		$api_logs_tab->set_title( __( 'API Logs', 'easy-language' ) );
 
 		// the icon tab.
-		$icons_tab = $settings_page->add_tab( 'icons', 70 );
+		$icons_tab = $settings_page->add_tab( 'icons', 50 );
 		$icons_tab->set_title( __( 'Icons', 'easy-language' ) );
 
 		// the log tab.
@@ -191,6 +191,7 @@ class Settings {
 		// the API section.
 		$api_tab_main = $api_tab->add_section( 'api', 10 );
 		$api_tab_main->set_setting( $settings_obj );
+		$api_tab_main->set_callback( array( $this, 'get_api_select_description' ) );
 
 		// the advanced section.
 		$advanced_tab_main = $advanced_tab->add_section( 'advanced_main', 10 );
@@ -218,7 +219,25 @@ class Settings {
 		// get the list of supported APIs.
 		$apis = array();
 		foreach ( Apis::get_instance()->get_available_apis() as $api_obj ) {
-			$apis[ $api_obj->get_name() ] = $api_obj->get_title();
+			// collect the description for this API.
+			$description = '';
+
+			// get the API-own logo, if it exists.
+			$logo_url = $api_obj->get_logo_url();
+			if ( ! empty( $logo_url ) ) {
+				$description .= '<img src="' .  esc_url( $logo_url ) . '" alt="' . esc_attr( $api_obj->get_title() ) . '">';
+			}
+
+			// show api-title.
+			$description .= '<h2>' . esc_html( $api_obj->get_title() ) . '</h2>';
+
+			// show api-description, if available.
+			if ( ! empty( $api_obj->get_description() ) ) {
+				$description .= $api_obj->get_description();
+			}
+
+			// add the description.
+			$apis[ $api_obj->get_name() ] = $description;
 		}
 
 		// add setting.
@@ -231,7 +250,6 @@ class Settings {
 		$setting->set_save_callback( array( $this, 'save_api' ) );
 		$field = new Radio();
 		$field->set_title( __( 'Select API', 'easy-language' ) );
-		$field->set_description( __( 'Please choose the API you want to use to simplify texts your website.', 'easy-language' ) );
 		$field->set_options( $apis );
 		$field->set_sanitize_callback( array( $this, 'sanitize_api' ) );
 		$setting->set_field( $field );
@@ -678,5 +696,10 @@ class Settings {
 
 		// forward user to dashboard.
 		wp_safe_redirect( get_admin_url() );
+	}
+
+	public function get_api_select_description(): void {
+		echo '<h1>' . __( 'Select API', 'easy-language' ) .  '</h1>';
+		echo  '<p>' . esc_html__( 'Please choose the API you want to use to simplify texts your website.', 'easy-language' ) . '</p>';
 	}
 }

@@ -21,6 +21,7 @@ use easyLanguage\Dependencies\easySettingsForWordPress\Section;
 use easyLanguage\Dependencies\easySettingsForWordPress\Settings;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
+use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Helper;
@@ -212,7 +213,7 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_logo_url(): string {
-		return Helper::get_plugin_url() . 'classes/apis/summ-ai/gfx/logo.jpg';
+		return Helper::get_plugin_url() . 'app/Apis/Summ_Ai/gfx/logo.jpg';
 	}
 
 	/**
@@ -694,8 +695,9 @@ class Summ_Ai extends Base implements Api_Base {
 		}
 
 		// add tab.
-		$summ_ai_tab = $settings_page->add_tab( 'summ_ai', 30 );
+		$summ_ai_tab = $settings_page->add_tab( 'summ_ai', 20 );
 		$summ_ai_tab->set_title( __( 'SUMM AI', 'easy-language' ) );
+		$summ_ai_tab->set_tab_class( ! $this->is_active() ? 'hidden' : '' );
 
 		// add section.
 		$summ_ai_tab_main = $summ_ai_tab->add_section( 'summ_ai_main', 10 );

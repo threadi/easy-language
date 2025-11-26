@@ -94,9 +94,9 @@ class Apis {
 		// create the list of APIs.
 		$apis = array(
 			'easyLanguage\Apis\Capito\Capito',
+			'easyLanguage\Apis\Summ_Ai\Summ_Ai',
 			'easyLanguage\Apis\ChatGpt\ChatGpt',
 			'easyLanguage\Apis\No_Api\No_Api',
-			'easyLanguage\Apis\Summ_Ai\Summ_Ai',
 		);
 
 		/**
