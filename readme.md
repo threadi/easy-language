@@ -2,7 +2,7 @@
 
 ## About
 
-This repository provides the features of the free version of the WordPress plugin _Easy Language_. The repository is used as a basis for deploying the plugin to the WordPress repository. It is not intended to run as a plugin as it is, even if that is possible for development.
+This repository provides the features for the free version of the WordPress plugin _Easy Language_. The repository is used as a basis for deploying the plugin to the WordPress repository. It is not intended to run as a plugin as it is, even if that is possible for development.
 
 ## Usage
 
@@ -17,15 +17,15 @@ After checkout go through the following steps:
 
 1. increase the version number in _build/build.properties_.
 2. execute the following command in _build/_: `ant build`
-3. after that you will finde in the release directory a zip file which could be used in WordPress to install it.
+3. after that you will find in the release directory a zip file which could be used in WordPress to install it.
 
 ## Translations
 
-I recommend to use [PoEdit](https://poedit.net/) to translate texts for this plugin.
+I recommend using [PoEdit](https://poedit.net/) to translate texts for this plugin.
 
 ### generate pot-file
 
-Run in main directory:
+Run in the main directory:
 
 `wp i18n make-pot . languages/easy-language.pot --exclude=classes/multilingual-plugins/easy-language/blocks/navigation-switcher/src/,classes/multilingual-plugins/easy-language/blocks/switcher/src/,svn/`
 
@@ -38,12 +38,12 @@ Run in main directory:
 ### export translation-file
 
 1. Open .po-file of the language in PoEdit.
-2. Go to File > Save.
+2. Go to "File" > "Save".
 3. Upload the generated .mo-file and the .po-file to the plugin-folder languages/
 
 ### generate json-translation-files
 
-Run in main directory:
+Run in the main directory:
 
 `wp i18n make-json languages`
 
@@ -89,6 +89,6 @@ Hint: this check runs against the VIP-GO-platform which is not our target for th
 
 `vendor/bin/phpcs --extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/,*translatepress* --standard=WordPress-VIP-Go .`
 
-## Analyse with PHPStan
+## Analyze with PHPStan
 
 `vendor/bin/phpstan analyse`

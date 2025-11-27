@@ -36,7 +36,7 @@ jobs:
                   cd ../../../
                   npm run build:switcher
                   npm run build:navigation-switcher
-                  cd classes/multilingual-plugins/easy-language/pagebuilder/divi/
+                  cd legacy-classes/Divi/
                   npm i
                   npm run build
                   cd ../../../../../
@@ -76,11 +76,10 @@ jobs:
                   rm -fr languages
                   rm -fr changelog.md
                   rm -fr svn
-                  rm -fr classes/multilingual-plugins/easy-language/pagebuilder/divi/src/
                   rm readme.md
                   rm ruleset.xml
                   cd ..
-                  zip -r -q ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/* -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/doc/*" "*/phpcs.xml" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "/.editorconfig"
+                  zip -r -q ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/* -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/doc/*" "*/phpcs.xml" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "/.editorconfig" "*/legacy-classes/Divi/.yarn/*" "*/legacy-classes/Divi/package-lock.json" "*/legacy-classes/Divi/node_modules/*" "*/legacy-classes/Divi/.env" "*/legacy-classes/Divi/.yarnrc" "*/legacy-classes/Divi/yarn.lock" "*/legacy-classes/Divi/package.json" "*/legacy-classes/Divi/*/.gitkeep"
                   zip -ur ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/autoload.php
                   zip -ur ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/composer/*
                   zip -ur ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/threadi/*/build/*

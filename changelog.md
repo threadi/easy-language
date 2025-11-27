@@ -4,7 +4,17 @@
 
 ### Added
 
+- Revamped plugin for a more robust and sustainable structure
+- Added a new object to handle all plugin settings
 - Added support for the PageBuilders Beaver Builder, Bold Page Builder, Brizy, Kubio, SiteOrigin, SeedProd and Visual Composer
+- Added option to reset the plugin in backend settings (in preparation for Cyber Resilience Act)
+
+### Changed
+
+- Now requires PHP 8.1 or higher
+- Changed handling of transients
+- Optimized support for automatic simplifications via TranslatePress
+- Updated dependencies
 
 ## [2.9.2] - 21.10.2025
 

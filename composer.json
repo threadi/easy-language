@@ -1,7 +1,7 @@
 {
 	"name": "threadi/easy-language",
-	"version": "2.10.0",
-	"description": "This plugin adds easy language support to WordPress.",
+	"version": "3.0.0",
+	"description": "This plugin adds support for easy language in WordPress.",
 	"authors": [
 		{
 			"name": "Thomas Zwirner",
@@ -13,11 +13,27 @@
 	"minimum-stability": "stable",
 	"scripts": {
 		"post-install-cmd": [
-			"\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra,vendor/sirbrillig/phpcs-variable-analysis,vendor/automattic/vipwpcs"
+			"\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra,vendor/sirbrillig/phpcs-variable-analysis,vendor/automattic/vipwpcs",
+			"\"vendor/bin/mozart\" compose",
+			"composer dump-autoload"
 		],
 		"post-update-cmd": [
-			"\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra,vendor/sirbrillig/phpcs-variable-analysis,vendor/automattic/vipwpcs"
+			"\"vendor/bin/phpcs\" --config-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra,vendor/sirbrillig/phpcs-variable-analysis,vendor/automattic/vipwpcs",
+			"\"vendor/bin/mozart\" compose",
+			"composer dump-autoload"
 		]
+	},
+	"extra": {
+		"mozart": {
+			"dep_namespace": "easyLanguage\\Dependencies\\",
+			"dep_directory": "/app/Dependencies/",
+			"classmap_directory": "/libs/classes/dependencies/",
+			"classmap_prefix": "easyLanguage",
+			"packages": [
+				"threadi/easy-settings-for-wordpress",
+				"threadi/easy-transients-for-wordpress"
+			]
+		}
 	},
 	"config": {
 		"allow-plugins": {
@@ -27,13 +43,21 @@
 		"optimize-autoloader": true,
 		"classmap-authoritative": true,
 		"apcu-autoloader": true,
-		"prepend-autoloader": false
+		"prepend-autoloader": false,
+		"platform-check": false
+	},
+	"autoload": {
+		"psr-4": {
+			"easyLanguage\\": "app/"
+		}
 	},
 	"require": {
 		"php": "^8.0",
 		"gettext/gettext": "^5.7",
 		"threadi/easy-dialog-for-wordpress": "^1.0.1",
-		"threadi/easy-setup-for-wordpress": "^1.2.1",
+		"threadi/easy-setup-for-wordpress": "^1.2.3",
+		"threadi/easy-settings-for-wordpress": "^1.16.0",
+		"threadi/easy-transients-for-wordpress": "^1.3.0",
 		"threadi/react-dialog": "dev-master"
 	},
 	"require-dev": {
@@ -43,6 +67,7 @@
 		"phpstan/phpstan": "^2.1",
 		"szepeviktor/phpstan-wordpress": "^2.0",
 		"phpstan/extension-installer": "^1.4",
-		"php-stubs/wp-cli-stubs": "^2.11"
+		"php-stubs/wp-cli-stubs": "^2.11",
+		"coenjacobs/mozart": "^0.7.1"
 	}
 }

@@ -25,15 +25,6 @@
     vertical-align: middle;
 }
 
-.form-table div.easy-language-checkbox > p, .form-table .easy-language-radio > p {
-    margin-left: 24px;
-    margin-bottom: 4px;
-}
-
-.form-table p.easy-language-checkbox { margin-bottom: 8px }
-
-.form-table .easy-language-checkbox label { cursor: pointer }
-
 #easy-language label {
 	display: block;
 	margin-bottom: 1em;
@@ -62,21 +53,9 @@ td[class^="easy-language"] a, td[class^="easy-language"] span, .text-translation
 
 .text-translations-table .options { white-space: nowrap }
 
-.easy-language-transient {
-    position: relative;
-    z-index: 1;
-}
+.etfw-transient h3 img { width: 32px; }
 
-.easy-language-transient h3 img {
-    vertical-align: middle;
-    display: inline-block;
-    margin-right: 8px;
-    width: 32px;
-}
-
-.easy-language-transient p { line-height: 2 }
-
-.easy-language-transient ul {
+.etfw-transient ul {
 	list-style: disc;
 	margin-left: 14px;
 	margin-top: 0;
@@ -91,6 +70,7 @@ td[class^="easy-language"] a, td[class^="easy-language"] span, .text-translation
 body .button.easy-language-settings-button {
     display: inline-block;
     margin-right: 8px;
+	margin-top: 8px;
 }
 
 body .text-translations-table #options { width: 42px; }
@@ -107,38 +87,53 @@ body .text-translations-table #source_language, body .text-translations-table #t
     padding: 2px 8px;
 }
 
-.easy-api-radios {
+.easy_language_api {
 	display: block;
     margin: 24px 0 0;
+	> th { display: none }
+	th, td {
+		line-height: 1;
+		padding: 0
+	}
+	table {
+		border-collapse: collapse;
+		margin-top: 4px;
+	}
+	.dashicons {
+		line-height: 1.3;
+	}
+	.button {
+		margin-right: 1em;
+	}
 }
 
-.easy-api-radio {
+.easy_language_api td > div {
 	margin-bottom: 12px;
 }
 
 @media only screen and (min-width: 600px) {
-	.easy-api-radios {
+	.easy_language_api td {
 		display: grid;
 		grid-template-columns: repeat(3, 1fr);
 		grid-gap: 12px;
 		grid-auto-rows: 1fr;
 		margin-right: 12px;
 	}
-	.easy-api-radio { margin: 12px 0; }
+	.easy_language_api td > div { margin: 12px 0; }
 }
 
-.easy-api-radio h2 {
+.easy_language_api h2 {
     margin-top: 0;
 }
 
-.easy-api-radio img {
+.easy_language_api img {
     float: right;
     height: 32px;
 }
 
-.easy-api-radios input[type='radio'] { display: none }
+.easy_language_api input[type='radio'] { display: none }
 
-.easy-api-radios input[type='radio'] + label {
+.easy_language_api input[type='radio'] + label {
     background-color: #dcdcde;
     border: 1px solid #c3c4c7;
     border-radius: 8px;
@@ -149,9 +144,9 @@ body .text-translations-table #source_language, body .text-translations-table #t
     z-index: 1;
 }
 
-.easy-api-radios input[type='radio'] + label > p:last-child { margin-bottom: 0 }
+.easy_language_api input[type='radio'] + label > p:last-child { margin-bottom: 0 }
 
-.easy-api-radios input[type='radio'] + label:before {
+.easy_language_api input[type='radio'] + label:before {
     background-color: var( --lwel-hint-bg);
     border-radius: 8px;
     color: var(--lwel-hint-font);
@@ -165,62 +160,12 @@ body .text-translations-table #source_language, body .text-translations-table #t
     z-index: 10;
 }
 
-.easy-api-radios .easy-language-api-pro-hint input[type='radio'] + label > span.pro-hint {
-	background-color: var(--lwel-pro-bg);
-	border-radius: 8px;
-	color: var(--lwel-pro-font);
-	content: attr(data-pro-hint);
-	padding: 4px 12px;
-	position: absolute;
-	bottom: 0;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	white-space: nowrap;
-	z-index: 10;
-}
-
-.easy-api-radios input[type='radio'] + label:hover {
+.easy_language_api input[type='radio'] + label:hover {
 	background-color: rgba(0,0,0,0.1);
 }
 
-.easy-api-radios input[type='radio']:checked + label, .easy-api-radios input[type='radio']:checked + label:hover {
+.easy_language_api input[type='radio']:checked + label, .easy_language_api input[type='radio']:checked + label:hover {
     background-color: #fff;
-}
-
-.easy-api-radios .easy-language-api-active input[type='radio'] + label:before {
-    display: inline-block;
-}
-
-.easy-api-radios :not(.easy-language-api-active) input[type='radio']:checked + label:before {
-	background-color: var(--lwel-pro-hint-bg);
-	display: inline-block;
-	content: attr(data-choose-title);
-}
-
-.easy-language-choose-api .form-table .easy-api-radios p {
-	margin-bottom: 8px;
-}
-
-.easy-language-choose-api .form-table > tr > th, .easy-language-choose-api .form-table > tbody > tr > th { display: none }
-
-.easy-language-choose-api .form-table div table {
-	border-collapse: collapse;
-	margin: 0 0 16px;
-}
-
-.easy-language-choose-api .form-table div th, .easy-language-choose-api .form-table div td { padding: 0; }
-
-.easy-language-choose-api .form-table div td { text-align: right; }
-
-.easy-language-choose-api .form-table td {
-	padding-left: 0;
-	padding-top: 0;
-}
-
-.easy-language-choose-api .form-table td a.button {
-	line-height: 2;
-	margin-right: 8px;
-	padding-top: 5px;
 }
 
 .easy-language-transient .notice-dismiss:before {
@@ -246,28 +191,6 @@ body .text-translations-table #source_language, body .text-translations-table #t
 	font-size: 13px;
 	list-style: disclosure-closed;
 	margin-left: 14px;
-}
-
-.pro-marker {
-	background-color: var(--lwel-pro-bg);
-	border-radius: 4px;
-	color: var(--lwel-pro-font);
-	display: inline-block;
-	padding: 0 8px;
-}
-
-.settings_page_easy_language_settings .easy-language-pro-hint {
-	background-color: var(--lwel-pro-hint-bg);
-	color: var(--lwel-pro-hint-font);
-	padding: 12px;
-}
-
-.settings_page_easy_language_settings div.wrap > .easy-language-pro-hint {
-	padding: 4px 8px;
-}
-
-.settings_page_easy_language_settings div.wrap > .page-title-action.easy-language-pro-hint {
-	padding: 0 8px;
 }
 
 .easy-language-input-text, .form-table td p.easy-language-input-text { margin-bottom: 12px }
@@ -300,14 +223,7 @@ body .text-translations-table #source_language, body .text-translations-table #t
 }
 
 @media only screen and (max-width: 990px) {
-	.easy-api-radios { display: block }
-}
-
-@media only screen and (min-width: 991px) and (max-width: 1800px) {
-	.easy-api-radios .easy-language-api-pro-hint input[type="radio"] + label > span.pro-hint {
-		bottom: -55px;
-		white-space: normal;
-	}
+	.easy_language_api { display: block }
 }
 
 a.easy-dialog-for-wordpress, span.easy-dialog-for-wordpress { cursor: pointer }
@@ -424,3 +340,31 @@ body.settings_page_easy_language_settings #state { width: 48px }
 body.settings_page_easy_language_settings #date { width: 124px }
 body.settings_page_easy_language_settings #api { width: 80px }
 body.settings_page_easy_language_settings #response { min-width: 200px;width: auto }
+
+#easy-language-active-api {
+	background-color: var(--lwel-hint-bg);
+	border-radius: 12px;
+	color: #fff;
+	padding: 8px 12px;
+	position: absolute;
+	top: -8px;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 10;
+}
+
+.easy_language_summ_ai_api_key td, .easy_language_capito_api_key td, .easy_language_chatgpt_api_key td {
+	background-color: var(--lwel-hint-bg);
+	color: #fff;
+	a {
+		color: #fff;
+	}
+}
+
+.easy_language_summ_ai_target_languages td {
+	vertical-align: top;
+}
+
+.easy_language_chatgpt_target_languages_prompts table {
+	width: 100%;
+}

@@ -1,12 +1,11 @@
 /.idea
 *.zip
 languages/*.json
+/app/Dependencies/
 /build/languages/
 /build/languages/.gitkeep
 /build/languages/index.php
 /build/build.properties
 /vendor/
-/classes/multilingual-plugins/easy-language/blocks/switcher/build/
-/classes/multilingual-plugins/easy-language/blocks/navigation-switcher/build/
-/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/
-/classes/multilingual-plugins/easy-language/pagebuilder/divi/package-lock.json
+/blocks/*/build/
+/legacy-classes/Divi/build/

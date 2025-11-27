@@ -20,8 +20,6 @@
     <fail unless="plugin.version" />
     <fail unless="npm.path" />
 	<fail unless="composer.path" />
-	<fail unless="apis" />
-	<fail unless="pagebuilders" />
     <fail message="Do not run as root!">
         <condition>
             <equals arg1="root" arg2="${user.name}"/>
@@ -96,10 +94,10 @@
 		<exec dir="${src.dir}/vendor/threadi/react-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build5.txt">
 			<arg line="run build"/>
 		</exec>
-		<exec dir="${src.dir}/classes/multilingual-plugins/easy-language/pagebuilder/divi/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build6.txt">
+		<exec dir="${src.dir}/legacy-classes/Divi/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build6.txt">
 			<arg line="install"/>
 		</exec>
-		<exec dir="${src.dir}/classes/multilingual-plugins/easy-language/pagebuilder/divi/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build7.txt">
+		<exec dir="${src.dir}/legacy-classes/Divi/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build7.txt">
 			<arg line="run build"/>
 		</exec>
     </target>
@@ -150,16 +148,22 @@
         <delete file="${build.dir}/${plugin.slug}_${plugin.version}.zip"/>
         <zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip">
 			<zipfileset dir="${src.dir}/admin" prefix="${plugin.slug}/admin" />
-            <zipfileset dir="${src.dir}/classes" prefix="${plugin.slug}/classes">
-				<exclude name="**/apis/**" />
-				<exclude name="**/multilingual-plugins/easy-language/pagebuilder/**" />
-				<exclude name="**/multilingual-plugins/easy-language/parser/**" />
-			</zipfileset>
+            <zipfileset dir="${src.dir}/app" prefix="${plugin.slug}/app" />
+			<zipfileset dir="${src.dir}/css" prefix="${plugin.slug}/css" />
 			<zipfileset dir="${src.dir}/gfx" prefix="${plugin.slug}/gfx" />
-            <zipfileset dir="${src.dir}/inc" prefix="${plugin.slug}/inc">
-				<exclude name="**/apis/**" />
+            <zipfileset dir="${src.dir}/inc" prefix="${plugin.slug}/inc" />
+			<zipfileset dir="${src.dir}/legacy-classes" prefix="${plugin.slug}/legacy-classes">
+				<exclude name="**/Divi/.yarn/**" />
+				<exclude name="**/Divi/package-lock.json" />
+				<exclude name="**/Divi/node_modules/**" />
+				<exclude name="**/Divi/.env" />
+				<exclude name="**/Divi/.yarnrc" />
+				<exclude name="**/Divi/yarn.lock" />
+				<exclude name="**/Divi/package.json" />
+				<exclude name="**/Divi/*/.gitkeep" />
 			</zipfileset>
 			<zipfileset dir="${src.dir}/libs" prefix="${plugin.slug}/libs" />
+			<zipfileset dir="${src.dir}/templates" prefix="${plugin.slug}/templates" />
 			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
 			<zipfileset dir="${src.dir}/vendor/gettext" prefix="${plugin.slug}/vendor/gettext" />
 			<zipfileset dir="${src.dir}/vendor/composer" prefix="${plugin.slug}/vendor/composer" />
@@ -172,28 +176,6 @@
 			<zipfileset dir="${src.dir}" includes="composer.json" fullpath="${plugin.slug}/composer.json" />
             <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
         </zip>
-		<for list="${apis}" param="api">
-			<sequential>
-				<zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip" update="true">
-					<zipfileset dir="${src.dir}/classes/apis/@{api}" prefix="${plugin.slug}/classes/apis/@{api}" />
-					<zipfileset dir="${src.dir}/inc/apis/" includes="@{api}.php" prefix="${plugin.slug}/inc/apis/" />
-				</zip>
-			</sequential>
-		</for>
-		<for list="${pagebuilders}" param="pagebuilder">
-			<sequential>
-				<zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip" update="true">
-					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/pagebuilder/" includes="@{pagebuilder}.php" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/pagebuilder/" />
-					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/pagebuilder/@{pagebuilder}" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/pagebuilder/@{pagebuilder}" erroronmissingdir="false">
-						<exclude name="**/src/**" />
-						<exclude name="**/node_modules/**" />
-						<exclude name="**/package.json" />
-						<exclude name="**/package-lock.json" />
-					</zipfileset>
-					<zipfileset dir="${src.dir}/classes/multilingual-plugins/easy-language/parser/" includes="class-@{pagebuilder}.php" prefix="${plugin.slug}/classes/multilingual-plugins/easy-language/parser/" />
-				</zip>
-			</sequential>
-		</for>
 		<delete file="${src.dir}/${plugin.slug}-release.php"/>
 		<delete file="${src.dir}/readme-release.txt"/>
     </target>
