@@ -78,11 +78,14 @@ class Apis {
 			$apis[] = $obj;
 		}
 
-		// mark this hook as deprecated.
-		apply_filters_deprecated( 'easy_language_register_api', $apis, '3.0.0' );
-
-		// return the list of APIs.
-		return $apis;
+		/**
+		 * Filter the list of APIs. This is the main hook to add custom APIs for this plugin.
+		 *
+		 * @since 2.0.0 Available since 2.0.0.
+		 *
+		 * @param array<int,Api_Base> $apis List of APIs
+		 */
+		return apply_filters( 'easy_language_register_api', $apis );
 	}
 
 	/**

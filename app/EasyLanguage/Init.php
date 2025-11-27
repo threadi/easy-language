@@ -26,7 +26,6 @@ use easyLanguage\Plugin\Log;
 use easyLanguage\Plugin\Setup;
 use easyLanguage\Plugin\ThirdPartySupport_Base;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
-use easyLanguage\Plugin\ThirdPartySupports;
 use WP_Admin_Bar;
 use WP_Post;
 use WP_Post_Type;
@@ -1054,20 +1053,12 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// delete options.
 		$options = array(
-			'easy_language_languages',
-			'easy_language_switcher_link',
 			EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING,
 			EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT,
 			EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX,
 			EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS,
 			'easy_language_switcher_default',
-			'easy_language_state_on_deactivation',
-			'easy_language_state_on_api_change',
-			'easy_language_generate_permalink',
 			'easy_language_intro_step_2',
-			'easy_language_automatic_simplification',
-			'easy_language_automatic_item_count',
-			'easy_language_automatic_simplification_enabled',
 			'easy_language_icons',
 			EASY_LANGUAGE_OPTION_DELETION_COUNT,
 			EASY_LANGUAGE_OPTION_DELETION_MAX,
@@ -3004,5 +2995,14 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// redirect user back to list.
 		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 		exit;
+	}
+
+	/**
+	 * Return whether this object is active.
+	 *
+	 * @return bool
+	 */
+	public function is_active(): bool {
+		return true;
 	}
 }

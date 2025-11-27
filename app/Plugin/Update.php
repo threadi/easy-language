@@ -102,6 +102,10 @@ class Update {
 				$this->version300();
 			}
 
+			// log this event.
+			/* translators: %1$s and %2$s are replaced by the old and new version. */
+			Log::get_instance()->add_log( sprintf( __( 'Easy Language has been updated from %1$s to %2$s.', 'easy-language' ), $db_plugin_version, $installed_plugin_version ), 'success' );
+
 			// save new plugin-version in DB.
 			delete_option( 'easyLanguageVersion' );
 			add_option( 'easyLanguageVersion', $installed_plugin_version, '', true );

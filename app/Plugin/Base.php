@@ -463,7 +463,7 @@ abstract class Base {
 	}
 
 	/**
-	 * Return false whether this API would support translatepress-plugin.
+	 * Return false whether this API would support TranslatePress-plugin.
 	 *
 	 * @return bool
 	 */
@@ -472,7 +472,7 @@ abstract class Base {
 	}
 
 	/**
-	 * Return class-name for translatepress-machine.
+	 * Return class-name for TranslatePress-machine.
 	 *
 	 * @return string
 	 */

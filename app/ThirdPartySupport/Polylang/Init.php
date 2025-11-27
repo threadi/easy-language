@@ -128,7 +128,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	public function deactivation(): void {}
 
 	/**
-	 * Run on deactivation of polylang.
+	 * Run on deactivation of Polylang.
 	 *
 	 * @return void
 	 */
@@ -144,7 +144,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * We add no simplification-scripts for polylang.
+	 * We add no simplification-scripts for Polylang.
 	 *
 	 * @return void
 	 */

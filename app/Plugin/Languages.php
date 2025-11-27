@@ -116,7 +116,7 @@ class Languages {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $source_languages List of source languages.
+		 * @param array<string,array<string,string>> $source_languages List of source languages.
 		 */
 		return apply_filters( 'easy_language_possible_source_languages', $source_languages );
 	}

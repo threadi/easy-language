@@ -241,14 +241,14 @@ interface Api_Base {
 	public function get_max_requests_per_minute(): int;
 
 	/**
-	 * Return false whether this API would support translatepress-plugin.
+	 * Return false whether this API would support TranslatePress-plugin.
 	 *
 	 * @return bool
 	 */
 	public function is_supporting_translatepress(): bool;
 
 	/**
-	 * Return class-name for translatepress-machine.
+	 * Return class-name for TranslatePress-machine.
 	 *
 	 * @return string
 	 */

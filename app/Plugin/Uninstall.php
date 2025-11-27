@@ -238,13 +238,6 @@ class Uninstall {
 	 */
 	private function get_options(): array {
 		return array(
-			'easy_language_debug_mode',
-			'easy_language_api',
-			'easy_language_log_max_age',
-			'easy_language_api_timeout',
-			'easy_language_api_text_limit_per_process',
-			'easy_language_delete_unused_simplifications',
-			EASY_LANGUAGE_TRANSIENT_LIST,
 			'easyLanguageVersion',
 		);
 	}

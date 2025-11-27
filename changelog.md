@@ -12,13 +12,15 @@
 - Added option to reset the plugin in backend settings (in preparation for Cyber Resilience Act)
 - Added Taskfile as alternative release building method for the plugin
 - Added check against WordPress Plugin Checker during each release
+- Added info in footer of admin where our plugin adds options or show settings
 
 ### Changed
 
-- Now requires PHP 8.1 or higher
+- Requires PHP 8.1 or higher
 - Changed handling of transients
 - Optimized support for automatic simplifications via TranslatePress
 - Optimized generating the hook documentation
+- Logging when which update of the plugin has been installed
 - Updated dependencies
 
 ## [2.9.2] - 21.10.2025
