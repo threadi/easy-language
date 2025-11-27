@@ -5,7 +5,6 @@ jQuery(document).ready(function($) {
 	let settings_body = $('body.settings_page_easy_language_settings .wrap > h1');
 
 	// add option near to list-headline.
-	settings_body.after('<a class="page-title-action easy-language-pro-hint" href="' + easyLanguageJsVars.pro_url + '" target="_blank">' + easyLanguageJsVars.title_get_pro + '</a>');
 	settings_body.each(function() {
 		let button = document.createElement('a');
 		button.className = 'review-hint-button page-title-action';

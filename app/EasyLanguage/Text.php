@@ -241,8 +241,8 @@ class Text {
 		// get object.
 		$object = Helper::get_object( $object_id );
 
-		// bail of object is not a Post_Object.
-		if ( ! $object instanceof Post_Object ) {
+		// bail of object is not an Objects object.
+		if ( ! $object instanceof Objects ) {
 			return false;
 		}
 

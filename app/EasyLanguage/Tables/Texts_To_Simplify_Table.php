@@ -13,6 +13,8 @@ defined( 'ABSPATH' ) || exit;
 use easyLanguage\EasyLanguage\Db;
 use easyLanguage\EasyLanguage\Init;
 use easyLanguage\EasyLanguage\Text;
+use easyLanguage\Plugin\Api_Base;
+use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Languages;
 use WP_List_Table;
@@ -160,20 +162,67 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 			),
 		);
 
-		$dialog = wp_json_encode( $dialog_simplification );
-		if ( ! $dialog ) {
-			$dialog = '';
-		}
-
 		// show content depending on column.
 		switch ( $column_name ) {
 			case 'options':
 				$options = array(
-					'<span class="dashicons dashicons-translation" title="' . __( 'Simplify now only with Easy Language Pro.', 'easy-language' ) . '">&nbsp;</span>',
-					'<a href="' . esc_url( $delete_link ) . '" class="dashicons dashicons-trash easy-dialog-for-wordpress" data-dialog="' . esc_attr( $dialog ) . '" title="' . __( 'Delete this text.', 'easy-language' ) . '">&nbsp;</a>',
+					'<a href="' . esc_url( $delete_link ) . '" class="dashicons dashicons-trash easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_json( $dialog_simplification ) ) . '" title="' . __( 'Delete this text.', 'easy-language' ) . '">&nbsp;</a>',
 				);
 
+				// get the item ID.
 				$item_id = $item->get_id();
+
+				// get actual API and check if it is configured.
+				$api_object = Apis::get_instance()->get_active_api();
+
+				// remove the first entry from the options-array to replace it with our own.
+				unset( $options[0] );
+
+				// if no API is active, show hint.
+				if ( ! $api_object instanceof Api_Base ) {
+					$options[0] = '<span class="dashicons dashicons-translation" title="' . esc_attr( __( 'No API active!', 'easy-language' ) ) . '">&nbsp;</a>';
+				}
+
+				// if API is not configured, show hint.
+				if ( $api_object instanceof Api_Base && false === $api_object->is_configured() ) {
+					/* translators: %1$s will be replaced by the name of the API */
+					$options[0] = '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'API %1$s is not configured.', 'easy-language' ), esc_html( $api_object->get_title() ) ) ) . '">&nbsp;</a>';
+				}
+
+				// if API is configured, show option to simplify the item.
+				if ( $api_object instanceof Api_Base && false !== $api_object->is_configured() ) {
+					// add option to delete a single simplification item.
+					$do_simplification = add_query_arg(
+						array(
+							'action' => 'easy_language_get_simplification_of_entry',
+							'id'     => $item_id,
+							'nonce'  => wp_create_nonce( 'easy-language-get-simplification-of-entry' ),
+						),
+						get_admin_url() . 'admin.php'
+					);
+
+					// create dialog.
+					$dialog_config = array(
+						'title'   => __( 'Simplify this text?', 'easy-language' ),
+						'texts'   => array(
+							__( '<p>Simplifying texts via API could cause costs.<br><strong>Are you sure your want to simplify this single text?</strong></p>', 'easy-language' ),
+						),
+						'buttons' => array(
+							array(
+								'action'  => 'location.href="' . $do_simplification . '";',
+								'variant' => 'primary',
+								'text'    => __( 'Yes', 'easy-language' ),
+							),
+							array(
+								'action'  => 'closeDialog();',
+								'variant' => 'secondary',
+								'text'    => __( 'No', 'easy-language' ),
+							),
+						),
+					);
+
+					$options[0] = '<a href="' . esc_url( $do_simplification ) . '" class="dashicons dashicons-translation easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_json( $dialog_config ) ) . '" title="' . esc_attr( __( 'Simplify now', 'easy-language' ) ) . '">&nbsp;</a>';
+				}
 
 				/**
 				 * Filter additional options.
@@ -209,9 +258,19 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 			case 'original':
 				return wp_strip_all_tags( $item->get_original() );
 
-			// show hint for pro in used in column.
+			// show hint where this text is used.
 			case 'used_in':
-				return '<span class="pro-marker">' . __( 'Info only with Pro visible', 'easy-language' ) . '</span>';
+				// collect the texts.
+				$texts = array();
+
+				// get all objects this text is used.
+				foreach ( $item->get_objects() as $object ) {
+					$object = Helper::get_object( absint( $object['object_id'] ), $object['object_type'] );
+					if ( false !== $object ) {
+						$texts[] = '<a href="' . esc_url( $object->get_edit_link() ) . '">' . esc_html( $object->get_title() ) . '</a><br>';
+					}
+				}
+				return implode( '', $texts );
 		}
 
 		// or return nothing.

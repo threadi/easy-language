@@ -186,11 +186,44 @@ class Texts_In_Use_Table extends WP_List_Table {
 
 			// show options.
 			case 'options':
-				$options = array(
-					'<span class="dashicons dashicons-trash" title="' . __( 'Delete entry only with Easy Language Pro.', 'easy-language' ) . '">&nbsp;</span>',
+				// get the item ID.
+				$item_id = $item->get_id();
+
+				// create the option-list.
+				$options = array();
+
+				// add option to delete a single simplification item.
+				$delete_link = add_query_arg(
+					array(
+						'action' => 'easy_language_delete_simplification',
+						'id'     => $item_id,
+						'nonce'  => wp_create_nonce( 'easy-language-delete-simplification' ),
+					),
+					get_admin_url() . 'admin.php'
 				);
 
-				$item_id = $item->get_id();
+				// define dialog.
+				$dialog = array(
+					'title'   => __( 'Do you really want to delete this simplification?', 'easy-language' ),
+					'texts'   => array(
+						'<p>' . __( 'Only the simplification will be deleted.<br>The objects where this text is used will not be altered.<br>After deletion you could request a new simplification for the original text from API.', 'easy-language' ) . '</p>',
+					),
+					'buttons' => array(
+						array(
+							'action'  => 'location.href="' . $delete_link . '"',
+							'variant' => 'primary',
+							'text'    => __( 'Yes, delete it', 'easy-language' ),
+						),
+						array(
+							'action'  => 'closeDialog();',
+							'variant' => 'primary',
+							'text'    => __( 'Do nothing', 'easy-language' ),
+						),
+					),
+				);
+
+				// add the option to the list.
+				$options[] = '<a href="' . esc_url( $delete_link ) . '" class="dashicons dashicons-trash easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_json( $dialog ) ) . '">&nbsp;</a>';
 
 				/**
 				 * Filter additional options.
@@ -228,9 +261,19 @@ class Texts_In_Use_Table extends WP_List_Table {
 				// return hint that this translation was run without login.
 				return '<i>' . __( 'without login', 'easy-language' ) . '</i>';
 
-			// show hint for pro in used in column.
+			// show hint where this text is used.
 			case 'used_in':
-				return '<span class="pro-marker">' . __( 'Info only with Pro visible', 'easy-language' ) . '</span>';
+				// collect the texts.
+				$texts = array();
+
+				// get all objects this text is used.
+				foreach ( $item->get_objects() as $object ) {
+					$object = Helper::get_object( absint( $object['object_id'] ), $object['object_type'] );
+					if ( false !== $object ) {
+						$texts[] = '<a href="' . esc_url( $object->get_edit_link() ) . '">' . esc_html( $object->get_title() ) . '</a><br>';
+					}
+				}
+				return implode( '', $texts );
 
 			// set default return to empty string.
 			default:

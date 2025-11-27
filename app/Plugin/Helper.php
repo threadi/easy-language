@@ -325,18 +325,6 @@ class Helper {
 	}
 
 	/**
-	 * Return the URL for laolaweb.com where we can order the Pro-Version.
-	 *
-	 * @return string
-	 */
-	public static function get_pro_url(): string {
-		if ( Languages::get_instance()->is_german_language() ) {
-			return 'https://laolaweb.com/plugins/leichte-sprache-fuer-wordpress/';
-		}
-		return 'https://laolaweb.com/en/plugins/easy-language-for-wordpress/';
-	}
-
-	/**
 	 * Get attachment-object by given filename.
 	 *
 	 * @param string $post_name The searched filename.
@@ -628,7 +616,7 @@ class Helper {
 			$transient_obj->set_dismissible_days( 2 );
 			$transient_obj->set_name( 'easy_language_source_language_not_supported' );
 			/* translators: %1$s will be replaced by name of the actual language, %2$s by the API-title, %3$s by the URL for WordPress-settings, %5$s by a list of languages, %6$s by the URL for the API-settings, %7$s by the Pro-link. */
-			$transient_obj->set_message( sprintf( __( '<strong>The language of your website (%1$s) is not supported as source language for simplifications via %2$s!</strong><br>You will not be able to use %3$s.<br>You will not be able to simplify any texts.<br>You have to <a href="%4$s">switch the language</a> in WordPress to one of the following supported source languages: %5$s Or <a href="%6$s">choose another API</a> which supports the language.<br><strong>Hint:</strong> We support more languages for each API with <a href="%7$s" target="_blank">Easy Language Pro (opens new window)</a>.', 'easy-language' ), '<em>' . esc_html( $language_name ) . '</em>', esc_html( $api->get_title() ), esc_html( $api->get_title() ), esc_url( self::get_wp_settings_url() ), wp_kses_post( $language_list ), esc_url( self::get_settings_page_url() ), esc_url( self::get_pro_url() ) ) );
+			$transient_obj->set_message( sprintf( __( '<strong>The language of your website (%1$s) is actually not supported as source language for simplifications via %2$s!</strong><br>You will not be able to use %3$s.<br>You will not be able to simplify any texts.<br>You have to <a href="%4$s">switch the language</a> in WordPress to one of the following supported source languages: %5$s Or <a href="%6$s">choose another API</a> which supports the language.', 'easy-language' ), '<em>' . esc_html( $language_name ) . '</em>', esc_html( $api->get_title() ), esc_html( $api->get_title() ), esc_url( self::get_wp_settings_url() ), wp_kses_post( $language_list ), esc_url( self::get_settings_page_url() ) ) );
 			$transient_obj->set_type( 'error' );
 			$transient_obj->set_hide_on( array( Setup::get_instance()->get_setup_link() ) );
 			$transient_obj->save();
@@ -667,7 +655,7 @@ class Helper {
 				),
 			),
 		);
-		return self::get_dialog_for_attribute( $dialog );
+		return self::get_json( $dialog );
 	}
 
 	/**
@@ -760,24 +748,6 @@ class Helper {
 		 * @param array $keys List of keys to ignore.
 		 */
 		return apply_filters( 'easy_language_post_meta_keys_to_ignore', $keys );
-	}
-
-	/**
-	 * Return dialog for attribute-usage.
-	 *
-	 * @param array<string,mixed> $dialog The dialog configuration.
-	 *
-	 * @return string
-	 */
-	public static function get_dialog_for_attribute( array $dialog ): string {
-		// get dialog as JSON.
-		$dialog_json = wp_json_encode( $dialog );
-		if ( ! $dialog_json ) {
-			return '';
-		}
-
-		// return the dialog as JSON-string.
-		return $dialog_json;
 	}
 
 	/**

@@ -387,15 +387,6 @@ abstract class Base {
 	}
 
 	/**
-	 * Return whether this API has extended support in Easy Language Pro.
-	 *
-	 * @return bool
-	 */
-	public function is_extended_in_pro(): bool {
-		return false;
-	}
-
-	/**
 	 * Return max text length for this API.
 	 *
 	 * @return int

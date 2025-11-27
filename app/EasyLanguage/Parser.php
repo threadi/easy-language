@@ -87,9 +87,9 @@ interface Parser {
 	/**
 	 * Run page-builder-specific tasks on object.
 	 *
-	 * @param Post_Object $post_object The object.
+	 * @param Objects $post_object The object.
 	 *
 	 * @return void
 	 */
-	public function update_object( Post_Object $post_object ): void;
+	public function update_object( Objects $post_object ): void;
 }

@@ -566,26 +566,6 @@ class Summ_Ai extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return whether this API has extended support in Easy Language Pro.
-	 *
-	 * @return bool
-	 */
-	public function is_extended_in_pro(): bool {
-		return true;
-	}
-
-	/**
-	 * Return custom pro-hint for API-chooser.
-	 *
-	 * @return string
-	 * @noinspection PhpUnused
-	 */
-	public function get_pro_hint(): string {
-		/* translators: %1$s will be replaced by the link to laolaweb.com */
-		return sprintf( __( 'More languages and Options with <a href="%1$s" target="_blank" title="link opens new window">Easy Language Pro</a>', 'easy-language' ), esc_url( Helper::get_pro_url() ) );
-	}
-
-	/**
 	 * Enable-routines for the API, called on the new API if another API is chosen.
 	 *
 	 * @return void

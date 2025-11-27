@@ -176,13 +176,6 @@ interface Api_Base {
 	public function is_configured(): bool;
 
 	/**
-	 * Return whether this API has extended support in Easy Language Pro.
-	 *
-	 * @return bool
-	 */
-	public function is_extended_in_pro(): bool;
-
-	/**
 	 * Return the log entries of this API.
 	 *
 	 * @return array<int,mixed>
