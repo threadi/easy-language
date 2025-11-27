@@ -8,16 +8,34 @@ This repository provides the features for the free version of the WordPress plug
 
 After checkout go through the following steps:
 
+### Using ant
+
 1. copy _build/build.properties.dist_ to _build/build.properties_.
 2. modify the build/build.properties file - note the comments in the file.
-3. execute the command in _build/_: `ant init`
-4. after that the plugin can be activated in WordPress
+3. after that the plugin can be activated in WordPress.
+
+### Using Taskfile
+
+1. Run this command: `task prepare`
+2. after that the plugin can be activated in WordPress.
 
 ## Release
 
+### from local environment with ant
+
 1. increase the version number in _build/build.properties_.
 2. execute the following command in _build/_: `ant build`
-3. after that you will find in the release directory a zip file which could be used in WordPress to install it.
+3. after that you will find a zip file in the release directory which could be used in WordPress to install it.
+
+### from local environment with Taskfile
+
+1. execute the following command in main directory: `task release -- 5.0.0` - adjust the version number.
+2. after that you will find a zip file in the release directory which could be used in WordPress to install it.
+
+### on GitHub
+
+1. Create a new tag with the new version number.
+2. The release zip will be created by GitHub action.
 
 ## Translations
 
@@ -79,7 +97,7 @@ Hint: will be called by ant-command mentioned above.
 
 ## Generate documentation
 
-`vendor/bin/wp-documentor parse classes --format=markdown --output=doc/hooks.md --prefix=easy_language`
+`vendor/bin/wp-documentor parse app --format=markdown --output=doc/hooks.md --prefix=easy_language_ --exclude=Section.php --exclude=Tab.php --exclude=Import.php --exclude=Export.php --exclude=Field_Base.php --exclude=Settings.php --exclude=Page.php --exclude=Rest.php --exclude=Transients.php`
 
 ## Check for WordPress VIP Coding Standards
 
@@ -92,3 +110,7 @@ Hint: this check runs against the VIP-GO-platform which is not our target for th
 ## Analyze with PHPStan
 
 `vendor/bin/phpstan analyse`
+
+## Check with plugin "Plugin Check"
+
+`wp plugin check --error-severity=7 --warning-severity=6 --include-low-severity-errors --categories=plugin_repo --format=json --slug=easy-language .`

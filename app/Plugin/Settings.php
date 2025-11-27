@@ -640,7 +640,7 @@ class Settings {
 	 * @return array<string,mixed>|null
 	 */
 	public function sanitize_checkboxes( ?array $values ): ?array {
-		if( ! is_array( $values ) ) {
+		if ( ! is_array( $values ) ) {
 			return $values;
 		}
 		foreach ( $values as $key => $value ) {
