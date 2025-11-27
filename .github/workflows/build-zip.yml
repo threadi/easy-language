@@ -4,6 +4,7 @@ on:
     push:
         tags:
             - '*'
+    workflow_dispatch:
 
 jobs:
     build:
@@ -40,6 +41,13 @@ jobs:
                   npm i
                   npm run build
                   cd ../../../../../
+                  rm -fr assets
+                  rm -fr build
+                  rm -fr releases
+                  rm -fr languages
+                  rm -fr changelog.md
+                  rm -fr svn
+                  rm readme.md
 
             - name: Generate autoloader
               run: composer dump-autoload -oa --no-dev
@@ -68,15 +76,21 @@ jobs:
                   search-text: '@@VersionNumber@@'
                   replacement-text: ${{ github.ref_name }}
 
+            - name: Run PCP check
+              uses: wordpress/plugin-check-action@v1
+              with:
+                  exclude-directories:
+                      app/Dependencies/easyTransientsForWordPress/
+                  ignore-codes:
+                      WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
+                  include-experimental: false
+                  error-severity: 7
+                  warning-severity: 6
+                  include-low-severity-errors: true
+              continue-on-error: true
+
             - name: Create ZIP release
               run: |
-                  rm -fr assets
-                  rm -fr build
-                  rm -fr releases
-                  rm -fr languages
-                  rm -fr changelog.md
-                  rm -fr svn
-                  rm readme.md
                   rm ruleset.xml
                   cd ..
                   zip -r -q ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/* -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/doc/*" "*/phpcs.xml" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "/.editorconfig" "*/legacy-classes/Divi/.yarn/*" "*/legacy-classes/Divi/package-lock.json" "*/legacy-classes/Divi/node_modules/*" "*/legacy-classes/Divi/.env" "*/legacy-classes/Divi/.yarnrc" "*/legacy-classes/Divi/yarn.lock" "*/legacy-classes/Divi/package.json" "*/legacy-classes/Divi/*/.gitkeep"
