@@ -63,11 +63,10 @@ class Init {
 		// initialize our installer.
 		Installer::get_instance()->init();
 
-		// initialize the main simplification functions.
-		\easyLanguage\EasyLanguage\Init::get_instance()->init();
-
-		// initialize the third party support.
-		ThirdPartySupports::get_instance()->get_available_plugins();
+		// loop through the active multilingual-plugins.
+		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
+			$plugin_obj->init();
+		}
 
 		// initialize the setup.
 		Setup::get_instance()->init();

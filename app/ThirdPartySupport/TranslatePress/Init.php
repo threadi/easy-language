@@ -86,6 +86,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function init(): void {
+		// bail if plugin is not enabled.
+		if( ! $this->is_active() ) {
+			return;
+		}
+
 		add_action( 'deactivate_translatepress-multilingual/index.php', array( $this, 'foreign_deactivate' ) );
 		add_filter( 'trp_wp_languages', array( $this, 'add_to_wp_list' ) );
 		add_filter( 'trp_automatic_translation_engines_classes', array( $this, 'add_automatic_machine' ) );
@@ -93,6 +98,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 		add_filter( 'trp_mt_available_supported_languages', array( $this, 'get_supported_languages_for_trp' ), 10, 3 );
 		add_filter( 'trp_ls_floating_current_language', array( $this, 'set_current_language_fields' ), 10, 3 );
 		add_filter( 'trp_flags_path', array( $this, 'set_flag' ), 10, 2 );
+		add_action( 'trp_machine_translation_extra_settings_middle', array( $this, 'add_settings' ), 40, 0 );
+		add_filter( 'trp_machine_translation_sanitize_settings', array( $this, 'sanitize_settings' ), 10, 1 );
 	}
 
 	/**
@@ -253,7 +260,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return $engines;
 		}
 
-		// bail if API does not support translatepress.
+		// bail if API does not support TranslatePress.
 		if ( ! $api_obj->is_supporting_translatepress() ) {
 			return $engines;
 		}
@@ -380,5 +387,63 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// return the given path.
 		return $flags_path;
+	}
+
+	/**
+	 * Add our individual settings.
+	 *
+	 * @return void
+	 */
+	public function add_settings(): void {
+		// define url to SUMM AI settings.
+		$summ_ai_settings = add_query_arg(
+			array(
+				'page' => 'easy_language_settings',
+				'tab'  => 'summ_ai',
+			),
+			get_admin_url() . 'options-general.php'
+		);
+
+		// output.
+		?>
+		<tr>
+			<th scope="row"><label for="trp-summ-ai-key"><?php esc_html_e( 'SUMM AI API Key', 'easy-language' ); ?></label></th>
+			<td>
+				<?php
+				/* translators: %1%s will be replaced by the URL for plugin-settings */
+				echo wp_kses_post( sprintf( __( 'Add your API-key in the <a href="%1$s">Easy Language plugin settings</a>.', 'easy-language' ), esc_url( $summ_ai_settings ) ) );
+				?>
+			</td>
+
+		</tr>
+		<?php
+	}
+
+	/**
+	 * Check our individual settings.
+	 *
+	 * @param array<string,string> $settings List of settings.
+	 * @return array<string,string>
+	 */
+	public function sanitize_settings( array $settings ): array {
+		// check for nonce.
+		if ( isset( $_POST['easy-language-verify'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['easy-language-verify'] ) ), 'submit-application' ) ) {
+			return $settings;
+		}
+
+		if ( ! empty( $_POST['trp_machine_translation_settings']['summ-ai-key'] ) ) {
+			$settings['summ-ai-key'] = sanitize_text_field( wp_unslash( $_POST['trp_machine_translation_settings']['summ-ai-key'] ) );
+		}
+
+		return $settings;
+	}
+
+	/**
+	 * Return whether this object is active.
+	 *
+	 * @return bool
+	 */
+	public function is_active(): bool {
+		return Helper::is_plugin_active( 'translatepress-multilingual/index.php' ) || Helper::is_plugin_active( 'translatepress-business/index.php' );
 	}
 }

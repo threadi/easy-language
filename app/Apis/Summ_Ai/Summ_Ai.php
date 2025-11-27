@@ -1350,7 +1350,7 @@ class Summ_Ai extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return true whether this API would support translatepress-plugin.
+	 * Return true whether this API would support TranslatePress-plugin.
 	 *
 	 * @return bool
 	 */
@@ -1359,7 +1359,7 @@ class Summ_Ai extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return class-name for translatepress-machine.
+	 * Return class-name for TranslatePress-machine.
 	 *
 	 * @return string
 	 */

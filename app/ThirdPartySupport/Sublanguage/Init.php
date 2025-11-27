@@ -11,6 +11,7 @@ namespace easyLanguage\ThirdPartySupport\Sublanguage;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Plugin\Base;
+use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Languages;
 use easyLanguage\Plugin\ThirdPartySupport_Base;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
@@ -72,6 +73,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function init(): void {
+		// bail if plugin is not enabled.
+		if( ! $this->is_active() ) {
+			return;
+		}
+
 		// add hooks.
 		add_action( 'admin_init', array( $this, 'wp_init' ) );
 
@@ -186,4 +192,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function cli(): void {}
+
+	/**
+	 * Return whether this object is active.
+	 *
+	 * @return bool
+	 */
+	public function is_active(): bool {
+		return Helper::is_plugin_active( 'sublanguage/sublanguage.php' );
+	}
 }
