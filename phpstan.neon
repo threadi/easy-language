@@ -25,6 +25,7 @@ parameters:
     - "#WP_PLUGIN_DIR#"
     - "#ARRAY_A#"
     - "#ABSPATH#"
+    - "#_IN_SECONDS#"
   paths:
     - app
     - easy-language.php
