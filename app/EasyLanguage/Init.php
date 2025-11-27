@@ -1072,10 +1072,17 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$general_main_section = $general_tab->add_section( 'easy_language_general_section', 10 );
 		$general_main_section->set_title( __( 'General Settings', 'easy-language' ) );
 
-		// get all actual post-types in this project.
-		$post_types_array = array( 'post', 'page' );
+		/**
+		 * Get all post-types in this project with support for title and editor
+		 * as we need this for simplification.
+		 */
 		$post_types       = array();
-		foreach ( $post_types_array as $post_type ) {
+
+		// get all post types with the necessary support.
+		$post_types_with_editor_support = get_post_types_by_support( array( 'editor', 'title' ) );
+
+		// loop through all of them.
+		foreach ( $post_types_with_editor_support as $post_type ) {
 			// get the post-type object.
 			$post_type_obj = get_post_type_object( $post_type );
 
@@ -1095,7 +1102,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array<string,mixed> $post_types The list of possible post-types.
+		 * @param array<string,string> $post_types The list of possible post-types.
 		 */
 		$post_types = apply_filters( 'easy_language_possible_post_types', $post_types );
 

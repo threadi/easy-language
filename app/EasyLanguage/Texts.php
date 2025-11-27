@@ -86,7 +86,7 @@ class Texts {
 
 		// check texts in updated post-types-objects.
 		foreach ( $init->get_supported_post_types() as $post_type => $enabled ) {
-			add_action( 'save_post_' . $post_type, array( $this, 'update_simplification_of_post' ), 10, 3 );
+			add_action( 'save_post_{$post_type}', array( $this, 'update_simplification_of_post' ), 10, 3 );
 		}
 
 		// if object is trashed.
