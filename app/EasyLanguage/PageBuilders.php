@@ -51,7 +51,7 @@ class PageBuilders {
 	}
 
 	/**
-	 * Initialize pagebuilder-support for our own plugin.
+	 * Initialize PageBuilder-support for our own plugin.
 	 *
 	 * @return void
 	 */
@@ -69,14 +69,14 @@ class PageBuilders {
 	 */
 	public function add_meta_box( string $post_type ): void {
 		// bail if the given post-type is not supported.
-		if ( ! Init::get_instance()->is_post_type_supported( $post_type) ) {
+		if ( ! Init::get_instance()->is_post_type_supported( $post_type ) ) {
 			return;
 		}
 
 		// add meta-box.
 		add_meta_box(
 			'easy-language',
-			__( 'Language', 'easy-language' ),
+			_x( 'Easy Language', 'Meta Box title', 'easy-language' ),
 			array( $this, 'render_meta_box_content' ),
 			$post_type,
 			'side',

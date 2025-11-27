@@ -486,7 +486,7 @@ class Capito extends Base implements Api_Base {
 		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
 
 		// bail if the page is not available.
-		if( ! $settings_page instanceof Page ) {
+		if ( ! $settings_page instanceof Page ) {
 			return;
 		}
 
@@ -498,6 +498,11 @@ class Capito extends Base implements Api_Base {
 		// add section.
 		$capito_tab_main = $capito_tab->add_section( 'settings_section_capito', 10 );
 		$capito_tab_main->set_title( __( 'capito settings', 'easy-language' ) );
+
+		// add section.
+		$capito_quota = $capito_tab->add_section( 'settings_section_quota', 20 );
+		$capito_quota->set_title( __( 'capito Quota', 'easy-language' ) );
+		$capito_quota->set_callback( array( $this, 'show_quota' ) );
 
 		// Set description for token field if it has not been set.
 		/* translators: %1$s will be replaced by the capito URL */
@@ -557,10 +562,12 @@ class Capito extends Base implements Api_Base {
 		$setting->set_save_callback( array( $this, 'clean_team_cache' ) );
 		$field = new Select();
 		$field->set_title( __( 'Account type', 'easy-language' ) );
-		$field->set_options( array(
-			'user' => __( 'User', 'easy-language' ),
-			'team' => __( 'Team', 'easy-language' ),
-		) );
+		$field->set_options(
+			array(
+				'user' => __( 'User', 'easy-language' ),
+				'team' => __( 'Team', 'easy-language' ),
+			)
+		);
 		$setting->set_field( $field );
 
 		// add setting.
@@ -569,7 +576,7 @@ class Capito extends Base implements Api_Base {
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
-		if( $this->is_team_account() ) {
+		if ( $this->is_team_account() ) {
 			// use cached value.
 			$teams = get_transient( 'easy_language_capito_teams' );
 
@@ -611,19 +618,17 @@ class Capito extends Base implements Api_Base {
 				}
 			}
 
-			if( empty( $teams ) ) {
+			if ( empty( $teams ) ) {
 				$field = new TextInfo();
 				$field->set_title( __( 'Account type', 'easy-language' ) );
 				$field->set_description( __( 'You are not assigned to any team.', 'easy-language' ) );
-			}
-			else {
+			} else {
 				// create the select field for the teams.
 				$field = new Select();
 				$field->set_title( __( 'Account type', 'easy-language' ) );
 				$field->set_options( $teams );
 			}
-		}
-		else {
+		} else {
 			$field = new TextInfo();
 			$field->set_title( __( 'Account type', 'easy-language' ) );
 			$field->set_description( __( 'Choose team as account type.', 'easy-language' ) );
@@ -694,7 +699,7 @@ class Capito extends Base implements Api_Base {
 		$hidden_section = Helper::get_hidden_section();
 
 		// bail if section could not be loaded.
-		if( ! $hidden_section instanceof Section ) {
+		if ( ! $hidden_section instanceof Section ) {
 			return;
 		}
 
@@ -1176,5 +1181,49 @@ class Capito extends Base implements Api_Base {
 	public function clean_team_cache( mixed $value ): mixed {
 		delete_transient( 'easy_language_capito_teams' );
 		return $value;
+	}
+
+	/**
+	 * Show actual quota for capito.
+	 *
+	 * @return void
+	 */
+	public function show_quota(): void {
+		if ( $this->is_capito_token_set() ) {
+			/**
+			 * Get and show the quota we received from API.
+			 */
+			$api_quota = $this->get_quota();
+			if ( empty( $api_quota ) ) {
+				$quota_text = esc_html__( 'No quota consumed so far', 'easy-language' );
+			} elseif ( -1 === $api_quota['character_limit'] ) {
+				$quota_text = __( 'Update quota now.', 'easy-language' );
+			} elseif ( 0 === $api_quota['character_limit'] ) {
+				$quota_text = __( 'Unlimited.', 'easy-language' );
+			} else {
+				$quota_text = $api_quota['character_spent'] . ' / ' . $api_quota['character_limit'];
+			}
+
+			// get the update quota link.
+			$update_quota_url = add_query_arg(
+				array(
+					'action' => 'easy_language_capito_get_quota',
+					'nonce'  => wp_create_nonce( 'easy-language-capito-get-quota' ),
+				),
+				get_admin_url() . 'admin.php'
+			);
+
+			// output.
+			?>
+			<p>
+				<strong><?php echo esc_html__( 'Quota', 'easy-language' ); ?>:</strong> <?php echo esc_html( $quota_text ); ?>
+				<a href="<?php echo esc_url( $update_quota_url ); ?>#statistics" class="button button-secondary"><?php echo esc_html__( 'Update now', 'easy-language' ); ?></a>
+			</p>
+			<?php
+		} else {
+			?>
+			<p><?php echo esc_html__( 'Info about quota will be available until the API token is set', 'easy-language' ); ?></p>
+			<?php
+		}
 	}
 }

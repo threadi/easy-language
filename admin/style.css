@@ -70,6 +70,7 @@ td[class^="easy-language"] a, td[class^="easy-language"] span, .text-translation
 body .button.easy-language-settings-button {
     display: inline-block;
     margin-right: 8px;
+	margin-top: 8px;
 }
 
 body .text-translations-table #options { width: 42px; }
@@ -339,3 +340,31 @@ body.settings_page_easy_language_settings #state { width: 48px }
 body.settings_page_easy_language_settings #date { width: 124px }
 body.settings_page_easy_language_settings #api { width: 80px }
 body.settings_page_easy_language_settings #response { min-width: 200px;width: auto }
+
+#easy-language-active-api {
+	background-color: var(--lwel-hint-bg);
+	border-radius: 12px;
+	color: #fff;
+	padding: 8px 12px;
+	position: absolute;
+	top: -8px;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 10;
+}
+
+.easy_language_summ_ai_api_key td, .easy_language_capito_api_key td, .easy_language_chatgpt_api_key td {
+	background-color: var(--lwel-hint-bg);
+	color: #fff;
+	a {
+		color: #fff;
+	}
+}
+
+.easy_language_summ_ai_target_languages td {
+	vertical-align: top;
+}
+
+.easy_language_chatgpt_target_languages_prompts table {
+	width: 100%;
+}

@@ -115,6 +115,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// get our own parsers-handler.
 		Parsers::get_instance()->init();
 
+		// get PageBuilder support.
+		PageBuilders::get_instance()->init();
+
 		// get our own REST API-support-handler.
 		Rest_Api::get_instance()->init();
 
@@ -520,12 +523,12 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 */
 	public function hide_simplified_posts( WP_Query $query ): void {
 		// bail if we are not in wp-admin.
-		if( ! is_admin() ) {
+		if ( ! is_admin() ) {
 			return;
 		}
 
 		// bail if filter used disabled.
-		if( '' !== $query->get( 'do_not_use_easy_language_filter') ) {
+		if ( '' !== $query->get( 'do_not_use_easy_language_filter' ) ) {
 			return;
 		}
 
@@ -603,7 +606,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	/**
 	 * If locale setting changed in WP, change the plugin-settings.
 	 *
-	 * @param string $old_value The old value of the changed option.
+	 * @param string      $old_value The old value of the changed option.
 	 * @param null|string $new_value The new value of the changed option.
 	 *
 	 * @return void
@@ -1057,7 +1060,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
 
 		// bail if the page is not available.
-		if( ! $settings_page instanceof Page ) {
+		if ( ! $settings_page instanceof Page ) {
 			return;
 		}
 
@@ -1100,7 +1103,12 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting = $settings_obj->add_setting( 'easy_language_post_types' );
 		$setting->set_section( $general_main_section );
 		$setting->set_type( 'array' );
-		$setting->set_default( array( 'page' => '1', 'post' => '1' ) );
+		$setting->set_default(
+			array(
+				'page' => '1',
+				'post' => '1',
+			)
+		);
 		$field = new Checkboxes();
 		$field->set_title( __( 'Choose supported post-types', 'easy-language' ) );
 		$field->set_options( $post_types );
@@ -1115,7 +1123,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		$languages = array();
-		foreach( Languages::get_instance()->get_possible_target_languages( true ) as $key => $settings ) {
+		foreach ( Languages::get_instance()->get_possible_target_languages( true ) as $key => $settings ) {
 			$languages[ $key ] = $settings['label'];
 		}
 
@@ -1141,11 +1149,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$field = new Select();
 		$field->set_title( __( 'Set object state on plugin deactivation', 'easy-language' ) );
 		$field->set_description( __( 'If the plugin is disabled, your simplified objects will get the state set here. If plugin is reactivated they will be set to their state before.<br><strong>Hint:</strong> During uninstallation all simplified objects will be deleted regardless of the setting here.', 'easy-language' ) );
-		$field->set_options( array(
-			'disabled' => __( 'Do not change anything', 'easy-language' ),
-			'draft'    => __( 'Set to draft', 'easy-language' ),
-			'trash'    => __( 'Set to trash', 'easy-language' ),
-		) );
+		$field->set_options(
+			array(
+				'disabled' => __( 'Do not change anything', 'easy-language' ),
+				'draft'    => __( 'Set to draft', 'easy-language' ),
+				'trash'    => __( 'Set to trash', 'easy-language' ),
+			)
+		);
 		$setting->set_field( $field );
 
 		// add setting.
@@ -1156,11 +1166,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$field = new Select();
 		$field->set_title( __( 'Set object state on API change', 'easy-language' ) );
 		$field->set_description( __( 'If the API is changed, set all objects of the former API to the state set here.', 'easy-language' ) );
-		$field->set_options( array(
-			'disabled' => __( 'Do not change anything', 'easy-language' ),
-			'draft'    => __( 'Set to draft', 'easy-language' ),
-			'trash'    => __( 'Set to trash', 'easy-language' ),
-		) );
+		$field->set_options(
+			array(
+				'disabled' => __( 'Do not change anything', 'easy-language' ),
+				'draft'    => __( 'Set to draft', 'easy-language' ),
+				'trash'    => __( 'Set to trash', 'easy-language' ),
+			)
+		);
 		$setting->set_field( $field );
 
 		// add setting.
@@ -1230,20 +1242,22 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_default( 'hide_not_translated' );
 		$field = new Radio();
 		$field->set_title( __( 'Choose link-mode for language switcher', 'easy-language' ) );
-		$field->set_options( array(
-			'do_not_link'         => array(
-				'label'       => __( 'do not link translated pages', 'easy-language' ),
-				'description' => __( 'The links in the switcher will general link to the language-specific homepage.', 'easy-language' ),
-			),
-			'link_translated'     => array(
-				'label'       => __( 'link translated pages', 'easy-language' ),
-				'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will target the language-specific homepage.', 'easy-language' ),
-			),
-			'hide_not_translated' => array(
-				'label'       => __( 'do not link not translated pages', 'easy-language' ),
-				'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will not be visible.', 'easy-language' ),
-			),
-		) );
+		$field->set_options(
+			array(
+				'do_not_link'         => array(
+					'label'       => __( 'do not link translated pages', 'easy-language' ),
+					'description' => __( 'The links in the switcher will general link to the language-specific homepage.', 'easy-language' ),
+				),
+				'link_translated'     => array(
+					'label'       => __( 'link translated pages', 'easy-language' ),
+					'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will target the language-specific homepage.', 'easy-language' ),
+				),
+				'hide_not_translated' => array(
+					'label'       => __( 'do not link not translated pages', 'easy-language' ),
+					'description' => __( 'The Links in the switcher will link to the translated page. If a page is not translated, the link will not be visible.', 'easy-language' ),
+				),
+			)
+		);
 		$setting->set_field( $field );
 	}
 
@@ -1845,9 +1859,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 	public function wp_enqueue_scripts(): void {
 		wp_enqueue_style(
 			'easy-language',
-			plugins_url( '/classes/multilingual-plugins/easy-language/frontend/style.css', EASY_LANGUAGE ),
+			Helper::get_plugin_url() . 'css/style.css',
 			array(),
-			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/classes/multilingual-plugins/easy-language/frontend/style.css' )
+			Helper::get_file_version( Helper::get_plugin_path() . '/css/style.css' )
 		);
 	}
 

@@ -16,6 +16,7 @@ use easyLanguage\EasyLanguage\Post_Object;
 use easyLanguage\PageBuilder\Elementor\Languages;
 use easyLanguage\PageBuilder\Elementor\Switcher;
 use easyLanguage\PageBuilder\Elementor\Switcher_Widget;
+use easyLanguage\Plugin\Admin\Admin;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\ThirdPartySupports;
 use Elementor\Controls_Manager;
@@ -228,7 +229,7 @@ class Elementor extends PageBuilder_Base {
 			wp_enqueue_script( 'easy-language-elementor-admin' );
 
 			// add dialog scripts.
-			Init::get_instance()->add_dialog();
+			Admin::get_instance()->add_dialog();
 
 			// embed simplification scripts.
 			$multilingual_plugin->get_simplifications_scripts();

@@ -10,6 +10,8 @@ namespace easyLanguage\ThirdPartySupport\TranslatePress;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Apis\Summ_Ai\Simplifications;
+use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Apis;
 use easyLanguage\Apis\Summ_Ai\Request;
 use TRP_Machine_Translator;
@@ -45,25 +47,8 @@ class TranslatePress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 			return new WP_Error( 'error', __( 'No active SUMM AI API!', 'easy-language' ) );
 		}
 
-		// send request.
-		$request_obj = $api_object->get_request_object();
-		$request_obj->set_token( $api_object->get_token() );
-		$request_obj->set_method( 'POST' );
-		$request_obj->set_url( $api_object->get_api_url() );
-		$request_obj->set_is_test( $this->is_test );
-		$request_obj->set_text( $string_to_translate );
-		/**
-		 * Filter the SUMM AI request object.
-		 *
-		 * @since 2.0.0 Available since 2.0.0.
-		 *
-		 * @param Request $request_obj The SUMM AI request object.
-		 */
-		$request_obj = apply_filters( 'easy_language_summ_ai_request_object', $request_obj );
-		$request_obj->send();
-
 		// return request result.
-		return $request_obj->get_result();
+		return Simplifications::get_instance()->call_api( $source_language, $language_code, $string_to_translate, false, $this->is_test );
 	}
 
 	/**

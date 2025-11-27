@@ -886,9 +886,10 @@ abstract class Objects {
 	 * @param string $source_language The source language of the text.
 	 * @param string $target_language The target language of the text.
 	 * @param bool   $is_html Marker if the text contains HTML-Code.
+	 * @param bool   $is_test Marker if this is a rest request.
 	 * @return array<string,int|string> The result as array.
 	 */
-	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html ): array {
+	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html, bool $is_test = false ): array {
 		if ( empty( $text_to_translate ) ) {
 			return array();
 		}
@@ -899,6 +900,9 @@ abstract class Objects {
 			return array();
 		}
 		if ( empty( $is_html ) ) {
+			return array();
+		}
+		if ( $is_test ) {
 			return array();
 		}
 		return array();

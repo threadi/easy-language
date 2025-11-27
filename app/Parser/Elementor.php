@@ -178,7 +178,7 @@ class Elementor extends Parser_Base implements Parser {
 				}
 			}
 		}
-		update_post_meta( $this->get_object_id(), '_elementor_data', wp_slash( wp_json_encode( $data ) ) );
+		update_post_meta( $this->get_object_id(), '_elementor_data', wp_slash( (string) wp_json_encode( $data ) ) );
 
 		// replacement for post_content.
 		return str_replace( $this->get_text(), $simplified_part, $original_complete );

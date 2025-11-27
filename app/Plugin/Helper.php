@@ -830,8 +830,8 @@ class Helper {
 	 */
 	public static function is_rest_request(): bool {
 		if ( ( defined( 'REST_REQUEST' ) && REST_REQUEST ) // Case #1.
-		     || ( isset( $GLOBALS['wp']->query_vars['rest_route'] ) // (#2)
-		          && str_starts_with( $GLOBALS['wp']->query_vars['rest_route'], '/' ) ) ) {
+			|| ( isset( $GLOBALS['wp']->query_vars['rest_route'] ) // (#2)
+					&& str_starts_with( $GLOBALS['wp']->query_vars['rest_route'], '/' ) ) ) {
 			return true;
 		}
 

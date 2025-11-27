@@ -21,7 +21,6 @@ use easyLanguage\Dependencies\easySettingsForWordPress\Section;
 use easyLanguage\Dependencies\easySettingsForWordPress\Settings;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
-use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Helper;
@@ -293,7 +292,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$target_languages = array(
 			'de_EL' => array(
 				'label'             => __( 'Einfache Sprache', 'easy-language' ),
-				'enabled'           => true,
+				'enabled'           => false,
 				'description'       => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language' ),
 				'url'               => 'de_el',
 				'api_value'         => 'plain',
@@ -413,43 +412,10 @@ class Summ_Ai extends Base implements Api_Base {
 		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
 
 		/**
-		 * Remove settings.
-		 */
-		foreach ( $this->get_options() as $option_name ) {
-			delete_option( $option_name );
-		}
-
-		/**
 		 * Delete our table.
 		 */
 		$sql = 'DROP TABLE IF EXISTS ' . $this->table_requests;
 		$this->wpdb->query( $sql );
-	}
-
-	/**
-	 * Return list of options this plugin is using, e.g. for clean uninstalling.
-	 *
-	 * @return array<string>
-	 */
-	private function get_options(): array {
-		return array(
-			'easy_language_summ_ai_source_languages',
-			'easy_language_summ_ai_target_languages',
-			'easy_language_summ_ai_target_languages_separator',
-			'easy_language_summ_ai_target_languages_new_lines',
-			'easy_language_summ_ai_target_languages_embolden_negative',
-			'easy_language_summ_ai_mode',
-			'easy_language_summ_ai_disable_free_requests',
-			'easy_language_summ_ai_api_key',
-			'easy_language_summ_api_email',
-			'easy_language_summ_ai_test',
-			'easy_language_summ_ai_quota',
-			'easy_language_summ_ai_paid_quota',
-			'easy_language_summ_ai_quota_interval',
-			'easy_language_summ_ai_email_mode',
-			'easy_language_summ_ai_separator',
-			'easy_language_summ_ai_html_mode',
-		);
 	}
 
 	/**
@@ -493,20 +459,12 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_active_target_languages(): array {
-		// get actual enabled target-languages, if token is given.
-		$target_languages = get_option( 'easy_language_languages', array() );
-		if ( $this->is_summ_api_token_set() ) {
-			$target_languages = get_option( 'easy_language_summ_ai_target_languages', array() );
-			if ( ! is_array( $target_languages ) ) {
-				$target_languages = array();
-			}
-		}
-
-		// define resulting list.
+		// create the list.
 		$list = array();
 
+		// collect all enabled target languages.
 		foreach ( $this->get_supported_target_languages() as $language_code => $language ) {
-			if ( ! empty( $target_languages[ $language_code ] ) ) {
+			if ( 1 === absint( get_option( 'easy_language_summ_ai_target_languages_' . $language_code ) ) ) {
 				$list[ $language_code ] = $language;
 			}
 		}
@@ -690,7 +648,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
 
 		// bail if the page is not available.
-		if( ! $settings_page instanceof Page ) {
+		if ( ! $settings_page instanceof Page ) {
 			return;
 		}
 
@@ -702,6 +660,11 @@ class Summ_Ai extends Base implements Api_Base {
 		// add section.
 		$summ_ai_tab_main = $summ_ai_tab->add_section( 'summ_ai_main', 10 );
 		$summ_ai_tab_main->set_title( __( 'SUMM AI settings', 'easy-language' ) );
+
+		// add section.
+		$summ_ai_tab_quota = $summ_ai_tab->add_section( 'summ_ai_quota', 20 );
+		$summ_ai_tab_quota->set_title( __( 'SUMM AI Quota', 'easy-language' ) );
+		$summ_ai_tab_quota->set_callback( array( $this, 'show_quota' ) );
 
 		// Set description for token field if it has not been set.
 		$description = '';
@@ -780,8 +743,9 @@ class Summ_Ai extends Base implements Api_Base {
 		$field->set_title( __( 'Choose email-mode', 'easy-language' ) );
 		$field->set_description( __( 'An email will be used for each request to the SUMM AI API. It is used as contact or identifier email for SUMM AI if question for simplifications arise.', 'easy-language' ) );
 		$field->set_readonly( ! $this->is_summ_api_token_set() );
-		$field->set_sanitize_callback( array( $this, 'validate_multiple_radios') );
-		$field->set_options( array(
+		$field->set_sanitize_callback( array( $this, 'validate_multiple_radios' ) );
+		$field->set_options(
+			array(
 				'custom' => array(
 					'label'       => __( 'Custom', 'easy-language' ),
 					'description' => __( 'Enter a custom email in the field bellow.', 'easy-language' ),
@@ -794,7 +758,7 @@ class Summ_Ai extends Base implements Api_Base {
 				'editor' => array(
 					'label'       => __( 'Use editor email', 'easy-language' ),
 					'description' => __( 'The email of the actual user, which requests the simplification, will be used.', 'easy-language' ),
-				)
+				),
 			)
 		);
 		$email_mode_setting->set_field( $field );
@@ -828,7 +792,8 @@ class Summ_Ai extends Base implements Api_Base {
 		$field->set_description( __( 'These are the possible source languages for SUMM AI-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ) );
 		$field->set_readonly( false === $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support );
 		$field->set_options( $this->get_supported_source_languages( true ) );
-		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_checkboxes' ) );;
+		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_checkboxes' ) );
+
 		$setting->set_field( $field );
 
 		$source_languages = get_option( 'easy_language_summ_ai_source_languages', array() );
@@ -857,7 +822,7 @@ class Summ_Ai extends Base implements Api_Base {
 				__( 'Enable your target language', 'easy-language' ),
 				__( 'Choose separator', 'easy-language' ),
 				__( 'Enable new lines', 'easy-language' ),
-				__( 'Embolden negative', 'easy-language' )
+				__( 'Embolden negative', 'easy-language' ),
 			)
 		);
 
@@ -873,7 +838,7 @@ class Summ_Ai extends Base implements Api_Base {
 			// add setting.
 			$language = $settings_obj->add_setting( 'easy_language_summ_ai_target_languages_' . $language_code );
 			$language->set_type( 'integer' );
-			$language->set_default( 0 );
+			$language->set_default( $settings['enabled'] ? 1 : 0 );
 			$language->set_section( $hidden_section );
 			$language_field = new Checkbox();
 			$language_field->set_title( $settings['label'] );
@@ -887,14 +852,16 @@ class Summ_Ai extends Base implements Api_Base {
 			// add setting.
 			$separator = $settings_obj->add_setting( 'easy_language_summ_ai_target_languages_' . $language_code . '_separator' );
 			$separator->set_type( 'string' );
-			$separator->set_default( '' );
+			$separator->set_default( $settings['separator'] );
 			$separator->set_section( $hidden_section );
 			$separator_field = new Select();
-			$separator_field->set_options( array(
-				'interpunct' => __( 'interpunct', 'easy-language' ),
-				'hyphen'     => __( 'hyphen', 'easy-language' ),
-				'none'       => __( 'do not use separator', 'easy-language' ),
-			) );
+			$separator_field->set_options(
+				array(
+					'interpunct' => __( 'interpunct', 'easy-language' ),
+					'hyphen'     => __( 'hyphen', 'easy-language' ),
+					'none'       => __( 'do not use separator', 'easy-language' ),
+				)
+			);
 			$separator_field->set_setting( $separator );
 			$separator_field->set_readonly( ! $this->is_summ_api_token_set() );
 			$separator->set_field( $separator_field );
@@ -903,7 +870,7 @@ class Summ_Ai extends Base implements Api_Base {
 			// add setting.
 			$new_line = $settings_obj->add_setting( 'easy_language_summ_ai_target_languages_' . $language_code . '_new_line' );
 			$new_line->set_type( 'integer' );
-			$new_line->set_default( 0 );
+			$new_line->set_default( $settings['new_lines'] ? 1 : 0 );
 			$new_line->set_section( $hidden_section );
 			$new_line_field = new Checkbox();
 			$new_line_field->set_setting( $new_line );
@@ -914,7 +881,7 @@ class Summ_Ai extends Base implements Api_Base {
 			// add setting.
 			$embolden_negative = $settings_obj->add_setting( 'easy_language_summ_ai_target_languages_' . $language_code . '_embolden_negative' );
 			$embolden_negative->set_type( 'integer' );
-			$embolden_negative->set_default( 0 );
+			$embolden_negative->set_default( $settings['embolden_negative'] ? 1 : 0 );
 			$embolden_negative->set_section( $hidden_section );
 			$embolden_negative_field = new Checkbox();
 			$embolden_negative_field->set_setting( $embolden_negative );
@@ -923,7 +890,7 @@ class Summ_Ai extends Base implements Api_Base {
 			$field->add_setting( $embolden_negative, $row, 3 );
 
 			// next row.
-			$row++;
+			++$row;
 		}
 		$setting->set_field( $field );
 
@@ -975,7 +942,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$hidden_section = Helper::get_hidden_section();
 
 		// bail if section could not be loaded.
-		if( ! $hidden_section instanceof Section ) {
+		if ( ! $hidden_section instanceof Section ) {
 			return;
 		}
 
@@ -1207,7 +1174,7 @@ class Summ_Ai extends Base implements Api_Base {
 				return $email;
 			case 'editor':
 				$user = wp_get_current_user();
-				if ( $user instanceof WP_User && ! empty( $user->user_email ) ) {
+				if ( $user instanceof WP_User && ! empty( $user->user_email ) ) { // @phpstan-ignore instanceof.alwaysTrue
 					return $user->user_email;
 				}
 				return get_option( 'admin_email' );
@@ -1438,5 +1405,45 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function get_request_text_by_language( string $target_language ): string {
 		return '';
+	}
+
+	/**
+	 * Show actual quota for SUMM AI.
+	 *
+	 * @return void
+	 */
+	public function show_quota(): void {
+		if ( $this->is_summ_api_token_set() ) {
+			/**
+			 * Get and show the quota we received from API.
+			 */
+			$api_quota = $this->get_quota();
+			if ( empty( $api_quota ) ) {
+				$quota_text = esc_html__( 'No quota consumed so far', 'easy-language' );
+			} else {
+				$quota_text = $api_quota['character_spent'] . ' / ' . $api_quota['character_limit'];
+			}
+
+			// get the update quota link.
+			$update_quota_url = add_query_arg(
+				array(
+					'action' => 'easy_language_summ_ai_get_quota',
+					'nonce'  => wp_create_nonce( 'easy-language-summ-ai-get-quota' ),
+				),
+				get_admin_url() . 'admin.php'
+			);
+
+			// output.
+			?>
+			<p>
+				<strong><?php echo esc_html__( 'Quota', 'easy-language' ); ?>:</strong> <?php echo wp_kses_post( $quota_text ); ?>
+				<a href="<?php echo esc_url( $update_quota_url ); ?>#statistics" class="button button-secondary"><?php echo esc_html__( 'Update now', 'easy-language' ); ?></a>
+			</p>
+			<?php
+		} else {
+			?>
+			<p><?php echo esc_html__( 'Info about quota will be available until the API token is set', 'easy-language' ); ?></p>
+			<?php
+		}
 	}
 }

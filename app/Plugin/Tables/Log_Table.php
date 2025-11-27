@@ -47,7 +47,7 @@ class Log_Table extends WP_List_Table {
 		}
 		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		if ( ! is_null( $order ) ) {
-			$order = sanitize_sql_orderby( $order );
+			$order = sanitize_sql_orderby( (string) $order );
 		} else {
 			$order = 'DESC';
 		}

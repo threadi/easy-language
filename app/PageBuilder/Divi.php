@@ -88,7 +88,7 @@ class Divi extends PageBuilder_Base {
 			'option_category'      => 'basic_option',
 			'tab_slug'             => 'content',
 			'toggle_slug'          => 'easy-language-simplifications',
-			'depends_on_post_type' => array_keys(Init::get_instance()->get_supported_post_types()),
+			'depends_on_post_type' => array_keys( Init::get_instance()->get_supported_post_types() ),
 		);
 
 		// return list of fields.

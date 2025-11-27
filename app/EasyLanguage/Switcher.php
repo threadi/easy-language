@@ -384,10 +384,11 @@ class Switcher {
 					// create own object for this menu item.
 					$new_item = clone $items[ $index ];
 					// set title for menu item.
-					$new_item->title      = $show_icons ? Helper::get_icon_img_for_language_code( $language_code ) : $settings['label'];
-					$new_item->menu_order = $items[ $index ]->menu_order + $language_counter;
+					$new_item->title      = $show_icons ? Helper::get_icon_img_for_language_code( $language_code ) : $settings['label']; // @phpstan-ignore property.notFound
+					// set the menu order.
+					$new_item->menu_order = $items[ $index ]->menu_order + $language_counter; // @phpstan-ignore property.notFound
 					// set URL for menu item.
-					$new_item->url = $object->get_language_specific_url( empty( $settings['url'] ) ? $permalink : $settings['url'], $language_code );
+					$new_item->url = $object->get_language_specific_url( empty( $settings['url'] ) ? $permalink : $settings['url'], $language_code ); // @phpstan-ignore property.notFound
 
 					// merge items.
 					array_splice( $items, $new_index, 1, array( $new_item ) );

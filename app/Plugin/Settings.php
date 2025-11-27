@@ -79,7 +79,7 @@ class Settings {
 		/**
 		 * Configure the basic settings object.
 		 */
-		$settings_obj  = \easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance();
+		$settings_obj = \easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance();
 		$settings_obj->set_slug( 'easy_language' );
 		$settings_obj->set_plugin_slug( EASY_LANGUAGE );
 		$settings_obj->set_menu_title( _x( 'Easy Language', 'settings menu title', 'easy-language' ) );
@@ -213,6 +213,9 @@ class Settings {
 		$logs_tab_main->set_callback( array( $this, 'render_logs' ) );
 		$logs_tab_main->set_setting( $settings_obj );
 
+		// get the active API object.
+		$active_api_obj = Apis::get_instance()->get_active_api();
+
 		/**
 		 * Configure all settings for this object.
 		 */
@@ -222,10 +225,14 @@ class Settings {
 			// collect the description for this API.
 			$description = '';
 
+			if ( $active_api_obj && $api_obj->get_name() === $active_api_obj->get_name() ) {
+				$description .= '<p id="easy-language-active-api">' . __( 'Active', 'easy-language' ) . '</p>';
+			}
+
 			// get the API-own logo, if it exists.
 			$logo_url = $api_obj->get_logo_url();
 			if ( ! empty( $logo_url ) ) {
-				$description .= '<img src="' .  esc_url( $logo_url ) . '" alt="' . esc_attr( $api_obj->get_title() ) . '">';
+				$description .= '<img src="' . esc_url( $logo_url ) . '" alt="' . esc_attr( $api_obj->get_title() ) . '">';
 			}
 
 			// show api-title.
@@ -241,7 +248,6 @@ class Settings {
 		}
 
 		// add setting.
-		// TODO Styling anpassen an bisherigen Aufbau.
 		$setting = $settings_obj->add_setting( 'easy_language_api' );
 		$setting->set_section( $api_tab_main );
 		$setting->set_show_in_rest( true );
@@ -249,7 +255,7 @@ class Settings {
 		$setting->set_default( 'summ_ai' );
 		$setting->set_save_callback( array( $this, 'save_api' ) );
 		$field = new Radio();
-		$field->set_title( __( 'Select API', 'easy-language' ) );
+		$field->set_title( __( 'Select your API', 'easy-language' ) );
 		$field->set_options( $apis );
 		$field->set_sanitize_callback( array( $this, 'sanitize_api' ) );
 		$setting->set_field( $field );
@@ -315,7 +321,7 @@ class Settings {
 					'variant' => 'primary',
 					'text'    => __( 'No', 'easy-language' ),
 				),
-			)
+			),
 		);
 
 		// add setting.
@@ -634,18 +640,12 @@ class Settings {
 	 * @return array<string,mixed>|null
 	 */
 	public function sanitize_checkboxes( ?array $values ): ?array {
-		$filter = current_filter();
-		if ( ! empty( $filter ) ) {
-			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) ) {
-				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_SANITIZE_NUMBER_INT, FILTER_FORCE_ARRAY );
-				if ( ! empty( $pre_values ) ) {
-					// set the callback for array_map.
-					$callback = 'sanitize_text_field';
-
-					// run the sanitizing.
-					$values = array_map( $callback, $pre_values ); // @phpstan-ignore argument.type
-				}
+		if( ! is_array( $values ) ) {
+			return $values;
+		}
+		foreach ( $values as $key => $value ) {
+			if ( empty( $value ) ) {
+				unset( $values[ $key ] );
 			}
 		}
 		return $values;
@@ -698,8 +698,13 @@ class Settings {
 		wp_safe_redirect( get_admin_url() );
 	}
 
+	/**
+	 * Show the description to select an API.
+	 *
+	 * @return void
+	 */
 	public function get_api_select_description(): void {
-		echo '<h1>' . __( 'Select API', 'easy-language' ) .  '</h1>';
-		echo  '<p>' . esc_html__( 'Please choose the API you want to use to simplify texts your website.', 'easy-language' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Select your API', 'easy-language' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Please choose the API you want to use to simplify texts your website.', 'easy-language' ) . '</p>';
 	}
 }
