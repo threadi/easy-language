@@ -384,7 +384,7 @@ class Switcher {
 					// create own object for this menu item.
 					$new_item = clone $items[ $index ];
 					// set title for menu item.
-					$new_item->title      = $show_icons ? Helper::get_icon_img_for_language_code( $language_code ) : $settings['label']; // @phpstan-ignore property.notFound
+					$new_item->title = $show_icons ? Helper::get_icon_img_for_language_code( $language_code ) : $settings['label']; // @phpstan-ignore property.notFound
 					// set the menu order.
 					$new_item->menu_order = $items[ $index ]->menu_order + $language_counter; // @phpstan-ignore property.notFound
 					// set URL for menu item.
