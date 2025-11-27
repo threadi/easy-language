@@ -1649,6 +1649,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 					),
 				);
 				wp_send_json( $return );
+				exit;
 			}
 
 			// get active API as object.
@@ -1680,6 +1681,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 					),
 				);
 				wp_send_json( $return );
+				exit;
 			}
 
 			// get info if this is a simplification-initialization.
@@ -1745,6 +1747,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 				// return results.
 				wp_send_json( $return );
+				exit;
 			}
 
 			// collect return array.
@@ -1755,6 +1758,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				$results[ $object->get_md5() ],
 			);
 			wp_send_json( $return );
+			exit;
 		}
 
 		// return general error.
