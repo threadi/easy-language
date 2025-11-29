@@ -169,7 +169,7 @@ class ChatGpt extends Base implements Api_Base {
 	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_supported_source_languages(): array {
-		$list_of_languages = array(
+		$source_languages = array(
 			'de_DE'          => array(
 				'label'       => __( 'German', 'easy-language' ),
 				'enable'      => true,
@@ -202,14 +202,47 @@ class ChatGpt extends Base implements Api_Base {
 			),
 		);
 
+		$source_languages['en_CA'] = array(
+			'label'       => __( 'English (Canada)', 'easy-language-pro' ),
+			'enable'      => true,
+			'description' => __( 'English spoken in Canada.', 'easy-language-pro' ),
+			'icon'        => 'icon-en-ca',
+			'img'         => 'en_ca.png',
+			'img_icon'    => Helper::get_icon_img_for_language_code( 'en_CA' ),
+		);
+		$source_languages['en_UK'] = array(
+			'label'       => __( 'English (UK)', 'easy-language-pro' ),
+			'enable'      => true,
+			'description' => __( 'English spoken in the United Kingdom.', 'easy-language-pro' ),
+			'icon'        => 'icon-en-uk',
+			'img'         => 'en_uk.png',
+			'img_icon'    => Helper::get_icon_img_for_language_code( 'en_UK' ),
+		);
+		$source_languages['en_US'] = array(
+			'label'       => __( 'English (United States)', 'easy-language-pro' ),
+			'enable'      => true,
+			'description' => __( 'English spoken in the United States.', 'easy-language-pro' ),
+			'icon'        => 'icon-en-us',
+			'img'         => 'en_us.png',
+			'img_icon'    => Helper::get_icon_img_for_language_code( 'en_US' ),
+		);
+		$source_languages['fr_FR'] = array(
+			'label'       => __( 'Français', 'easy-language-pro' ),
+			'enable'      => true,
+			'description' => __( 'Français spoken in France.', 'easy-language-pro' ),
+			'icon'        => 'icon-fr-fr',
+			'img'         => 'fr_fr.png',
+			'img_icon'    => Helper::get_icon_img_for_language_code( 'fr_FR' ),
+		);
+
 		/**
 		 * Filter ChatGpt source languages.
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $list_of_languages List of source languages.
+		 * @param array $source_languages List of source languages.
 		 */
-		return apply_filters( 'easy_language_chatgpt_source_languages', $list_of_languages );
+		return apply_filters( 'easy_language_chatgpt_source_languages', $source_languages );
 	}
 
 	/**
@@ -294,6 +327,9 @@ class ChatGpt extends Base implements Api_Base {
 			'de_CH'          => array( 'de_LS', 'de_EL' ),
 			'de_CH_informal' => array( 'de_LS', 'de_EL' ),
 			'de_AT'          => array( 'de_LS', 'de_EL' ),
+			'en_CA'          => array( 'en_ER', 'en_PE' ),
+			'en_UK'          => array( 'en_ER', 'en_PE' ),
+			'en_US'          => array( 'en_ER', 'en_PE' ),
 		);
 
 		/**

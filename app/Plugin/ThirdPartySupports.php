@@ -70,6 +70,11 @@ class ThirdPartySupports {
 				continue;
 			}
 
+			// bail if plugin is not active.
+			if( ! $obj->is_active() ) {
+				continue;
+			}
+
 			// add this object to the list.
 			$plugin_list[] = $obj;
 		}
@@ -88,6 +93,7 @@ class ThirdPartySupports {
 		$plugins = array(
 			'easyLanguage\EasyLanguage\Init',
 			'easyLanguage\ThirdPartySupport\Polylang\Init',
+			'easyLanguage\ThirdPartySupport\PopupMaker',
 			'easyLanguage\ThirdPartySupport\Sublanguage\Init',
 			'easyLanguage\ThirdPartySupport\TranslatePress\Init',
 			'easyLanguage\ThirdPartySupport\Wpml\Init',

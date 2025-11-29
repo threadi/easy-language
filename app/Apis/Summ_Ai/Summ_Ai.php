@@ -271,6 +271,39 @@ class Summ_Ai extends Base implements Api_Base {
 			),
 		);
 
+		$source_languages['en_CA'] = array(
+			'label'       => __( 'English (Canada)', 'easy-language-pro' ),
+			'enable'      => true,
+			'description' => __( 'English spoken in Canada.', 'easy-language-pro' ),
+			'icon'        => 'icon-en-ca',
+			'img'         => 'en_ca.png',
+			'img_icon'    => Helper::get_icon_img_for_language_code( 'en_CA' ),
+		);
+		$source_languages['en_UK'] = array(
+			'label'       => __( 'English (UK)', 'easy-language-pro' ),
+			'enable'      => true,
+			'description' => __( 'English spoken in the United Kingdom.', 'easy-language-pro' ),
+			'icon'        => 'icon-en-uk',
+			'img'         => 'en_uk.png',
+			'img_icon'    => Helper::get_icon_img_for_language_code( 'en_UK' ),
+		);
+		$source_languages['en_US'] = array(
+			'label'       => __( 'English (United States)', 'easy-language-pro' ),
+			'enable'      => true,
+			'description' => __( 'English spoken in the United States.', 'easy-language-pro' ),
+			'icon'        => 'icon-en-us',
+			'img'         => 'en_us.png',
+			'img_icon'    => Helper::get_icon_img_for_language_code( 'en_US' ),
+		);
+		$source_languages['fr_FR'] = array(
+			'label'       => __( 'Français', 'easy-language-pro' ),
+			'enable'      => true,
+			'description' => __( 'Français spoken in France.', 'easy-language-pro' ),
+			'icon'        => 'icon-fr-fr',
+			'img'         => 'fr_fr.png',
+			'img_icon'    => Helper::get_icon_img_for_language_code( 'fr_FR' ),
+		);
+
 		/**
 		 * Filter SUMM AI source languages.
 		 *
@@ -316,6 +349,27 @@ class Summ_Ai extends Base implements Api_Base {
 				'embolden_negative' => true,
 				'separator'         => 'hyphen',
 			),
+			'en_ER' => array(
+				'label'       => __( 'Easy Read', 'easy-language-pro' ),
+				'enabled'     => true,
+				'api_value'   => 'easy',
+				'description' => __( 'The easy read language used in englisch-based countries.', 'easy-language-pro' ),
+				'url'         => 'en_er',
+			),
+			'en_PE' => array(
+				'label'       => __( 'Plain Englisch', 'easy-language-pro' ),
+				'enabled'     => true,
+				'api_value'   => 'plain',
+				'description' => __( 'The plain englisch used in englisch-based countries.', 'easy-language-pro' ),
+				'url'         => 'en_pe',
+			),
+			'fr_FA' => array(
+				'label'       => __( 'FALC', 'easy-language-pro' ),
+				'enabled'     => true,
+				'api_value'   => 'easy',
+				'description' => __( 'The FALC used in french-based countries.', 'easy-language-pro' ),
+				'url'         => 'fr_fr',
+			),
 		);
 
 		/**
@@ -342,6 +396,9 @@ class Summ_Ai extends Base implements Api_Base {
 			'de_CH'          => array( 'de_LS', 'de_EL' ),
 			'de_CH_informal' => array( 'de_LS', 'de_EL' ),
 			'de_AT'          => array( 'de_LS', 'de_EL' ),
+			'en_CA'          => array( 'en_ER', 'en_PE' ),
+			'en_UK'          => array( 'en_ER', 'en_PE' ),
+			'en_US'          => array( 'en_ER', 'en_PE' ),
 		);
 
 		/**
@@ -723,7 +780,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$field->set_title( __( 'Choose email-mode', 'easy-language' ) );
 		$field->set_description( __( 'An email will be used for each request to the SUMM AI API. It is used as contact or identifier email for SUMM AI if question for simplifications arise.', 'easy-language' ) );
 		$field->set_readonly( ! $this->is_summ_api_token_set() );
-		$field->set_sanitize_callback( array( $this, 'validate_multiple_radios' ) );
+		$field->set_sanitize_callback( array( 'easyLanguage\Plugin\Helper', 'settings_validate_multiple_radios' ) );
 		$field->set_options(
 			array(
 				'custom' => array(
@@ -1014,17 +1071,6 @@ class Summ_Ai extends Base implements Api_Base {
 			add_settings_error( 'easy_language_summ_api_email', 'easy_language_summ_api_email', __( 'The given email is not a valid email-address.', 'easy-language' ) );
 		}
 		return $value;
-	}
-
-	/**
-	 * Validate multiple radios.
-	 *
-	 * @param ?string $value The radios to validate.
-	 *
-	 * @return ?string
-	 */
-	public function validate_multiple_radios( ?string $value ): ?string {
-		return Helper::settings_validate_multiple_radios( $value );
 	}
 
 	/**

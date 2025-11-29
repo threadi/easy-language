@@ -40,14 +40,14 @@ abstract class Base {
 	protected bool $has_own_api_config = false;
 
 	/**
-	 * Internal name of the API.
+	 * Internal name of the object.
 	 *
 	 * @var string
 	 */
 	protected string $name = '';
 
 	/**
-	 * Title of the API.
+	 * Title of the object.
 	 *
 	 * @var string
 	 */

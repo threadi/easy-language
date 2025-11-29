@@ -224,6 +224,34 @@ class Capito extends Base implements Api_Base {
 			),
 		);
 
+		$source_languages['en_CA'] = array(
+			'label'       => __( 'English (Canada)', 'easy-language-pro' ),
+			'enable'      => true,
+			'description' => __( 'English spoken in Canada.', 'easy-language-pro' ),
+			'icon'        => 'icon-en-ca',
+			'img'         => 'en_ca.png',
+			'img_icon'    => Helper::get_icon_img_for_language_code( 'en_CA' ),
+			'api_value'   => 'en',
+		);
+		$source_languages['en_UK'] = array(
+			'label'       => __( 'English (UK)', 'easy-language-pro' ),
+			'enable'      => true,
+			'description' => __( 'English spoken in the United Kingdom.', 'easy-language-pro' ),
+			'icon'        => 'icon-en-uk',
+			'img'         => 'en_uk.png',
+			'img_icon'    => Helper::get_icon_img_for_language_code( 'en_UK' ),
+			'api_value'   => 'en',
+		);
+		$source_languages['en_US'] = array(
+			'label'       => __( 'English (United States)', 'easy-language-pro' ),
+			'enable'      => true,
+			'description' => __( 'English spoken in the United States.', 'easy-language-pro' ),
+			'icon'        => 'icon-en-us',
+			'img'         => 'en_us.png',
+			'img_icon'    => Helper::get_icon_img_for_language_code( 'en_US' ),
+			'api_value'   => 'en',
+		);
+
 		/**
 		 * Filter capito source languages.
 		 *
@@ -272,6 +300,36 @@ class Capito extends Base implements Api_Base {
 				'img'         => 'de_EL.svg',
 				'img_icon'    => $this->is_active() ? Helper::get_icon_img_for_language_code( 'de_b1' ) : '',
 			),
+			'en_a1' => array(
+				'label'       => __( 'English A1', 'easy-language-pro' ),
+				'enabled'     => true,
+				'description' => __( 'The easiest level of english language.', 'easy-language-pro' ),
+				'url'         => 'en_a1',
+				'api_value'   => 'a1',
+				'icon'        => 'icon-de-ls',
+				'img'         => 'de_LS.svg',
+				'img_icon'    => Helper::get_icon_img_for_language_code( 'de_a1' ),
+			),
+			'en_a2' => array(
+				'label'       => __( 'English A2', 'easy-language-pro' ),
+				'enabled'     => true,
+				'description' => __( 'capito compares this with Plain Language', 'easy-language-pro' ),
+				'url'         => 'en_a2',
+				'api_value'   => 'a2',
+				'icon'        => 'icon-de-ls',
+				'img'         => 'de_LS.svg',
+				'img_icon'    => Helper::get_icon_img_for_language_code( 'de_a2' ),
+			),
+			'en_b1' => array(
+				'label'       => __( 'English B1', 'easy-language-pro' ),
+				'enabled'     => true,
+				'description' => __( 'capito compares this with Easy Language', 'easy-language-pro' ),
+				'url'         => 'de_a2',
+				'api_value'   => 'b1',
+				'icon'        => 'icon-de-el',
+				'img'         => 'de_EL.svg',
+				'img_icon'    => Helper::get_icon_img_for_language_code( 'de_b1' ),
+			),
 		);
 
 		/**
@@ -298,6 +356,9 @@ class Capito extends Base implements Api_Base {
 			'de_AT'          => array( 'de_a1', 'de_a2', 'de_b1' ),
 			'de_CH'          => array( 'de_a1', 'de_a2', 'de_b1' ),
 			'de_CH_informal' => array( 'de_a1', 'de_a2', 'de_b1' ),
+			'en_CA'          => array( 'en_a1', 'en_a2', 'en_b1' ),
+			'en_UK'          => array( 'en_a1', 'en_a2', 'en_b1' ),
+			'en_US'          => array( 'en_a1', 'en_a2', 'en_b1' ),
 		);
 
 		/**

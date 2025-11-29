@@ -1331,6 +1331,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				),
 			)
 		);
+		$field->set_sanitize_callback( array( 'easyLanguage\Plugin\Helper', 'settings_validate_multiple_radios' ) );
 		$setting->set_field( $field );
 	}
 

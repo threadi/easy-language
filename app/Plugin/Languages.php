@@ -109,6 +109,22 @@ class Languages {
 				'enabled' => true,
 				'icon'    => 'ch_icon_url',
 			),
+			'en_CA' => array(
+				'label'   => __( 'English (Canada)', 'easy-language-pro' ),
+				'enabled' => true,
+			),
+			'en_UK' => array(
+				'label'   => __( 'English (United Kingdom)', 'easy-language-pro' ),
+				'enabled' => true,
+			),
+			'en_US' => array(
+				'label'   => __( 'English (United States)', 'easy-language-pro' ),
+				'enabled' => true,
+			),
+			'fr_FR' => array(
+				'label'   => __( 'Français', 'easy-language-pro' ),
+				'enabled' => true,
+			),
 		);
 
 		/**
@@ -147,6 +163,24 @@ class Languages {
 				'icon'        => 'icon-de-ls',
 				'img'         => 'de_LS.png',
 				'img_icon'    => ! $without_img ? Helper::get_icon_img_for_language_code( 'de_LS' ) : '',
+			),
+			'en_ER' => array(
+				'label'       => __( 'Easy Read', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'The easy read language used in englisch-based countries.', 'easy-language' ),
+				'url'         => 'en_er',
+			),
+			'en_PE' => array(
+				'label'       => __( 'Plain Englisch', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'The plain englisch used in englisch-based countries.', 'easy-language' ),
+				'url'         => 'en_pe',
+			),
+			'fr_FA' => array(
+				'label'       => __( 'FALC', 'easy-language' ),
+				'enabled'     => true,
+				'description' => __( 'The FALC used in french-based countries.', 'easy-language' ),
+				'url'         => 'fr_fr',
 			),
 		);
 
