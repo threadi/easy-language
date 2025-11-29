@@ -105,12 +105,21 @@ Hint: this check runs against the VIP-GO-platform which is not our target for th
 
 ### Run
 
-`vendor/bin/phpcs --extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/,*translatepress* --standard=WordPress-VIP-Go .`
+`vendor/bin/phpcs --extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*translatepress* --standard=WordPress-VIP-Go .`
 
 ## Analyze with PHPStan
 
 `vendor/bin/phpstan analyse`
 
+## Check for PHP-compatibility
+
+`vendor/bin/phpcs -p app --standard=PHPCompatibilityWP`
+
 ## Check with plugin "Plugin Check"
+
+Hints:
+
+* The plugin "Plugin Check (PCP)" has to be installed and activated.
+* Do not run this in a development system, only in production system or with the generated release ZIP.
 
 `wp plugin check --error-severity=7 --warning-severity=6 --include-low-severity-errors --categories=plugin_repo --format=json --slug=easy-language .`
