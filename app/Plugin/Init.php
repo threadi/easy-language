@@ -93,7 +93,7 @@ class Init {
 	 */
 	public function cli(): void {
 		// add the main command.
-		\WP_CLI::add_command( 'easy-language', 'easyLanguage\Cli' );
+		\WP_CLI::add_command( 'easy-language', 'easyLanguage\Plugin\Cli' );
 
 		// add cli tasks of enabled APIs.
 		foreach ( Apis::get_instance()->get_available_apis() as $api_obj ) {
