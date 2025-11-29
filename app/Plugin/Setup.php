@@ -310,7 +310,7 @@ class Setup {
 	 * @return void
 	 */
 	public function update_max_step( int $max_count ): void {
-		update_option( 'esfw_max_steps', absint( get_option( 'esfw_max_steps' ) ) + $max_count );
+		update_option( 'esfw_max_steps', $this->get_max_step() + $max_count );
 	}
 
 	/**

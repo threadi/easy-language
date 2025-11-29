@@ -75,6 +75,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function init(): void {
+		// bail if plugin is not enabled.
+		if ( ! $this->is_active() ) {
+			return;
+		}
+
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 
 		// disable transients on WPML-deactivation.
@@ -255,4 +260,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function cli(): void {}
+
+	/**
+	 * Return whether this object is active.
+	 *
+	 * @return bool
+	 */
+	public function is_active(): bool {
+		return Helper::is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' );
+	}
 }

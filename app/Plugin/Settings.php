@@ -81,13 +81,14 @@ class Settings {
 		 */
 		$settings_obj = \easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance();
 		$settings_obj->set_slug( 'easy_language' );
-		$settings_obj->set_plugin_slug( EASY_LANGUAGE );
+		$settings_obj->set_plugin_slug( plugin_basename( EASY_LANGUAGE ) );
 		$settings_obj->set_menu_title( _x( 'Easy Language', 'settings menu title', 'easy-language' ) );
 		$settings_obj->set_title( __( 'Easy Language settings', 'easy-language' ) );
 		$settings_obj->set_menu_slug( 'easy_language_settings' );
 		$settings_obj->set_menu_parent_slug( 'options-general.php' );
 		$settings_obj->set_url( Helper::get_plugin_url() . '/app/Dependencies/easySettingsForWordPress/' );
 		$settings_obj->set_path( Helper::get_plugin_path() . '/app/Dependencies/easySettingsForWordPress/' );
+		$settings_obj->show_settings_link_in_plugin_list( true );
 		$settings_obj->set_translations(
 			array(
 				'title_settings_import_file_missing' => __( 'Required file missing', 'easy-language' ),
@@ -276,7 +277,7 @@ class Settings {
 		$setting->set_section( $advanced_tab_main );
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'integer' );
-		$setting->set_default( 30 );
+		$setting->set_default( 60 );
 		$field = new Number();
 		$field->set_title( __( 'Timeout for API-requests', 'easy-language' ) );
 		$field->set_description( __( 'This value is in seconds. If you get a timeout from an API try to set this to a higher value.', 'easy-language' ) );

@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Avada pagebuilder for simplifications.
+ * File for handling Avada content for simplifications.
  *
  * @package easy-language
  */
@@ -131,7 +131,7 @@ class Avada extends Parser_Base implements Parser {
 			} elseif ( ! empty( $attributes ) && ! empty( $matches[2] ) && ! empty( $matches[3] ) ) {
 				foreach ( $matches[2] as $key => $value ) {
 					foreach ( shortcode_parse_atts( $matches[3][ $key ] ) as $attribute => $attribute_value ) {
-						if ( in_array( $attribute, $attributes, true ) && ! empty( $attribute_value ) ) {
+						if ( ! empty( $attribute_value ) && in_array( $attribute, $attributes, true ) ) {
 							$resulting_texts[] = array(
 								'text' => $attribute_value,
 								'html' => $this->is_flow_text_widget_html( $shortcode ),
@@ -193,7 +193,7 @@ class Avada extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this PageBuilder plugin is active.
 	 *
 	 * @return bool
 	 */

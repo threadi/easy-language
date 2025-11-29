@@ -265,11 +265,6 @@ class Parser_Base {
 						),
 					);
 
-					$dialog = wp_json_encode( $dialog_config );
-					if ( ! $dialog ) {
-						$dialog = '';
-					}
-
 					// get permalink.
 					$permalink = get_permalink( $post_id );
 					if ( ! $permalink ) {
@@ -277,7 +272,7 @@ class Parser_Base {
 					}
 
 					?>
-					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary easy-dialog-for-wordpress elementor-button" data-dialog="<?php echo esc_attr( $dialog ); ?>" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( $permalink ); ?>" title="<?php echo esc_attr( $title ); ?>">
+					<p><a href="<?php echo esc_url( $do_simplification ); ?>" class="button button-secondary easy-dialog-for-wordpress elementor-button" data-dialog="<?php echo esc_attr( Helper::get_json( $dialog_config ) ); ?>" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-link="<?php echo esc_url( $permalink ); ?>" title="<?php echo esc_attr( $title ); ?>">
 					<?php
 					// @phpstan-ignore argument.type
 							$min_percent = 0.8;
@@ -462,11 +457,11 @@ class Parser_Base {
 	/**
 	 * Run no updates on object per default.
 	 *
-	 * @param Post_Object $post_object The object.
+	 * @param Objects $post_object The object.
 	 *
 	 * @return void
 	 */
-	public function update_object( Post_Object $post_object ): void {}
+	public function update_object( Objects $post_object ): void {}
 
 	/**
 	 * Return the parsed texts from pagebuilder.

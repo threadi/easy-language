@@ -64,11 +64,6 @@ const EASY_LANGUAGE_CPT_SWITCHER = 'lel_lang_switcher';
 const EASY_LANGUAGE_LANGUAGE_EMERGENCY = 'en_US';
 
 /**
- * Options-list of transients.
- */
-const EASY_LANGUAGE_TRANSIENT_LIST = 'easy_language_transients';
-
-/**
  * Define names for progressbar during simplification.
  */
 const EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT   = 'easy_language_simplification_count';

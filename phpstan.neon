@@ -26,6 +26,8 @@ parameters:
     - "#ARRAY_A#"
     - "#ABSPATH#"
     - "#_IN_SECONDS#"
+  earlyTerminatingFunctionCalls:
+    - wp_send_json
   paths:
     - app
     - easy-language.php

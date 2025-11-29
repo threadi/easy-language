@@ -10,6 +10,7 @@ namespace easyLanguage\Parser;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\EasyLanguage\Objects;
 use Elementor\Core\Files\CSS\Post as Post_CSS;
 use Elementor\Plugin;
 use easyLanguage\Plugin\Helper;
@@ -306,11 +307,11 @@ class Elementor extends Parser_Base implements Parser {
 	/**
 	 * Run Elementor-specific updates on object.
 	 *
-	 * @param Post_Object $post_object The object.
+	 * @param Objects $post_object The object.
 	 *
 	 * @return void
 	 */
-	public function update_object( Post_Object $post_object ): void {
+	public function update_object( Objects $post_object ): void {
 		// update object-specific css.
 		$post_css = Post_CSS::create( $post_object->get_id() );
 		$post_css->update();

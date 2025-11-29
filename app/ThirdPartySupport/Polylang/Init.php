@@ -11,6 +11,7 @@ namespace easyLanguage\ThirdPartySupport\Polylang;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Plugin\Base;
+use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Languages;
 use easyLanguage\Plugin\ThirdPartySupport_Base;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
@@ -70,6 +71,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function init(): void {
+		// bail if plugin is not enabled.
+		if ( ! $this->is_active() ) {
+			return;
+		}
+
 		// hooks for polylang.
 		add_filter( 'pll_predefined_languages', array( $this, 'add_predefined_language' ) );
 		add_filter( 'pll_predefined_flags', array( $this, 'add_flag' ) );
@@ -122,7 +128,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	public function deactivation(): void {}
 
 	/**
-	 * Run on deactivation of polylang.
+	 * Run on deactivation of Polylang.
 	 *
 	 * @return void
 	 */
@@ -138,7 +144,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * We add no simplification-scripts for polylang.
+	 * We add no simplification-scripts for Polylang.
 	 *
 	 * @return void
 	 */
@@ -228,4 +234,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function cli(): void {}
+
+	/**
+	 * Return whether this object is active.
+	 *
+	 * @return bool
+	 */
+	public function is_active(): bool {
+		return Helper::is_plugin_active( 'polylang/polylang.php' );
+	}
 }

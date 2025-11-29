@@ -228,7 +228,7 @@ class Avia extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this PageBuilder plugin is active.
 	 *
 	 * @return bool
 	 */

@@ -421,7 +421,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Apis/Summ_Ai/Summ_Ai.php](Apis/Summ_Ai/Summ_Ai.php), [line 1069](Apis/Summ_Ai/Summ_Ai.php#L1069-L1076)
+Source: [app/Apis/Summ_Ai/Summ_Ai.php](Apis/Summ_Ai/Summ_Ai.php), [line 1049](Apis/Summ_Ai/Summ_Ai.php#L1049-L1056)
 
 ### `easy_language_possible_source_languages`
 
@@ -673,7 +673,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 537](Plugin/Helper.php#L537-L548)
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 525](Plugin/Helper.php#L525-L536)
 
 ### `easy_language_file_version`
 
@@ -692,7 +692,7 @@ Version | Description
 ------- | -----------
 `2.3.0` | Available since 2.3.0.
 
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 737](Plugin/Helper.php#L737-L745)
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 725](Plugin/Helper.php#L725-L733)
 
 ### `easy_language_post_meta_keys_to_ignore`
 
@@ -710,7 +710,7 @@ Version | Description
 ------- | -----------
 `2.4.0` | Available since 2.4.0.
 
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 756](Plugin/Helper.php#L756-L762)
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 744](Plugin/Helper.php#L744-L750)
 
 ### `easy_language_icon_path`
 
@@ -803,7 +803,7 @@ Version | Description
 ------- | -----------
 `2.2.0` | Available since 2.2.0.
 
-Source: [app/EasyLanguage/Objects.php](EasyLanguage/Objects.php), [line 229](EasyLanguage/Objects.php#L229-L235)
+Source: [app/EasyLanguage/Objects.php](EasyLanguage/Objects.php), [line 240](EasyLanguage/Objects.php#L240-L246)
 
 ### `easy_language_js_top`
 
@@ -821,7 +821,7 @@ Version | Description
 ------- | -----------
 `2.2.0` | Available since 2.2.0.
 
-Source: [app/EasyLanguage/Objects.php](EasyLanguage/Objects.php), [line 616](EasyLanguage/Objects.php#L616-L622)
+Source: [app/EasyLanguage/Objects.php](EasyLanguage/Objects.php), [line 638](EasyLanguage/Objects.php#L638-L644)
 
 ### `easy_language_simplification_table_to_simplify`
 
@@ -840,7 +840,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/EasyLanguage/Tables/Texts_To_Simplify_Table.php](EasyLanguage/Tables/Texts_To_Simplify_Table.php), [line 118](EasyLanguage/Tables/Texts_To_Simplify_Table.php#L118-L126)
+Source: [app/EasyLanguage/Tables/Texts_To_Simplify_Table.php](EasyLanguage/Tables/Texts_To_Simplify_Table.php), [line 120](EasyLanguage/Tables/Texts_To_Simplify_Table.php#L120-L128)
 
 ### `easy_language_simplification_to_simplify_table_options`
 
@@ -859,7 +859,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/EasyLanguage/Tables/Texts_To_Simplify_Table.php](EasyLanguage/Tables/Texts_To_Simplify_Table.php), [line 178](EasyLanguage/Tables/Texts_To_Simplify_Table.php#L178-L186)
+Source: [app/EasyLanguage/Tables/Texts_To_Simplify_Table.php](EasyLanguage/Tables/Texts_To_Simplify_Table.php), [line 227](EasyLanguage/Tables/Texts_To_Simplify_Table.php#L227-L235)
 
 ### `easy_language_simplification_table_used_in`
 
@@ -897,7 +897,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/EasyLanguage/Tables/Texts_In_Use_Table.php](EasyLanguage/Tables/Texts_In_Use_Table.php), [line 195](EasyLanguage/Tables/Texts_In_Use_Table.php#L195-L203)
+Source: [app/EasyLanguage/Tables/Texts_In_Use_Table.php](EasyLanguage/Tables/Texts_In_Use_Table.php), [line 228](EasyLanguage/Tables/Texts_In_Use_Table.php#L228-L236)
 
 ### `easy_language_first_simplify_dialog`
 
@@ -917,7 +917,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/EasyLanguage/Init.php](EasyLanguage/Init.php), [line 472](EasyLanguage/Init.php#L472-L481)
+Source: [app/EasyLanguage/Init.php](EasyLanguage/Init.php), [line 491](EasyLanguage/Init.php#L491-L500)
 
 ### `easy_language_possible_post_types`
 
@@ -927,7 +927,7 @@ Source: [app/EasyLanguage/Init.php](EasyLanguage/Init.php), [line 472](EasyLangu
 
 Argument | Type | Description
 -------- | ---- | -----------
-`$post_types` | `array<string,mixed>` | The list of possible post-types.
+`$post_types` | `array<string,string>` | The list of possible post-types.
 
 **Changelog**
 
@@ -935,7 +935,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/EasyLanguage/Init.php](EasyLanguage/Init.php), [line 1093](EasyLanguage/Init.php#L1093-L1100)
+Source: [app/EasyLanguage/Init.php](EasyLanguage/Init.php), [line 1135](EasyLanguage/Init.php#L1135-L1142)
 
 ### `easy_language_first_simplify_dialog`
 
@@ -955,7 +955,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/EasyLanguage/Init.php](EasyLanguage/Init.php), [line 1353](EasyLanguage/Init.php#L1353-L1362)
+Source: [app/EasyLanguage/Init.php](EasyLanguage/Init.php), [line 1434](EasyLanguage/Init.php#L1434-L1443)
 
 ### `easy_language_get_object_by_wp_object`
 
@@ -975,7 +975,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/EasyLanguage/Init.php](EasyLanguage/Init.php), [line 1398](EasyLanguage/Init.php#L1398-L1407)
+Source: [app/EasyLanguage/Init.php](EasyLanguage/Init.php), [line 1479](EasyLanguage/Init.php#L1479-L1488)
 
 ### `easy_language_quota_percent`
 
@@ -993,7 +993,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/EasyLanguage/Init.php](EasyLanguage/Init.php), [line 1897](EasyLanguage/Init.php#L1897-L1904)
+Source: [app/EasyLanguage/Init.php](EasyLanguage/Init.php), [line 1978](EasyLanguage/Init.php#L1978-L1985)
 
 ### `easy_language_quota_percent`
 
@@ -1011,7 +1011,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/EasyLanguage/Parser_Base.php](EasyLanguage/Parser_Base.php), [line 284](EasyLanguage/Parser_Base.php#L284-L291)
+Source: [app/EasyLanguage/Parser_Base.php](EasyLanguage/Parser_Base.php), [line 279](EasyLanguage/Parser_Base.php#L279-L286)
 
 ### `easy_language_page_builder_list`
 
@@ -1101,7 +1101,7 @@ Version | Description
 ------- | -----------
 `2.10.0` | Available since 2.10.0.
 
-Source: [app/Parser/BoldBuilder.php](Parser/BoldBuilder.php), [line 69](Parser/BoldBuilder.php#L69-L76)
+Source: [app/Parser/BoldBuilder.php](Parser/BoldBuilder.php), [line 70](Parser/BoldBuilder.php#L70-L77)
 
 ### `easy_language_boldbuilder_html_widgets`
 
@@ -1119,7 +1119,7 @@ Version | Description
 ------- | -----------
 `2.10.0` | Available since 2.10.0.
 
-Source: [app/Parser/BoldBuilder.php](Parser/BoldBuilder.php), [line 91](Parser/BoldBuilder.php#L91-L98)
+Source: [app/Parser/BoldBuilder.php](Parser/BoldBuilder.php), [line 92](Parser/BoldBuilder.php#L92-L99)
 
 ### `easy_language_beaverbuilder_text_widgets`
 
@@ -1173,7 +1173,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Parser/Themify.php](Parser/Themify.php), [line 81](Parser/Themify.php#L81-L88)
+Source: [app/Parser/Themify.php](Parser/Themify.php), [line 82](Parser/Themify.php#L82-L89)
 
 ### `easy_language_themify_html_widgets`
 
@@ -1191,7 +1191,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Parser/Themify.php](Parser/Themify.php), [line 103](Parser/Themify.php#L103-L110)
+Source: [app/Parser/Themify.php](Parser/Themify.php), [line 104](Parser/Themify.php#L104-L111)
 
 ### `easy_language_seedprod_text_widgets`
 
@@ -1245,7 +1245,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Parser/Elementor.php](Parser/Elementor.php), [line 89](Parser/Elementor.php#L89-L96)
+Source: [app/Parser/Elementor.php](Parser/Elementor.php), [line 90](Parser/Elementor.php#L90-L97)
 
 ### `easy_language_elementor_html_widgets`
 
@@ -1263,7 +1263,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Parser/Elementor.php](Parser/Elementor.php), [line 111](Parser/Elementor.php#L111-L118)
+Source: [app/Parser/Elementor.php](Parser/Elementor.php), [line 112](Parser/Elementor.php#L112-L119)
 
 ### `easy_language_siteorigin_text_widgets`
 
@@ -1317,7 +1317,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Parser/WpBakery.php](Parser/WpBakery.php), [line 78](Parser/WpBakery.php#L78-L85)
+Source: [app/Parser/WpBakery.php](Parser/WpBakery.php), [line 79](Parser/WpBakery.php#L79-L86)
 
 ### `easy_language_wpbakery_html_widgets`
 
@@ -1335,7 +1335,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Parser/WpBakery.php](Parser/WpBakery.php), [line 100](Parser/WpBakery.php#L100-L107)
+Source: [app/Parser/WpBakery.php](Parser/WpBakery.php), [line 101](Parser/WpBakery.php#L101-L108)
 
 ### `easy_language_visual_composer_text_widgets`
 
@@ -1479,7 +1479,7 @@ Version | Description
 ------- | -----------
 `2.7.0` | Available since 2.7.0.
 
-Source: [app/Parser/Salients_WpBakery.php](Parser/Salients_WpBakery.php), [line 78](Parser/Salients_WpBakery.php#L78-L85)
+Source: [app/Parser/Salients_WpBakery.php](Parser/Salients_WpBakery.php), [line 79](Parser/Salients_WpBakery.php#L79-L86)
 
 ### `easy_language_salient_wpbakery_html_widgets`
 
@@ -1497,7 +1497,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Parser/Salients_WpBakery.php](Parser/Salients_WpBakery.php), [line 100](Parser/Salients_WpBakery.php#L100-L107)
+Source: [app/Parser/Salients_WpBakery.php](Parser/Salients_WpBakery.php), [line 101](Parser/Salients_WpBakery.php#L101-L108)
 
 ### `easy_language_divi_text_widgets`
 

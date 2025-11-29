@@ -34,10 +34,9 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 
 #### Features ####
 
-- Simplify German pages and blog posts into German easy or plain language (Supports German formal too)
-- Simplify selected pages or post one by one
+- Simplify your contents into easy or plain language
 - Auto-simplify using the API of SUMM AI, capito or OpenAI (ChatGPT)
-- Edit the pages or post manually
+- Edit your simplified contents manually
 - Add a language switcher by shortcode at any position on your website
 - Multisite support
 - Own role for users to only simplify texts
@@ -69,6 +68,11 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 - Sublanguage
 - TranslatePress
 
+#### Compatible with other plugins ####
+
+- Advanced Custom Fields (ACF)
+- Custom Post Type UI (CPTUI)
+
 #### More Information ####
 
 We also provide Shortcodes as documented [here](https://github.com/threadi/easy-language/blob/master/doc/shortcodes.md).
@@ -76,17 +80,6 @@ We also provide Shortcodes as documented [here](https://github.com/threadi/easy-
 Please Note: The plugin was tested in a broad variety of WordPress pages, but we highly recommend to install and test the plugin in a development environment first.
 
 The development repository is on [GitHub](https://github.com/threadi/easy-language).
-
-#### the Pro license includes: ####
-
-* Support for English (simplify to easy or plain language)
-* Support for French (simplify to FALC)
-* Support for more post-types, e.g., for WooCommerce
-* Support for any taxonomies (e.g., category descriptions)
-* Simplification of single texts
-* Show where any simplified text is used in your website
-
-More details: [laolaweb.com/en/plugins/easy-language-for-wordpress/](https://laolaweb.com/en/plugins/easy-language-for-wordpress/)
 
 == Installation ==
 

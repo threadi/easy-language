@@ -345,7 +345,7 @@ abstract class Base {
 		$table  = '<table>';
 		$table .= '<tr><th>' . esc_html__( 'Quota', 'easy-language' ) . ':</th><td>' . absint( $quota['character_limit'] ) . '</td></tr>';
 		$table .= '<tr><th>' . esc_html__( 'Character spent', 'easy-language' ) . ':</th><td>' . absint( $quota['character_spent'] ) . '</td></tr>';
-		$table .= '<tr><th>' . esc_html__( 'Rest quota', 'easy-language' ) . ':</th><td>' . absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) . '</td></tr>';
+		$table .= '<tr><th>' . esc_html__( 'Rest quota', 'easy-language' ) . ':</th><td>' . ( absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) ) . '</td></tr>';
 		$table .= '</table>';
 
 		// output the resulting table.
@@ -384,15 +384,6 @@ abstract class Base {
 
 		// return false if no valid combination has been found.
 		return ! empty( $match );
-	}
-
-	/**
-	 * Return whether this API has extended support in Easy Language Pro.
-	 *
-	 * @return bool
-	 */
-	public function is_extended_in_pro(): bool {
-		return false;
 	}
 
 	/**
@@ -472,7 +463,7 @@ abstract class Base {
 	}
 
 	/**
-	 * Return false whether this API would support translatepress-plugin.
+	 * Return false whether this API would support TranslatePress-plugin.
 	 *
 	 * @return bool
 	 */
@@ -481,7 +472,7 @@ abstract class Base {
 	}
 
 	/**
-	 * Return class-name for translatepress-machine.
+	 * Return class-name for TranslatePress-machine.
 	 *
 	 * @return string
 	 */

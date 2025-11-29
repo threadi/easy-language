@@ -14,6 +14,8 @@ use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Helper;
+use WP_Post;
+use WP_Term;
 
 /**
  * Definition of our Objects object.
@@ -98,7 +100,16 @@ abstract class Objects {
 	}
 
 	/**
-	 * Return edit link for pagebuilder-object.
+	 * Return public URL for this object.
+	 *
+	 * @return string
+	 */
+	public function get_link(): string {
+		return '';
+	}
+
+	/**
+	 * Return edit URL for this object.
 	 *
 	 * @return string
 	 */
@@ -490,7 +501,7 @@ abstract class Objects {
 		// end progress on CLI.
 		$progress ? $progress->finish() : false;
 
-		// save result for this simplification if we used an API.
+		// save result for this simplification, if we used an API, and show success dialog.
 		if ( $c > 0 ) {
 			// set result.
 			$dialog = array(
@@ -501,11 +512,6 @@ abstract class Objects {
 					'<p>' . sprintf( __( '<strong>Simplifications have been returned from %2$s.</strong><br>They were inserted into the %1$s.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->get_api()->get_title() ) ) . '</p>',
 				),
 				'buttons'   => array(
-					array(
-						'action'  => $js_top . 'location.href="' . get_permalink( $this->get_id() ) . '";',
-						'variant' => 'primary',
-						'text'    => __( 'Show in frontend', 'easy-language' ),
-					),
 					array(
 						'action'  => $js_top . 'location.href="' . $this->get_edit_link() . '";',
 						'variant' => 'primary',
@@ -518,6 +524,22 @@ abstract class Objects {
 					),
 				),
 			);
+
+			// get the public URL of this object.
+			$public_url = $this->get_link();
+
+			// add the public URL as button on dialog, if set.
+			if ( ! empty( $public_url ) ) {
+				$dialog['buttons'][2] = $dialog['buttons'][1];
+				$dialog['buttons'][1] = $dialog['buttons'][0];
+				$dialog['buttons'][0] = array(
+					'action'  => $js_top . 'location.href="' . $this->get_link() . '";',
+					'variant' => 'primary',
+					'text'    => __( 'Show in frontend', 'easy-language' ),
+				);
+			}
+
+			// mark the simplification.
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 		}
 
@@ -845,9 +867,9 @@ abstract class Objects {
 	 * @param string   $target_language The target-language.
 	 * @param Api_Base $api_object The API to use.
 	 * @param bool     $prevent_automatic_mode True if automatic mode is prevented.
-	 * @return bool|Post_Object
+	 * @return bool|Objects
 	 */
-	public function add_simplification_object( string $target_language, Api_Base $api_object, bool $prevent_automatic_mode ): bool|Post_Object {
+	public function add_simplification_object( string $target_language, Api_Base $api_object, bool $prevent_automatic_mode ): bool|Objects {
 		if ( empty( $target_language ) ) {
 			return false;
 		}
@@ -929,5 +951,23 @@ abstract class Objects {
 			return '';
 		}
 		return '';
+	}
+
+	/**
+	 * Return the content of this object.
+	 *
+	 * @return string
+	 */
+	public function get_content(): string {
+		return '';
+	}
+
+	/**
+	 * Return WP-own object of this plugin handled object.
+	 *
+	 * @return WP_Post|WP_Term|false
+	 */
+	public function get_object_as_object(): WP_Post|WP_Term|false {
+		return false;
 	}
 }

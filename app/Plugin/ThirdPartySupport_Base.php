@@ -109,4 +109,11 @@ interface ThirdPartySupport_Base {
 	 * @return string
 	 */
 	public function get_title(): string;
+
+	/**
+	 * Return whether this object is active.
+	 *
+	 * @return bool
+	 */
+	public function is_active(): bool;
 }

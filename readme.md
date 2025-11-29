@@ -97,7 +97,7 @@ Hint: will be called by ant-command mentioned above.
 
 ## Generate documentation
 
-`vendor/bin/wp-documentor parse app --format=markdown --output=doc/hooks.md --prefix=easy_language_ --exclude=Section.php --exclude=Tab.php --exclude=Import.php --exclude=Export.php --exclude=Field_Base.php --exclude=Settings.php --exclude=Page.php --exclude=Rest.php --exclude=Transients.php`
+`vendor/bin/wp-documentor parse app --format=markdown --output=doc/hooks.md --prefix=easy_language_ --exclude=Section.php --exclude=Tab.php --exclude=Import.php --exclude=Export.php --exclude=Field_Base.php --exclude=Settings.php --exclude=Page.php --exclude=Rest.php --exclude=Transients.php --exclude=Post_Object.php`
 
 ## Check for WordPress VIP Coding Standards
 

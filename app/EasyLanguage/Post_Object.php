@@ -16,6 +16,7 @@ use easyLanguage\Plugin\Init;
 use easyLanguage\Plugin\Languages;
 use WP_Post;
 use WP_Query;
+use WP_Term;
 
 /**
  * Handles a single post-object.
@@ -191,9 +192,9 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	/**
 	 * Get WP-own post object as WP-object.
 	 *
-	 * @return WP_Post|false
+	 * @return WP_Post|WP_Term|false
 	 */
-	public function get_object_as_object(): WP_Post|false {
+	public function get_object_as_object(): WP_Post|WP_Term|false {
 		// get post as object.
 		$post = get_post( $this->get_id() );
 
@@ -506,9 +507,9 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 * @param string   $target_language The target-language.
 	 * @param Api_Base $api_object The API to use.
 	 * @param bool     $prevent_automatic_mode True if automatic mode is prevented.
-	 * @return bool|Post_Object
+	 * @return bool|Objects
 	 */
-	public function add_simplification_object( string $target_language, Api_Base $api_object, bool $prevent_automatic_mode ): bool|Post_Object {
+	public function add_simplification_object( string $target_language, Api_Base $api_object, bool $prevent_automatic_mode ): bool|Objects {
 		// get DB-object.
 		$db = Db::get_instance();
 
@@ -658,6 +659,24 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
+	 * Return public URL for this object.
+	 *
+	 * @return string
+	 */
+	public function get_link(): string {
+		// get the term URL.
+		$url = get_permalink( $this->get_id() );
+
+		// bail if URL could not be loaded.
+		if ( ! is_string( $url ) ) {
+			return '';
+		}
+
+		// return the URL.
+		return $url;
+	}
+
+	/**
 	 * Return the edit link.
 	 *
 	 * @return string
@@ -688,8 +707,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 * @return void
 	 */
 	protected function process_simplification_trigger_on_end(): void {
-		$type = $this->get_type();
 		// trigger object-update.
-		do_action( 'save_post_' . $type, $this->get_id(), $this->get_object_as_object(), true );
+		do_action( 'save_post_' . $this->get_type(), $this->get_id(), $this->get_object_as_object(), true );
 	}
 }

@@ -63,11 +63,10 @@ class Init {
 		// initialize our installer.
 		Installer::get_instance()->init();
 
-		// initialize the main simplification functions.
-		\easyLanguage\EasyLanguage\Init::get_instance()->init();
-
-		// initialize the third party support.
-		ThirdPartySupports::get_instance()->get_available_plugins();
+		// loop through the active multilingual-plugins.
+		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
+			$plugin_obj->init();
+		}
 
 		// initialize the setup.
 		Setup::get_instance()->init();
@@ -76,7 +75,6 @@ class Init {
 		Admin::get_instance()->init();
 
 		// general hooks.
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'cli_init', array( $this, 'cli' ) );
 		add_action( 'update_option_easy_language_api', array( $this, 'update_easy_language_api' ), 10, 2 );
 		add_action( 'admin_action_easy_language_clear_log', array( $this, 'clear_log_by_request' ) );
@@ -94,6 +92,7 @@ class Init {
 	 * @noinspection PhpFullyQualifiedNameUsageInspection
 	 */
 	public function cli(): void {
+		// add the main command.
 		\WP_CLI::add_command( 'easy-language', 'easyLanguage\Cli' );
 
 		// add cli tasks of enabled APIs.
@@ -103,62 +102,13 @@ class Init {
 
 		// add cli tasks for the supported multilingual plugins.
 		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
+			// bail if plugin is not enabled.
+			if ( ! $plugin_obj->is_active() ) {
+				continue;
+			}
+
+			// add its WP CLI tasks.
 			$plugin_obj->cli();
-		}
-	}
-
-	/**
-	 * Run on every admin load.
-	 *
-	 * @return void
-	 */
-	public function admin_init(): void {
-		global $pagenow;
-
-		// get transients objects-object.
-		$transients_obj = Transients::get_instance();
-
-		// loop through the active multilingual-plugins.
-		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
-			// bail if this is not a foreign plugin.
-			if ( ! $plugin_obj->is_foreign_plugin() ) {
-				continue;
-			}
-
-			/**
-			 * Show hint if this is a foreign plugin.
-			 */
-			// set transient name.
-			$transient_name = 'easy_language_plugin_' . $plugin_obj->get_name();
-
-			// get transient-object for this plugin.
-			$transient_obj = $transients_obj->get_transient_by_name( $transient_name );
-			if ( $transient_obj->is_set() ) {
-				// bail if this transient is already set.
-				continue;
-			}
-			$transient_obj = $transients_obj->add();
-			$transient_obj->set_name( $transient_name );
-			$transient_obj->set_dismissible_days( 180 );
-
-			/**
-			 * Show hint if the foreign plugin does NOT support APIs.
-			 */
-			/* translators: %1$s will be replaced by the name of the multilingual-plugin */
-			$message = sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional language.', 'easy-language' ), $plugin_obj->get_title() );
-			if ( false === $plugin_obj->is_supporting_apis() ) {
-				/* translators: %1$s will be replaced by the name of the multilingual-plugin */
-				$message .= '<br><br>' . sprintf( __( 'Due to limitations of %1$s, it is unfortunately not possible for us to provide automatic simplification for easy or plain language. If you want to use this, you could use the <i>Easy Language</i> plugin alongside %1$s.', 'easy-language' ), esc_html( $plugin_obj->get_title() ), esc_html( $plugin_obj->get_title() ) );
-			}
-			$transient_obj->set_message( $message );
-			$transient_obj->save();
-		}
-
-		// remove first step hint if API-settings are called.
-		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_intro_step_1' );
-		$page          = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( 'options-general.php' === $pagenow && ! empty( $page ) && 'easy_language_settings' === $page && $transient_obj->is_set() ) {
-			$transient_obj->delete();
 		}
 	}
 
@@ -168,7 +118,7 @@ class Init {
 	 * @param string $singular The singular name.
 	 * @param string $plural The plural name.
 	 *
-	 * @return string[]
+	 * @return array<string,string>
 	 */
 	public function get_capabilities( string $singular, string $plural ): array {
 		return array(

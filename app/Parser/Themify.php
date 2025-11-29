@@ -10,6 +10,7 @@ namespace easyLanguage\Parser;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\EasyLanguage\Objects;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\EasyLanguage\Parser;
 use easyLanguage\EasyLanguage\Parser_Base;
@@ -211,11 +212,11 @@ class Themify extends Parser_Base implements Parser {
 	/**
 	 * Run themify-specific updates on object.
 	 *
-	 * @param Post_Object $post_object The object.
+	 * @param Objects $post_object The object.
 	 *
 	 * @return void
 	 */
-	public function update_object( Post_Object $post_object ): void {
+	public function update_object( Objects $post_object ): void {
 		do_action( 'save_post' );
 	}
 

@@ -80,7 +80,7 @@ class Languages {
 	/**
 	 * Return possible source languages.
 	 *
-	 * @return array<string,array<string,string>>
+	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_possible_source_languages(): array {
 		$source_languages = array(
@@ -116,7 +116,7 @@ class Languages {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array $source_languages List of source languages.
+		 * @param array<string,array<string,mixed>> $source_languages List of source languages.
 		 */
 		return apply_filters( 'easy_language_possible_source_languages', $source_languages );
 	}

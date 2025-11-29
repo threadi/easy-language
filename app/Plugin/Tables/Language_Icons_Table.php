@@ -105,8 +105,6 @@ class Language_Icons_Table extends WP_List_Table {
 
 	/**
 	 * Message to be displayed when there are no items
-	 *
-	 * @since 3.1.0
 	 */
 	public function no_items(): void {
 		echo esc_html__( 'No icons found.', 'easy-language' );

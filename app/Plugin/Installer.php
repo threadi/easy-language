@@ -132,36 +132,6 @@ class Installer {
 		// initiate the settings.
 		\easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance()->activation();
 
-		// set debug-mode to disabled per default.
-		if ( false === get_option( 'easy_language_debug_mode' ) ) {
-			update_option( 'easy_language_debug_mode', '0' );
-		}
-
-		// set api to empty.
-		if ( ! get_option( 'easy_language_api' ) ) {
-			update_option( 'easy_language_api', '' );
-		}
-
-		// set max age for log entries.
-		if ( ! get_option( 'easy_language_log_max_age' ) ) {
-			update_option( 'easy_language_log_max_age', '50' );
-		}
-
-		// set API timeout.
-		if ( ! get_option( 'easy_language_api_timeout' ) ) {
-			update_option( 'easy_language_api_timeout', 60 );
-		}
-
-		// set text-simplification limit per process.
-		if ( false === get_option( 'easy_language_api_text_limit_per_process' ) ) {
-			update_option( 'easy_language_api_text_limit_per_process', 1 );
-		}
-
-		// enable deletion of unused simplification.
-		if ( false === get_option( 'easy_language_delete_unused_simplifications' ) ) {
-			update_option( 'easy_language_delete_unused_simplifications', 1 );
-		}
-
 		// generate random-installation-hash if it does not already exist (will never be removed or changed).
 		if ( ! get_option( EASY_LANGUAGE_HASH ) ) {
 			update_option( EASY_LANGUAGE_HASH, hash( 'sha256', wp_rand() . get_option( 'home' ) ) );
@@ -179,7 +149,7 @@ class Installer {
 		// get admin-role.
 		$admin_role = get_role( 'administrator' );
 
-		// loop through the capabilities and add them to the translator.
+		// loop through the capabilities and add them to the translator and administrator role.
 		foreach ( Init::get_instance()->get_capabilities( 'el_simplifier', 'el_simplifier' ) as $capability ) {
 			if ( $translator_role instanceof WP_Role ) {
 				$translator_role->add_cap( $capability );

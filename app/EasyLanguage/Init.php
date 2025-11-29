@@ -32,6 +32,7 @@ use WP_Post_Type;
 use WP_Query;
 use WP_Role;
 use WP_Screen;
+use WP_Taxonomy;
 use WP_Term;
 use WP_User;
 
@@ -125,7 +126,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 		add_action( 'init', array( $this, 'add_settings' ), 20 );
 
 		// backend simplification-hooks to show or hide simplified pages.
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_init', array( $this, 'admin_init_post_types' ) );
+		add_action( 'admin_init', array( $this, 'admin_init_taxonomies' ) );
 		add_action( 'pre_get_posts', array( $this, 'hide_simplified_posts' ) );
 		add_filter( 'get_pages', array( $this, 'remove_simplified_pages' ) );
 
@@ -155,7 +157,10 @@ class Init extends Base implements ThirdPartySupport_Base {
 		add_filter( 'site_status_tests', array( $this, 'add_site_status_test' ) );
 		add_action( 'admin_action_easy_language_create_automatic_cron', array( $this, 'create_automatic_simplification_cron' ) );
 		add_filter( 'easy_language_get_object', array( $this, 'get_post_object' ), 20, 2 );
+		add_filter( 'easy_language_get_object', array( $this, 'get_term_object' ), 10, 3 );
 		add_filter( 'easy_language_first_simplify_dialog', array( $this, 'change_first_simplify_dialog' ), 10, 3 );
+		add_filter( 'easy_language_get_object_by_wp_object', array( $this, 'get_term_object_by_wp_object' ), 10, 3 );
+		add_action( 'admin_action_easy_language_delete_simplification', array( $this, 'delete_simplification' ) );
 		add_action( 'admin_action_easy_language_delete_text_for_simplification', array( $this, 'delete_text_for_simplification' ) );
 		add_action( 'admin_action_easy_language_delete_all_to_simplified_texts', array( $this, 'delete_all_to_simplified_texts' ) );
 	}
@@ -165,7 +170,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 *
 	 * @return void
 	 */
-	public function admin_init(): void {
+	public function admin_init_post_types(): void {
 		// bail if setup has not been run.
 		if ( ! Setup::get_instance()->is_completed() ) {
 			return;
@@ -212,6 +217,20 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// support for nested pages: show simplified pages as action-links.
 		if ( Helper::is_plugin_active( 'wp-nested-pages/nestedpages.php' ) ) {
 			add_filter( 'post_row_actions', array( $this, 'add_post_row_action' ), 10, 2 );
+		}
+	}
+
+	/**
+	 * Add language-columns for each supported taxonomy.
+	 *
+	 * @return void
+	 */
+	public function admin_init_taxonomies(): void {
+		// check updated terms.
+		foreach ( $this->get_supported_taxonomies() as $taxonomy => $enabled ) {
+			add_action( 'saved_' . $taxonomy, array( $this, 'update_translation_of_term' ), 10, 4 );
+			add_filter( 'manage_edit-' . $taxonomy . '_columns', array( $this, 'add_taxonomy_columns' ) );
+			add_action( 'manage_' . $taxonomy . '_custom_column', array( $this, 'add_taxonomy_column_content' ), 10, 3 );
 		}
 	}
 
@@ -403,7 +422,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 							),
 						),
 					);
-					echo '<span class="dashicons dashicons-admin-generic easy-language-automatic-simplification-prevented easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_dialog_for_attribute( $dialog ) ) . '" title="' . esc_attr__( 'Automatic simplification is prevented', 'easy-language' ) . '"></span>';
+					echo '<span class="dashicons dashicons-admin-generic easy-language-automatic-simplification-prevented easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_json( $dialog ) ) . '" title="' . esc_attr__( 'Automatic simplification is prevented', 'easy-language' ) . '"></span>';
 				}
 
 				// show mark if content of original object has been changed.
@@ -482,7 +501,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 					// show link to add simplification for this language.
 					/* translators: %1$s is the name of the language */
-					echo '<a href="' . esc_url( $create_simplification_link ) . '" class="dashicons dashicons-plus ' . esc_attr( $add_class ) . '" data-dialog="' . esc_attr( Helper::get_dialog_for_attribute( $dialog ) ) . '" data-title="' . esc_attr( $post_object->get_title() ) . '" data-object-type-name="' . esc_attr( $post_object->get_type_name() ) . '" title="' . esc_attr( sprintf( esc_html__( 'Simplify this %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+					echo '<a href="' . esc_url( $create_simplification_link ) . '" class="dashicons dashicons-plus ' . esc_attr( $add_class ) . '" data-dialog="' . esc_attr( Helper::get_json( $dialog ) ) . '" data-title="' . esc_attr( $post_object->get_title() ) . '" data-object-type-name="' . esc_attr( $post_object->get_type_name() ) . '" title="' . esc_attr( sprintf( esc_html__( 'Simplify this %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
 
 					// if the detected pagebuilder is "undetected" show warning.
 					if ( false !== $show_page_builder_warning ) {
@@ -503,7 +522,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 						);
 
 						/* translators: %1$s is the name of the object (e.g. page or post) */
-						echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress"  data-dialog="' . esc_attr( Helper::get_dialog_for_attribute( $dialog ) ) . '" title="' . esc_attr( sprintf( __( 'This %1$s has been edited with an unknown page builder or the classic editor', 'easy-language' ), esc_html( $post_object->get_type_name() ) ) ) . '"></span>';
+						echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress"  data-dialog="' . esc_attr( Helper::get_json( $dialog ) ) . '" title="' . esc_attr( sprintf( __( 'This %1$s has been edited with an unknown page builder or the classic editor', 'easy-language' ), esc_html( $post_object->get_type_name() ) ) ) . '"></span>';
 					}
 				} else {
 					// otherwise should warning that the for this object used page builder is not active or not supported.
@@ -719,7 +738,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// bail if not object could be loaded.
-		if ( false === $object ) {
+		if ( ! $object instanceof Objects ) {
 			return;
 		}
 
@@ -732,10 +751,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$id = 'easy-language-translate-button';
 
 		// get object type name.
-		$object_type_name = '';
-		if ( $object instanceof Post_Object ) {
-			$object_type_name = $object->get_type_name();
-		}
+		$object_type_name = $object->get_type_name();
 
 		// add not clickable main menu where all languages will be added as dropdown-items.
 		$admin_bar->add_menu(
@@ -791,6 +807,24 @@ class Init extends Base implements ThirdPartySupport_Base {
 	public function is_post_type_supported( string $post_type ): bool {
 		$post_types = $this->get_supported_post_types();
 		return ! empty( $post_types[ $post_type ] );
+	}
+
+	/**
+	 * Return supported taxonomies.
+	 *
+	 * @return array<string>
+	 */
+	public function get_supported_taxonomies(): array {
+		// get the setting.
+		$supported_taxonomies = get_option( 'easy_language_taxonomies' );
+
+		// if setting is empty, return empty array.
+		if ( ! is_array( $supported_taxonomies ) ) {
+			return array();
+		}
+
+		// return the list of supported post types.
+		return $supported_taxonomies;
 	}
 
 	/**
@@ -1019,20 +1053,12 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// delete options.
 		$options = array(
-			'easy_language_languages',
-			'easy_language_switcher_link',
 			EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING,
 			EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT,
 			EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX,
 			EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS,
 			'easy_language_switcher_default',
-			'easy_language_state_on_deactivation',
-			'easy_language_state_on_api_change',
-			'easy_language_generate_permalink',
 			'easy_language_intro_step_2',
-			'easy_language_automatic_simplification',
-			'easy_language_automatic_item_count',
-			'easy_language_automatic_simplification_enabled',
 			'easy_language_icons',
 			EASY_LANGUAGE_OPTION_DELETION_COUNT,
 			EASY_LANGUAGE_OPTION_DELETION_MAX,
@@ -1072,10 +1098,18 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$general_main_section = $general_tab->add_section( 'easy_language_general_section', 10 );
 		$general_main_section->set_title( __( 'General Settings', 'easy-language' ) );
 
-		// get all actual post-types in this project.
-		$post_types_array = array( 'post', 'page' );
-		$post_types       = array();
-		foreach ( $post_types_array as $post_type ) {
+		/**
+		 * Get all post-types in this project with support for title and editor
+		 * as we need this for simplification.
+		 */
+		// collect them.
+		$post_types = array();
+
+		// get all post types with the necessary support.
+		$post_types_with_editor_support = get_post_types_by_support( array( 'editor', 'title' ) );
+
+		// loop through all of them.
+		foreach ( $post_types_with_editor_support as $post_type ) {
 			// get the post-type object.
 			$post_type_obj = get_post_type_object( $post_type );
 
@@ -1095,7 +1129,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array<string,mixed> $post_types The list of possible post-types.
+		 * @param array<string,string> $post_types The list of possible post-types.
 		 */
 		$post_types = apply_filters( 'easy_language_possible_post_types', $post_types );
 
@@ -1112,7 +1146,46 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$field = new Checkboxes();
 		$field->set_title( __( 'Choose supported post-types', 'easy-language' ) );
 		$field->set_options( $post_types );
-		$field->set_sanitize_callback( array( $this, 'validate_post_types' ) );
+		$field->set_sanitize_callback( array( $this, 'validate_checkboxes' ) );
+		$setting->set_field( $field );
+
+		/**
+		 * Get list of possible supported taxonomies.
+		 */
+		// collect them.
+		$taxonomies = array();
+
+		// get the possible taxonomies.
+		$taxonomies_available = get_taxonomies();
+
+		// loop through all of them.
+		foreach ( $taxonomies_available as $taxonomy_name ) {
+			// get the taxonomy object.
+			$taxonomy = get_taxonomy( $taxonomy_name );
+
+			// bail if object could not be loaded.
+			if ( ! $taxonomy instanceof WP_Taxonomy ) {
+				continue;
+			}
+
+			// bail if taxonomy is not public or not in backend menu.
+			if ( ! $taxonomy->public || ! $taxonomy->show_in_menu ) {
+				continue;
+			}
+
+			// add it to the list.
+			$taxonomies[ $taxonomy_name ] = $taxonomy->label;
+		}
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_taxonomies' );
+		$setting->set_section( $general_main_section );
+		$setting->set_type( 'array' );
+		$setting->set_default( array() );
+		$field = new Checkboxes();
+		$field->set_title( __( 'Choose supported taxonomies', 'easy-language' ) );
+		$field->set_options( $taxonomies );
+		$field->set_sanitize_callback( array( $this, 'validate_checkboxes' ) );
 		$setting->set_field( $field );
 
 		// get active api for readonly-marker depending on active api.
@@ -1362,7 +1435,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				$dialog = apply_filters( 'easy_language_first_simplify_dialog', $dialog, $api_obj, $post_object );
 
 				// show link to add simplification for this language.
-				$actions[ 'easy-language-' . $language_code ] = '<a href="' . esc_url( $create_translation ) . '" class="easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_dialog_for_attribute( $dialog ) ) . '"><i class="dashicons dashicons-plus"></i> ' . esc_html( $settings['label'] ) . '</a>';
+				$actions[ 'easy-language-' . $language_code ] = '<a href="' . esc_url( $create_translation ) . '" class="easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_json( $dialog ) ) . '"><i class="dashicons dashicons-plus"></i> ' . esc_html( $settings['label'] ) . '</a>';
 			}
 		}
 
@@ -1649,7 +1722,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 					),
 				);
 				wp_send_json( $return );
-				exit;
 			}
 
 			// get active API as object.
@@ -1681,7 +1753,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 					),
 				);
 				wp_send_json( $return );
-				exit;
 			}
 
 			// get info if this is a simplification-initialization.
@@ -1747,7 +1818,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 				// return results.
 				wp_send_json( $return );
-				exit;
 			}
 
 			// collect return array.
@@ -1758,7 +1828,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 				$results[ $object->get_md5() ],
 			);
 			wp_send_json( $return );
-			exit;
 		}
 
 		// return general error.
@@ -1870,13 +1939,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Validate the post-type-setting.
+	 * Validate the checkboxes settings.
 	 *
 	 * @param array<string>|null $values The possible values.
 	 *
 	 * @return array<string>
 	 */
-	public function validate_post_types( array|null $values ): array {
+	public function validate_checkboxes( array|null $values ): array {
 		if ( is_null( $values ) ) {
 			$values = array();
 		}
@@ -2209,6 +2278,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// get active api.
 		$api_object = Apis::get_instance()->get_active_api();
 
+		// bail if no API is active.
+		if ( ! $api_object instanceof Api_Base ) {
+			wp_send_json( $return );
+		}
+
 		// get id of original object.
 		$original_id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
 
@@ -2218,39 +2292,50 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// get language.
 		$target_language = isset( $_POST['language'] ) ? sanitize_text_field( wp_unslash( $_POST['language'] ) ) : '';
 
-		if ( $original_id > 0 && ! empty( $target_language ) && $api_object && ! empty( $original_type ) ) {
+		if ( $original_id > 0 && ! empty( $target_language ) && ! empty( $original_type ) ) {
+			// get the object.
 			$object = Helper::get_object( $original_id, $original_type );
-			if ( $object ) {
-				// get the copied simplified object.
-				$copy_obj = $object->add_simplification_object( $target_language, $api_object, false );
-				if ( $copy_obj instanceof Post_Object ) {
-					// get language for output its title.
-					$languages = Languages::get_instance()->get_active_languages();
 
-					// get simplification-list-url.
-					$simplification_list_url = add_query_arg(
-						array(
-							'page'   => 'easy_language_settings',
-							'tab'    => 'simplifications',
-							'subtab' => 'to_simplify',
-						),
-						'options-general.php'
-					);
-
-					// collect return values.
-					$return['status']                   = 'ok';
-					$return['object_id']                = $copy_obj->get_id();
-					$return['link']                     = get_permalink( $copy_obj->get_id() );
-					$return['language']                 = $languages[ $target_language ]['label'];
-					$return['object_type']              = $copy_obj->get_type();
-					$return['object_type_name']         = $copy_obj->get_type_name();
-					$return['title']                    = $copy_obj->get_title();
-					$return['api_title']                = $api_object->get_title();
-					$return['edit_link']                = $copy_obj->get_edit_link();
-					$return['simplification_list_link'] = $simplification_list_url;
-					$return['quota_state']              = $copy_obj->get_quota_state( $api_object );
-				}
+			// bail if object could not be loaded.
+			if ( ! $object instanceof Objects ) {
+				// return result.
+				wp_send_json( $return );
 			}
+
+			// get the copied simplified object.
+			$copy_obj = $object->add_simplification_object( $target_language, $api_object, false );
+
+			// bail if copy does not load.
+			if ( ! $copy_obj instanceof Objects ) {
+				// return result.
+				wp_send_json( $return );
+			}
+
+			// get language for output its title.
+			$languages = Languages::get_instance()->get_active_languages();
+
+			// get simplification-list-url.
+			$simplification_list_url = add_query_arg(
+				array(
+					'page'   => 'easy_language_settings',
+					'tab'    => 'simplified_texts',
+					'subtab' => 'to_simplify',
+				),
+				'options-general.php'
+			);
+
+			// collect return values.
+			$return['status']                   = 'ok';
+			$return['object_id']                = $copy_obj->get_id();
+			$return['link']                     = get_permalink( $copy_obj->get_id() );
+			$return['language']                 = $languages[ $target_language ]['label'];
+			$return['object_type']              = $copy_obj->get_type();
+			$return['object_type_name']         = $copy_obj->get_type_name();
+			$return['title']                    = $copy_obj->get_title();
+			$return['api_title']                = $api_object->get_title();
+			$return['edit_link']                = $copy_obj->get_edit_link();
+			$return['simplification_list_link'] = $simplification_list_url;
+			$return['quota_state']              = $copy_obj->get_quota_state( $api_object );
 		}
 
 		// return result.
@@ -2310,7 +2395,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$url = add_query_arg(
 			array(
 				'page'   => 'easy_language_settings',
-				'tab'    => 'simplifications',
+				'tab'    => 'simplified_texts',
 				'subtab' => 'to_simplify',
 			),
 			admin_url() . 'options-general.php'
@@ -2525,6 +2610,37 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
+	 * Add taxonomies as additional allowed object type and return the term-object, if requested.
+	 *
+	 * @param object|false $resulting_object The resulting object.
+	 * @param int          $object_id The object-ID.
+	 * @param string       $object_type The object-type.
+	 * @return object|false
+	 */
+	public function get_term_object( object|false $resulting_object, int $object_id, string $object_type ): object|false {
+		// bail if object is already known.
+		if ( false !== $resulting_object ) {
+			return $resulting_object;
+		}
+
+		// we assume this is a term.
+		$term = get_term( $object_id );
+
+		// bail if term could not be loaded.
+		if ( ! $term instanceof WP_Term ) {
+			return false;
+		}
+
+		// bail if taxonomy if this term is not supported.
+		if ( ! array_key_exists( $term->taxonomy, $this->get_supported_taxonomies() ) ) {
+			return false;
+		}
+
+		// return our object.
+		return new Term_Object( $object_id, $object_type );
+	}
+
+	/**
 	 * Change the initial simplify dialog depending on API-configuration.
 	 *
 	 * @param array<string,array<integer,mixed>> $dialog The dialog-configuration.
@@ -2615,5 +2731,278 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// redirect user back to list.
 		wp_safe_redirect( wp_get_referer() );
 		exit;
+	}
+
+	/**
+	 * Check updated translatable term.
+	 *
+	 * @param int                 $term_id The term-id.
+	 * @param int                 $tt_id The term-id.
+	 * @param bool                $update Marker whether this is an update (true) or not (false).
+	 * @param array<string,mixed> $args List of arguments as array.
+	 *
+	 * @return void
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function update_translation_of_term( int $term_id, int $tt_id, bool $update, array $args ): void {
+		// bail if this is not an update to prevent confusing during creation of simplification-objects.
+		if ( ! $update ) {
+			return;
+		}
+
+		// get the object.
+		$term_obj = new Term_Object( $term_id, $args['taxonomy'] );
+
+		// if this is an original object, check its contents.
+		if ( $term_obj->is_simplifiable() ) {
+			// get all simplifications for this object in all active languages.
+			foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+				$translated_post_id = $term_obj->get_simplification_in_language( $language_code );
+
+				// loop through the resulting texts and check if the text has been changed (aka: is not available in simplification-db).
+				foreach ( array(
+					'taxonomy_title'       => '',
+					'taxonomy_description' => '',
+				) as $field => $text ) {
+					$filter = array(
+						'object_id'   => $translated_post_id,
+						'object_type' => $term_obj->get_type(),
+						'field'       => $field,
+						'hash'        => Db::get_instance()->get_string_hash( $text ),
+					);
+					if ( empty( Db::get_instance()->get_entries( $filter ) ) ) {
+						// mark the object as changed as translated content has been changed or new content has been added in the given language.
+						$term_obj->mark_as_changed_in_language( $language_code );
+					}
+				}
+			}
+		}
+
+		// if this is a simplified object, reset the changed-marker on its original.
+		if ( $term_obj->is_simplified() ) {
+			$original_post = new Term_Object( $term_obj->get_original_object_as_int(), $args['taxonomy'] );
+			// get all simplifications for this object in all active languages.
+			foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+				$original_post->remove_changed_marker( $language_code );
+			}
+		}
+	}
+
+	/**
+	 * Add one column for each enabled language in supported taxonomies.
+	 *
+	 * @param array<string,string> $columns The columns of this taxonomy-table.
+	 *
+	 * @return array<string,string>
+	 */
+	public function add_taxonomy_columns( array $columns ): array {
+		// create new array for columns to get clean ordering.
+		$new_columns         = array();
+		$new_columns['cb']   = $columns['cb'];
+		$new_columns['name'] = $columns['name'];
+
+		// get actual supported languages.
+		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+			$new_columns[ 'easy-language ' . strtolower( $language_code ) ] = $settings['label'];
+		}
+
+		// return result.
+		return array_merge( $new_columns, $columns );
+	}
+
+	/**
+	 * Add content for the new added columns in taxonomies.
+	 *
+	 * @param string $default_value The default value for the column.
+	 * @param string $column The name of the column.
+	 * @param int    $term_id The ID of the term.
+	 *
+	 * @return void
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function add_taxonomy_column_content( string $default_value, string $column, int $term_id ): void {
+		// get active API for simplification.
+		$api_obj = Apis::get_instance()->get_active_api();
+
+		// bail if no API is active.
+		if ( ! $api_obj instanceof Api_Base ) {
+			return;
+		}
+
+		// get term.
+		$term = get_term( $term_id );
+
+		// bail if term could not be loaded.
+		if ( ! $term instanceof WP_Term ) {
+			return;
+		}
+
+		// get object of this term.
+		$term_object = new Term_Object( $term_id, $term->taxonomy );
+
+		// get actual supported languages.
+		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
+			if ( 'easy-language ' . strtolower( $language_code ) === $column ) {
+				// check if this object is already translated in this language.
+				if ( false !== $term_object->is_simplified_in_language( $language_code ) ) {
+					// get the term-ID of the translated term.
+					$translated_term_id = $term_object->get_simplification_in_language( $language_code );
+
+					// get page-builder of this object.
+					$translated_term_obj = new Term_Object( $translated_term_id, $term->taxonomy );
+
+					// get page-builder-specific edit-link if user has capability for it.
+					if ( current_user_can( 'edit_el_simplifier' ) ) {
+						$edit_translation = $translated_term_obj->get_edit_link();
+
+						// show link to add simplification for this language.
+						/* translators: %1$s is the name of the language */
+						echo '<a href="' . esc_url( $edit_translation ) . '" class="dashicons dashicons-edit" title="' . esc_attr( sprintf( __( 'Edit simplification in %1$s', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+					}
+
+					// create link to run simplification of this term via API (if available).
+					if ( current_user_can( 'edit_el_simplifier' ) ) {
+						// get link to add simplification.
+						$do_translation = $translated_term_obj->get_simplification_via_api_link();
+
+						// show link to translate this page via api.
+						/* translators: %1$s is the name of the language, %2$s is the name of the used API */
+						echo '<a href="' . esc_url( $do_translation ) . '" class="dashicons dashicons-translation easy-language-translate-object" data-id="' . absint( $translated_term_obj->get_id() ) . '" data-link="' . esc_url( (string) get_permalink( $translated_term_obj->get_id() ) ) . '" data-object-type="' . esc_attr( $translated_term_obj->get_type() ) . '" title="' . esc_attr( sprintf( __( 'Simplify this term in %1$s with %2$s.', 'easy-language' ), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</a>';
+
+						// show quota hint.
+						$this->show_quota_hint( $api_obj );
+					}
+
+					// get link to delete this simplification if user has capability for it.
+					if ( current_user_can( 'delete_el_simplifier' ) ) {
+						$delete_translation = $translated_term_obj->get_delete_link();
+
+						// show link to delete the simplified term.
+						/* translators: %1$s is the name of the language */
+						echo '<a href="' . esc_url( $delete_translation ) . '" class="dashicons dashicons-trash easy-language-trash" title="' . esc_attr( sprintf( __( 'Delete simplification in %1$s', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '" data-object-type-name="' . esc_attr( $translated_term_obj->get_type_name() ) . '" data-title="' . esc_attr( $translated_term_obj->get_title() ) . '">&nbsp;</a>';
+					}
+
+					// show mark if content of original page has been changed.
+					if ( $term_object->has_changed( $language_code ) && current_user_can( 'edit_el_simplifier' ) ) {
+						echo '<span class="dashicons dashicons-image-rotate" title="' . esc_html__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
+					}
+				} else {
+					// create link to simplify this term.
+					$create_translation = $term_object->get_simplification_link( $language_code );
+
+					// define dialog for click on simplify-link.
+					$dialog = array(
+						/* translators: %1$s will be replaced by the object-title */
+						'title'   => sprintf( __( 'Add simplification for %1$s', 'easy-language' ), esc_html( $term_object->get_title() ) ),
+						'texts'   => array(
+							/* translators: %1$s will be replaced by the object-type-name (e.g. post or page), %2$s will be replaced by the API-title */
+							'<p>' . sprintf( __( 'Please decide how you want to proceed to simplify this %1$s.<br>Note that the use of the API %2$s may incur costs.', 'easy-language' ), esc_html( $term_object->get_type_name() ), esc_html( $api_obj->get_title() ) ) . '</p>',
+						),
+						'buttons' => array(
+							array(
+								'action'  => 'easy_language_add_simplification_object(' . absint( $term_object->get_id() ) . ', "' . $term_object->get_type() . '","' . $language_code . '", "auto", true );',
+								'variant' => 'primary',
+								/* translators: %1$s will be replaced by the API-title */
+								'text'    => sprintf( __( 'Simplify now via %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ) ),
+							),
+							array(
+								'action'  => 'easy_language_add_simplification_object(' . absint( $term_object->get_id() ) . ', "' . $term_object->get_type() . '", "' . $language_code . '", "manually", ' . $api_obj->is_configured() . ' );',
+								'variant' => 'secondary',
+								/* translators: %1$s will be replaced by the object-type-name (e.g. post or page) */
+								'text'    => sprintf( __( 'Just add %1$s', 'easy-language' ), esc_html( $term_object->get_type_name() ) ),
+							),
+							array(
+								'action' => 'closeDialog();',
+								'text'   => __( 'Cancel', 'easy-language' ),
+							),
+						),
+					);
+
+					// change options if active API is not configured.
+					if ( false === $api_obj->is_configured() ) {
+						/* translators: %1$s will be replaced by the object-type-name (e.g. post or page), %2$s will be replaced by the object-title */
+						$dialog['texts'][0]              = '<p>' . sprintf( __( 'Create a simplified %1$s for <i>%2$s</i> to edit is manually.', 'easy-language' ), esc_html( $term_object->get_type_name() ), esc_html( $term_object->get_title() ) ) . '</p>';
+						$dialog['buttons'][0]            = $dialog['buttons'][1];
+						$dialog['buttons'][0]['variant'] = 'primary';
+						$dialog['buttons'][1]            = $dialog['buttons'][2];
+						unset( $dialog['buttons'][2] );
+					}
+
+					// show link to add simplification for this language.
+					/* translators: %1$s is the name of the language */
+					echo '<a href="' . esc_url( $create_translation ) . '" class="dashicons dashicons-plus easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_json( $dialog ) ) . '" title="' . esc_attr( sprintf( __( 'Add translation in %s', 'easy-language' ), $settings['label'] ) ) . '">&nbsp;</a>';
+				}
+			}
+		}
+	}
+
+	/**
+	 * Add taxonomies as additional allowed object type and return the term-object, if requested.
+	 *
+	 * @param object|false                              $resulting_object The resulting object.
+	 * @param WP_Term|WP_User|WP_Post_Type|WP_Post|null $wp_object The WP Object.
+	 * @param int                                       $id The ID of the object.
+	 * @return object|false
+	 */
+	public function get_term_object_by_wp_object( object|false $resulting_object, WP_Term|WP_User|WP_Post_Type|WP_Post|null $wp_object, int $id ): object|false {
+		// bail if object is already known.
+		if ( false !== $resulting_object ) {
+			return $resulting_object;
+		}
+
+		// bail if class of object is not WP_Term.
+		if ( ! $wp_object instanceof WP_Term ) {
+			return false;
+		}
+
+		// we assume it is a term and try to load it via our own objects.
+		$term = get_term( $id );
+
+		// bail if term could not be loaded.
+		if ( ! $term instanceof WP_Term ) {
+			return false;
+		}
+
+		// return our own object.
+		return new Term_Object( $id, $term->taxonomy );
+	}
+
+	/**
+	 * Delete the requested simplification.
+	 *
+	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
+	 */
+	public function delete_simplification(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-delete-simplification', 'nonce' );
+
+		// get requested text.
+		$text_id = ! empty( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
+		if ( $text_id > 0 ) {
+			$text_obj = new Text( $text_id );
+			$text_obj->delete();
+
+			// show success-message.
+			$transients_obj = Transients::get_instance();
+			$transient_obj  = $transients_obj->add();
+			$transient_obj->set_name( 'easy_language_text_deleted' );
+			$transient_obj->set_message( '<strong>' . __( 'The chosen text is deleted.', 'easy-language' ) . '</strong>' );
+			$transient_obj->set_type( 'success' );
+			$transient_obj->save();
+		}
+
+		// redirect user back to list.
+		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		exit;
+	}
+
+	/**
+	 * Return whether this object is active.
+	 *
+	 * @return bool
+	 */
+	public function is_active(): bool {
+		return true;
 	}
 }
