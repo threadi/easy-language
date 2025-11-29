@@ -81,8 +81,10 @@ jobs:
             - name: Run PCP check
               uses: wordpress/plugin-check-action@v1
               with:
+                  exclude-files:
+                      .gitignore,.editorconfig
                   exclude-directories:
-                      app/Dependencies/easyTransientsForWordPress/
+                      app/Dependencies/easyTransientsForWordPress/,svn/,release/,build/
                   ignore-codes:
                       WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
                   include-experimental: false
