@@ -82,7 +82,7 @@ jobs:
               uses: wordpress/plugin-check-action@v1
               with:
                   exclude-files:
-                      .gitignore,.editorconfig
+                      .gitignore,.editorconfig,.gitkeep,build/build.properties.dist
                   exclude-directories:
                       app/Dependencies/easyTransientsForWordPress/,svn/,release/,build/
                   ignore-codes:
