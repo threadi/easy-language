@@ -40,7 +40,7 @@ jobs:
                   cd legacy-classes/Divi/
                   npm i
                   npm run build
-                  cd ../../../../../
+                  cd ../../../
                   rm -fr assets
                   rm -fr build
                   rm -fr releases
@@ -93,9 +93,8 @@ jobs:
 
             - name: Create ZIP release
               run: |
-                  rm ruleset.xml
                   cd ..
-                  zip -r -q ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/* -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/doc/*" "*/phpcs.xml" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "/.editorconfig" "*/legacy-classes/Divi/.yarn/*" "*/legacy-classes/Divi/package-lock.json" "*/legacy-classes/Divi/node_modules/*" "*/legacy-classes/Divi/.env" "*/legacy-classes/Divi/.yarnrc" "*/legacy-classes/Divi/yarn.lock" "*/legacy-classes/Divi/package.json" "*/legacy-classes/Divi/*/.gitkeep"
+                  zip -r -q ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/* -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/doc/*" "*/phpcs.xml" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "/.editorconfig" "*/legacy-classes/Divi/.yarn/*" "*/legacy-classes/Divi/package-lock.json" "*/legacy-classes/Divi/node_modules/*" "*/legacy-classes/Divi/.env" "*/legacy-classes/Divi/.yarnrc" "*/legacy-classes/Divi/yarn.lock" "*/legacy-classes/Divi/package.json" "*/legacy-classes/Divi/*/.gitkeep" "*/ruleset.xml"
                   zip -ur ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/autoload.php
                   zip -ur ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/composer/*
                   zip -ur ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/threadi/*/build/*
