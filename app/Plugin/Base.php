@@ -345,7 +345,7 @@ abstract class Base {
 		$table  = '<table>';
 		$table .= '<tr><th>' . esc_html__( 'Quota', 'easy-language' ) . ':</th><td>' . absint( $quota['character_limit'] ) . '</td></tr>';
 		$table .= '<tr><th>' . esc_html__( 'Character spent', 'easy-language' ) . ':</th><td>' . absint( $quota['character_spent'] ) . '</td></tr>';
-		$table .= '<tr><th>' . esc_html__( 'Rest quota', 'easy-language' ) . ':</th><td>' . absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) . '</td></tr>';
+		$table .= '<tr><th>' . esc_html__( 'Rest quota', 'easy-language' ) . ':</th><td>' . ( absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) ) . '</td></tr>';
 		$table .= '</table>';
 
 		// output the resulting table.

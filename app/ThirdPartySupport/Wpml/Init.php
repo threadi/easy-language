@@ -76,7 +76,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 */
 	public function init(): void {
 		// bail if plugin is not enabled.
-		if( ! $this->is_active() ) {
+		if ( ! $this->is_active() ) {
 			return;
 		}
 

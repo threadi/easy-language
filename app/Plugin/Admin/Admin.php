@@ -157,9 +157,9 @@ class Admin {
 				'set_icon_for_language_nonce' => wp_create_nonce( 'easy-language-set-icon-for-language' ),
 				'review_url'                  => 'https://wordpress.org/plugins/easy-language/#reviews',
 				'title_rate_us'               => __( 'Add your review for this plugin', 'easy-language' ),
-				'dismiss_intro_nonce' => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),
+				'dismiss_intro_nonce'         => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),
 				/* translators: %1$s will be replaced by the path to the easy language icon */
-				'intro_step_2'        => sprintf( __( '<p><img src="%1$s" alt="Easy Language Logo"><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
+				'intro_step_2'                => sprintf( __( '<p><img src="%1$s" alt="Easy Language Logo"><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
 			)
 		);
 
@@ -271,7 +271,7 @@ class Admin {
 		$post_type = (string) filter_input( INPUT_GET, 'post_type' );
 
 		// if this page is a supported post type listing, show hint.
-		if( $pagenow === 'edit.php' || Init::get_instance()->is_post_type_supported( $post_type ) ) {
+		if ( 'edit.php' === $pagenow || Init::get_instance()->is_post_type_supported( $post_type ) ) {
 			/* translators: %1$s will be replaced by the plugin name. */
 			return $content . ' ' . sprintf( __( 'This page is extended by the plugin %1$s.', 'easy-language' ), '<em>' . Helper::get_plugin_name() . '</em>' );
 		}

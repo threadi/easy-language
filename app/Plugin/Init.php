@@ -103,7 +103,7 @@ class Init {
 		// add cli tasks for the supported multilingual plugins.
 		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
 			// bail if plugin is not enabled.
-			if( ! $plugin_obj->is_active() ) {
+			if ( ! $plugin_obj->is_active() ) {
 				continue;
 			}
 
