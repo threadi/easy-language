@@ -107,6 +107,10 @@ Hint: this check runs against the VIP-GO-platform which is not our target for th
 
 `vendor/bin/phpcs --extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/,*translatepress* --standard=WordPress-VIP-Go .`
 
+## Check PHP compatibility
+
+`vendor/bin/phpcs -p app --standard=PHPCompatibilityWP`
+
 ## Analyze with PHPStan
 
 `vendor/bin/phpstan analyse`
