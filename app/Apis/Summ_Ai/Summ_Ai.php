@@ -24,6 +24,7 @@ use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Helper;
+use easyLanguage\Plugin\Intervals;
 use easyLanguage\Plugin\Language_Icon;
 use easyLanguage\Plugin\Log;
 use easyLanguage\Plugin\ThirdPartySupports;
@@ -682,10 +683,10 @@ class Summ_Ai extends Base implements Api_Base {
 			$description .= '<br><a href="' . esc_url( $url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Test token', 'easy-language' ) . '</a><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
 		}
 
-		// if foreign translation-plugin with API-support is used, hide the language-settings.
+		// if the foreign translation-plugin with the API support is used, hide the language-settings.
 		$foreign_translation_plugin_with_api_support = false;
 		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if ( $plugin_obj->is_foreign_plugin() && $plugin_obj->is_supporting_apis() ) {
+			if ( $plugin_obj->is_foreign_plugin() && $plugin_obj->is_supporting_apis() && $plugin_obj->is_active() ) {
 				$foreign_translation_plugin_with_api_support = true;
 			}
 		}
@@ -757,8 +758,8 @@ class Summ_Ai extends Base implements Api_Base {
 		$field->set_title( __( 'Contact email for SUMM AI', 'easy-language' ) );
 		$field->set_placeholder( __( 'Enter contact email here', 'easy-language' ) );
 		$field->set_description( __( 'This field is only enabled if the setting above is set to "Custom".', 'easy-language' ) );
-		$field->set_readonly( 'custom' !== get_option( 'easy_language_summ_ai_email_mode', 'editor' ) );
-		$field->add_depend( $email_mode_setting, 'custom' ); // TODO möglich machen.
+		$field->set_readonly( ! $this->is_summ_api_token_set() );
+		$field->add_depend( $email_mode_setting, 'custom' );
 		$setting->set_field( $field );
 
 		// get the default language.
@@ -892,23 +893,17 @@ class Summ_Ai extends Base implements Api_Base {
 		$field->set_readonly( false === $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support );
 		$setting->set_field( $field );
 
-		// get possible intervals.
-		$intervals = array(); // TODO ersetzen durch eigene Intervalle.
-		foreach ( wp_get_schedules() as $name => $schedule ) {
-			$intervals[ $name ] = $schedule['display'];
-		}
-
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_summ_ai_quota_interval' );
 		$setting->set_section( $summ_ai_tab_main );
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'string' );
-		$setting->set_default( 'daily' );
+		$setting->set_default( 'easy_language_daily' );
 		$setting->set_save_callback( array( $this, 'set_quota_interval' ) );
 		$field = new Select();
 		$field->set_title( __( 'Interval for quota request', 'easy-language' ) );
 		$field->set_description( __( 'The actual API quota will be requested in this interval.', 'easy-language' ) );
-		$field->set_options( $intervals );
+		$field->set_options( Intervals::get_instance()->get_intervals_for_settings() );
 		$field->set_readonly( false === $this->is_summ_api_token_set() || $foreign_translation_plugin_with_api_support );
 		$setting->set_field( $field );
 

@@ -74,6 +74,9 @@ class Init {
 		// initialize the admin tasks.
 		Admin::get_instance()->init();
 
+		// initialize the intervals.
+		Intervals::get_instance()->init();
+
 		// general hooks.
 		add_action( 'cli_init', array( $this, 'cli' ) );
 		add_action( 'update_option_easy_language_api', array( $this, 'update_easy_language_api' ), 10, 2 );
