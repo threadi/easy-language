@@ -238,7 +238,7 @@ abstract class Objects {
 
 		$js_top = '';
 		/**
-		 * Set top for JS-location if page builder which makes it necessary is actually used.
+		 * Set top for JS-location if the page builder which makes it necessary is actually used.
 		 *
 		 * @since 2.2.0 Available since 2.2.0.
 		 * @param string $js_top The top-string.
@@ -344,8 +344,10 @@ abstract class Objects {
 			// get entry-count.
 			$max_entry_count = count( $max_entries );
 
-			// do not run simplification if the requested object contains more than the text-limit of the API allow.
+			// get the active API.
 			$api_obj = Apis::get_instance()->get_active_api();
+
+			// do not run simplification if the requested object contains more than the text-limit of the API allow.
 			if ( false !== $api_obj && $max_entry_count > $api_obj->get_max_requests_per_minute() ) {
 				// set result.
 				$dialog = array(
@@ -378,7 +380,7 @@ abstract class Objects {
 				}
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
-				// set error marker for return value.
+				// set the error marker for return value.
 				$this->set_error_marker_for_process();
 
 				// return 0 as we have not simplified anything.
@@ -443,7 +445,7 @@ abstract class Objects {
 					),
 				);
 			} else {
-				// otherwise show hint that some texts are already optimized.
+				// otherwise show a hint that some texts are already optimized.
 				$dialog = array(
 					'className' => 'wp-dialog-hint',
 					'title'     => __( 'Simplification canceled', 'easy-language' ),
@@ -501,7 +503,7 @@ abstract class Objects {
 		// end progress on CLI.
 		$progress ? $progress->finish() : false;
 
-		// save result for this simplification, if we used an API, and show success dialog.
+		// save the result for this simplification if we used an API and show success dialog.
 		if ( $c > 0 ) {
 			// set result.
 			$dialog = array(
@@ -573,16 +575,16 @@ abstract class Objects {
 		// counter for simplifications.
 		$c = 0;
 
-		// set state for the entry to "processing".
+		// set the state for the entry to "processing".
 		$entry->set_state( 'processing' );
 
-		// get object the text belongs to, to get its target language.
+		// get the object the text belongs to, to get its target language.
 		$object_language = $this->get_language();
 
 		// marker if API-errors happened.
 		$api_errors = false;
 
-		// send request for each active mapping between source-language and target-languages.
+		// send the request for each active mapping between source-language and target-languages.
 		foreach ( $language_mappings as $source_language => $target_languages ) {
 			foreach ( $target_languages as $target_language ) {
 				// only if this text is not already simplified in source-language matching the target-language.
@@ -601,7 +603,7 @@ abstract class Objects {
 			}
 		}
 
-		// set result if we have not got any simplification from API and no simplifications are available.
+		// set the result if we have not got any simplification from API and no simplifications are available.
 		if ( false !== $api_errors && 0 === $c ) {
 			$dialog = array(
 				'className' => 'wp-dialog-error',

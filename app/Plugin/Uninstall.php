@@ -10,6 +10,7 @@ namespace easyLanguage\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transient;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Db;
 use WP_Query;
@@ -175,8 +176,15 @@ class Uninstall {
 		/**
 		 * Delete managed transients.
 		 */
-		foreach ( Transients::get_instance()->get_transients() as $transient ) {
-			$transient->delete();
+		foreach ( Transients::get_instance()->get_transients( false, true ) as $transient_obj ) {
+			// bail if the object is not ours.
+			if ( ! $transient_obj instanceof Transient ) { // @phpstan-ignore instanceof.alwaysTrue
+				continue;
+			}
+
+			// delete transient-data.
+			$transient_obj->delete();
+			$transient_obj->delete_dismiss();
 		}
 
 		/**

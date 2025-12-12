@@ -99,7 +99,10 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @var array<string,string>
 	 */
 	protected array $support_url = array(
-		'de_DE' => 'https://summ-ai.com/unsere-schnittstelle/',
+		'de_DE' => 'https://summ-ai.com/',
+		'en_CA' => 'https://summ-ai.com/en/',
+		'en_UK' => 'https://summ-ai.com/en/',
+		'en_US' => 'https://summ-ai.com/en/',
 	);
 
 	/**
@@ -723,7 +726,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$field->set_title( __( 'Choose email-mode', 'easy-language' ) );
 		$field->set_description( __( 'An email will be used for each request to the SUMM AI API. It is used as contact or identifier email for SUMM AI if question for simplifications arise.', 'easy-language' ) );
 		$field->set_readonly( ! $this->is_summ_api_token_set() );
-		$field->set_sanitize_callback( array( $this, 'validate_multiple_radios' ) );
+		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_radio_as_string' ) );
 		$field->set_options(
 			array(
 				'custom' => array(
@@ -759,7 +762,10 @@ class Summ_Ai extends Base implements Api_Base {
 		$setting->set_field( $field );
 
 		// get the default language.
-		$language  = Helper::get_wp_lang();
+		$language = Helper::get_wp_lang();
+		if ( $this->get_supported_source_languages( true ) && ! array_key_exists( $language, $this->get_supported_source_languages( true ) ) ) {
+			$language = 'de_DE';
+		}
 		$languages = array( $language => '1' );
 
 		// add setting.
@@ -1017,17 +1023,6 @@ class Summ_Ai extends Base implements Api_Base {
 	}
 
 	/**
-	 * Validate multiple radios.
-	 *
-	 * @param ?string $value The radios to validate.
-	 *
-	 * @return ?string
-	 */
-	public function validate_multiple_radios( ?string $value ): ?string {
-		return Helper::settings_validate_multiple_radios( $value );
-	}
-
-	/**
 	 * Get quota from API.
 	 *
 	 * @param string $token The optional token.
@@ -1055,7 +1050,7 @@ class Summ_Ai extends Base implements Api_Base {
 			 */
 			$min_percent = apply_filters( 'easy_language_quota_percent', $min_percent );
 
-			// show hint of 80% of limit is used.
+			// show hint it limit has been reached.
 			$percent = absint( $quota['character_spent'] ) / absint( $quota['character_limit'] );
 			if ( 1 === $percent ) {
 				// get the transients-object to add the new one.

@@ -205,6 +205,7 @@ class Request implements Api_Requests {
 			// Log event.
 			Log::get_instance()->add_log( __( 'SUMM AI: no API key given for simplification.', 'easy-language' ), 'error' );
 
+			// do nothing more.
 			return;
 		}
 
@@ -213,6 +214,7 @@ class Request implements Api_Requests {
 			// Log event.
 			Log::get_instance()->add_log( __( 'SUMM AI: no text given for simplification.', 'easy-language' ), 'error' );
 
+			// do nothing more.
 			return;
 		}
 
@@ -281,7 +283,7 @@ class Request implements Api_Requests {
 		// secure start-time.
 		$start_time = microtime( true );
 
-		// send request and get the result-object depending on used request method.
+		// send the request and get the result-object depending on the used request method.
 		switch ( $this->get_method() ) {
 			case 'POST':
 				$this->result = wp_safe_remote_post( $this->url, $args );
@@ -307,7 +309,7 @@ class Request implements Api_Requests {
 			// secure http-status.
 			$this->http_status = absint( wp_remote_retrieve_response_code( $this->get_result() ) );
 
-			// log the request (with anonymized token).
+			// log the request (with an anonymized token).
 			$args['headers']['Authorization'] = 'anonymized';
 			$args_json                        = wp_json_encode( $args );
 			if ( ! $args_json ) {
@@ -315,7 +317,7 @@ class Request implements Api_Requests {
 			}
 			Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, $args_json, 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
 
-			// save request and result in db.
+			// save the request and result in db.
 			$this->save_in_db();
 		}
 	}

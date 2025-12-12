@@ -217,16 +217,25 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return the post content of this object.
+	 * Return the post-content of this object.
 	 *
 	 * @return string
 	 */
 	public function get_content(): string {
-		return get_post_field( 'post_content', $this->get_id() );
+		// get the content.
+		$content = get_post_field( 'post_content', $this->get_id() );
+
+		// bail if the content is not a string.
+		if ( ! is_string( $content ) ) {
+			return '';
+		}
+
+		// return the content.
+		return $content;
 	}
 
 	/**
-	 * Get language specific URL for this object.
+	 * Return the language specific URL for this object.
 	 *
 	 * @param string $slug The slug of the language.
 	 * @param string $language_code The language-code.
@@ -266,7 +275,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Set marker that the simplified content of this object has been changed.
+	 * Set the marker that the simplified content of this object has been changed.
 	 *
 	 * @param string $language_code The language we search.
 	 *
@@ -329,7 +338,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			$value .= ',' . $target_language . ',';
 		}
 
-		// add new language to list.
+		// add new language to the list.
 		update_post_meta( $this->get_id(), 'easy_language_simplified_in', $value );
 	}
 

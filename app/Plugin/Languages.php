@@ -78,7 +78,7 @@ class Languages {
 	}
 
 	/**
-	 * Return possible source languages.
+	 * Return possible source languages for all APIs. This list will be extended by the API-specific list.
 	 *
 	 * @return array<string,array<string,mixed>>
 	 */

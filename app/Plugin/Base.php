@@ -196,7 +196,7 @@ abstract class Base {
 	}
 
 	/**
-	 * Return list of active language-mappings.
+	 * Return the list of active language-mappings.
 	 *
 	 * @return array<string,list<mixed>>
 	 */
@@ -227,7 +227,7 @@ abstract class Base {
 			}
 		}
 
-		// return resulting list.
+		// return the resulting list of active languages and their mappings.
 		return $result;
 	}
 
@@ -323,7 +323,7 @@ abstract class Base {
 	 * @return string
 	 */
 	public function get_language_specific_support_page(): string {
-		// return language-specific URL if it exists.
+		// return the language-specific URL if it exists.
 		if ( ! empty( $this->support_url[ Helper::get_current_language() ] ) ) {
 			return $this->support_url[ Helper::get_current_language() ];
 		}

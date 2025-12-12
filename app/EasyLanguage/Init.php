@@ -327,7 +327,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 					/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
 					echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) . '" title="' . esc_attr( sprintf( __( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
 
-					// get link to delete this simplification.
+					// get the link to delete this simplification.
 					$delete_simplification = get_delete_post_link( $simplified_post_id );
 					if ( ! is_string( $delete_simplification ) ) {
 						$delete_simplification = '';
@@ -339,7 +339,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 					continue;
 				}
 
-				// get page-builder-specific edit-link if user has capability for it.
+				// get page-builder-specific edit-link if the user has capability for it.
 				if ( $page_builder && current_user_can( 'edit_el_simplifier' ) ) {
 					$edit_simplification = $page_builder->get_edit_link();
 
@@ -501,7 +501,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 					// show link to add simplification for this language.
 					/* translators: %1$s is the name of the language */
-					echo '<a href="' . esc_url( $create_simplification_link ) . '" class="dashicons dashicons-plus ' . esc_attr( $add_class ) . '" data-dialog="' . esc_attr( Helper::get_json( $dialog ) ) . '" data-title="' . esc_attr( $post_object->get_title() ) . '" data-object-type-name="' . esc_attr( $post_object->get_type_name() ) . '" title="' . esc_attr( sprintf( esc_html__( 'Simplify this %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
+					echo '<a href="' . esc_url( $create_simplification_link ) . '" class="dashicons dashicons-plus ' . esc_attr( $add_class ) . '" data-dialog="' . esc_attr( Helper::get_json( $dialog ) ) . '" data-title="' . esc_attr( $post_object->get_title() ) . '" data-object-type-name="' . esc_attr( $post_object->get_type_name() ) . '" title="' . esc_attr( sprintf( __( 'Simplify this %1$s in %2$s with %3$s.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $settings['label'] ), esc_html( $api_obj->get_title() ) ) ) . '">&nbsp;</a>';
 
 					// if the detected pagebuilder is "undetected" show warning.
 					if ( false !== $show_page_builder_warning ) {
@@ -509,7 +509,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 							/* translators: %1$s will be replaced by the object-title */
 							'title'   => sprintf( __( 'Unknown page builder or Classic Editor', 'easy-language' ), esc_html( $post_object->get_title() ) ),
 							'texts'   => array(
-								/* translators: %1$s will be replaced by the API-title */
+								/* translators: %1$s will be replaced by the API title */
 								'<p>' . sprintf( __( 'This %1$s has been edited with an unknown page builder.<br>This could also be the Classic Editor.<br>If this %1$s has been edited with another page builder, the plugin Easy Language does not support it atm.<br>Please <a href="%2$s" target="_blank">contact our support forum</a>.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_url( Helper::get_plugin_support_url() ) ) . '</p>',
 							),
 							'buttons' => array(
@@ -633,12 +633,12 @@ class Init extends Base implements ThirdPartySupport_Base {
 	public function option_locale_changed( string $old_value, null|string $new_value ): void {
 		// if new value is empty, use our fallback.
 		if ( empty( $new_value ) ) {
-			$new_value = EASY_LANGUAGE_LANGUAGE_EMERGENCY;
+			$new_value = EASY_LANGUAGE_LANGUAGE_FALLBACK;
 		}
 
 		// same for old_value.
 		if ( empty( $old_value ) ) {
-			$old_value = EASY_LANGUAGE_LANGUAGE_EMERGENCY;
+			$old_value = EASY_LANGUAGE_LANGUAGE_FALLBACK;
 		}
 
 		// get actual setting for source languages.
@@ -1331,6 +1331,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				),
 			)
 		);
+		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_radio_as_string' ) );
 		$setting->set_field( $field );
 	}
 
@@ -1685,17 +1686,17 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check nonce.
 		check_ajax_referer( 'easy-language-run-simplification-nonce', 'nonce' );
 
-		// get the object-id from request.
+		// get the object-id from the request.
 		$object_id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
 
-		// get the object-type from request.
+		// get the object-type from the request.
 		$object_type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : 0;
 
 		if ( ! empty( $object_type ) && absint( $object_id ) > 0 ) {
 			// get object.
 			$object = Helper::get_object( $object_id, $object_type );
 
-			// bail if object is not a simplified object.
+			// bail if the object is not a simplified object.
 			if ( false === $object || ! $object->is_simplified() ) {
 				// Log event.
 				/* translators: %1$d will be replaced by an ID, %2$s by a type name. */
@@ -1758,7 +1759,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			// get info if this is a simplification-initialization.
 			$initialization = isset( $_POST['initialization'] ) ? filter_var( wp_unslash( $_POST['initialization'] ), FILTER_VALIDATE_BOOLEAN ) : false;
 
-			// run simplification of X text-entries in given object.
+			// run simplification of X text-entries on the given object.
 			$object->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping(), absint( get_option( 'easy_language_api_text_limit_per_process', 1 ) ), $initialization );
 
 			// get running simplifications.
@@ -1770,24 +1771,25 @@ class Init extends Base implements ThirdPartySupport_Base {
 			// get count value for running simplifications.
 			$count_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, array() );
 
-			// get result (if set).
+			// get the result (if set).
 			$results = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, array() );
 
-			// check if all values are available and return general error if not.
+			// check if all values are available and return the general error if not.
 			if ( ! isset( $count_simplifications[ $object->get_md5() ] ) || ! isset( $max_simplifications[ $object->get_md5() ] ) || ! isset( $running_simplifications[ $object->get_md5() ] ) || ! isset( $results[ $object->get_md5() ] ) ) {
-				$error_message = sprintf( '<p>Error: Simplification failed with %1$s:<br>', esc_html( $api_obj->get_title() ) );
+				$error_message = sprintf( '<p>Error: Simplification failed with %1$s:</p>', esc_html( $api_obj->get_title() ) ) . '<ul>';
 				if ( ! isset( $count_simplifications[ $object->get_md5() ] ) ) {
-					$error_message .= '* counting failed<br>';
+					$error_message .= '<li>counting failed</li>';
 				}
 				if ( ! isset( $max_simplifications[ $object->get_md5() ] ) ) {
-					$error_message .= '* max value failed<br>';
+					$error_message .= '<li>max value failed</li>';
 				}
 				if ( ! isset( $running_simplifications[ $object->get_md5() ] ) ) {
-					$error_message .= '* running marker failed<br>';
+					$error_message .= '<li>running marker failed</li>';
 				}
 				if ( ! isset( $results[ $object->get_md5() ] ) ) {
-					$error_message .= '* no result returned<br>';
+					$error_message .= '<li>no result returned</li>';
 				}
+				$error_message .= '</ul>';
 
 				// Log event.
 				/* translators: %1$d will be replaced by an ID, %2$s by a type name. */

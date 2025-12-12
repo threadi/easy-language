@@ -258,7 +258,7 @@ class Settings {
 		$field = new Radio();
 		$field->set_title( __( 'Select your API', 'easy-language' ) );
 		$field->set_options( $apis );
-		$field->set_sanitize_callback( array( $this, 'sanitize_api' ) );
+		$field->set_sanitize_callback( array( self::get_instance(), 'sanitize_radio_as_string' ) );
 		$setting->set_field( $field );
 
 		// add setting.
@@ -653,17 +653,6 @@ class Settings {
 	}
 
 	/**
-	 * Sanitize the API setting.
-	 *
-	 * @param string|null $value The settings value.
-	 *
-	 * @return string
-	 */
-	public function sanitize_api( ?string $value ): string {
-		return (string) $value;
-	}
-
-	/**
 	 * Reset the plugin by request.
 	 *
 	 * @return void
@@ -707,5 +696,16 @@ class Settings {
 	public function get_api_select_description(): void {
 		echo '<h2>' . esc_html__( 'Select your API', 'easy-language' ) . '</h2>';
 		echo '<p>' . esc_html__( 'Please choose the API you want to use to simplify texts your website.', 'easy-language' ) . '</p>';
+	}
+
+	/**
+	 * Sanitize the API setting.
+	 *
+	 * @param string|null $value The settings value.
+	 *
+	 * @return string
+	 */
+	public function sanitize_radio_as_string( ?string $value ): string {
+		return (string) $value;
 	}
 }

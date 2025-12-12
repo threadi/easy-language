@@ -62,10 +62,10 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 		// get the separator setting for the target language.
 		$enable_separator = (string) get_option( 'easy_language_summ_ai_target_languages_' . $target_language . '_separator' );
 
-		// get the new line setting for target language.
+		// get the new line setting for the target language.
 		$enable_new_lines = absint( get_option( 'easy_language_summ_ai_target_languages_' . $target_language . '_new_line' ) );
 
-		// get the embolden setting for target language.
+		// get the emboldened setting for target language.
 		$enable_embolden_negative = absint( get_option( 'easy_language_summ_ai_target_languages_' . $target_language . '_embolden_negative' ) );
 
 		// build request.
