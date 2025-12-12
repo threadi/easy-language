@@ -6,13 +6,14 @@
 
 - Revamped plugin for a more robust and sustainable structure
 - Added a new object to handle all plugin settings
-- Added support for any post types which enabled title and editor as we need them for the simplification of texts
+- Added support for any post-types that enabled title and editor as we need them for the simplification of texts
 - Added support to simply taxonomy terms
 - Added support for the PageBuilders Beaver Builder, Bold Page Builder, Brizy, Kubio, SiteOrigin, SeedProd and Visual Composer
 - Added option to reset the plugin in backend settings (in preparation for Cyber Resilience Act)
-- Added Taskfile as alternative release building method for the plugin
+- Added Taskfile as an alternative release building method for the plugin
 - Added check against WordPress Plugin Checker during each release
-- Added info in footer of admin where our plugin adds options or show settings
+- Added info in footer of admin where our plugin adds options or shows settings
+- Added our own intervals for automatic simplifications
 
 ### Changed
 

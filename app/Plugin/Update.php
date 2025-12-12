@@ -271,5 +271,10 @@ class Update {
 		delete_option( 'easy_language_summ_ai_target_languages_separator' );
 		delete_option( 'easy_language_summ_ai_target_languages_new_lines' );
 		delete_option( 'easy_language_summ_ai_target_languages_embolden_negative' );
+
+		// migrate the interval settings for our schedules.
+		update_option( 'easy_language_capito_quota_interval', 'easy_language_' . get_option( 'easy_language_capito_quota_interval' ) );
+		update_option( 'easy_language_summ_ai_quota_interval', 'easy_language_' . get_option( 'easy_language_summ_ai_quota_interval' ) );
+		update_option( 'easy_language_automatic_simplification', 'easy_language_' . get_option( 'easy_language_automatic_simplification' ) );
 	}
 }

@@ -21,6 +21,7 @@ use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Helper;
+use easyLanguage\Plugin\Intervals;
 use easyLanguage\Plugin\Languages;
 use easyLanguage\Plugin\Log;
 use easyLanguage\Plugin\Setup;
@@ -153,7 +154,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		add_action( 'update_option_WPLANG', array( $this, 'option_locale_changed' ), 10, 2 );
 		add_action( 'admin_bar_menu', array( $this, 'add_simplification_button_in_admin_bar' ), 500 );
 		add_action( 'admin_bar_menu', array( $this, 'show_simplification_process' ), 400 );
-		add_filter( 'cron_schedules', array( $this, 'add_cron_intervals' ) );
 		add_filter( 'site_status_tests', array( $this, 'add_site_status_test' ) );
 		add_action( 'admin_action_easy_language_create_automatic_cron', array( $this, 'create_automatic_simplification_cron' ) );
 		add_filter( 'easy_language_get_object', array( $this, 'get_post_object' ), 20, 2 );
@@ -166,7 +166,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Add language-columns for each supported post type.
+	 * Add language-columns for each supported the post type.
 	 *
 	 * @return void
 	 */
@@ -1284,21 +1284,15 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$field->add_depend( $automatic_simplification_setting, 1 );
 		$setting->set_field( $field );
 
-		// get possible intervals.
-		$intervals = array(); // TODO nur eigene Intervalle verwenden.
-		foreach ( wp_get_schedules() as $name => $schedule ) {
-			$intervals[ $name ] = $schedule['display'];
-		}
-
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_automatic_simplification' );
 		$setting->set_section( $automatic_section );
 		$setting->set_type( 'string' );
-		$setting->set_default( '10minutly' );
+		$setting->set_default( 'easy_language_15minutly' );
 		$field = new Select();
 		$field->set_title( __( 'Interval for automatic simplification', 'easy-language' ) );
 		$field->set_description( __( 'Simplification are run automatically in this intervall.', 'easy-language' ) );
-		$field->set_options( $intervals );
+		$field->set_options( Intervals::get_instance()->get_intervals_for_settings() );
 		$field->set_sanitize_callback( array( $this, 'set_automatic_interval' ) );
 		$field->add_depend( $automatic_simplification_setting, 1 );
 		$setting->set_field( $field );
@@ -2485,43 +2479,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// return setting.
 		return $value;
-	}
-
-	/**
-	 * Add some cron-intervals.
-	 *
-	 * @param array<string,array<string,mixed>> $intervals List of intervals.
-	 *
-	 * @return array<string,array<string,mixed>>
-	 */
-	public function add_cron_intervals( array $intervals ): array {
-		$intervals['4hourly']    = array(
-			'interval' => 60 * 60 * 4,
-			'display'  => __( 'every 4 hours', 'easy-language' ),
-		);
-		$intervals['3hourly']    = array(
-			'interval' => 60 * 60 * 3,
-			'display'  => __( 'every 3 hours', 'easy-language' ),
-		);
-		$intervals['2hourly']    = array(
-			'interval' => 60 * 60 * 2,
-			'display'  => __( 'every 2 hours', 'easy-language' ),
-		);
-		$intervals['30minutely'] = array(
-			'interval' => 60 * 30,
-			'display'  => __( 'every 30 Minutes', 'easy-language' ),
-		);
-		$intervals['20minutely'] = array(
-			'interval' => 60 * 20,
-			'display'  => __( 'every 20 Minutes', 'easy-language' ),
-		);
-		$intervals['10minutely'] = array(
-			'interval' => 60 * 10,
-			'display'  => __( 'every 10 Minutes', 'easy-language' ),
-		);
-
-		// return resulting list of additional intervals.
-		return $intervals;
 	}
 
 	/**
