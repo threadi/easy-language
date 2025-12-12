@@ -61,7 +61,7 @@ const EASY_LANGUAGE_CPT_SWITCHER = 'lel_lang_switcher';
 /**
  * Name of emergency language if no supported language is found.
  */
-const EASY_LANGUAGE_LANGUAGE_EMERGENCY = 'en_US';
+const EASY_LANGUAGE_LANGUAGE_FALLBACK = 'en_US';
 
 /**
  * Define names for progressbar during simplification.

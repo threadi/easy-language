@@ -22,7 +22,7 @@ interface Api_Simplifications {
 	public function get_api(): Api_Base;
 
 	/**
-	 * Set the API which requests this API-simplification object.
+	 * Set the API, which requests this API-simplification object.
 	 *
 	 * @param Api_Base $api_obj The api-object.
 	 * @return void
@@ -30,7 +30,7 @@ interface Api_Simplifications {
 	public function set_api( Api_Base $api_obj ): void;
 
 	/**
-	 * Call API to simplify single text.
+	 * Call API to simplify a single text.
 	 *
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.

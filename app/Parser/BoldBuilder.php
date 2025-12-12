@@ -192,7 +192,7 @@ class BoldBuilder extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return $this->is_active() && str_contains( get_post_field( 'post_content', $post_object->get_id() ), '[bt_bb_section' );
+		return $this->is_active() && str_contains( $post_object->get_content(), '[bt_bb_section' );
 	}
 
 	/**

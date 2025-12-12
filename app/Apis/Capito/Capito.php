@@ -568,6 +568,7 @@ class Capito extends Base implements Api_Base {
 				'team' => __( 'Team', 'easy-language' ),
 			)
 		);
+		$field->set_readonly( false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support );
 		$setting->set_field( $field );
 
 		// add setting.

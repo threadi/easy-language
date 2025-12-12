@@ -134,9 +134,9 @@ class Helper {
 			$wp_language = $sitepress->get_locale_from_language_code( apply_filters( 'wpml_default_language', null ) );
 		}
 
-		// if language not set, use default language.
+		// if language not set, use the fallback language.
 		if ( empty( $wp_language ) ) {
-			$wp_language = EASY_LANGUAGE_LANGUAGE_EMERGENCY;
+			$wp_language = EASY_LANGUAGE_LANGUAGE_FALLBACK;
 		}
 
 		// return language in format ab_CD (e.g. en_US).
@@ -283,27 +283,6 @@ class Helper {
 	}
 
 	/**
-	 * Validate multiple radio-fields.
-	 *
-	 * @param ?string $values The list of values.
-	 *
-	 * @return string|null
-	 */
-	public static function settings_validate_multiple_radios( ?string $values ): ?string {
-		$filter = current_filter();
-		if ( ! empty( $filter ) ) {
-			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) ) {
-				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-				if ( ! empty( $pre_values ) ) {
-					$values = sanitize_text_field( $pre_values );
-				}
-			}
-		}
-		return $values;
-	}
-
-	/**
 	 * Validate select field.
 	 *
 	 * @param ?string $value The value as string.
@@ -325,7 +304,7 @@ class Helper {
 	}
 
 	/**
-	 * Get attachment-object by given filename.
+	 * Get attachment-object by the given filename.
 	 *
 	 * @param string $post_name The searched filename.
 	 *
@@ -580,17 +559,20 @@ class Helper {
 	 * Validate the language support of the active API.
 	 *
 	 * @param Api_Base $api The API to check.
+	 * @param string   $language The language to check (optional).
 	 *
 	 * @return void
 	 */
-	public static function validate_language_support_on_api( Api_Base $api ): void {
+	public static function validate_language_support_on_api( Api_Base $api, string $language = '' ): void {
 		// get the transients-object.
 		$transients_obj = Transients::get_instance();
 
 		// get the actual language in WordPress.
-		$language = self::get_wp_lang();
+		if ( empty( $language ) ) {
+			$language = self::get_wp_lang();
+		}
 
-		// if the actual language is not supported as a possible source language, show a hint.
+		// if the actual language in WordPress is not supported as a possible source language, show a hint.
 		$source_languages = $api->get_supported_source_languages();
 		if ( empty( $source_languages[ $language ] ) ) {
 			// create a list of languages this API supports as the HTML list.
@@ -615,7 +597,7 @@ class Helper {
 			$transient_obj = $transients_obj->add();
 			$transient_obj->set_dismissible_days( 2 );
 			$transient_obj->set_name( 'easy_language_source_language_not_supported' );
-			/* translators: %1$s will be replaced by name of the actual language, %2$s by the API-title, %3$s by the URL for WordPress-settings, %5$s by a list of languages, %6$s by the URL for the API-settings, %7$s by the Pro-link. */
+			/* translators: %1$s will be replaced by the name of the actual language, %2$s by the API title, %3$s by the URL for WordPress settings, %5$s by a list of languages, %6$s by the URL for the API settings. */
 			$transient_obj->set_message( sprintf( __( '<strong>The language of your website (%1$s) is actually not supported as source language for simplifications via %2$s!</strong><br>You will not be able to use %3$s.<br>You will not be able to simplify any texts.<br>You have to <a href="%4$s">switch the language</a> in WordPress to one of the following supported source languages: %5$s Or <a href="%6$s">choose another API</a> which supports the language.', 'easy-language' ), '<em>' . esc_html( $language_name ) . '</em>', esc_html( $api->get_title() ), esc_html( $api->get_title() ), esc_url( self::get_wp_settings_url() ), wp_kses_post( $language_list ), esc_url( self::get_settings_page_url() ) ) );
 			$transient_obj->set_type( 'error' );
 			$transient_obj->set_hide_on( array( Setup::get_instance()->get_setup_link() ) );

@@ -82,10 +82,15 @@ class Admin {
 				continue;
 			}
 
+			// bail if the assigned plugin is not active.
+			if ( ! $plugin_obj->is_active() ) {
+				continue;
+			}
+
 			/**
 			 * Show hint if this is a foreign plugin.
 			 */
-			// set transient name.
+			// set the transient name.
 			$transient_name = 'easy_language_plugin_' . $plugin_obj->get_name();
 
 			// get transient-object for this plugin.
@@ -258,19 +263,19 @@ class Admin {
 	public function show_plugin_hint_in_footer( string $content ): string {
 		global $pagenow;
 
-		// get requested page.
+		// get the requested page.
 		$page = (string) filter_input( INPUT_GET, 'page' );
 
-		// if this page is the settings page, show hint.
+		// if this page is the settings page, show a hint.
 		if ( 'easy_language_settings' === $page ) {
 			/* translators: %1$s will be replaced by the plugin name. */
 			return $content . ' ' . sprintf( __( 'This page is provided by the plugin %1$s.', 'easy-language' ), '<em>' . Helper::get_plugin_name() . '</em>' );
 		}
 
-		// get requested post type.
+		// get requested the post-type.
 		$post_type = (string) filter_input( INPUT_GET, 'post_type' );
 
-		// if this page is a supported post type listing, show hint.
+		// if this page is a supported post-type listing, show a hint.
 		if ( 'edit.php' === $pagenow || Init::get_instance()->is_post_type_supported( $post_type ) ) {
 			/* translators: %1$s will be replaced by the plugin name. */
 			return $content . ' ' . sprintf( __( 'This page is extended by the plugin %1$s.', 'easy-language' ), '<em>' . Helper::get_plugin_name() . '</em>' );

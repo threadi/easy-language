@@ -77,6 +77,7 @@ class Init {
 		// general hooks.
 		add_action( 'cli_init', array( $this, 'cli' ) );
 		add_action( 'update_option_easy_language_api', array( $this, 'update_easy_language_api' ), 10, 2 );
+		add_action( 'update_option_WPLANG', array( $this, 'update_wp_lang' ), 10, 2 );
 		add_action( 'admin_action_easy_language_clear_log', array( $this, 'clear_log_by_request' ) );
 		add_filter( 'plugin_row_meta', array( $this, 'add_row_meta_links' ), 10, 2 );
 
@@ -198,8 +199,8 @@ class Init {
 	}
 
 	/**
-	 * If chosen api changes, cleanup the former API (e.g. let it delete its transients) and enable the new API
-	 * with individual settings.
+	 * If the chosen api changes, then cleanup the former API (e.g. let it delete its transients) and enable the new API
+	 * with its individual settings.
 	 * Global settings after user-interaction are run via @function easy_language_admin_validate_chosen_api().
 	 *
 	 * @param string $old_value The name of the former API.
@@ -214,7 +215,7 @@ class Init {
 			$old_api_obj->disable();
 		}
 
-		// run enable tasks on new API.
+		// run enable tasks on the new API.
 		$new_api_obj = Apis::get_instance()->get_api_by_name( $new_value );
 		if ( $new_api_obj instanceof Api_Base ) {
 			$new_api_obj->enable();
@@ -231,6 +232,37 @@ class Init {
 			/* translators: %1$s will be replaced by the old value, %2$s by the new value. */
 			Log::get_instance()->add_log( sprintf( __( 'API has been changed from %1$s to %2$s', 'easy-language' ), $old_value, $new_value ), 'success' );
 		}
+	}
+
+	/**
+	 * Run the check for compatibility of WP_LANG with the chosen API if the WordPress language is changed.
+	 *
+	 * @param string $old_value The name of the former language.
+	 * @param string $new_value The name of the new language.
+	 *
+	 * @return void
+	 */
+	public function update_wp_lang( string $old_value, string $new_value ): void {
+		// if the old value is not set, we assume it is the WordPress default language "en_US".
+		if ( empty( $old_value ) ) {
+			$old_value = 'en_US';
+		}
+
+		// if the new value is not set, we assume it is the WordPress default language "en_US".
+		if ( empty( $new_value ) ) {
+			$new_value = 'en_US';
+		}
+
+		// get the active API object.
+		$api_obj = Apis::get_instance()->get_active_api();
+
+		// bail if no API is active.
+		if ( ! $api_obj instanceof Api_Base ) {
+			return;
+		}
+
+		// validate language support on API.
+		Helper::validate_language_support_on_api( $api_obj, $new_value );
 	}
 
 	/**
