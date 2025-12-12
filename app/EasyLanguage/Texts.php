@@ -592,7 +592,7 @@ class Texts {
 					// get the simplification.
 					$simplification = trim( $entry->get_simplification( $target_language ) );
 
-					// TODO $parse_texts genauer debuggen: wie kommt man an den zu löschenden Text darin?
+					// TODO Debugging $parse_texts more precisely: how do you get to the text that needs to be deleted?
 					if ( false === $entry->is_field( 'title' )
 						&& false === in_array( $simplification, $parsed_texts, true ) // @phpstan-ignore function.impossibleType,identical.alwaysTrue
 						&& false === in_array( $entry->get_original(), $parsed_texts, true ) // @phpstan-ignore function.impossibleType,identical.alwaysTrue

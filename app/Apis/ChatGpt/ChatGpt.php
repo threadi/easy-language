@@ -354,7 +354,7 @@ class ChatGpt extends Base implements Api_Base {
 		// if foreign simplification-plugin with API-support is used, hide the language-settings.
 		$foreign_translation_plugin_with_api_support = false;
 		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
-			if ( $plugin_obj->is_foreign_plugin() && $plugin_obj->is_supporting_apis() ) {
+			if ( $plugin_obj->is_foreign_plugin() && $plugin_obj->is_supporting_apis() && $plugin_obj->is_active() ) {
 				$foreign_translation_plugin_with_api_support = true;
 			}
 		}
