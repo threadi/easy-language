@@ -118,3 +118,13 @@ Hint: this check runs against the VIP-GO-platform which is not our target for th
 ## Check with plugin "Plugin Check"
 
 `wp plugin check --error-severity=7 --warning-severity=6 --include-low-severity-errors --categories=plugin_repo --format=json --slug=easy-language .`
+
+## Unit tests
+
+### Preparation
+
+Be sure to have run `composer install` or `composer update` before.
+
+### Run
+
+`composer test`
