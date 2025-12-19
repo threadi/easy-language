@@ -144,7 +144,7 @@ class Init {
 	}
 
 	/**
-	 * Return list of internal singular-plural-names for post-types (not the translated names).
+	 * Return a list of internal singular-plural-names for post-types (not the translated names).
 	 *
 	 * @return array<string,string>
 	 */
@@ -155,7 +155,7 @@ class Init {
 		);
 
 		/**
-		 * Filter the post type names.
+		 * Filter the post-type names.
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
@@ -165,7 +165,7 @@ class Init {
 	}
 
 	/**
-	 * Return list of settings for supported post-types.
+	 * Return a list of settings for supported post-types.
 	 *
 	 * @return array<string,array<string,string>>
 	 */
@@ -192,7 +192,7 @@ class Init {
 		);
 
 		/**
-		 * Filter the post type names.
+		 * Filter the post-type names.
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *

@@ -12,8 +12,9 @@
 - Added option to reset the plugin in backend settings (in preparation for Cyber Resilience Act)
 - Added Taskfile as an alternative release building method for the plugin
 - Added check against WordPress Plugin Checker during each release
-- Added info in footer of admin where our plugin adds options or shows settings
+- Added info in the footer of admin where our plugin adds options or shows settings
 - Added our own intervals for automatic simplifications
+- Added some unit tests to check for potential errors
 
 ### Changed
 
@@ -24,6 +25,10 @@
 - Logging when which update of the plugin has been installed
 - Updated dependencies
 
+### Removed
+
+- Removed any mentions of the pro-plugin which does not exist anymore
+
 ## [2.9.2] - 21.10.2025
 
 ### Changed
@@ -33,7 +38,7 @@
 
 ### Fixed
 
-- Fixed filter for simplified posts or pages in their tables if another API as SUMM AI is used
+- Fixed the filter for simplified posts or pages in their tables if another API as SUMM AI is used
 - Fixed mark for changed original objects (has been marked just not simplified objects)
 
 ## [2.9.1] - 28.09.2925

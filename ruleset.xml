@@ -49,6 +49,9 @@
 		<exclude name="WordPress.PHP.DiscouragedPHPFunctions"/>
 		<exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
 		<exclude name="WordPress.WP.I18n.NonSingularStringLiteralText" />
+
+		<!-- Bug: https://github.com/WordPress/WordPress-Coding-Standards/issues/1865 -->
+		<exclude name="WordPress.WP.CronInterval" />
 	</rule>
 	<rule ref="WordPress.WP.Capabilities">
 		<properties>
