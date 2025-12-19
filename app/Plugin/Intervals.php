@@ -148,7 +148,7 @@ class Intervals {
 	public function add_intervals( array $intervals ): array {
 		// loop through our own intervals and add them to the list.
 		foreach ( $this->get_intervals_as_objects() as $obj ) {
-			$key = $this->get_prefix() . $obj->get_name();
+			$key               = $this->get_prefix() . $obj->get_name();
 			$intervals[ $key ] = array(
 				'interval' => $obj->get_time(),
 				'display'  => $obj->get_title(),
