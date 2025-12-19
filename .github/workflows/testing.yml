@@ -24,6 +24,31 @@ jobs:
       - name: Check out source code
         uses: actions/checkout@v4
 
+      - name: Run package installs and builds
+        run: |
+              composer install
+              composer update
+              npm i
+              npm i concurrently
+              cd vendor/threadi/easy-dialog-for-wordpress/
+              npm i
+              npm run build
+              cd ../../../
+              cd vendor/threadi/easy-setup-for-wordpress/
+              npm i
+              npm run build
+              cd ../../../
+              cd vendor/threadi/react-dialog/
+              npm i
+              npm run build
+              cd ../../../
+              npm run build:switcher
+              npm run build:navigation-switcher
+              cd legacy-classes/Divi/
+              npm i
+              npm run build
+              cd ../../
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
