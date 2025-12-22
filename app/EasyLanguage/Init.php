@@ -250,7 +250,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if we're looking at trash.
 		$status = get_query_var( 'post_status' );
 
-		// create new array for columns to get clean ordering.
+		// create a new array for columns to get clean ordering.
 		$new_columns          = array();
 		$new_columns['cb']    = $columns['cb'];
 		$new_columns['title'] = $columns['title'];
@@ -786,7 +786,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// get the setting.
 		$supported_post_types = get_option( 'easy_language_post_types' );
 
-		// if setting is empty, return empty array.
+		// if the setting is empty, return an empty array.
 		if ( ! is_array( $supported_post_types ) ) {
 			return array();
 		}
@@ -816,7 +816,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// get the setting.
 		$supported_taxonomies = get_option( 'easy_language_taxonomies' );
 
-		// if setting is empty, return empty array.
+		// if setting is empty, return an empty array.
 		if ( ! is_array( $supported_taxonomies ) ) {
 			return array();
 		}
@@ -1367,7 +1367,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Add row actions to show simplification-options and -state per object for plugin nested pages.
+	 * Add row actions to show simplification-options and -state per object for plugin "Nested Pages".
 	 *
 	 * @param array<string> $actions The possible actions for posts.
 	 * @param WP_Post       $post The post-object.
@@ -1960,7 +1960,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Validate the checkboxes settings.
+	 * Validate the multiple checkbox settings.
 	 *
 	 * @param array<string>|null $values The possible values.
 	 *
@@ -2006,7 +2006,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	/**
 	 * Initialize the permalink refresh if languages changing.
 	 *
-	 * @param array<string>|null $value The new language-strings as list.
+	 * @param array<string>|null $value The new language-strings as a list.
 	 *
 	 * @return array<string>|null
 	 */
@@ -2017,7 +2017,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Return list of active languages this plugin is using atm.
+	 * Return the list of active languages this plugin is using atm.
 	 *
 	 * @return array<string,string>
 	 */
@@ -2641,10 +2641,10 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// change options if active API is not configured.
 		if ( false === $api_obj->is_configured() ) {
 			if ( $api_obj->has_settings() && current_user_can( 'manage_options' ) ) {
-				/* translators: %1$s will be replaced by the API-title, %2$s will be replaced by the object-type-name (e.g. post or page), %3$s will be replaced by the object-title */
+				/* translators: %1$s will be replaced by the API title, %2$s will be replaced by the object-type-name (e.g. post or page), %3$s will be replaced by the object-title */
 				$dialog['texts'][0] = '<p>' . sprintf( __( 'The actual active API %1$s is not yet configured. You can configure it <a href="%2$s">here</a>.<br>Create a simplified %3$s for <i>%4$s</i> to edit is manually.', 'easy-language' ), esc_html( $api_obj->get_title() ), esc_url( $api_obj->get_settings_url() ), esc_html( $post_object->get_type_name() ), esc_html( $post_object->get_title() ) ) . '</p>';
 			} else {
-				/* translators: %1$s will be replaced by the API-title, %2$s will be replaced by the object-type-name (e.g. post or page), %3$s will be replaced by the object-title */
+				/* translators: %1$s will be replaced by the API title, %2$s will be replaced by the object-type-name (e.g. post or page), %3$s will be replaced by the object-title */
 				$dialog['texts'][0] = '<p>' . sprintf( __( 'The actual active API %1$s is not yet configured.<br>Create a simplified %2$s for <i>%3$s</i> to edit is manually.', 'easy-language' ), esc_html( $api_obj->get_title() ), esc_html( $post_object->get_type_name() ), esc_html( $post_object->get_title() ) ) . '</p>';
 			}
 			$dialog['buttons'][0]            = $dialog['buttons'][1];
@@ -2784,7 +2784,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return array<string,string>
 	 */
 	public function add_taxonomy_columns( array $columns ): array {
-		// create new array for columns to get clean ordering.
+		// create a new array for columns to get clean ordering.
 		$new_columns         = array();
 		$new_columns['cb']   = $columns['cb'];
 		$new_columns['name'] = $columns['name'];

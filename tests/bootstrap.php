@@ -48,3 +48,9 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 
 // Start up the WP testing environment.
 require "{$_tests_dir}/includes/bootstrap.php";
+
+/**
+ * Setup the test environment.
+ */
+switch_to_locale( 'de_DE' );
+\easyLanguage\Plugin\Installer::get_instance()->activation();
