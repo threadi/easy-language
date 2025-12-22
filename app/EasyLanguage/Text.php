@@ -355,7 +355,6 @@ class Text {
 		global $wpdb;
 
 		// update the state of this text to the given state-string.
-		error_log( $this->get_id() . ' ' . $state );
 		$wpdb->update( Db::get_instance()->get_table_name_originals(), array( 'state' => $state ), array( 'id' => $this->get_id() ) );
 
 		// log any DB-errors.

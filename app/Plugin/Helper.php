@@ -312,7 +312,7 @@ class Helper {
 	}
 
 	/**
-	 * Get attachment by given language-code via post-meta of the attachment.
+	 * Return the attachment object by given language-code via post-meta of the attachment.
 	 *
 	 * @param string $language_code The search language code.
 	 *
@@ -341,7 +341,7 @@ class Helper {
 		// get first result.
 		$post = $attachment->posts[0];
 
-		// bail if attachment is not WP_Post.
+		// bail if the attachment is not WP_Post.
 		if ( ! $post instanceof WP_Post ) {
 			return false;
 		}

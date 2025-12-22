@@ -368,7 +368,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Change path for our own language-flag.
+	 * Change the path for our own language-flag.
 	 *
 	 * @param string $flags_path Path to the flags.
 	 * @param string $searched_language_code Checked language-code.
@@ -381,7 +381,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add them to the list.
 		foreach ( $languages as $language_code => $language ) {
 			if ( $language_code === $searched_language_code ) {
-				$flags_path = trailingslashit( dirname( Helper::get_icon_path_for_language_code( $language_code ) ) );
+				$flags_path = Helper::get_icon_path_for_language_code( $language_code );
 			}
 		}
 

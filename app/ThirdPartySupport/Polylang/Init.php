@@ -1,6 +1,6 @@
 <?php
 /**
- * File for initializing polylang support.
+ * File for initializing Polylang support.
  *
  * @package easy-language
  */
@@ -11,13 +11,12 @@ namespace easyLanguage\ThirdPartySupport\Polylang;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Plugin\Base;
-use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Languages;
 use easyLanguage\Plugin\ThirdPartySupport_Base;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 
 /**
- * Object to handle polylang support.
+ * Object to handle Polylang support.
  */
 class Init extends Base implements ThirdPartySupport_Base {
 
@@ -224,7 +223,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			$languages[ $language->get_locale() ] = '1';
 		}
 
-		// return resulting list of locales (e.g. "de_EL").
+		// return the resulting list of locales (e.g. "de_EL").
 		return $languages;
 	}
 
@@ -241,6 +240,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return bool
 	 */
 	public function is_active(): bool {
-		return Helper::is_plugin_active( 'polylang/polylang.php' );
+		return defined( 'POLYLANG_BASENAME' );
 	}
 }

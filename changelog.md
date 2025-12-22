@@ -16,6 +16,7 @@
 - Added our own intervals for automatic simplifications
 - Added some unit tests to check for potential errors
 - Added an option to show which texts would be simplified (enabled by default)
+- Added support for Polylang Pro
 
 ### Changed
 
@@ -26,6 +27,10 @@
 - Optimized order of entries in log tables
 - Logging when which update of the plugin has been installed
 - Updated dependencies
+
+### Fixed
+
+- Fixed wrong handling of flag icons for TranslatePress and WPML
 
 ### Removed
 
@@ -158,8 +163,8 @@
 
 ### Fixed
 
-- Fixed error if SUMM AI quota is depleted and message about this should be shown
-- Fixed potential error with third-party-plugins in multisite-installation
+- Fixed the error if SUMM AI quota is depleted and message about this should be shown
+- Fixed a potential error with third-party-plugins in multisite-installation
 
 ## [2.4.1] - 04.02.2025
 

@@ -377,3 +377,8 @@ body.settings_page_easy_language_settings #response { min-width: 200px;width: au
 .easy-language-debug-info {
 	max-width: 640px;
 }
+
+.settings_page_easy_language_settings .icon > img, .pll-selectmenu-button .ui-selectmenu-text img, .toplevel_page_mlang table.languages .flag > img {
+	height: 18px;
+	width: 18px;
+}
