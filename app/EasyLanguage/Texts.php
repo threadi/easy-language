@@ -72,21 +72,21 @@ class Texts {
 	 */
 	public function init( Init $init ): void {
 
-		// add single object for simplification.
+		// add a single object for simplification.
 		add_action( 'admin_action_easy_language_add_simplification', array( $this, 'add_post_object_to_simplification' ) );
 		add_action( 'admin_action_easy_language_add_simplification_term', array( $this, 'add_term_object_to_simplification' ) );
 
-		// get simplification of given object.
+		// get simplification of a given object.
 		add_action( 'admin_action_easy_language_get_simplification', array( $this, 'get_post_simplification' ) );
 		add_action( 'admin_action_easy_language_get_term_simplification', array( $this, 'get_term_simplification' ) );
 
-		// get simplification of given text.
+		// get simplification of a given text.
 		add_action( 'admin_action_easy_language_get_simplification_of_entry', array( $this, 'get_simplification_of_entry' ) );
 
 		// export simplified texts.
 		add_action( 'admin_action_easy_language_export_simplifications', array( $this, 'export_simplifications' ) );
 
-		// some term specific hooks.
+		// some term-specific hooks.
 		add_action( 'easy_language_replace_texts', array( $this, 'replace_term_texts' ), 10, 4 );
 		add_filter( 'get_terms_args', array( $this, 'hide_simplified_terms' ) );
 
@@ -119,7 +119,7 @@ class Texts {
 	 */
 	public function add_post_object_to_simplification(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-add-simplification', 'nonce' );
+		check_admin_referer( 'easy-language-add-simplification', 'nonce' );
 
 		// get active api.
 		$api_object = Apis::get_instance()->get_active_api();
@@ -177,7 +177,7 @@ class Texts {
 	 */
 	public function add_term_object_to_simplification(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-add-simplification-term', 'nonce' );
+		check_admin_referer( 'easy-language-add-simplification-term', 'nonce' );
 
 		// get active api.
 		$api_object = Apis::get_instance()->get_active_api();
@@ -309,7 +309,7 @@ class Texts {
 	 */
 	public function get_post_simplification(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-get-simplification', 'nonce' );
+		check_admin_referer( 'easy-language-get-simplification', 'nonce' );
 
 		// get api.
 		$api_obj = Apis::get_instance()->get_active_api();
@@ -352,7 +352,7 @@ class Texts {
 	 */
 	public function get_term_simplification(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-get-term-simplification', 'nonce' );
+		check_admin_referer( 'easy-language-get-term-simplification', 'nonce' );
 
 		// get api.
 		$api_obj = Apis::get_instance()->get_active_api();
@@ -380,19 +380,20 @@ class Texts {
 	}
 
 	/**
-	 * Run simplification of single text via link-request.
+	 * Run simplification of a single text via link-request.
 	 *
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function get_simplification_of_entry(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-get-simplification-of-entry', 'nonce' );
+		check_admin_referer( 'easy-language-get-simplification-of-entry', 'nonce' );
 
 		// get api.
 		$api_obj = Apis::get_instance()->get_active_api();
+
+		// bail if no api is active.
 		if ( false === $api_obj ) {
-			// no api active => do nothing and forward user.
 			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}
@@ -400,59 +401,63 @@ class Texts {
 		// get text id.
 		$entry_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 
-		if ( $entry_id > 0 ) {
-			// get the requested text.
-			$query   = array(
-				'id'         => $entry_id,
-				'not_locked' => true,
-			);
-			$entries = Db::get_instance()->get_entries( $query, array(), 1 );
-
-			// bail if we have no results.
-			if ( empty( $entries ) ) {
-				// Log event.
-				/* translators: %1$s will be replaced by an ID. */
-				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
-
-				// redirect user back.
-				wp_safe_redirect( wp_get_referer() );
-				exit;
-			}
-
-			// get entry.
-			$entry = $entries[0];
-
-			// get the objects where this text is been used.
-			$post_objects = $entry->get_objects();
-
-			// bail if no objects could be found.
-			if ( empty( $post_objects ) ) {
-				// Log event.
-				/* translators: %1$s will be replaced by an ID. */
-				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
-
-				// redirect user back.
-				wp_safe_redirect( wp_get_referer() );
-				exit;
-			}
-
-			// get object of the first one.
-			$object = Helper::get_object( absint( $post_objects[0]['object_id'] ), $post_objects[0]['object_type'] );
-
-			// bail if none could be found.
-			if ( false === $object ) {
-				// Log event.
-				/* translators: %1$s will be replaced by an ID. */
-				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
-
-				// redirect user back.
-				wp_safe_redirect( wp_get_referer() );
-				exit;
-			}
-
-			// call simplification for each text on this object.
-			$object->process_simplification( $api_obj->get_simplifications_obj(), $api_obj->get_mapping_languages(), $entry );
+		// bail if no entry id is given.
+		if( 0 === $entry_id ) {
+			wp_safe_redirect( wp_get_referer() );
+			exit;
 		}
+
+		// get the requested text.
+		$query   = array(
+			'id'         => $entry_id,
+			'not_locked' => true,
+		);
+		$entries = Db::get_instance()->get_entries( $query, array(), 1 );
+
+		// bail if we have no results.
+		if ( empty( $entries ) ) {
+			// Log event.
+			/* translators: %1$s will be replaced by an ID. */
+			Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
+
+			// redirect user back.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
+		// get the entry.
+		$entry = $entries[0];
+
+		// get the objects where this text is used.
+		$post_objects = $entry->get_objects();
+
+		// bail if no objects could be found.
+		if ( empty( $post_objects ) ) {
+			// Log event.
+			/* translators: %1$s will be replaced by an ID. */
+			Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
+
+			// redirect user back.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
+		// get the object of the first one.
+		$object = Helper::get_object( absint( $post_objects[0]['object_id'] ), $post_objects[0]['object_type'] );
+
+		// bail if none could be found.
+		if ( false === $object ) {
+			// Log event.
+			/* translators: %1$s will be replaced by an ID. */
+			Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
+
+			// redirect user back.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
+		// call simplification for each text on this object.
+		$object->process_simplification( $api_obj->get_simplifications_obj(), $api_obj->get_mapping_languages(), $entry );
 
 		// redirect user back to editor.
 		wp_safe_redirect( wp_get_referer() );
@@ -478,10 +483,10 @@ class Texts {
 		// get the object.
 		$post_obj = new Post_Object( $post_id );
 
-		// get the post type.
+		// get the post-type.
 		$post_type = get_post_type( $post_id );
 
-		// bail if post type could not be loaded.
+		// bail if post-type could not be loaded.
 		if ( ! $post_type ) {
 			return;
 		}
@@ -494,7 +499,7 @@ class Texts {
 			// parse text depending on used pagebuilder.
 			$pagebuilder_obj = $post_obj->get_page_builder();
 
-			// only get texts if pagebuilder is known.
+			// only get texts if the pagebuilder is known.
 			if ( false !== $pagebuilder_obj ) {
 				// set object-id to pagebuilder-object.
 				$pagebuilder_obj->set_object_id( $post_obj->get_id() );
@@ -556,22 +561,22 @@ class Texts {
 			$parent_post_obj  = new Post_Object( $post_obj->get_original_object_as_int() );
 			$source_languages = $parent_post_obj->get_language();
 
-			// bail if list is empty.
+			// bail if a list is empty.
 			if ( empty( $source_languages ) ) {
 				return;
 			}
 
-			// get the first language as source language.
+			// get the first language as the source language.
 			$source_language = (string) array_key_first( $source_languages );
 
-			// get target language from simplified object.
+			// get target language from a simplified object.
 			$target_languages = $post_obj->get_language();
 			$target_language  = array_key_first( $target_languages );
 
-			// get the actual title from object.
+			// get the actual title from the object.
 			$title = $pagebuilder_obj->get_title();
 
-			// get parsed texts from object.
+			// get parsed texts from the object.
 			$parsed_texts = $pagebuilder_obj->get_parsed_texts();
 
 			// delete in DB existing texts of its object is not part of the actual content.
@@ -618,19 +623,19 @@ class Texts {
 
 				// check if the text is already saved as original text for simplification.
 				$original_text_obj = $this->db->get_entry_by_text( $text['text'], $source_language );
+
 				// also check if this is a simplified text of the given language.
 				if ( ( false === $original_text_obj ) && false === $this->db->get_entry_by_simplification( trim( $text['text'] ), $source_language ) ) {
 					// if not save the text for simplification.
 					$original_text_obj = $this->db->add( $text['text'], $source_language, 'post_content', $text['html'] );
 
 					// bail if text could not be added.
-					if ( ! $original_text_obj ) {
+					if ( ! $original_text_obj instanceof Text ) {
 						return;
 					}
 
-					// set object and state on Text object.
+					// set the object.
 					$original_text_obj->set_object( $post_type, $post_obj->get_id(), $index, $pagebuilder_obj->get_name() );
-					$original_text_obj->set_state( 'in_use' );
 				}
 			}
 
@@ -642,16 +647,15 @@ class Texts {
 				$original_title_obj = $this->db->add( $title, $source_language, 'title', false );
 
 				// bail if text could not be added.
-				if ( ! $original_title_obj ) {
+				if ( ! $original_title_obj instanceof Text ) {
 					return;
 				}
 
-				// set object and state on Text object.
+				// set the object.
 				$original_title_obj->set_object( $post_type, $post_id, 0, $pagebuilder_obj->get_name() );
-				$original_title_obj->set_state( 'in_use' );
 			}
 
-			// remove changed-marker on original object for each language.
+			// remove changed-marker on an original object for each language.
 			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
 			foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
 				$original_post->remove_changed_marker( $language_code );
@@ -664,7 +668,7 @@ class Texts {
 	}
 
 	/**
-	 * If simplified object is moved to trash, update the settings on its original object.
+	 * If a simplified object is moved to trash, update the settings on its original object.
 	 *
 	 * If an original object is moved to trash, also trash any simplified object from this object.
 	 *
@@ -676,7 +680,7 @@ class Texts {
 		// get the object.
 		$post_obj = new Post_Object( $post_id );
 
-		// bail if post type is not supported.
+		// bail if post-type is not supported.
 		if ( ! Init::get_instance()->is_post_type_supported( $post_obj->get_type() ) ) {
 			return;
 		}
@@ -687,7 +691,7 @@ class Texts {
 			$languages     = $post_obj->get_language();
 			$language_code = array_key_first( $languages );
 			if ( ! empty( $language_code ) ) {
-				// remove language from list of translated languages on original post.
+				// remove language from a list of translated languages on original post.
 				$original_post->remove_language( $language_code );
 
 				// remove changed marker on original post.
@@ -706,7 +710,7 @@ class Texts {
 	}
 
 	/**
-	 * If simplified object is removed from trash, update the settings on its original object.
+	 * If a simplified object is removed from trash, update the settings on its original object.
 	 *
 	 * @param int $post_id The post-ID.
 	 *
@@ -716,7 +720,7 @@ class Texts {
 		// get the object.
 		$post_obj = new Post_Object( $post_id );
 
-		// bail if post type is not supported.
+		// bail if post-type is not supported.
 		if ( ! Init::get_instance()->is_post_type_supported( $post_obj->get_type() ) ) {
 			return;
 		}
@@ -754,7 +758,7 @@ class Texts {
 	}
 
 	/**
-	 * Export simplified texts as po file.
+	 * Export simplified texts as .po file.
 	 *
 	 * @return void
 	 * @noinspection PhpUndefinedClassInspection

@@ -23,6 +23,7 @@
 - Changed handling of transients
 - Optimized support for automatic simplifications via TranslatePress
 - Optimized generating the hook documentation
+- Optimized order of entries in log tables
 - Logging when which update of the plugin has been installed
 - Updated dependencies
 

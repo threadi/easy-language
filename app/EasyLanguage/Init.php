@@ -158,13 +158,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 		add_action( 'admin_bar_menu', array( $this, 'add_simplification_button_in_admin_bar' ), 500 );
 		add_action( 'admin_bar_menu', array( $this, 'show_simplification_process' ), 400 );
 		add_filter( 'site_status_tests', array( $this, 'add_site_status_test' ) );
-		add_action( 'admin_action_easy_language_create_automatic_cron', array( $this, 'create_automatic_simplification_cron' ) );
 		add_filter( 'easy_language_get_object', array( $this, 'get_post_object' ), 20, 2 );
 		add_filter( 'easy_language_get_object', array( $this, 'get_term_object' ), 10, 3 );
 		add_filter( 'easy_language_first_simplify_dialog', array( $this, 'change_first_simplify_dialog' ), 10, 3 );
 		add_filter( 'easy_language_get_object_by_wp_object', array( $this, 'get_term_object_by_wp_object' ), 10, 3 );
 
-		// action hooks.
+		// admin action hooks.
+		add_action( 'admin_action_easy_language_create_automatic_cron', array( $this, 'create_automatic_simplification_cron' ) );
 		add_action( 'admin_action_easy_language_delete_simplification', array( $this, 'delete_simplification' ) );
 		add_action( 'admin_action_easy_language_delete_text_for_simplification', array( $this, 'delete_text_for_simplification' ) );
 		add_action( 'admin_action_easy_language_delete_all_to_simplified_texts', array( $this, 'delete_all_to_simplified_texts' ) );
@@ -2151,6 +2151,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function ajax_reset_processing_simplification(): void {
+		// check nonce.
 		check_ajax_referer( 'easy-language-reset-processing-simplification-nonce', 'nonce' );
 
 		// get the object-id from request.
@@ -2183,6 +2184,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function ajax_ignore_processing_simplification(): void {
+		// check nonce.
 		check_ajax_referer( 'easy-language-ignore-processing-simplification-nonce', 'nonce' );
 
 		// get the object-id from request.
@@ -2289,6 +2291,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function ajax_add_simplification(): void {
+		// check nonce.
 		check_ajax_referer( 'easy-language-add-simplification-nonce', 'nonce' );
 
 		// define answer.
@@ -2340,7 +2343,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				array(
 					'page'   => 'easy_language_settings',
 					'tab'    => 'simplified_texts',
-					'subtab' => 'to_simplify',
+					'subtab' => 'simplified_texts_to_simplify',
 				),
 				'options-general.php'
 			);
@@ -2417,7 +2420,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			array(
 				'page'   => 'easy_language_settings',
 				'tab'    => 'simplified_texts',
-				'subtab' => 'to_simplify',
+				'subtab' => 'simplified_texts_to_simplify',
 			),
 			admin_url() . 'options-general.php'
 		);
@@ -2454,6 +2457,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function ajax_set_simplification_prevention(): void {
+		// check nonce.
 		check_ajax_referer( 'easy-language-set-simplification-prevention-nonce', 'nonce' );
 
 		// define return value.
@@ -2547,7 +2551,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 */
 	public function create_automatic_simplification_cron(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-create-schedules', 'nonce' );
+		check_admin_referer( 'easy-language-create-schedules', 'nonce' );
 
 		// check if automatic interval exist, if not create it.
 		if ( ! wp_next_scheduled( 'easy_language_automatic_simplification' ) ) {
@@ -2661,7 +2665,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 */
 	public function delete_text_for_simplification(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-delete-text-for-simplification', 'nonce' );
+		check_admin_referer( 'easy-language-delete-text-for-simplification', 'nonce' );
 
 		// get requested text.
 		$text_id = ! empty( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
@@ -2691,9 +2695,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 */
 	public function delete_all_to_simplified_texts(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-delete-all-to-simplified_texts', 'nonce' );
+		check_admin_referer( 'easy-language-delete-all-to-simplified_texts', 'nonce' );
 
-		// get all texts which should be simplified.
+		// get all texts that should be simplified.
 		$entries = Db::get_instance()->get_entries( self::get_instance()->get_filter_for_entries_to_simplify() );
 
 		// delete them.
@@ -2959,7 +2963,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 */
 	public function delete_simplification(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-delete-simplification', 'nonce' );
+		check_admin_referer( 'easy-language-delete-simplification', 'nonce' );
 
 		// get requested text.
 		$text_id = ! empty( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;

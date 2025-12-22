@@ -638,7 +638,7 @@ abstract class Objects {
 
 		$js_top = '';
 		/**
-		 * Set top for JS-location if page builder which makes it necessary is actually used.
+		 * Set top for JS-location if the page builder which makes it necessary is actually used.
 		 *
 		 * @since 2.2.0 Available since 2.2.0.
 		 * @param string $js_top The top-string.

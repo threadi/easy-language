@@ -964,7 +964,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function remove_token(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-capito-remove-token', 'nonce' );
+		check_admin_referer( 'easy-language-capito-remove-token', 'nonce' );
 
 		// delete settings.
 		delete_option( 'easy_language_capito_api_key' );
@@ -996,7 +996,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_quota_from_api_via_link(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-capito-get-quota', 'nonce' );
+		check_admin_referer( 'easy-language-capito-get-quota', 'nonce' );
 
 		// get quota.
 		$this->get_quota_from_api();

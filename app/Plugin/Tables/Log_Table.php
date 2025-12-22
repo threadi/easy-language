@@ -60,7 +60,7 @@ class Log_Table extends WP_List_Table {
 		);
 
 		// get statement.
-		$sql = $this->get_base_sql() . ' ORDER BY %2$s %3$s';
+		$sql = $this->get_base_sql() . ' ORDER BY %2$s %3$s, `id` DESC';
 
 		// get results and return them.
 		return $wpdb->get_results( $wpdb->prepare( $sql, $vars ), ARRAY_A );

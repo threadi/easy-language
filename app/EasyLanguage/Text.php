@@ -148,7 +148,7 @@ class Text {
 	}
 
 	/**
-	 * Get translation of this text in the given language.
+	 * Return the translation of this text in the given language.
 	 *
 	 * @param string $language The language we search.
 	 * @return string
@@ -163,14 +163,14 @@ class Text {
 		// get from DB.
 		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `simplification` FROM ' . Db::get_instance()->get_table_name_simplifications() . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
 		if ( ! empty( $result ) ) {
-			// save in object.
+			// save in the object.
 			$this->simplifications[ $language ] = $result['simplification'];
 
 			// return result.
 			return $result['simplification'];
 		}
 
-		// return empty string if no translation exist.
+		// return an empty string if no translation exists.
 		return '';
 	}
 
@@ -331,9 +331,9 @@ class Text {
 	}
 
 	/**
-	 * Set state of this text.
+	 * Set the state of this text.
 	 *
-	 * Only if it is one of this valid states:
+	 * Only if it is one of these valid states:
 	 * - to_simplify => text will be simplified
 	 * - processing => text is simplified
 	 * - in_use => text has been simplified
@@ -346,7 +346,7 @@ class Text {
 	 * @return void
 	 */
 	public function set_state( string $state ): void {
-		// bail if a not allowed state is used.
+		// bail, if not allowed state, is used.
 		if ( ! in_array( $state, array( 'to_simplify', 'processing', 'in_use', 'ignore' ), true ) ) {
 			return;
 		}
@@ -355,6 +355,7 @@ class Text {
 		global $wpdb;
 
 		// update the state of this text to the given state-string.
+		error_log( $this->get_id() . ' ' . $state );
 		$wpdb->update( Db::get_instance()->get_table_name_originals(), array( 'state' => $state ), array( 'id' => $this->get_id() ) );
 
 		// log any DB-errors.

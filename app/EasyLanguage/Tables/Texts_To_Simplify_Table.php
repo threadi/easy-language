@@ -162,7 +162,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 			),
 		);
 
-		// show content depending on column.
+		// show content depending on the column.
 		switch ( $column_name ) {
 			case 'options':
 				$options = array(
@@ -172,26 +172,26 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 				// get the item ID.
 				$item_id = $item->get_id();
 
-				// get actual API and check if it is configured.
+				// get the actual API and check if it is configured.
 				$api_object = Apis::get_instance()->get_active_api();
 
 				// remove the first entry from the options-array to replace it with our own.
 				unset( $options[0] );
 
-				// if no API is active, show hint.
+				// if no API is active, show a hint.
 				if ( ! $api_object instanceof Api_Base ) {
 					$options[0] = '<span class="dashicons dashicons-translation" title="' . esc_attr( __( 'No API active!', 'easy-language' ) ) . '">&nbsp;</a>';
 				}
 
-				// if API is not configured, show hint.
+				// if the API is not configured, show an hint.
 				if ( $api_object instanceof Api_Base && false === $api_object->is_configured() ) {
 					/* translators: %1$s will be replaced by the name of the API */
 					$options[0] = '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'API %1$s is not configured.', 'easy-language' ), esc_html( $api_object->get_title() ) ) ) . '">&nbsp;</a>';
 				}
 
-				// if API is configured, show option to simplify the item.
+				// if API is configured, show an option to simplify the item.
 				if ( $api_object instanceof Api_Base && false !== $api_object->is_configured() ) {
-					// add option to delete a single simplification item.
+					// add an option to simplify this entry now.
 					$do_simplification = add_query_arg(
 						array(
 							'action' => 'easy_language_get_simplification_of_entry',
@@ -205,7 +205,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 					$dialog_config = array(
 						'title'   => __( 'Simplify this text?', 'easy-language' ),
 						'texts'   => array(
-							__( '<p>Simplifying texts via API could cause costs.<br><strong>Are you sure your want to simplify this single text?</strong></p>', 'easy-language' ),
+							__( '<p>Simplifying texts via API could cause costs.<br><strong>Are you sure you want to simplify this single text?</strong></p>', 'easy-language' ),
 						),
 						'buttons' => array(
 							array(
@@ -223,6 +223,38 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 
 					$options[0] = '<a href="' . esc_url( $do_simplification ) . '" class="dashicons dashicons-translation easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_json( $dialog_config ) ) . '" title="' . esc_attr( __( 'Simplify now', 'easy-language' ) ) . '">&nbsp;</a>';
 				}
+
+				// add an option to delete this entry.
+				$delete_task_link = add_query_arg(
+					array(
+						'action' => 'easy_language_delete_text_for_simplification',
+						'id'     => $item_id,
+						'nonce'  => wp_create_nonce( 'easy-language-delete-text-for-simplification' ),
+					),
+					get_admin_url() . 'admin.php'
+				);
+
+				// create dialog.
+				$dialog_config = array(
+					'title'   => __( 'Delete this task?', 'easy-language' ),
+					'texts'   => array(
+						__( '<p>Deleting this task will not simplify the text.<br><strong>Are you sure?</strong></p>', 'easy-language' ),
+					),
+					'buttons' => array(
+						array(
+							'action'  => 'location.href="' . $delete_task_link . '";',
+							'variant' => 'primary',
+							'text'    => __( 'Yes, delete it', 'easy-language' ),
+						),
+						array(
+							'action'  => 'closeDialog();',
+							'variant' => 'primary',
+							'text'    => __( 'Cancel', 'easy-language' ),
+						),
+					),
+				);
+
+				$options[1] = '<a href="' . esc_url( $delete_task_link ) . '" class="dashicons dashicons-trash easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_json( $dialog_config ) ) . '" title="' . esc_attr( __( 'Delete', 'easy-language' ) ) . '">&nbsp;</a>';
 
 				/**
 				 * Filter additional options.

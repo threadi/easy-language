@@ -1197,7 +1197,7 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function run_token_test(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-summ-ai-test-token', 'nonce' );
+		check_admin_referer( 'easy-language-summ-ai-test-token', 'nonce' );
 
 		// get global transients-object.
 		$transients_obj = Transients::get_instance();
@@ -1256,7 +1256,7 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function remove_token(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-summ-ai-remove-token', 'nonce' );
+		check_admin_referer( 'easy-language-summ-ai-remove-token', 'nonce' );
 
 		// delete settings.
 		delete_option( 'easy_language_summ_ai_api_key' );

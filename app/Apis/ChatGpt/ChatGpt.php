@@ -676,7 +676,7 @@ class ChatGpt extends Base implements Api_Base {
 	 */
 	public function remove_token(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-chatgpt-remove-token', 'nonce' );
+		check_admin_referer( 'easy-language-chatgpt-remove-token', 'nonce' );
 
 		// delete settings.
 		delete_option( 'easy_language_chatgpt_api_key' );
