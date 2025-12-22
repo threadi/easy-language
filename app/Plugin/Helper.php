@@ -234,31 +234,6 @@ class Helper {
 	}
 
 	/**
-	 * Validate multiple select fields.
-	 *
-	 * @param array<string,mixed>|null $values The list of values.
-	 *
-	 * @return array<string,mixed>|null
-	 */
-	public static function settings_validate_multiple_select_fields( ?array $values ): ?array {
-		$filter = current_filter();
-		if ( ! empty( $filter ) ) {
-			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) ) {
-				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_FORCE_ARRAY );
-				if ( ! empty( $pre_values ) ) {
-					// set the callback for array_map.
-					$callback = 'sanitize_text_field';
-
-					// run the sanitizing.
-					$values = array_map( $callback, $pre_values );
-				}
-			}
-		}
-		return $values;
-	}
-
-	/**
 	 * Validate multiple text fields.
 	 *
 	 * @param array<string,mixed>|null $values The list of values.

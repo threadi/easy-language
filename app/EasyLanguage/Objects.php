@@ -904,7 +904,7 @@ abstract class Objects {
 	}
 
 	/**
-	 * Call API to simplify single text.
+	 * Call API to simplify a single text.
 	 *
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.

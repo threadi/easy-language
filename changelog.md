@@ -9,12 +9,13 @@
 - Added support for any post-types that enabled title and editor as we need them for the simplification of texts
 - Added support to simply taxonomy terms
 - Added support for the PageBuilders Beaver Builder, Bold Page Builder, Brizy, Kubio, SiteOrigin, SeedProd and Visual Composer
-- Added option to reset the plugin in backend settings (in preparation for Cyber Resilience Act)
+- Added an option to reset the plugin in backend settings (in preparation for Cyber Resilience Act)
 - Added Taskfile as an alternative release building method for the plugin
 - Added check against WordPress Plugin Checker during each release
 - Added info in the footer of admin where our plugin adds options or shows settings
 - Added our own intervals for automatic simplifications
 - Added some unit tests to check for potential errors
+- Added an option to show which texts would be simplified (enabled by default)
 
 ### Changed
 

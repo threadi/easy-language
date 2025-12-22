@@ -10,7 +10,6 @@ namespace easyLanguage\PageBuilder;
 // deny direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\EasyLanguage\Init;
 use easyLanguage\EasyLanguage\PageBuilder_Base;
 use easyLanguage\EasyLanguage\Post_Object;
 use easyLanguage\PageBuilder\Elementor\Languages;
@@ -212,18 +211,18 @@ class Elementor extends PageBuilder_Base {
 		if ( false !== $multilingual_plugin ) {
 			wp_register_style(
 				'easy-language-elementor-admin',
-				trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'admin/elementor.css',
+				trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'admin/elementor/elementor.css',
 				array(),
-				Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . 'admin/elementor.css' ),
+				Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . 'admin/elementor/elementor.css' ),
 			);
 			wp_enqueue_style( 'easy-language-elementor-admin' );
 
 			// elementor-specific backend-JS.
 			wp_register_script(
 				'easy-language-elementor-admin',
-				trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'admin/elementor.js',
+				trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'admin/elementor/elementor.js',
 				array( 'jquery', 'easy-dialog' ),
-				Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . 'admin/elementor.js' ),
+				Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . 'admin/elementor/elementor.js' ),
 				true
 			);
 			wp_enqueue_script( 'easy-language-elementor-admin' );
@@ -243,7 +242,7 @@ class Elementor extends PageBuilder_Base {
 	 * @return void
 	 */
 	public function add_dynamic_tags( Manager $dynamic_tags ): void {
-		// bail if elementor pro is not active.
+		// bail if Elementor pro is not active.
 		if ( ! Helper::is_plugin_active( 'elementor-pro/elementor-pro.php' ) ) {
 			return;
 		}

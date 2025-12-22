@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling VisualComposer pagebuilder for simplifications.
+ * File for parsing VisualComposer pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -147,7 +147,7 @@ class VisualComposer extends Parser_Base implements Parser {
 
 	/**
 	 * Replace original text with translation.
-	 * This is done 1:1 for Kubio.
+	 * This is done 1:1 for VisualComposer.
 	 *
 	 * @param string $original_complete Complete original content.
 	 * @param string $simplified_part The translated content.
@@ -202,7 +202,7 @@ class VisualComposer extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */

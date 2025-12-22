@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Salients WPBakery PageBuilder for simplifications.
+ * File for parsing Salients WPBakery PageBuilder for simplifications.
  *
  * @package easy-language
  */

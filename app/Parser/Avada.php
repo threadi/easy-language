@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Avada content for simplifications.
+ * File for parsing Avada content for simplifications.
  *
  * @package easy-language
  */
@@ -15,7 +15,7 @@ use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
 
 /**
- * Handler for parsing avada-content.
+ * Handler for parsing Avada-content.
  */
 class Avada extends Parser_Base implements Parser {
 	/**
@@ -142,7 +142,7 @@ class Avada extends Parser_Base implements Parser {
 			}
 		}
 
-		// return resulting list.
+		// return the resulting list of parse texts.
 		return $resulting_texts;
 	}
 
@@ -193,7 +193,7 @@ class Avada extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this PageBuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */
@@ -202,7 +202,7 @@ class Avada extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Prevent translate-option in frontend.
+	 * Prevent the translate-option in the frontend.
 	 *
 	 * @return bool
 	 */

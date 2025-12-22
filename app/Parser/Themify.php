@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Themify pagebuilder for simplifications.
+ * File for parsing Themify pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -18,7 +18,7 @@ use easyLanguage\EasyLanguage\Post_Object;
 use ThemifyBuilder_Data_Manager;
 
 /**
- * Handler for parsing themify-content.
+ * Handler for parsing Themify-content.
  */
 class Themify extends Parser_Base implements Parser {
 	/**
@@ -192,7 +192,7 @@ class Themify extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */
@@ -297,7 +297,7 @@ class Themify extends Parser_Base implements Parser {
 			}
 		}
 
-		// return resulting container.
+		// return the resulting container.
 		return $container;
 	}
 }

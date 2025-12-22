@@ -16,7 +16,9 @@ use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Number;
 use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Radio;
 use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Select;
 use easyLanguage\Dependencies\easySettingsForWordPress\Page;
+use easyLanguage\Dependencies\easySettingsForWordPress\Section;
 use easyLanguage\Dependencies\easySettingsForWordPress\Settings;
+use easyLanguage\Dependencies\easySettingsForWordPress\Tab;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Base;
@@ -124,7 +126,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		Rest_Api::get_instance()->init();
 
 		// add settings.
-		add_action( 'init', array( $this, 'add_settings' ), 20 );
+		add_action( 'init', array( $this, 'add_settings' ), 30 );
 
 		// backend simplification-hooks to show or hide simplified pages.
 		add_action( 'admin_init', array( $this, 'admin_init_post_types' ) );
@@ -140,6 +142,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		add_action( 'wp_ajax_easy_language_reset_processing_simplification', array( $this, 'ajax_reset_processing_simplification' ) );
 		add_action( 'wp_ajax_easy_language_ignore_processing_simplification', array( $this, 'ajax_ignore_processing_simplification' ) );
 		add_action( 'wp_ajax_easy_language_set_simplification_prevention_on_object', array( $this, 'ajax_set_simplification_prevention' ) );
+		add_action( 'wp_ajax_easy_language_get_debug_info', array( $this, 'get_debug_info_by_ajax_request' ) );
 
 		// embed files.
 		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ), PHP_INT_MAX );
@@ -160,13 +163,15 @@ class Init extends Base implements ThirdPartySupport_Base {
 		add_filter( 'easy_language_get_object', array( $this, 'get_term_object' ), 10, 3 );
 		add_filter( 'easy_language_first_simplify_dialog', array( $this, 'change_first_simplify_dialog' ), 10, 3 );
 		add_filter( 'easy_language_get_object_by_wp_object', array( $this, 'get_term_object_by_wp_object' ), 10, 3 );
+
+		// action hooks.
 		add_action( 'admin_action_easy_language_delete_simplification', array( $this, 'delete_simplification' ) );
 		add_action( 'admin_action_easy_language_delete_text_for_simplification', array( $this, 'delete_text_for_simplification' ) );
 		add_action( 'admin_action_easy_language_delete_all_to_simplified_texts', array( $this, 'delete_all_to_simplified_texts' ) );
 	}
 
 	/**
-	 * Add language-columns for each supported the post type.
+	 * Add language-columns for each supported post type.
 	 *
 	 * @return void
 	 */
@@ -184,7 +189,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return;
 		}
 
-		// bail if actual WordPress-language is not in the supported source language list.
+		// bail if the actual WordPress-language is not in the supported source language list.
 		$source_languages = Languages::get_instance()->get_possible_source_languages();
 		if ( empty( $source_languages[ Helper::get_wp_lang() ] ) ) {
 			return;
@@ -283,7 +288,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return;
 		}
 
-		// get object of this post.
+		// get the object of this post.
 		$post_object = new Post_Object( $post_id );
 
 		// show only the used language in trash.
@@ -385,7 +390,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 					$this->show_quota_hint( $api_obj );
 				}
 
-				// show link to view object in frontend.
+				// show link to view the object in frontend.
 				echo '<a href="' . esc_url( $show_link ) . '" class="dashicons dashicons-admin-site-alt3" target="_blank" title="' . esc_attr( __( 'Show in fronted (opens new window)', 'easy-language' ) ) . '">&nbsp;</a>';
 
 				// get link to delete this simplification if user has capability for it.
@@ -425,15 +430,24 @@ class Init extends Base implements ThirdPartySupport_Base {
 					echo '<span class="dashicons dashicons-admin-generic easy-language-automatic-simplification-prevented easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_json( $dialog ) ) . '" title="' . esc_attr__( 'Automatic simplification is prevented', 'easy-language' ) . '"></span>';
 				}
 
-				// show mark if content of original object has been changed.
+				// show mark if the original object has been changed.
 				if ( $post_object->has_changed( $language_code ) && current_user_can( 'edit_el_simplifier' ) ) {
 					echo '<span class="dashicons dashicons-image-rotate" title="' . esc_attr__( 'Original content has been changed!', 'easy-language' ) . '"></span>';
 				}
+
+				// show a link to debug this object for admin only.
+				if ( current_user_can( 'manage_options' ) && 1 === absint( get_option( 'easy_language_show_debug_info' ) ) ) {
+					$debug_config = array(
+						'id'   => $simplified_post_obj->get_id(),
+						'type' => $simplified_post_obj->get_type(),
+					);
+					echo '<a href="#" class="dashicons dashicons-admin-tools easy-language-debug-object" data-debug-config="' . esc_attr( Helper::get_json( $debug_config ) ) . '" title="' . esc_attr( __( 'Debug the content', 'easy-language' ) ) . '">&nbsp;</a>';
+				}
 			} else {
-				// create the link to simplify this post if used pagebuilder is active.
+				// create the link to simplify this post if the used pagebuilder is active.
 				$page_builder = $post_object->get_page_builder();
 
-				// bail if page builder could not be loaded.
+				// bail if the parser object could not be loaded.
 				if ( ! $page_builder instanceof Parser_Base ) {
 					return;
 				}
@@ -463,7 +477,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 							array(
 								'action'  => 'easy_language_add_simplification_object(' . absint( $post_id ) . ', "' . $post_object->get_type() . '", "' . esc_attr( $language_code ) . '", "auto", true );',
 								'variant' => 'primary',
-								/* translators: %1$s will be replaced by the API-title */
+								/* translators: %1$s will be replaced by the API title */
 								'text'    => sprintf( __( 'Simplify now via %1$s', 'easy-language' ), esc_html( $api_obj->get_title() ) ),
 							),
 							array(
@@ -505,24 +519,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 					// if the detected pagebuilder is "undetected" show warning.
 					if ( false !== $show_page_builder_warning ) {
-						$dialog = array(
-							/* translators: %1$s will be replaced by the object-title */
-							'title'   => sprintf( __( 'Unknown page builder or Classic Editor', 'easy-language' ), esc_html( $post_object->get_title() ) ),
-							'texts'   => array(
-								/* translators: %1$s will be replaced by the API title */
-								'<p>' . sprintf( __( 'This %1$s has been edited with an unknown page builder.<br>This could also be the Classic Editor.<br>If this %1$s has been edited with another page builder, the plugin Easy Language does not support it atm.<br>Please <a href="%2$s" target="_blank">contact our support forum</a>.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_url( Helper::get_plugin_support_url() ) ) . '</p>',
-							),
-							'buttons' => array(
-								array(
-									'action'  => 'closeDialog();',
-									'variant' => 'primary',
-									'text'    => __( 'OK', 'easy-language' ),
-								),
-							),
-						);
-
 						/* translators: %1$s is the name of the object (e.g. page or post) */
-						echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress"  data-dialog="' . esc_attr( Helper::get_json( $dialog ) ) . '" title="' . esc_attr( sprintf( __( 'This %1$s has been edited with an unknown page builder or the classic editor', 'easy-language' ), esc_html( $post_object->get_type_name() ) ) ) . '"></span>';
+						echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) . '" title="' . esc_attr( sprintf( __( 'This %1$s has been edited with an unknown page builder or the classic editor', 'easy-language' ), esc_html( $post_object->get_type_name() ) ) ) . '"></span>';
 					}
 				} else {
 					// otherwise should warning that the for this object used page builder is not active or not supported.
@@ -567,7 +565,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// get our supported post-types.
 		$post_types = $this->get_supported_post_types();
 
-		// get the requested post-types, if they are a post-type.
+		// get the requested post-types if they are a post-type.
 		$hide_simplified_posts = false;
 		if ( is_array( $query->get( 'post_type' ) ) ) {
 			foreach ( $query->get( 'post_type' ) as $post_type ) {
@@ -595,7 +593,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				return;
 			}
 
-			// check if requested language is supported by our plugin.
+			// check if the requested language is supported by our plugin.
 			$languages = $api->get_active_target_languages();
 
 			// bail if requested language is not supported by this API.
@@ -1105,7 +1103,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// collect them.
 		$post_types = array();
 
-		// get all post types with the necessary support.
+		// get all the post types with the necessary support.
 		$post_types_with_editor_support = get_post_types_by_support( array( 'editor', 'title' ) );
 
 		// loop through all of them.
@@ -1168,7 +1166,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				continue;
 			}
 
-			// bail if taxonomy is not public or not in backend menu.
+			// bail if taxonomy is not public or not in the backend menu.
 			if ( ! $taxonomy->public || ! $taxonomy->show_in_menu ) {
 				continue;
 			}
@@ -1326,6 +1324,32 @@ class Init extends Base implements ThirdPartySupport_Base {
 			)
 		);
 		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_radio_as_string' ) );
+		$setting->set_field( $field );
+
+		// get the advanced tab.
+		$advanced_tab = $settings_page->get_tab( 'advanced' );
+
+		// bail if the tab could not be found.
+		if ( ! $advanced_tab instanceof Tab ) {
+			return;
+		}
+
+		// get the advanced section.
+		$advanced_section = $advanced_tab->get_section( 'advanced_main' );
+
+		// bail if the section could not be found.
+		if ( ! $advanced_section instanceof Section ) {
+			return;
+		}
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_show_debug_info' );
+		$setting->set_section( $advanced_section );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 1 );
+		$field = new Checkbox();
+		$field->set_title( __( 'Show debug info', 'easy-language' ) );
+		$field->set_description( __( 'When activated, you can see which texts would be simplified for each object.', 'easy-language' ) );
 		$setting->set_field( $field );
 	}
 
@@ -1899,6 +1923,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				'set_simplification_prevention_nonce'    => wp_create_nonce( 'easy-language-set-simplification-prevention-nonce' ),
 				'ignore_processing_simplification_nonce' => wp_create_nonce( 'easy-language-ignore-processing-simplification-nonce' ),
 				'reset_processing_simplification_nonce'  => wp_create_nonce( 'easy-language-reset-processing-simplification-nonce' ),
+				'debug_info_nonce'                       => wp_create_nonce( 'easy-language-get-debug-info' ),
 			)
 		);
 
@@ -2590,7 +2615,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return false;
 		}
 
-		// bail if taxonomy if this term is not supported.
+		// bail if taxonomy of this term is not supported.
 		if ( ! array_key_exists( $term->taxonomy, $this->get_supported_taxonomies() ) ) {
 			return false;
 		}
@@ -2807,7 +2832,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 					// get the term-ID of the translated term.
 					$translated_term_id = $term_object->get_simplification_in_language( $language_code );
 
-					// get page-builder of this object.
+					// get the page-builder of this object.
 					$translated_term_obj = new Term_Object( $translated_term_id, $term->taxonomy );
 
 					// get page-builder-specific edit-link if user has capability for it.
@@ -2963,5 +2988,79 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 */
 	public function is_active(): bool {
 		return true;
+	}
+
+	/**
+	 * Return debug info about a single object via AJAX.
+	 *
+	 * @return void
+	 */
+	public function get_debug_info_by_ajax_request(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-get-debug-info', 'nonce' );
+
+		// create the dialog for response.
+		$dialog = array(
+			'detail' => array(
+				'title'   => __( 'Error', 'easy-language' ),
+				'texts'   => array(
+					'<p><strong>' . __( 'Error loading the debug information.', 'easy-language' ) . '</strong></p>',
+				),
+				'buttons' => array(
+					array(
+						'action'  => 'closeDialog();',
+						'variant' => 'primary',
+						'text'    => __( 'OK', 'easy-language' ),
+					),
+				),
+			),
+		);
+
+		// get debug config.
+		$config = isset( $_POST['config'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['config'] ) ) : array();
+
+		// bail if no config is given.
+		if ( empty( $config ) ) {
+			wp_send_json( $dialog );
+		}
+
+		// get the object.
+		$object = Helper::get_object( absint( $config['id'] ), $config['type'] );
+
+		// bail if no object could be found.
+		if ( ! $object instanceof Objects ) {
+			wp_send_json( $dialog );
+		}
+
+		// define filter to get all entries for this object.
+		$filter = array(
+			'object_id'   => $object->get_id(),
+			'object_type' => $object->get_type(),
+		);
+
+		// get the entries for this object.
+		$entries = Db::get_instance()->get_entries( $filter );
+
+		// create the dialog for the response.
+		$dialog['detail']['className'] = 'easy-language-debug-info';
+		$dialog['detail']['title']     = __( 'Debug information', 'easy-language' );
+		$dialog['detail']['texts']     = array(
+			'<p><strong>' . __( 'The following contents of this object are simplified:', 'easy-language' ) . '</strong></p>',
+		);
+		foreach ( $entries as $entry ) {
+			// get the original content.
+			$original_content = $entry->get_original();
+
+			// bail if content without HTML would be empty.
+			if ( empty( wp_strip_all_tags( $original_content ) ) ) {
+				continue;
+			}
+
+			// add the content to the dialog.
+			$dialog['detail']['texts'][] = wp_kses_post( $original_content );
+		}
+
+		// return the dialog.
+		wp_send_json( $dialog );
 	}
 }

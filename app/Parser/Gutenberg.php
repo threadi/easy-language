@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Gutenberg pagebuilder for simplifications.
+ * File for parsing Gutenberg blocks for simplifications.
  *
  * @package easy-language
  */
@@ -15,7 +15,7 @@ use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
 
 /**
- * Handler for parsing gutenberg-blocks.
+ * Handler for parsing Gutenberg-blocks.
  */
 class Gutenberg extends Parser_Base implements Parser {
 	/**
@@ -86,7 +86,7 @@ class Gutenberg extends Parser_Base implements Parser {
 	/**
 	 * Return parsed texts.
 	 *
-	 * Loop through the blocks and save their flow-text-elements (e.g. paragraphs and headings) to list.
+	 * Loop through the blocks and save their flow-text-elements (e.g. paragraphs and headings) to the list.
 	 *
 	 * @return array<array<string,mixed>>
 	 */
@@ -97,6 +97,7 @@ class Gutenberg extends Parser_Base implements Parser {
 			$resulting_texts = $this->get_block_text( $block, $resulting_texts );
 		}
 
+		// return the resulting list of parse texts.
 		return $resulting_texts;
 	}
 
@@ -127,7 +128,7 @@ class Gutenberg extends Parser_Base implements Parser {
 			$resulting_texts = $this->get_block_text( $inner_block, $resulting_texts );
 		}
 
-		// return resulting list.
+		// return the resulting list.
 		return $resulting_texts;
 	}
 
@@ -156,7 +157,7 @@ class Gutenberg extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */

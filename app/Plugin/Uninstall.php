@@ -237,18 +237,6 @@ class Uninstall {
 				$role->remove_cap( $capability );
 			}
 		}
-
-		// delete transients.
-		foreach ( Transients::get_instance()->get_transients( false, true ) as $transient_obj ) {
-			// bail if the object is not ours.
-			if ( ! $transient_obj instanceof Transient ) { // @phpstan-ignore instanceof.alwaysTrue
-				continue;
-			}
-
-			// delete transient-data.
-			$transient_obj->delete();
-			$transient_obj->delete_dismiss();
-		}
 	}
 
 	/**

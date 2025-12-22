@@ -1,9 +1,8 @@
 jQuery( document ).ready(
 	function ($) {
-		// get internationalization tools of WordPress.
-		let { __ } = wp.i18n;
-
-		// start to translate an object via AJAX.
+		/**
+		 * Start to translate an object via AJAX.
+		 */
 		$('.easy-language-translate-object').on(
 			'click',
 			function (e) {
@@ -11,6 +10,27 @@ jQuery( document ).ready(
 				easy_language_simplification_init( $(this).data('id'), $(this).data('object-type') );
 			}
 		);
+
+		/**
+		 * Load the debug information for the given object.
+		 */
+		$('.easy-language-debug-object').on( 'click', function(e) {
+			e.preventDefault();
+			$.ajax(
+				{
+					type: "POST",
+					url: easyLanguageSimplificationJsVars.ajax_url,
+					data: {
+						'action': 'easy_language_get_debug_info',
+						'config': $(this).data('debug-config'),
+						'nonce': easyLanguageSimplificationJsVars.debug_info_nonce
+					},
+					success: function( result ) {
+						easy_language_create_dialog( result )
+					}
+				}
+			);
+		});
 
 		// save automatic prevention setting.
 		$('input.easy-language-automatic-simplification-prevention').on( 'change', function() {

@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling WPBakery pagebuilder for simplifications.
+ * File for parsing WPBakery pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -162,7 +162,7 @@ class WpBakery extends Parser_Base implements Parser {
 			}
 		}
 
-		// return resulting list.
+		// return the resulting list.
 		return $resulting_texts;
 	}
 
@@ -221,7 +221,7 @@ class WpBakery extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */
@@ -230,7 +230,7 @@ class WpBakery extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Prevent translate-option in frontend.
+	 * Prevent a translate-option in the frontend.
 	 *
 	 * @return bool
 	 */
@@ -239,7 +239,7 @@ class WpBakery extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Run WPBakery-specific updates on object.
+	 * Run WPBakery-specific updates on the object.
 	 *
 	 * @param Objects $post_object The object.
 	 *

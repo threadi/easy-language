@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Avia pagebuilder for simplifications.
+ * File for parsing Avia pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -228,7 +228,7 @@ class Avia extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this PageBuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */
