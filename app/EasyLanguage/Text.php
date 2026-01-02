@@ -18,7 +18,7 @@ use easyLanguage\Plugin\Log;
 use WP_User;
 
 /**
- * Object for single translatable text based on DB-dataset.
+ * Object for a single translatable text based on DB-dataset.
  */
 class Text {
 
@@ -60,7 +60,7 @@ class Text {
 	/**
 	 * Constructor for this object.
 	 *
-	 * @param int $id The original object id of this text from originals-table.
+	 * @param int $id The original object id of this text from the originals-table.
 	 */
 	public function __construct( int $id ) {
 		// get db-object.
@@ -89,7 +89,7 @@ class Text {
 	}
 
 	/**
-	 * Set original text.
+	 * Set the original text.
 	 *
 	 * @param string $original The text to translate.
 	 * @return void
@@ -108,7 +108,7 @@ class Text {
 	}
 
 	/**
-	 * Set original text.
+	 * Set the source language.
 	 *
 	 * @param string $language The source-language.
 	 * @return void
@@ -118,9 +118,9 @@ class Text {
 	}
 
 	/**
-	 * Get the simplification of this text in the given language from Db.
+	 * Return the simplification of this text in the given language from Db.
 	 *
-	 * If given language is unknown or no simplification exist,
+	 * If the given language is unknown or no simplification exists,
 	 * return the original text.
 	 *
 	 * @param string $target_language The target language for this simplification.
@@ -148,7 +148,7 @@ class Text {
 	}
 
 	/**
-	 * Get translation of this text in the given language.
+	 * Return the translation of this text in the given language.
 	 *
 	 * @param string $language The language we search.
 	 * @return string
@@ -163,14 +163,14 @@ class Text {
 		// get from DB.
 		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `simplification` FROM ' . Db::get_instance()->get_table_name_simplifications() . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
 		if ( ! empty( $result ) ) {
-			// save in object.
+			// save in the object.
 			$this->simplifications[ $language ] = $result['simplification'];
 
 			// return result.
 			return $result['simplification'];
 		}
 
-		// return empty string if no translation exist.
+		// return an empty string if no translation exists.
 		return '';
 	}
 
@@ -213,16 +213,16 @@ class Text {
 		if ( $wpdb->last_error ) {
 			Log::get_instance()->add_log( __( 'Error during adding simplification of text in DB: ', 'easy-language' ) . $wpdb->last_error, 'error' );
 		} else {
-			// change state of text to "simplified".
+			// change the state of text to "simplified".
 			$this->set_state( 'simplified' );
 
-			// save simplification in object.
+			// save simplification in the object.
 			$this->simplifications[ $target_language ] = $translated_text;
 		}
 	}
 
 	/**
-	 * Replace the original with the translation and save this in object.
+	 * Replace the original with the translation and save this in the object.
 	 *
 	 * @param int    $object_id The object-ID where the text should be replaced.
 	 * @param string $target_language The target language for the translated text.
@@ -241,13 +241,13 @@ class Text {
 		// get object.
 		$object = Helper::get_object( $object_id );
 
-		// bail of object is not an Objects object.
+		// bail of the object is not an Objects object.
 		if ( ! $object instanceof Objects ) {
 			return false;
 		}
 
 		/**
-		 * Replace content in simplification object depending on the field.
+		 * Replace content in the simplification object depending on the field.
 		 */
 		foreach ( $simplification_objects as $translation_object ) {
 			switch ( $translation_object['field'] ) {
@@ -255,7 +255,7 @@ class Text {
 					// replace text depending on used pagebuilder for original text.
 					$obj = $object->get_page_builder();
 
-					// bail if pagebuilder could not be loaded.
+					// bail if the pagebuilder could not be loaded.
 					if ( ! $obj ) {
 						return false;
 					}
@@ -331,9 +331,9 @@ class Text {
 	}
 
 	/**
-	 * Set state of this text.
+	 * Set the state of this text.
 	 *
-	 * Only if it is one of this valid states:
+	 * Only if it is one of these valid states:
 	 * - to_simplify => text will be simplified
 	 * - processing => text is simplified
 	 * - in_use => text has been simplified
@@ -346,7 +346,7 @@ class Text {
 	 * @return void
 	 */
 	public function set_state( string $state ): void {
-		// bail if a not allowed state is used.
+		// bail, if not allowed state, is used.
 		if ( ! in_array( $state, array( 'to_simplify', 'processing', 'in_use', 'ignore' ), true ) ) {
 			return;
 		}
@@ -376,7 +376,7 @@ class Text {
 		// get object count before we do anything.
 		$object_count = count( $this->get_objects() );
 
-		// delete connection between text and given object_id.
+		// delete the connection between text and given object_id.
 		if ( $object_id > 0 ) {
 			$wpdb->delete(
 				Db::get_instance()->get_table_name_originals_objects(),
@@ -396,7 +396,7 @@ class Text {
 			);
 		}
 
-		// if this text is used only from 1 object, delete it completely including its simplifications.
+		// if this text is used only from 1 object, delete it complete, including its simplifications.
 		if ( 1 === $object_count && 1 === absint( get_option( 'easy_language_delete_unused_simplifications', 0 ) ) ) {
 			$wpdb->delete( Db::get_instance()->get_table_name_originals(), array( 'id' => $this->get_id() ) );
 			$wpdb->delete( Db::get_instance()->get_table_name_simplifications(), array( 'oid' => $this->get_id() ) );
@@ -404,7 +404,7 @@ class Text {
 	}
 
 	/**
-	 * Return list of simplification-objects which are using this text.
+	 * Return the list of simplification-objects which are using this text.
 	 *
 	 * @return array<array<string,string>>
 	 */
@@ -436,7 +436,7 @@ class Text {
 	}
 
 	/**
-	 * Set given ID and type as object which is using this text.
+	 * Set the given ID and type as the object that is using this text.
 	 *
 	 * @param string $type The object-type (e.g. post, page, category).
 	 * @param int    $item_id The object-ID from WP.
@@ -465,7 +465,7 @@ class Text {
 	}
 
 	/**
-	 * Get date of this object (when it was saved).
+	 * Return the date of this object (when it was saved).
 	 *
 	 * @return string
 	 */
@@ -488,7 +488,7 @@ class Text {
 	}
 
 	/**
-	 * Return whether this text is used for given field.
+	 * Return whether this text is used for the given field.
 	 *
 	 * @param string $field The requested field (e.g. post_content, title ..).
 	 * @return bool
@@ -506,7 +506,7 @@ class Text {
 	}
 
 	/**
-	 * Get target languages which depends on settings of the objects where the text is used.
+	 * Return the target languages that depend on settings of the objects where the text is used.
 	 *
 	 * @return array<string,string>
 	 * @noinspection PhpUnused
@@ -518,7 +518,7 @@ class Text {
 		// get possible target languages.
 		$languages = $languages_obj->get_possible_target_languages();
 
-		// define resulting array.
+		// define the resulting array.
 		$item_languages = array();
 
 		// loop through the objects of this text.
@@ -526,7 +526,7 @@ class Text {
 			// get the object.
 			$object = Helper::get_object( absint( $object_array['object_id'] ), $object_array['object_type'] );
 
-			// bail if object is unknown.
+			// bail if the object is unknown.
 			if ( ! $object ) {
 				continue;
 			}
@@ -543,7 +543,7 @@ class Text {
 			$item_languages[ $language ] = $languages[ $language ]['label'];
 		}
 
-		// return resulting list.
+		// return the resulting list.
 		return $item_languages;
 	}
 
@@ -572,12 +572,12 @@ class Text {
 			return Apis::get_instance()->get_api_by_name( $result[0]['used_api'] );
 		}
 
-		// get the API-name.
+		// get the API name.
 		return false;
 	}
 
 	/**
-	 * Get user who requested a specific simplification.
+	 * Return the user who requested a specific simplification.
 	 *
 	 * @param string $language The requested language.
 	 * @return int
@@ -592,7 +592,7 @@ class Text {
 			return $result['user_id'];
 		}
 
-		// return zero if no simplification exist.
+		// return zero if no simplification exists.
 		return 0;
 	}
 

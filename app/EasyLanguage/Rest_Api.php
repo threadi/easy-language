@@ -123,10 +123,10 @@ class Rest_Api {
 	 * @return array<string,string>
 	 */
 	public function get_language_options_for_page( WP_REST_Request $data ): array {
-		// get ID of requested object.
+		// get ID of the requested object.
 		$post_id = absint( $data['post'] );
 
-		// bail if not post ID is given.
+		// bail if the post-ID is not given.
 		if ( 0 === $post_id ) {
 			return array();
 		}
@@ -134,7 +134,7 @@ class Rest_Api {
 		// get WP_Post-object.
 		$wp_post_object = get_post( $post_id );
 
-		// bail if post is not WP_Post.
+		// bail if the post is not WP_Post.
 		if ( ! $wp_post_object instanceof WP_Post ) {
 			return array();
 		}
@@ -160,7 +160,7 @@ class Rest_Api {
 	}
 
 	/**
-	 * Run check of our own automatic simplification cron for Tools > Site Health.
+	 * Run the check of our own automatic simplification cron for Tools > Site Health.
 	 *
 	 * @return array<string,mixed>
 	 */

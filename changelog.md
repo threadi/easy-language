@@ -14,7 +14,7 @@
 - Added check against WordPress Plugin Checker during each release
 - Added info in the footer of admin where our plugin adds options or shows settings
 - Added our own intervals for automatic simplifications
-- Added some unit tests to check for potential errors
+- Added more than 100 PHP unit tests to check for potential errors
 
 ### Changed
 
@@ -24,6 +24,10 @@
 - Optimized generating the hook documentation
 - Logging when which update of the plugin has been installed
 - Updated dependencies
+
+### Fixed
+
+- Fixed reading of HTTP status for external API responses
 
 ### Removed
 

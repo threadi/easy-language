@@ -45,50 +45,6 @@ class Db {
 	private function __construct() {}
 
 	/**
-	 * Get table name for the original text.
-	 *
-	 * @return string
-	 */
-	public function get_table_name_originals(): string {
-		return $this->get_wpdb_prefix() . 'easy_language_originals';
-	}
-
-	/**
-	 * Get the table name for the objects where the original texts are used.
-	 *
-	 * @return string
-	 */
-	public function get_table_name_originals_objects(): string {
-		return $this->get_wpdb_prefix() . 'easy_language_originals_objects';
-	}
-
-	/**
-	 * Get the table name for simplifications.
-	 *
-	 * @return string
-	 */
-	public function get_table_name_simplifications(): string {
-		return $this->get_wpdb_prefix() . 'easy_language_simplifications';
-	}
-
-	/**
-	 * Return WP-DB-prefix.
-	 *
-	 * On multisite return the prefix of the main blog as we save all simplifications in the main db
-	 * to prevent double simplifications.
-	 *
-	 * @return string
-	 */
-	public function get_wpdb_prefix(): string {
-		global $wpdb;
-		$prefix = $wpdb->prefix;
-		if ( is_multisite() ) {
-			$prefix = $wpdb->base_prefix;
-		}
-		return $prefix;
-	}
-
-	/**
 	 * Prevent cloning of this object.
 	 *
 	 * @return void
@@ -184,7 +140,7 @@ class Db {
 	public function add( string $text, string $source_language, string $field, bool $html ): false|Text {
 		global $wpdb;
 
-		// bail if text is empty.
+		// bail if the text is empty.
 		if ( empty( $text ) ) {
 			return false;
 		}
@@ -214,8 +170,13 @@ class Db {
 		// get DB-id.
 		$id = $wpdb->insert_id;
 		if ( absint( $id ) ) {
-			// return text-object.
-			return new Text( $id );
+			// optimized the text-object.
+			$text_obj = new Text( $id );
+			$text_obj->set_original( $text );
+			$text_obj->set_source_language( $source_language );
+
+			// return the text-object.
+			return $text_obj;
 		}
 
 		// return error.
@@ -234,10 +195,7 @@ class Db {
 	public function get_entries( array $filter = array(), array $order = array(), int $limit = 0 ): array {
 		global $wpdb;
 
-		// initialize return array.
-		$return = array();
-
-		// set filter depending on parameters this function receives.
+		// set the filter depending on parameters this function receives.
 		$sql_select = '';
 		$sql_join   = array();
 		$sql_where  = ' WHERE 1 = %d';
@@ -309,10 +267,11 @@ class Db {
 				$vars[]      = $filter['object_type'];
 				$vars[]      = absint( get_current_blog_id() );
 			}
-			if ( ! empty( $filter['simplification_hash'] ) ) {
+			if ( ! empty( $filter['simplification_hash'] ) && ! empty( $filter['simplification_lang']) ) {
 				$sql_join[ $this->get_table_name_simplifications() ] = ' INNER JOIN ' . $this->get_table_name_simplifications() . ' s ON s.oid = o.id';
-				$sql_where .= ' AND s.hash = %s';
+				$sql_where .= ' AND s.hash = %s AND s.language = %s';
 				$vars[]     = $filter['simplification_hash'];
+				$vars[]     = $filter['simplification_lang'];
 			}
 			if ( ! empty( $filter['not_locked'] ) ) {
 				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
@@ -355,6 +314,16 @@ class Db {
 
 		// get entries.
 		$results = $wpdb->get_results( $prepared_sql, ARRAY_A );
+
+		// bail if results are empty.
+		if( empty( $results ) ) {
+			return array();
+		}
+
+		// initialize the return array.
+		$return = array();
+
+		// loop through results and add them to the list.
 		foreach ( $results as $result ) {
 			// only add post-type-objects if not_locked is set and if they are not locked.
 			$add = true;
@@ -383,9 +352,9 @@ class Db {
 				}
 			}
 
-			// add entry to list.
+			// add entry to the list.
 			if ( $add ) {
-				// create Text-object for this text.
+				// create the Text-object for this text.
 				$obj = new Text( $result['id'] );
 				$obj->set_original( $result['original'] );
 				$obj->set_source_language( $result['lang'] );
@@ -417,7 +386,7 @@ class Db {
 	 * @return bool|Text
 	 */
 	public function get_entry_by_text( string $text, string $source_language ): bool|Text {
-		// return already loaded object.
+		// return the already loaded object.
 		if ( ! empty( $this->texts[ $this->get_string_hash( $text . $source_language ) ] ) ) {
 			return $this->texts[ $this->get_string_hash( $text . $source_language ) ];
 		}
@@ -449,12 +418,12 @@ class Db {
 	 * @return bool|Text
 	 */
 	public function get_entry_by_simplification( string $simplification, string $language ): bool|Text {
-		// check if object has already been loaded.
+		// check if the object has already been loaded.
 		if ( empty( $this->simplifications[ $this->get_string_hash( $simplification . $language ) ] ) ) {
 			// get object via DB-request.
 			$query     = array(
 				'simplification_hash' => $this->get_string_hash( $simplification ),
-				'lang'                => $language,
+				'simplification_lang' => $language,
 			);
 			$text_objs = $this->get_entries( $query );
 			if ( ! empty( $text_objs ) ) {
@@ -472,7 +441,7 @@ class Db {
 	}
 
 	/**
-	 * Get a hash for a given string.
+	 * Return a hash for a given string.
 	 *
 	 * @param string $text The text to hash.
 	 *
@@ -480,5 +449,49 @@ class Db {
 	 */
 	public function get_string_hash( string $text ): string {
 		return md5( $text );
+	}
+
+	/**
+	 * Return the table name for the original text.
+	 *
+	 * @return string
+	 */
+	public function get_table_name_originals(): string {
+		return $this->get_wpdb_prefix() . 'easy_language_originals';
+	}
+
+	/**
+	 * Return the table name for the objects where the original texts are used.
+	 *
+	 * @return string
+	 */
+	public function get_table_name_originals_objects(): string {
+		return $this->get_wpdb_prefix() . 'easy_language_originals_objects';
+	}
+
+	/**
+	 * Return the table name for simplifications.
+	 *
+	 * @return string
+	 */
+	public function get_table_name_simplifications(): string {
+		return $this->get_wpdb_prefix() . 'easy_language_simplifications';
+	}
+
+	/**
+	 * Return WP-DB-prefix.
+	 *
+	 * On multisite return the prefix of the main blog as we save all simplifications in the main db
+	 * to prevent double simplifications.
+	 *
+	 * @return string
+	 */
+	public function get_wpdb_prefix(): string {
+		global $wpdb;
+		$prefix = $wpdb->prefix;
+		if ( is_multisite() ) {
+			$prefix = $wpdb->base_prefix;
+		}
+		return $prefix;
 	}
 }

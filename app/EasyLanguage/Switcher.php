@@ -81,7 +81,7 @@ class Switcher {
 	 */
 	public function wp_init(): void {
 		// bail if our cpt is already registered.
-		if( post_type_exists( EASY_LANGUAGE_CPT_SWITCHER ) ) {
+		if ( post_type_exists( EASY_LANGUAGE_CPT_SWITCHER ) ) {
 			return;
 		}
 

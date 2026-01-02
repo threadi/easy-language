@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handler for things the ChatGpt supports.
+ * File for handler for things the ChatGPT supports.
  *
  * @source https://platform.openai.com/docs/api-reference/chat/create
  *
@@ -31,7 +31,7 @@ use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use wpdb;
 
 /**
- * Define what ChatGpt supports and what not.
+ * Define what ChatGPT supports and what not.
  */
 class ChatGpt extends Base implements Api_Base {
 
@@ -258,7 +258,7 @@ class ChatGpt extends Base implements Api_Base {
 	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_active_target_languages(): array {
-		// get actual enabled target-languages, if token is given.
+		// get the actual enabled target-languages, if token is given.
 		$target_languages = array();
 		if ( $this->is_chatgpt_token_set() ) {
 			$target_languages = get_option( 'easy_language_chatgpt_target_languages', array() );
@@ -423,9 +423,9 @@ class ChatGpt extends Base implements Api_Base {
 
 		// get default translation languages.
 		$language  = Helper::get_wp_lang();
-		$languages = array( 'de_b1' => '1' );
+		$languages = array( 'de_LS' => '1' );
 		if ( false !== str_contains( $language, 'en_' ) ) {
-			$languages = array( 'en_b1' => '1' );
+			$languages = array( 'en_LS' => '1' );
 		}
 
 		// add setting.
@@ -676,7 +676,7 @@ class ChatGpt extends Base implements Api_Base {
 	 */
 	public function remove_token(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-chatgpt-remove-token', 'nonce' );
+		check_admin_referer( 'easy-language-chatgpt-remove-token', 'nonce' );
 
 		// delete settings.
 		delete_option( 'easy_language_chatgpt_api_key' );

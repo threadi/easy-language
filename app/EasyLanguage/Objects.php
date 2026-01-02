@@ -275,7 +275,7 @@ abstract class Objects {
 				);
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
-				// set error marker for return value.
+				// set an error marker for return value.
 				$this->set_error_marker_for_process();
 
 				// return 0 as we have not simplified anything.
@@ -288,14 +288,14 @@ abstract class Objects {
 			 * - Go back to the failed simplifications.
 			 * - Ignore and do not simplify
 			 */
-			// define filter for entry-loading to check max count of entries for this object.
+			// define filter for entry-loading to check the max count of entries for this object.
 			$filter = array(
 				'object_id'   => $this->get_id(),
 				'object_type' => $this->get_type(),
 				'state'       => 'processing',
 			);
 
-			// get entries which are in process and show error if there are any.
+			// get entries which are in process and show the error if there are any.
 			$entries_in_process = Db::get_instance()->get_entries( $filter );
 			if ( ! empty( $entries_in_process ) ) {
 				// set result.
@@ -325,7 +325,7 @@ abstract class Objects {
 				);
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
-				// set error marker for return value.
+				// set the error marker for return value.
 				$this->set_error_marker_for_process();
 
 				// return 0 as we have not simplified anything.
@@ -400,7 +400,7 @@ abstract class Objects {
 		// counter for simplifications during this run.
 		$c = 0;
 
-		// define filter to get all entries for this object which should be simplified.
+		// define filter to get all entries for this object that should be simplified.
 		$filter = array(
 			'object_id'   => $this->get_id(),
 			'object_type' => $this->get_type(),
@@ -410,7 +410,7 @@ abstract class Objects {
 		// get limited entries.
 		$entries = Db::get_instance()->get_entries( $filter, array(), $limit );
 
-		// if no more texts to simplify found, break the process and show hint depending on progress.
+		// if no more texts to simplify found, break the process and show a hint depending on progress.
 		if ( empty( $entries ) ) {
 			// get max value.
 			$simplification_max = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, array() );
@@ -476,7 +476,7 @@ abstract class Objects {
 			// set max value as count.
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, absint( $simplification_max[ $hash ] ) );
 
-			// remove running marker to mark end of process.
+			// remove running marker to mark the end of the process.
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
 
 			// return max value.
@@ -492,7 +492,7 @@ abstract class Objects {
 
 			// update counter for simplification of texts.
 			$simplification_count_in_loop = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, array() );
-			if ( is_array( $simplification_count_in_loop ) ) {
+			if ( is_array( $simplification_count_in_loop ) && isset( $simplification_count_in_loop[ $hash ] ) ) {
 				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, ++$simplification_count_in_loop[ $hash ] );
 			}
 
@@ -552,7 +552,7 @@ abstract class Objects {
 		$max_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, array() );
 
 		// remove marker for running simplification on this object.
-		if ( absint( $max_simplifications[ $hash ] ) <= absint( $count_simplifications[ $hash ] ) ) {
+		if ( isset( $count_simplifications[ $hash ], $max_simplifications[ $hash ] ) && absint( $max_simplifications[ $hash ] ) <= absint( $count_simplifications[ $hash ] ) ) {
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
 
 			$this->process_simplification_trigger_on_end();
@@ -563,7 +563,7 @@ abstract class Objects {
 	}
 
 	/**
-	 * Process simplification of single text.
+	 * Process simplification of a single text.
 	 *
 	 * @param Api_Simplifications $simplification_obj The simplification-object.
 	 * @param array<string,mixed> $language_mappings The language-mappings.
@@ -638,14 +638,14 @@ abstract class Objects {
 
 		$js_top = '';
 		/**
-		 * Set top for JS-location if page builder which makes it necessary is actually used.
+		 * Set top for JS-location if the page builder which makes it necessary is actually used.
 		 *
 		 * @since 2.2.0 Available since 2.2.0.
 		 * @param string $js_top The top-string.
 		 */
 		$js_top = apply_filters( 'easy_language_js_top', $js_top );
 
-		// set state to "in_use" to mark text as simplified and inserted.
+		// set the state to "in_use" to mark text as simplified and inserted.
 		if ( 0 === $c && $replaced_count > 0 ) {
 			$entry->set_state( 'in_use' );
 
@@ -700,7 +700,7 @@ abstract class Objects {
 			return 0;
 		}
 
-		// set state to in_use.
+		// set the state to in_use.
 		$entry->set_state( 'in_use' );
 
 		// return simplification-count.
@@ -864,7 +864,7 @@ abstract class Objects {
 	}
 
 	/**
-	 * Add simplification object to this object if it is a not simplifiable object.
+	 * Add a simplification object to this object if it is a not simplifiable object.
 	 *
 	 * @param string   $target_language The target-language.
 	 * @param Api_Base $api_object The API to use.
@@ -904,7 +904,7 @@ abstract class Objects {
 	}
 
 	/**
-	 * Call API to simplify single text.
+	 * Call API to simplify a single text.
 	 *
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.

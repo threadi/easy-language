@@ -23,7 +23,7 @@ use WP_Term;
  */
 class Post_Object extends Objects implements Easy_Language_Interface {
 	/**
-	 * Get simplification type.
+	 * Return simplification type.
 	 *
 	 * @return string
 	 */
@@ -38,7 +38,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return the object language depending on object type.
+	 * Return the object language depending on the object type.
 	 *
 	 * @return array<string,array<string,string>>
 	 */
@@ -69,20 +69,20 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 * @return string
 	 */
 	public function get_type(): string {
-		// get the post type.
+		// get the post-type.
 		$post_type = get_post_type( $this->get_id() );
 
-		// bail if post type could not be returned.
+		// bail if post-type could not be returned.
 		if ( ! $post_type ) {
 			return '';
 		}
 
-		// return the post type.
+		// return the post-type.
 		return $post_type;
 	}
 
 	/**
-	 * Get post-ID of the original post.
+	 * Return post-ID of the original post.
 	 *
 	 * @return int
 	 */
@@ -91,7 +91,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return the post_id of the simplification of this object in a given language.
+	 * Return the simplified post_id of this object in a given language.
 	 *
 	 * @param string $language_code The language we search.
 	 *
@@ -172,30 +172,30 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Get WP-own post object as array.
+	 * Return the WP-own post-object as an array.
 	 *
 	 * @return array<int|string,mixed>
 	 */
 	public function get_object_as_array(): array {
-		// get post as array.
+		// get to post as an array.
 		$post = get_post( $this->get_id(), ARRAY_A );
 
-		// bail if returned value is not an array.
+		// bail if the returned value is not an array.
 		if ( ! is_array( $post ) ) {
 			return array();
 		}
 
-		// return the post as array.
+		// return the post as an array.
 		return $post;
 	}
 
 	/**
-	 * Get WP-own post object as WP-object.
+	 * Return the WP-own post-object as WP-object.
 	 *
 	 * @return WP_Post|WP_Term|false
 	 */
 	public function get_object_as_object(): WP_Post|WP_Term|false {
-		// get post as object.
+		// get post as an object.
 		$post = get_post( $this->get_id() );
 
 		// bail if returned value is not an object.
@@ -203,7 +203,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			return false;
 		}
 
-		// return the post as object.
+		// return the post as an object.
 		return $post;
 	}
 
@@ -235,7 +235,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return the language specific URL for this object.
+	 * Return the language-specific URL for this object.
 	 *
 	 * @param string $slug The slug of the language.
 	 * @param string $language_code The language-code.
@@ -247,7 +247,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		// define target-url.
 		$url = trailingslashit( $slug );
 
-		// if actual object is simplified, link to the simplified object.
+		// if an actual object is simplified, link to the simplified object.
 		if ( $this->is_simplified_in_language( $language_code ) ) {
 			if ( in_array( get_option( 'easy_language_switcher_link', '' ), array( 'hide_not_translated', 'link_translated' ), true ) ) {
 				$url = get_permalink( $this->get_simplification_in_language( $language_code ) );
@@ -319,7 +319,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Add a language as simplified language to simplifiable object.
+	 * Add a language as a simplified language to the simplifiable object.
 	 *
 	 * @param string $target_language The language we search.
 	 *
@@ -358,7 +358,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		// get actual value.
 		$value = get_post_meta( $this->get_id(), 'easy_language_simplified_in', true );
 
-		// remove language from list.
+		// remove language from the list.
 		$value = str_replace( ',' . $target_language . ',', '', $value );
 		if ( empty( $value ) ) {
 			delete_post_meta( $this->get_id(), 'easy_language_simplified_in' );
@@ -410,7 +410,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Get link to create a simplification of the actual object with given language.
+	 * Return the link to create a simplification of the actual object with the given language.
 	 *
 	 * @param string $language_code The language we search.
 	 *
@@ -434,15 +434,15 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 * @return string
 	 */
 	public function get_status(): string {
-		// get post status.
+		// get the post-status.
 		$post_status = get_post_status( $this->get_id() );
 
-		// bail if no post status is found.
+		// bail if no post-status is found.
 		if ( ! $post_status ) {
 			return '';
 		}
 
-		// return the post status.
+		// return the post-status.
 		return $post_status;
 	}
 
@@ -457,7 +457,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			return false;
 		}
 
-		// get list of simplifications in languages.
+		// get the list of simplifications for this object in languages.
 		$languages = get_post_meta( $this->get_id(), 'easy_language_simplified_in', true );
 
 		// return true if the list is not empty.
@@ -481,7 +481,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	/**
 	 * Return whether this object is locked or not.
 	 *
-	 * @return bool true if object is locked.
+	 * @return bool true if the object is locked.
 	 */
 	public function is_locked(): bool {
 		if ( ! function_exists( 'wp_check_post_lock' ) ) {
@@ -491,7 +491,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		// get lock status.
 		$lock = wp_check_post_lock( $this->get_id() );
 
-		// if lock is an integer, it is locked.
+		// if the lock value is an integer, it is locked.
 		if ( ! is_bool( $lock ) ) {
 			return true;
 		}
@@ -511,7 +511,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Add simplification object to this object if it is a not simplifiable object.
+	 * Add a simplification object to this object if it is a not simplifiable object.
 	 *
 	 * @param string   $target_language The target-language.
 	 * @param Api_Base $api_object The API to use.
@@ -530,7 +530,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 				$source_language = Helper::get_wp_lang();
 			}
 
-			// get array with post-data of the original.
+			// get the array with post-data of the original.
 			$post_array = $this->get_object_as_array();
 
 			// remove some settings.
@@ -542,12 +542,12 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			// add the copy.
 			$copied_post_id = wp_insert_post( $post_array ); // @phpstan-ignore argument.type
 
-			// bail if post could not be created.
+			// bail if the post could not be created.
 			if ( is_wp_error( $copied_post_id ) ) { // @phpstan-ignore function.impossibleType
 				return false;
 			}
 
-			// copy taxonomies and post-metas of this post type object.
+			// copy taxonomies and post-metas of this post-type object.
 			Helper::copy_cpt( $this->get_id(), $copied_post_id );
 
 			// mark the copied post as simplified-object of the original.
@@ -568,22 +568,22 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			// set the language for the original object.
 			update_post_meta( $this->get_id(), 'easy_language_text_language', $source_language );
 
-			// parse text depending on used pagebuilder for this object.
+			// parse text depending on the used pagebuilder for this object.
 			$pagebuilder_obj = $this->get_page_builder();
 
-			// bail if page builder could not be loaded.
+			// bail if the page builder could not be loaded.
 			if ( ! $pagebuilder_obj instanceof Parser_Base ) {
 				return false;
 			}
 
-			// set settings on page builder object.
+			// set settings on a page builder object.
 			$pagebuilder_obj->set_object_id( $copied_post_id );
 			$pagebuilder_obj->set_title( $this->get_title() );
 			$pagebuilder_obj->set_text( $this->get_content() );
 
 			// loop through the resulting texts and add each one for simplification.
 			foreach ( $pagebuilder_obj->get_parsed_texts() as $index => $text ) {
-				// bail if text is empty.
+				// bail if the text is empty.
 				if ( empty( $text['text'] ) ) {
 					continue;
 				}
@@ -618,7 +618,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			$original_title_obj->set_object( $this->get_type(), $copied_post_id, 0, $pagebuilder_obj->get_name() );
 			$original_title_obj->set_state( 'to_simplify' );
 
-			// add this language as simplified language to original post.
+			// add this language as simplified language to the original post.
 			$this->add_language( $target_language );
 
 			// set marker to reset permalinks.
@@ -627,7 +627,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			// set lock on post to prevent automatic simplification.
 			wp_set_post_lock( $copied_post_id );
 
-			// get object of copy.
+			// get the copy as "Post_Object".
 			$copy_post_obj = new Post_Object( $copied_post_id );
 
 			// run pagebuilder-specific tasks.
@@ -654,7 +654,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return language-specific title for the type of the given object.
+	 * Return the language-specific title for the type of the given object.
 	 *
 	 * @return string
 	 */
@@ -701,7 +701,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		// return the default edit link as fallback.
 		$edit_post_link = get_edit_post_link( $this->get_id() );
 
-		// bail if post link could not be loaded.
+		// bail if post-link could not be loaded.
 		if ( ! is_string( $edit_post_link ) ) {
 			return '';
 		}
@@ -711,7 +711,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Call object-specific trigger after processed simplification.
+	 * Call an object-specific trigger after processed simplification.
 	 *
 	 * @return void
 	 */

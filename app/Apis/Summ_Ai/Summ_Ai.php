@@ -493,7 +493,7 @@ class Summ_Ai extends Base implements Api_Base {
 	}
 
 	/**
-	 * Get quota as array containing 'character_spent' and 'character_limit'.
+	 * Get quota as an array containing 'character_spent' and 'character_limit'.
 	 *
 	 * @return array<string,mixed>
 	 */
@@ -572,7 +572,7 @@ class Summ_Ai extends Base implements Api_Base {
 	}
 
 	/**
-	 * Enable-routines for the API, called on the new API if another API is chosen.
+	 * Enable-routines for the API, called on the new API if APIs are switched.
 	 *
 	 * @return void
 	 */
@@ -963,15 +963,15 @@ class Summ_Ai extends Base implements Api_Base {
 			return $value;
 		}
 
-		// if no token has been entered, show hint.
+		// if no token has been entered, show a hint.
 		if ( empty( $value ) ) {
-			// set API-mode to 'free'.
+			// set API mode to 'free'.
 			$this->set_mode( 'free' );
 
 			// show error.
 			add_settings_error( 'easy_language_summ_ai_api_key', 'easy_language_summ_ai_api_key', __( 'You did not enter an API key. You will now use the free quota, if available.', 'easy-language' ) );
 		} elseif ( 0 !== strcmp( $value, get_option( 'easy_language_summ_ai_api_key', '' ) ) ) {
-			// if token has been changed, run tests with it.
+			// if the token has been changed, run tests with it.
 			// switch mode to paid for test.
 			$mode = $this->mode;
 			$this->set_mode( 'paid' );
@@ -993,7 +993,7 @@ class Summ_Ai extends Base implements Api_Base {
 				// get quota of the given key.
 				$this->get_quota_from_api( $value );
 
-				// set API-mode to 'paid'.
+				// set API mode to 'paid'.
 				$this->set_mode( 'paid' );
 
 				// log the event.
@@ -1234,7 +1234,7 @@ class Summ_Ai extends Base implements Api_Base {
 	}
 
 	/**
-	 * Send test request to API.
+	 * Send a test request to API.
 	 *
 	 * @param string $token The token to use.
 	 *
@@ -1302,7 +1302,7 @@ class Summ_Ai extends Base implements Api_Base {
 	}
 
 	/**
-	 * Set mode for this API (paid or free).
+	 * Set a mode for this API (paid or free).
 	 *
 	 * @param string $mode The mode to set.
 	 *
@@ -1310,7 +1310,7 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	private function set_mode( string $mode ): void {
 		if ( in_array( $mode, array( 'paid', 'free' ), true ) ) {
-			// set in object.
+			// set in an object.
 			$this->mode = $mode;
 
 			// save in db.

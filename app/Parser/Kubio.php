@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Kubio pagebuilder for simplifications.
+ * File for parsing Kubio pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -151,7 +151,7 @@ class Kubio extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */

@@ -82,7 +82,7 @@ class Log {
 	}
 
 	/**
-	 * Remove log-table on uninstallation.
+	 * Remove the log-table on uninstallation.
 	 *
 	 * @return void
 	 */
@@ -138,12 +138,55 @@ class Log {
 	}
 
 	/**
-	 * Delete all entries which are older than X days.
+	 * Delete all entries that are older than X days.
 	 *
 	 * @return void
 	 */
 	private function clean_log(): void {
 		global $wpdb;
 		$wpdb->query( $wpdb->prepare( 'DELETE FROM `' . $this->get_table_name() . '` WHERE 1 = %d AND `time` < DATE_SUB(NOW(), INTERVAL %d DAY)', array( 1, absint( get_option( 'easy_language_log_max_age', 50 ) ) ) ) );
+	}
+
+	/**
+	 * Return base-SQL-statement to get api logs.
+	 *
+	 * @return string
+	 */
+	private function get_base_sql(): string {
+		return 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM `' . $this->get_table_name() . '` WHERE 1 = %1$d';
+	}
+
+	/**
+	 * Return the entries for this log object.
+	 *
+	 * @return array<string,mixed>
+	 */
+	public function get_entries(): array {
+		global $wpdb;
+
+		// order table.
+		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( is_null( $order_by ) ) {
+			$order_by = 'date';
+		}
+		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( ! is_null( $order ) ) {
+			$order = sanitize_sql_orderby( (string) $order );
+		} else {
+			$order = 'DESC';
+		}
+
+		// define vars for prepared statement.
+		$vars = array(
+			1,
+			$order_by,
+			$order,
+		);
+
+		// get the SQL statement.
+		$sql = $this->get_base_sql() . ' ORDER BY %2$s %3$s, `id` DESC';
+
+		// get results and return them.
+		return $wpdb->get_results( $wpdb->prepare( $sql, $vars ), ARRAY_A );
 	}
 }

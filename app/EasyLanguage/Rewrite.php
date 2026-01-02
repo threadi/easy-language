@@ -82,9 +82,9 @@ class Rewrite {
 	}
 
 	/**
-	 * Set to refresh the rewrite rules on next request.
+	 * Set to refresh the rewrite rules on the next request.
 	 *
-	 * This is not run via Transient-object as we must use it via wp-hook.
+	 * This is not run via the @Transient-object as we must use it via wp-hook.
 	 *
 	 * @return void
 	 */
@@ -170,7 +170,7 @@ class Rewrite {
 	}
 
 	/**
-	 * Do not redirect URLs if requested URL contains a language-code from our plugin.
+	 * Do not redirect URLs if the requested URL contains a language-code from our plugin.
 	 *
 	 * @param string $redirect_url The URL to redirect to.
 	 * @param string $requested_url The requested URL.

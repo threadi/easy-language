@@ -52,7 +52,7 @@ class Languages extends Base_Data_Control {
 		$language_array = $post_object->get_language();
 
 		// return merge of both settings.
-		return array_merge( $language_array, \easyLanguage\Languages::get_instance()->get_active_languages() );
+		return array_merge( $language_array, \easyLanguage\Plugin\Languages::get_instance()->get_active_languages() );
 	}
 
 	/**

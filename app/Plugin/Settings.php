@@ -83,7 +83,7 @@ class Settings {
 		$settings_obj->set_slug( 'easy_language' );
 		$settings_obj->set_plugin_slug( plugin_basename( EASY_LANGUAGE ) );
 		$settings_obj->set_menu_title( _x( 'Easy Language', 'settings menu title', 'easy-language' ) );
-		$settings_obj->set_title( __( 'Easy Language settings', 'easy-language' ) );
+		$settings_obj->set_title( __( 'Easy Language Settings', 'easy-language' ) );
 		$settings_obj->set_menu_slug( 'easy_language_settings' );
 		$settings_obj->set_menu_parent_slug( 'options-general.php' );
 		$settings_obj->set_url( Helper::get_plugin_url() . '/app/Dependencies/easySettingsForWordPress/' );

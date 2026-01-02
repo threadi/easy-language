@@ -1,0 +1,11 @@
+{
+	"choices": [
+		{
+			"delta": 0,
+			"message": {
+				"role": "assistant",
+				"content": "Das ist ein vereinfachter Beispiel Text."
+			}
+		}
+	]
+}

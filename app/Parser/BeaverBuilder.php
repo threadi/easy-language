@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling BeaverBuilder pagebuilder for simplifications.
+ * File for parsing BeaverBuilder pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -185,7 +185,7 @@ class BeaverBuilder extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */

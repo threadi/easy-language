@@ -107,7 +107,7 @@ class Admin {
 			 * Show hint if the foreign plugin does NOT support APIs.
 			 */
 			/* translators: %1$s will be replaced by the name of the multilingual-plugin */
-			$message = sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional language.', 'easy-language' ), $plugin_obj->get_title() );
+			$message = sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional languages.', 'easy-language' ), $plugin_obj->get_title() );
 			if ( false === $plugin_obj->is_supporting_apis() ) {
 				/* translators: %1$s will be replaced by the name of the multilingual-plugin */
 				$message .= '<br><br>' . sprintf( __( 'Due to limitations of %1$s, it is unfortunately not possible for us to provide automatic simplification for easy or plain language. If you want to use this, you could use the <i>Easy Language</i> plugin alongside %1$s.', 'easy-language' ), esc_html( $plugin_obj->get_title() ), esc_html( $plugin_obj->get_title() ) );
@@ -116,7 +116,7 @@ class Admin {
 			$transient_obj->save();
 		}
 
-		// remove first step hint if API-settings are called.
+		// remove the first step hint if the API settings are called.
 		$transient_obj = $transients_obj->get_transient_by_name( 'easy_language_intro_step_1' );
 		$page          = filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		if ( 'options-general.php' === $pagenow && ! empty( $page ) && 'easy_language_settings' === $page && $transient_obj->is_set() ) {
@@ -164,7 +164,7 @@ class Admin {
 				'title_rate_us'               => __( 'Add your review for this plugin', 'easy-language' ),
 				'dismiss_intro_nonce'         => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),
 				/* translators: %1$s will be replaced by the path to the easy language icon */
-				'intro_step_2'                => sprintf( __( '<p><img src="%1$s" alt="Easy Language Logo"><strong>Start to simplify texts in your pages.</strong></p><p>Simply click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
+				'intro_step_2'                => sprintf( __( '<p><img src="%1$s" alt="Easy Language Logo"><strong>Start to simplify texts in your pages.</strong></p><p>Click here and choose which page you want to translate.</p>', 'easy-language' ), Helper::get_plugin_url() . '/gfx/easy-language-icon.png' ),
 			)
 		);
 
@@ -215,11 +215,11 @@ class Admin {
 	 * @return void
 	 */
 	public function add_dialog(): void {
-		// embed the necessary scripts for dialog.
+		// embed the necessary scripts for the dialog.
 		$path = Helper::get_plugin_path() . 'vendor/threadi/easy-dialog-for-wordpress/';
 		$url  = Helper::get_plugin_url() . 'vendor/threadi/easy-dialog-for-wordpress/';
 
-		// bail if path does not exist.
+		// bail if the path does not exist.
 		if ( ! file_exists( $path ) ) {
 			return;
 		}
@@ -254,7 +254,7 @@ class Admin {
 	}
 
 	/**
-	 * Show hint in footer in backend on all pages this plugin adds options.
+	 * Show hint in footer in the backend on all pages this plugin adds options.
 	 *
 	 * @param string $content The actual footer content.
 	 *

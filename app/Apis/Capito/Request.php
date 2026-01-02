@@ -212,7 +212,7 @@ class Request implements Api_Requests {
 		// secure start-time.
 		$start_time = microtime( true );
 
-		// send request and get the result-object.
+		// send the request and get the result-object.
 		$this->result = wp_remote_post( $this->url, $args );
 
 		// secure end-time.
@@ -225,9 +225,9 @@ class Request implements Api_Requests {
 		$this->response = wp_remote_retrieve_body( $this->get_result() );
 
 		// secure http-status.
-		$this->http_status = absint( wp_remote_retrieve_response_code( $this->get_result() ) );
+		$this->http_status = $this->get_result()['http_response']->get_status();
 
-		// log the request (with anonymized token).
+		// log the request (with an anonymized token).
 		$args['headers']['Authorization'] = 'anonymized';
 		$args['url']                      = $this->url;
 		$args                             = wp_json_encode( $args );
@@ -236,12 +236,12 @@ class Request implements Api_Requests {
 		}
 		Log_Api::get_instance()->add_log( $capito_obj->get_name(), $this->http_status, $args, 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
 
-		// save request and result in db.
+		// save the request and result in db.
 		$this->save_in_db();
 	}
 
 	/**
-	 * Return the response of the request.
+	 * Return the response.
 	 *
 	 * @return string
 	 */
@@ -250,7 +250,7 @@ class Request implements Api_Requests {
 	}
 
 	/**
-	 * Return the response of this request.
+	 * Return the response.
 	 *
 	 * @return int
 	 */

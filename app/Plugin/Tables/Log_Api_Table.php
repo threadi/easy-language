@@ -1,6 +1,6 @@
 <?php
 /**
- * File for output of logged entries for API-actions in a table in WP-admin.
+ * File for the output of logged entries for API actions in a table in WP-admin.
  *
  * @package easy-language
  */
@@ -72,8 +72,8 @@ class Log_Api_Table extends WP_List_Table {
 			$vars[] = $api;
 		}
 
-		// get statement.
-		$sql = $this->get_base_sql() . $where . ' ORDER BY %2$s %3$s';
+		// get the SQL statement.
+		$sql = $this->get_base_sql() . $where . ' ORDER BY %2$s %3$s, `id` DESC';
 
 		// get results and return them.
 		return $wpdb->get_results( $wpdb->prepare( $sql, $vars ), ARRAY_A );
@@ -176,12 +176,12 @@ class Log_Api_Table extends WP_List_Table {
 			$list[ $api ] = '<a href="' . esc_url( $url ) . '">' . esc_html( $api_object->get_title() ) . '</a>';
 		}
 
-		// return resulting list.
+		// return the resulting list.
 		return $list;
 	}
 
 	/**
-	 * Add export-buttons on top of table.
+	 * Add export buttons on top of the table.
 	 *
 	 * @param string $which Position.
 	 * @return void
@@ -242,7 +242,7 @@ class Log_Api_Table extends WP_List_Table {
 			return '';
 		}
 
-		// return the API from request.
+		// return the API from the request.
 		return $api;
 	}
 
@@ -256,7 +256,7 @@ class Log_Api_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Return HTML-code for icon of the given status.
+	 * Return HTML code for the icon of the given status.
 	 *
 	 * @param string $status The requested status.
 	 *
@@ -270,7 +270,7 @@ class Log_Api_Table extends WP_List_Table {
 		);
 
 		/**
-		 * Filter the list of possible states in log table.
+		 * Filter the list of possible states in the log table.
 		 *
 		 * @since 2.8.0 Available since 2.8.0.
 		 *
@@ -283,7 +283,7 @@ class Log_Api_Table extends WP_List_Table {
 			return '';
 		}
 
-		// return the HTML-code for the icon of this status.
+		// return the HTML code for the icon of this status.
 		return $list[ $status ];
 	}
 }

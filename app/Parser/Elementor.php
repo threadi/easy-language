@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Elementor pagebuilder for simplifications.
+ * File for parsing Elementor pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -13,13 +13,12 @@ defined( 'ABSPATH' ) || exit;
 use easyLanguage\EasyLanguage\Objects;
 use Elementor\Core\Files\CSS\Post as Post_CSS;
 use Elementor\Plugin;
-use easyLanguage\Plugin\Helper;
 use easyLanguage\EasyLanguage\Parser;
 use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
 
 /**
- * Handler for parsing Elementor-blocks.
+ * Handler for parsing Elementor-widgets.
  */
 class Elementor extends Parser_Base implements Parser {
 	/**
@@ -129,7 +128,7 @@ class Elementor extends Parser_Base implements Parser {
 	 * @return array<array<string,mixed>>
 	 */
 	public function get_parsed_texts(): array {
-		// do nothing if elementor is not active.
+		// do nothing if Elementor is not active.
 		if ( false === $this->is_elementor_active() ) {
 			return array();
 		}
@@ -163,7 +162,7 @@ class Elementor extends Parser_Base implements Parser {
 	 * @return string
 	 */
 	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
-		// do nothing if elementor is not active.
+		// do nothing if Elementor is not active.
 		if ( false === $this->is_elementor_active() ) {
 			return $original_complete;
 		}
@@ -223,7 +222,7 @@ class Elementor extends Parser_Base implements Parser {
 			$resulting_texts = $this->get_widgets( $sub_widget, $resulting_texts );
 		}
 
-		// return resulting list.
+		// return the resulting list.
 		return $resulting_texts;
 	}
 
@@ -264,12 +263,12 @@ class Elementor extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether Elementor is active.
+	 * Return whether the plugin Elementor is active.
 	 *
 	 * @return bool
 	 */
 	private function is_elementor_active(): bool {
-		return Helper::is_plugin_active( 'elementor/elementor.php' );
+		return \easyLanguage\PageBuilder\Elementor::get_instance()->is_active();
 	}
 
 	/**
@@ -296,7 +295,7 @@ class Elementor extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */

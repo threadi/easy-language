@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handler for logging API-actions in this plugin.
+ * File for handler for logging API actions in this plugin.
  *
  * @package easy-language
  */
@@ -83,7 +83,7 @@ class Log_Api {
 	}
 
 	/**
-	 * Remove log-table on uninstallation.
+	 * Remove the log-table on uninstallation.
 	 *
 	 * @return void
 	 */
@@ -97,8 +97,8 @@ class Log_Api {
 	 *
 	 * @param string $api The used API.
 	 * @param int    $http_state The http-state of the request.
-	 * @param string $request The request as dump.
-	 * @param string $response The response as dump.
+	 * @param string $request The request as a dump.
+	 * @param string $response The response as a dump.
 	 * @return void
 	 */
 	public function add_log( string $api, int $http_state, string $request, string $response ): void {
@@ -145,7 +145,7 @@ class Log_Api {
 	}
 
 	/**
-	 * Delete all entries which are older than X days.
+	 * Delete all entries that are older than X days.
 	 *
 	 * @return void
 	 */

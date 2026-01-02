@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling SiteOrigin pagebuilder for simplifications.
+ * File for parsing SiteOrigin pagebuilder for simplifications.
  *
  * @package easy-language
  */

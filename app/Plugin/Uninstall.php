@@ -97,7 +97,7 @@ class Uninstall {
 				$this->deactivation_tasks();
 			}
 
-			// switch back to original blog.
+			// switch back to the original blog.
 			switch_to_blog( $original_blog_id );
 		} else {
 			// simply run the tasks on single-site-install.
@@ -227,7 +227,7 @@ class Uninstall {
 			// get the role object by its name.
 			$role = get_role( $role_name );
 
-			// bail if role could not be loaded.
+			// bail if the role could not be loaded.
 			if ( ! $role instanceof WP_Role ) {
 				continue;
 			}
@@ -236,18 +236,6 @@ class Uninstall {
 			foreach ( Init::get_instance()->get_capabilities( 'el_simplifier', 'el_simplifier' ) as $capability ) {
 				$role->remove_cap( $capability );
 			}
-		}
-
-		// delete transients.
-		foreach ( Transients::get_instance()->get_transients( false, true ) as $transient_obj ) {
-			// bail if the object is not ours.
-			if ( ! $transient_obj instanceof Transient ) { // @phpstan-ignore instanceof.alwaysTrue
-				continue;
-			}
-
-			// delete transient-data.
-			$transient_obj->delete();
-			$transient_obj->delete_dismiss();
 		}
 	}
 
