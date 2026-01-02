@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Brizy pagebuilder for simplifications.
+ * File for parsing Brizy pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -227,7 +227,7 @@ class Brizy extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */
@@ -236,7 +236,7 @@ class Brizy extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Prevent translate-option in frontend.
+	 * Prevent a translate-option in the frontend.
 	 *
 	 * @return bool
 	 */
@@ -290,7 +290,7 @@ class Brizy extends Parser_Base implements Parser {
 	 * @return array<string,mixed>
 	 */
 	private function replace_content_in_widgets( array $container, string $simplified_part ): array {
-		// get list of flow text widgets.
+		// get a list of flow text widgets.
 		$flow_text_widgets = $this->get_flow_text_widgets();
 
 		foreach ( $container as $index => $section ) {

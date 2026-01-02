@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Breakdance pagebuilder for simplifications.
+ * File for parsing Breakdance pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -279,7 +279,7 @@ class Breakdance extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */

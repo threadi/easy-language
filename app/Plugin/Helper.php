@@ -19,6 +19,8 @@ use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
 use WP_Admin_Bar;
 use WP_Error;
+use WP_Filesystem_Base;
+use WP_Filesystem_Direct;
 use WP_Post;
 use WP_Post_Type;
 use WP_Query;
@@ -234,31 +236,6 @@ class Helper {
 	}
 
 	/**
-	 * Validate multiple select fields.
-	 *
-	 * @param array<string,mixed>|null $values The list of values.
-	 *
-	 * @return array<string,mixed>|null
-	 */
-	public static function settings_validate_multiple_select_fields( ?array $values ): ?array {
-		$filter = current_filter();
-		if ( ! empty( $filter ) ) {
-			$filter = str_replace( 'sanitize_option_', '', $filter );
-			if ( empty( $values ) ) {
-				$pre_values = filter_input( INPUT_POST, $filter . '_ro', FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_FORCE_ARRAY );
-				if ( ! empty( $pre_values ) ) {
-					// set the callback for array_map.
-					$callback = 'sanitize_text_field';
-
-					// run the sanitizing.
-					$values = array_map( $callback, $pre_values );
-				}
-			}
-		}
-		return $values;
-	}
-
-	/**
 	 * Validate multiple text fields.
 	 *
 	 * @param array<string,mixed>|null $values The list of values.
@@ -337,7 +314,7 @@ class Helper {
 	}
 
 	/**
-	 * Get attachment by given language-code via post-meta of the attachment.
+	 * Return the attachment object by given language-code via post-meta of the attachment.
 	 *
 	 * @param string $language_code The search language code.
 	 *
@@ -366,7 +343,7 @@ class Helper {
 		// get first result.
 		$post = $attachment->posts[0];
 
-		// bail if attachment is not WP_Post.
+		// bail if the attachment is not WP_Post.
 		if ( ! $post instanceof WP_Post ) {
 			return false;
 		}
@@ -837,5 +814,46 @@ class Helper {
 
 		// return the hidden section object.
 		return $hidden_section;
+	}
+
+	/**
+	 * Return the WP Filesystem object.
+	 *
+	 * @param bool $local True, to get the local filesystem object.
+	 *
+	 * @return WP_Filesystem_Base
+	 */
+	public static function get_wp_filesystem( bool $local = false ): WP_Filesystem_Base {
+		// get WP Filesystem-handler for local files if requested.
+		if ( $local ) {
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+
+			return new WP_Filesystem_Direct( false );
+		}
+
+		// get global WP Filesystem handler.
+		require_once ABSPATH . '/wp-admin/includes/file.php';
+		\WP_Filesystem();
+		global $wp_filesystem;
+
+		// bail if wp_filesystem is not of "WP_Filesystem_Base".
+		if ( ! $wp_filesystem instanceof WP_Filesystem_Base ) {
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+			return new WP_Filesystem_Direct( false );
+		}
+
+		// return the local object on any error.
+		if ( $wp_filesystem->errors->has_errors() ) {
+			// embed the local directory object.
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
+			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+
+			return new WP_Filesystem_Direct( false );
+		}
+
+		// return the requested filesystem object.
+		return $wp_filesystem;
 	}
 }

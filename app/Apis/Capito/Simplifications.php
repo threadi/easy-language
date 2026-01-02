@@ -57,14 +57,14 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 	}
 
 	/**
-	 * Call API to simplify single text.
+	 * Call API to simplify a single text.
 	 *
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.
 	 * @param string $target_language The target language of the text.
 	 * @param bool   $is_html Marker if the text contains HTML-Code.
 	 * @param bool   $is_test Marker if this is a rest request.
-	 * @return array<string,int|string> The result as array.
+	 * @return array<string,int|string> The result as an array.
 	 * @noinspection PhpUnused
 	 */
 	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html, bool $is_test = false ): array {
@@ -113,7 +113,7 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 			 */
 			$simplified_text = apply_filters( 'easy_language_simplified_text', $simplified_text, $response_array, $instance );
 
-			// return simplification to plugin which will save it.
+			// return simplification to the plugin which will save it.
 			return array(
 				'translated_text' => $simplified_text,
 				'jobid'           => 0,

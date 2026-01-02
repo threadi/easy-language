@@ -159,7 +159,7 @@ class Init {
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array<string,string> $post_type_names List of post type names.
+		 * @param array<string,string> $post_type_names List of the post type names.
 		 */
 		return apply_filters( 'easy_language_post_type_names', $post_type_names );
 	}

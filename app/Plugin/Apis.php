@@ -123,7 +123,7 @@ class Apis {
 				continue;
 			}
 
-			// return this object as active API.
+			// return this object as the active API.
 			return $api_obj;
 		}
 		return false;
@@ -143,7 +143,7 @@ class Apis {
 				continue;
 			}
 
-			// return this object as matching object.
+			// return this object as the matching object.
 			return $api_obj;
 		}
 		return false;
@@ -209,7 +209,7 @@ class Apis {
 	}
 
 	/**
-	 * Clear API log for specific API.
+	 * Clear API log for the specified API.
 	 *
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection

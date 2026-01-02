@@ -11,6 +11,7 @@ namespace easyLanguage\Plugin\Tables;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Plugin\Helper;
+use easyLanguage\Plugin\Log;
 use WP_List_Table;
 use WP_User;
 
@@ -38,32 +39,7 @@ class Log_Table extends WP_List_Table {
 	 * @return array<string,mixed>
 	 */
 	private function table_data(): array {
-		global $wpdb;
-
-		// order table.
-		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( is_null( $order_by ) ) {
-			$order_by = 'date';
-		}
-		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( ! is_null( $order ) ) {
-			$order = sanitize_sql_orderby( (string) $order );
-		} else {
-			$order = 'DESC';
-		}
-
-		// define vars for prepared statement.
-		$vars = array(
-			1,
-			$order_by,
-			$order,
-		);
-
-		// get statement.
-		$sql = $this->get_base_sql() . ' ORDER BY %2$s %3$s';
-
-		// get results and return them.
-		return $wpdb->get_results( $wpdb->prepare( $sql, $vars ), ARRAY_A );
+		return Log::get_instance()->get_entries();
 	}
 
 	/**
@@ -139,16 +115,7 @@ class Log_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Return base-SQL-statement to get api logs.
-	 *
-	 * @return string
-	 */
-	private function get_base_sql(): string {
-		return 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM `' . \easyLanguage\Plugin\Log::get_instance()->get_table_name() . '` WHERE 1 = %1$d';
-	}
-
-	/**
-	 * Return HTML-code for icon of the given status.
+	 * Return HTML code for the icon of the given status.
 	 *
 	 * @param string $status The requested status.
 	 *

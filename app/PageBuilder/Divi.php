@@ -91,7 +91,7 @@ class Divi extends PageBuilder_Base {
 			'depends_on_post_type' => array_keys( Init::get_instance()->get_supported_post_types() ),
 		);
 
-		// return list of fields.
+		// return the list of fields.
 		return $fields;
 	}
 
@@ -101,7 +101,7 @@ class Divi extends PageBuilder_Base {
 	 * @return void
 	 */
 	public function add_scripts_and_styles(): void {
-		// add styles for language field in Divi-settings.
+		// add styles for the language field in Divi-settings.
 		wp_register_style(
 			'easy-language-language-field',
 			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'legacy-classes/Divi/build/style-language_field.css',
@@ -110,7 +110,7 @@ class Divi extends PageBuilder_Base {
 		);
 		wp_enqueue_style( 'easy-language-language-field' );
 
-		// add script for language field in Divi-settings.
+		// add a script for the language field in Divi-settings.
 		wp_register_script(
 			'easy-language-language-field',
 			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'legacy-classes/Divi/build/language_field.js',

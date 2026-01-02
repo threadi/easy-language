@@ -21,11 +21,8 @@ class Cli {
 	 * @noinspection PhpUnused
 	 */
 	public function reset_simplifications(): void {
-		// get db-object.
-		$db_obj = Db::get_instance();
-
 		// reset the simplifications.
-		$db_obj->reset_simplifications();
+		Db::get_instance()->reset_simplifications();
 
 		// return ok-message.
 		\WP_CLI::success( 'All simplifications has been reset.' );

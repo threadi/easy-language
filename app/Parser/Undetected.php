@@ -1,6 +1,10 @@
 <?php
 /**
- * File for handling unknown pagebuilder for simplifications.
+ * File for parsing any unknown pagebuilder for simplifications.
+ *
+ * We try to parse the content as HTML-code as classic editor does.
+ *
+ * We will do our best here :-)
  *
  * @package easy-language
  */
@@ -15,8 +19,6 @@ use easyLanguage\EasyLanguage\Parser_Base;
 
 /**
  * Handler for parsing texts from any unknown page builder.
- *
- * We will do our best here :-)
  */
 class Undetected extends Parser_Base implements Parser {
 
@@ -101,7 +103,7 @@ class Undetected extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */

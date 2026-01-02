@@ -19,7 +19,7 @@ use easyLanguage\EasyLanguage\Db;
 use WP_Error;
 
 /**
- * Create and send request to summ-ai API. Gets the response.
+ * Create and send a request to SUMM AI API.
  */
 class Request implements Api_Requests {
 
@@ -300,14 +300,14 @@ class Request implements Api_Requests {
 		$this->duration = $end_time - $start_time;
 
 		// log error if something happened.
-		if ( is_wp_error( $this->result ) ) {
+		if ( is_wp_error( $this->get_result() ) ) {
 			Log::get_instance()->add_log( sprintf( 'Error during request on API %1$s via %2$s: ' . $this->result->get_error_message(), esc_html( $summ_ai_obj->get_title() ), esc_html( $this->url ) ), 'error' );
 		} else {
 			// secure response.
 			$this->response = wp_remote_retrieve_body( $this->get_result() );
 
 			// secure http-status.
-			$this->http_status = absint( wp_remote_retrieve_response_code( $this->get_result() ) );
+			$this->http_status = $this->get_result()['http_response']->get_status();
 
 			// log the request (with an anonymized token).
 			$args['headers']['Authorization'] = 'anonymized';

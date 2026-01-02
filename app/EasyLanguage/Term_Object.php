@@ -58,7 +58,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return the object language depending on object type.
+	 * Return the object language depending on an object type.
 	 *
 	 * @return array<string,mixed>
 	 */
@@ -110,15 +110,15 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 			return false;
 		}
 
-		// get list of simplifications in languages.
+		// get a list of simplifications in languages.
 		$languages = get_term_meta( $this->get_id(), 'easy_language_simplified_in', true );
 
-		// return true if list is not empty.
+		// return true if the list is not empty.
 		return ! empty( $languages );
 	}
 
 	/**
-	 * Return the term_id of the simplification of this object in a given language.
+	 * Return the simplified term_id of this object in the given language.
 	 *
 	 * @param string $language_code The language we search.
 	 *
@@ -159,7 +159,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 		// get the title.
 		$title = get_term_field( 'name', $this->get_id() );
 
-		// bail if title is not a string.
+		// bail if the title is not a string.
 		if ( ! is_string( $title ) ) {
 			return '';
 		}
@@ -169,7 +169,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Get language specific URL for this object.
+	 * Return the language-specific URL for this object.
 	 *
 	 * @param string $slug The slug of the language.
 	 * @param string $language_code The language-code.
@@ -181,7 +181,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 		// define target-url.
 		$url = trailingslashit( $slug );
 
-		// if actual object is translated, link to the translated object.
+		// if an actual object is translated, link to the translated object.
 		if ( $this->is_simplified_in_language( $language_code ) ) {
 			if ( 'link_translated' === get_option( 'easy_language_switcher_link', '' ) ) {
 				$url = get_term_link( $this->get_simplification_in_language( $language_code ) );
@@ -209,7 +209,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Set marker that the simplified content of this object has been changed.
+	 * Set a marker that the simplified content of this object has been changed.
 	 *
 	 * @param string $language_code The language we will mark.
 	 *
@@ -254,7 +254,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Add a language as simplified language to simplifiable object.
+	 * Add a language as a simplified language to a simplifiable object.
 	 *
 	 * @param string $target_language The language we search.
 	 *
@@ -273,12 +273,12 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 			$value .= ',' . $target_language . ',';
 		}
 
-		// add new language to list.
+		// add new language to the list.
 		update_term_meta( $this->get_id(), 'easy_language_simplified_in', $value );
 	}
 
 	/**
-	 * Remove a language as translated language from a translatable object.
+	 * Remove a language as a translated language from a translatable object.
 	 *
 	 * @param string $target_language The language we search.
 	 *
@@ -293,7 +293,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 		// get actual value.
 		$value = get_term_meta( $this->get_id(), 'easy_language_simplified_in', true );
 
-		// remove language from list.
+		// remove language from a list.
 		$value = str_replace( ',' . $target_language . ',', '', $value );
 		if ( empty( $value ) ) {
 			delete_term_meta( $this->get_id(), 'easy_language_simplified_in' );
@@ -320,7 +320,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Get link to create a translation of the actual object with given language.
+	 * Return the link to create a translation of the actual object with a given language.
 	 *
 	 * @param string $language_code The language we search.
 	 *
@@ -340,7 +340,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return the term-status: always published as terms does not have such an entity.
+	 * Return the term-status: always published as terms do not have such an entity.
 	 *
 	 * @return string
 	 */
@@ -376,7 +376,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 		// get the name.
 		$name = get_term_field( 'name', $this->get_id(), $this->get_type() );
 
-		// bail if name is not a string.
+		// bail if the name is not a string.
 		if ( ! is_string( $name ) ) {
 			return '';
 		}
@@ -398,7 +398,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return language-specific title for the type of the given object.
+	 * Return a language-specific title for the type of the given object.
 	 *
 	 * @return string
 	 */
@@ -412,12 +412,12 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 			return $taxonomy->labels->singular_name;
 		}
 
-		// fallback to general name.
+		// fallback to the general name.
 		return 'term';
 	}
 
 	/**
-	 * Add simplification object to this object if it is a not simplifiable object.
+	 * Add a simplification object to this object if it is a not simplifiable object.
 	 *
 	 * @param string   $target_language The target-language.
 	 * @param Api_Base $api_object The API to use.
@@ -426,7 +426,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	 * @return bool|Objects
 	 **/
 	public function add_simplification_object( string $target_language, Api_Base $api_object, bool $prevent_automatic_mode ): bool|Objects {
-		// bail if object is already simplified.
+		// bail if an object is already simplified.
 		if ( $this->is_simplified_in_language( $target_language ) ) {
 			return false;
 		}
@@ -437,10 +437,10 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 			$source_language = Helper::get_wp_lang();
 		}
 
-		// get the original-term as array.
+		// get the original-term as an array.
 		$term = get_term( $this->get_id(), $this->get_type(), ARRAY_A );
 
-		// bail if term could not be loaded as array.
+		// bail if term could not be loaded as an array.
 		if ( ! is_array( $term ) ) {
 			return false;
 		}
@@ -459,7 +459,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 		// get the ID of the copy.
 		$copied_term_id = $result['term_id'];
 
-		// mark the copied term as translation-object of the original.
+		// mark the copied term as a translation-object of the original.
 		update_term_meta( $copied_term_id, 'easy_language_simplification_original_id', $this->get_id() );
 
 		// save the source-language of the copied object.
@@ -481,7 +481,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 			$description = '';
 		}
 
-		// set this texts as translatable texts.
+		// set these texts as translatable texts.
 		foreach ( array(
 			'taxonomy_title'       => $title,
 			'taxonomy_description' => $description,
@@ -497,13 +497,13 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 			}
 		}
 
-		// add this language as translated language to original term.
+		// add this language as translated language to the original term.
 		$this->add_language( $target_language );
 
 		// set marker to reset permalinks.
 		Rewrite::get_instance()->set_refresh();
 
-		// get object of copy and return it.
+		// get the object of copy and return it.
 		return new Term_Object( $copied_term_id, $this->get_type() );
 	}
 
@@ -554,7 +554,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	public function set_automatic_mode_prevented( bool $prevent_automatic_mode ): void {}
 
 	/**
-	 * Return WP-own object of this plugin handled object.
+	 * Return WP-own object of this plugin-handled object.
 	 *
 	 * @return WP_Post|WP_Term|false
 	 */

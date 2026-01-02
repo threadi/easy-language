@@ -51,6 +51,11 @@
 			"easyLanguage\\": "app/"
 		}
 	},
+	"autoload-dev": {
+		"psr-4": {
+			"easyLanguage\\Tests\\": "tests/"
+		}
+	},
 	"require": {
 		"php": "^8.0",
 		"gettext/gettext": "^5.7",

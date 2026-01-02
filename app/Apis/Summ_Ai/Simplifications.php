@@ -49,14 +49,14 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 	}
 
 	/**
-	 * Call API to simplify single text.
+	 * Call API to simplify a single text.
 	 *
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.
 	 * @param string $target_language The target language of the text.
 	 * @param bool   $is_html Marker if the text contains HTML-Code.
 	 * @param bool   $is_test Marker if this is a rest request.
-	 * @return array<string,int|string> The result as array.
+	 * @return array<string,int|string> The result as an array.
 	 */
 	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html, bool $is_test = false ): array {
 		// get the separator setting for the target language.
@@ -120,12 +120,12 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 				$this->get_api()->disable_free_requests();
 			}
 
-			// save character-count to quota if answer does not contain "no_count".
+			// save character-count to quota if the answer does not contain "no_count".
 			if ( empty( $response_array['no_count'] ) ) {
 				update_option( 'easy_language_summ_ai_quota', absint( get_option( 'easy_language_summ_ai_quota', 0 ) ) + strlen( $text_to_translate ) );
 			}
 
-			// return simplification to plugin which will save it.
+			// return simplification to the plugin which will save it.
 			return array(
 				'translated_text' => $simplified_text,
 				'jobid'           => absint( $response_array['jobid'] ),

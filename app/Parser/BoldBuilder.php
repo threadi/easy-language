@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling BoldBuilder pagebuilder for simplifications.
+ * File for parsing BoldBuilder pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -196,7 +196,7 @@ class BoldBuilder extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether this pagebuilder plugin is active.
+	 * Return whether this parser is active.
 	 *
 	 * @return bool
 	 */
@@ -205,7 +205,7 @@ class BoldBuilder extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Prevent translate-option in frontend.
+	 * Prevent a translate-option in the frontend.
 	 *
 	 * @return bool
 	 */
@@ -214,7 +214,7 @@ class BoldBuilder extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Run page builder specific updates on object.
+	 * Run page builder-specific updates on an object.
 	 *
 	 * @param Objects $post_object The object.
 	 *

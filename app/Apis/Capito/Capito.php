@@ -436,7 +436,7 @@ class Capito extends Base implements Api_Base {
 	 * @return array<string,array<string,mixed>>
 	 */
 	public function get_active_target_languages(): array {
-		// get actual enabled target-languages, if token is given.
+		// get actual enabled target-languages if token is given.
 		$target_languages = array();
 		if ( $this->is_capito_token_set() ) {
 			$target_languages = get_option( 'easy_language_capito_target_languages', array() );
@@ -454,7 +454,7 @@ class Capito extends Base implements Api_Base {
 			}
 		}
 
-		// return resulting list.
+		// return the resulting list.
 		return $list;
 	}
 
@@ -964,7 +964,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function remove_token(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-capito-remove-token', 'nonce' );
+		check_admin_referer( 'easy-language-capito-remove-token', 'nonce' );
 
 		// delete settings.
 		delete_option( 'easy_language_capito_api_key' );
@@ -996,7 +996,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_quota_from_api_via_link(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-capito-get-quota', 'nonce' );
+		check_admin_referer( 'easy-language-capito-get-quota', 'nonce' );
 
 		// get quota.
 		$this->get_quota_from_api();

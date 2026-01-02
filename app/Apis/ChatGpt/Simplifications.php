@@ -59,7 +59,7 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 	}
 
 	/**
-	 * Call API to simplify single text.
+	 * Call API to simplify a single text.
 	 *
 	 * @param string $text_to_translate The text to translate.
 	 * @param string $source_language The source language of the text.
@@ -79,11 +79,11 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 		$request_obj->set_source_language( $source_language );
 		$request_obj->set_target_language( $target_language );
 		/**
-		 * Filter the ChatGpt request object.
+		 * Filter the ChatGPT request object.
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param Api_Requests $request_obj The ChatGpt request object.
+		 * @param Api_Requests $request_obj The ChatGPT request object.
 		 * @param bool $is_html Whether to use HTML or not.
 		 */
 		$request_obj = apply_filters( 'easy_language_chatgpt_request_object', $request_obj, $is_html );

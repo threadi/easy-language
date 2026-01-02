@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handling Divi pagebuilder for simplifications.
+ * File for parsing Divi pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -92,14 +92,15 @@ class Divi extends Parser_Base implements Parser {
 		);
 
 		/**
-		 * Filter the possible Divi widgets with HTML-support.
+		 * Filter the possible Divi widgets with HTML support.
 		 *
 		 * @since 2.0.0 Available since 2.0.0.
 		 *
-		 * @param array<string,mixed> $html_support_widgets List of widgets with HTML-support.
+		 * @param array<string,mixed> $html_support_widgets List of widgets with HTML support.
 		 */
 		$html_widgets = apply_filters( 'easy_language_divi_html_widgets', $html_support_widgets );
 
+		// return whether the widget is supported.
 		return isset( $html_widgets[ $widget_name ] );
 	}
 
@@ -145,7 +146,7 @@ class Divi extends Parser_Base implements Parser {
 			}
 		}
 
-		// return resulting list.
+		// return the resulting list.
 		return $resulting_texts;
 	}
 
@@ -175,7 +176,7 @@ class Divi extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return 'on' === get_post_meta( $post_object->get_id(), '_et_pb_use_builder', true );
+		return $post_object->get_type() === get_post_meta( $post_object->get_id(), '_et_pb_built_for_post_type', true );
 	}
 
 	/**
@@ -203,5 +204,14 @@ class Divi extends Parser_Base implements Parser {
 	 */
 	public function hide_translate_menu_in_frontend(): bool {
 		return et_core_is_fb_enabled();
+	}
+
+	/**
+	 * Return whether this parser is active.
+	 *
+	 * @return bool
+	 */
+	public function is_active(): bool {
+		return \easyLanguage\PageBuilder\Divi::get_instance()->is_active();
 	}
 }

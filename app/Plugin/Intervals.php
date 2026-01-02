@@ -106,7 +106,7 @@ class Intervals {
 			// get the object.
 			$obj = $class_name();
 
-			// bail if the object is not a Interval_Base.
+			// bail if the object is not an Interval_Base object.
 			if ( ! $obj instanceof Interval_Base ) {
 				continue;
 			}

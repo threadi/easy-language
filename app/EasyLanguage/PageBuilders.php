@@ -3,7 +3,7 @@
  * File for our own page-builder-support.
  *
  * This file handles the extension of page builders for our plugin.
- * This does not include the parsing of content in this page builders.
+ * This does not include the parsing the content of supported page builders.
  *
  * @package easy-language
  */
@@ -56,12 +56,26 @@ class PageBuilders {
 	 * @return void
 	 */
 	public function init(): void {
+		// initialize the page-builder support.
+		$this->init_page_builder_support();
+
 		// add meta-box.
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 	}
 
 	/**
-	 * Add language-meta-box for edit-page of some post types.
+	 * Initialize the page-builder support.
+	 *
+	 * @return void
+	 */
+	public function init_page_builder_support(): void {
+		foreach ( $this->get_page_builder_as_objects() as $page_builder_obj ) {
+			$page_builder_obj->init();
+		}
+	}
+
+	/**
+	 * Add language-meta-box for edit-page of some post-types.
 	 *
 	 * @param string $post_type The requested post-type.
 	 *
@@ -88,7 +102,7 @@ class PageBuilders {
 	 * Content of meta-box with infos about:
 	 * - the actual edited language.
 	 * - which language is also available.
-	 * - the possibility to delete this simplification complete.
+	 * - the possibility to delete this simplification is complete.
 	 *
 	 * @param WP_Post $post The Post-object.
 	 *
@@ -124,20 +138,20 @@ class PageBuilders {
 		}
 
 		/**
-		 * Get page builder of this object.
+		 * Get the page builder of this object.
 		 */
 		$page_builder = $original_post_object->get_page_builder();
 
 		/**
-		 * Bail if page builder could not be loaded.
+		 * Bail if the page builder could not be loaded.
 		 */
 		if ( ! $page_builder ) {
 			return;
 		}
 
 		/**
-		 * Show list of active languages the content could be simplified
-		 * only if page builder is active.
+		 * Show a list of active languages the content could be simplified
+		 * only if the page builder is active.
 		 */
 		if ( $page_builder->is_active() ) {
 			$page_builder->get_language_switch();
@@ -147,17 +161,18 @@ class PageBuilders {
 	/**
 	 * Return the list of all page builders as objects.
 	 *
-	 * @return array<int,Parser_Base>
+	 * @return array<int,PageBuilder_Base>
 	 */
 	public function get_page_builder_as_objects(): array {
 		// create the list.
 		$list = array();
 
+		// loop through all supported page builders.
 		foreach ( $this->get_page_builder() as $page_builder_class_name ) {
 			// create the classname.
 			$classname = $page_builder_class_name . '::get_instance';
 
-			// bail if classname is not callable.
+			// bail if the classname is not callable.
 			if ( ! is_callable( $classname ) ) {
 				continue;
 			}
@@ -166,7 +181,7 @@ class PageBuilders {
 			$obj = $classname();
 
 			// bail if the object is not the handler base.
-			if ( ! $obj instanceof Parser_Base ) {
+			if ( ! $obj instanceof PageBuilder_Base ) {
 				continue;
 			}
 
@@ -186,23 +201,8 @@ class PageBuilders {
 	private function get_page_builder(): array {
 		// create the list.
 		$list = array(
-			'\easyLanguage\PageBuilder\Avada',
-			'\easyLanguage\PageBuilder\Avia',
-			'\easyLanguage\PageBuilder\BeaverBuilder',
-			'\easyLanguage\PageBuilder\BoldBuilder',
-			'\easyLanguage\PageBuilder\Breakdance',
-			'\easyLanguage\PageBuilder\Brizy',
 			'\easyLanguage\PageBuilder\Divi',
 			'\easyLanguage\PageBuilder\Elementor',
-			'\easyLanguage\PageBuilder\Gutenberg',
-			'\easyLanguage\PageBuilder\Kubio',
-			'\easyLanguage\PageBuilder\Salients_WpBakery',
-			'\easyLanguage\PageBuilder\SeedProd',
-			'\easyLanguage\PageBuilder\SiteOrigin',
-			'\easyLanguage\PageBuilder\Themify',
-			'\easyLanguage\PageBuilder\Undetected',
-			'\easyLanguage\PageBuilder\VisualComposer',
-			'\easyLanguage\PageBuilder\WpBakery',
 		);
 
 		/**
