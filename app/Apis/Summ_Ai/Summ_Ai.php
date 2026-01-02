@@ -100,10 +100,12 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @var array<string,string>
 	 */
 	protected array $support_url = array(
-		'de_DE' => 'https://summ-ai.com/',
-		'en_CA' => 'https://summ-ai.com/en/',
-		'en_UK' => 'https://summ-ai.com/en/',
-		'en_US' => 'https://summ-ai.com/en/',
+		'de_DE' => 'https://summ-ai.com/leichte-sprache-ki-integrieren/',
+		'de_CH' => 'https://summ-ai.com/leichte-sprache-ki-integrieren/',
+		'de_AT' => 'https://summ-ai.com/leichte-sprache-ki-integrieren/',
+		'en_CA' => 'https://summ-ai.com/en/integrations/',
+		'en_UK' => 'https://summ-ai.com/en/integrations/',
+		'en_US' => 'https://summ-ai.com/en/integrations/',
 	);
 
 	/**
