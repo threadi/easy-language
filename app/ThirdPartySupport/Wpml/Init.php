@@ -195,7 +195,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			}
 
 			// bail if no icon is given.
-			if( empty( $language['img'] ) ) {
+			if ( empty( $language['img'] ) ) {
 				continue;
 			}
 

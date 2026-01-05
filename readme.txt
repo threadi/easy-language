@@ -105,9 +105,27 @@ Each release of this plugin will only be published if it fulfills the following 
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Optimized untrash and real trash handling for objects
-- Updated setup components
-- Fixed filter for simplified posts or pages in their tables if another API as SUMM AI is used
-- Fixed mark for changed original objects (has been marked just not simplified objects)
+- Revamped plugin for a more robust and sustainable structure
+- Added a new object to handle all plugin settings
+- Added support for any post-types that enabled title and editor as we need them for the simplification of texts
+- Added support to simply taxonomy terms
+- Added support for the PageBuilders Beaver Builder, Bold Page Builder, Brizy, Kubio, SiteOrigin, SeedProd and Visual Composer
+- Added option to reset the plugin in backend settings (in preparation for Cyber Resilience Act)
+- Added Taskfile as an alternative release building method for the plugin
+- Added check against WordPress Plugin Checker during each release
+- Added info in the footer of admin where our plugin adds options or shows settings
+- Added our own intervals for automatic simplifications
+- Added more than 100 PHP unit tests to check for potential errors
+- Requires PHP 8.1 or higher
+- Changed handling of transients
+- Optimized support for automatic simplifications via TranslatePress
+- Optimized generating the hook documentation
+- Logging when which update of the plugin has been installed
+- Updated dependencies
+- Fixed reading of HTTP status for external API responses
+
+### Removed
+
+- Removed any mentions of the pro-plugin which does not exist anymore
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)

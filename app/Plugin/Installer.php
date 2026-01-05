@@ -129,8 +129,8 @@ class Installer {
 		// create simplification tables if they do not exist.
 		Db::get_instance()->create_table();
 
-		// initiate the settings.
-		\easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance()->activation();
+		// add the settings.
+		Settings::get_instance()->add_the_settings();
 
 		// generate random-installation-hash if it does not already exist (will never be removed or changed).
 		if ( ! get_option( EASY_LANGUAGE_HASH ) ) {
@@ -170,11 +170,14 @@ class Installer {
 			$plugin_obj->install();
 		}
 
-		// enable the default API for a moment for set the default settings.
+		// enable the default API to set the default settings.
 		$api_obj = Apis::get_instance()->get_active_api();
 		if ( $api_obj instanceof Base ) {
 			$api_obj->enable();
 		}
+
+		// initiate the settings.
+		\easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance()->activation();
 	}
 
 	/**

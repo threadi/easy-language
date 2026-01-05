@@ -942,6 +942,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 		if ( $api_obj instanceof Api_Base ) {
 			Helper::validate_language_support_on_api( $api_obj );
 		}
+
+		// add the settings.
+		$this->add_settings();
 	}
 
 	/**
