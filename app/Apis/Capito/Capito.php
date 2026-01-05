@@ -345,6 +345,9 @@ class Capito extends Base implements Api_Base {
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		dbDelta( $sql );
+
+		// add the settings.
+		$this->add_settings();
 	}
 
 	/**

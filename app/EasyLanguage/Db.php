@@ -267,7 +267,7 @@ class Db {
 				$vars[]      = $filter['object_type'];
 				$vars[]      = absint( get_current_blog_id() );
 			}
-			if ( ! empty( $filter['simplification_hash'] ) && ! empty( $filter['simplification_lang']) ) {
+			if ( ! empty( $filter['simplification_hash'] ) && ! empty( $filter['simplification_lang'] ) ) {
 				$sql_join[ $this->get_table_name_simplifications() ] = ' INNER JOIN ' . $this->get_table_name_simplifications() . ' s ON s.oid = o.id';
 				$sql_where .= ' AND s.hash = %s AND s.language = %s';
 				$vars[]     = $filter['simplification_hash'];
@@ -316,7 +316,7 @@ class Db {
 		$results = $wpdb->get_results( $prepared_sql, ARRAY_A );
 
 		// bail if results are empty.
-		if( empty( $results ) ) {
+		if ( empty( $results ) ) {
 			return array();
 		}
 

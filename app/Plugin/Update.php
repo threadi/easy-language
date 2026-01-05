@@ -106,7 +106,7 @@ class Update {
 			/* translators: %1$s and %2$s are replaced by the old and new version. */
 			Log::get_instance()->add_log( sprintf( __( 'Easy Language has been updated from %1$s to %2$s.', 'easy-language' ), $db_plugin_version, $installed_plugin_version ), 'success' );
 
-			// save new plugin-version in DB.
+			// save the new plugin-version in DB.
 			delete_option( 'easyLanguageVersion' );
 			add_option( 'easyLanguageVersion', $installed_plugin_version, '', true );
 		}
@@ -167,7 +167,7 @@ class Update {
 	 * @return void
 	 */
 	public function version230(): void {
-		// get the actual value for setup and save it in new field, if not already set.
+		// get the actual value for setup and save it in the new field, if not already set.
 		if ( ! get_option( 'esfw_completed' ) ) {
 			update_option( 'esfw_completed', get_option( 'wp_easy_setup_completed' ) );
 		}
@@ -202,7 +202,7 @@ class Update {
 			update_option( 'easy_language_summ_ai_target_languages_separator', $separators );
 		}
 
-		// set new_lines setting for each activated target language.
+		// set the new_lines setting for each activated target language.
 		if ( ! get_option( 'easy_language_summ_ai_target_languages_new_lines' ) ) {
 			$target_languages = Summ_Ai::get_instance()->get_supported_target_languages();
 			$new_lines        = array();
@@ -250,20 +250,28 @@ class Update {
 		 * Migrate SUMM AI target language settings.
 		 */
 		$target_languages = get_option( 'easy_language_summ_ai_target_languages' );
-		foreach ( $target_languages as $target_language => $settings ) {
-			update_option( 'easy_language_summ_ai_target_languages_' . $target_language, $settings );
+		if ( is_array( $target_languages ) ) {
+			foreach ( $target_languages as $target_language => $settings ) {
+				update_option( 'easy_language_summ_ai_target_languages_' . $target_language, $settings );
+			}
 		}
 		$target_languages_separator = get_option( 'easy_language_summ_ai_target_languages_separator' );
-		foreach ( $target_languages_separator as $target_language => $settings ) {
-			update_option( 'easy_language_summ_ai_target_languages_' . $target_language . '_separator', $settings );
+		if ( is_array( $target_languages_separator ) ) {
+			foreach ( $target_languages_separator as $target_language => $settings ) {
+				update_option( 'easy_language_summ_ai_target_languages_' . $target_language . '_separator', $settings );
+			}
 		}
 		$target_languages_new_lines = get_option( 'easy_language_summ_ai_target_languages_new_lines' );
-		foreach ( $target_languages_new_lines as $target_language => $settings ) {
-			update_option( 'easy_language_summ_ai_target_languages_' . $target_language . '_new_line', $settings );
+		if ( is_array( $target_languages_new_lines ) ) {
+			foreach ( $target_languages_new_lines as $target_language => $settings ) {
+				update_option( 'easy_language_summ_ai_target_languages_' . $target_language . '_new_line', $settings );
+			}
 		}
 		$target_languages_embolden_negative = get_option( 'easy_language_summ_ai_target_languages_embolden_negative' );
-		foreach ( $target_languages_embolden_negative as $target_language => $settings ) {
-			update_option( 'easy_language_summ_ai_target_languages_' . $target_language . '_embolden_negative', $settings );
+		if ( is_array( $target_languages_embolden_negative ) ) {
+			foreach ( $target_languages_embolden_negative as $target_language => $settings ) {
+				update_option( 'easy_language_summ_ai_target_languages_' . $target_language . '_embolden_negative', $settings );
+			}
 		}
 
 		// delete the old settings.
