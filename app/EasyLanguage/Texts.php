@@ -124,7 +124,7 @@ class Texts {
 		// get active api.
 		$api_object = Apis::get_instance()->get_active_api();
 
-		// get post id.
+		// get post ID.
 		$original_post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
 
 		// get target-language.
@@ -573,14 +573,19 @@ class Texts {
 			$target_languages = $post_obj->get_language();
 			$target_language  = array_key_first( $target_languages );
 
+			// bail if target language is missing.
+			if( ! is_string( $target_language ) ) {
+				return;
+			}
+
 			// get the actual title from the object.
 			$title = $pagebuilder_obj->get_title();
 
 			// get parsed texts from the object.
 			$parsed_texts = $pagebuilder_obj->get_parsed_texts();
 
-			// delete it in DB existing texts of its object is not part of the actual content.
-			// also check for their simplifications.
+			// Delete it in DB existing texts of its object is not part of the actual content.
+			// Also check for their simplifications.
 			$query   = array(
 				'object_id'   => $post_id,
 				'object_type' => $post_obj->get_type(),

@@ -1,10 +1,16 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed usage of missing target language during post update, which could result in an error
+
 ## [3.0.0] - 05.01.2026
 
 ### Added
 
-- Revamped plugin for a more robust and sustainable structure
+- Revamped the plugin for a more robust and sustainable structure
 - Added a new object to handle all plugin settings
 - Added support for any post-types that enabled title and editor as we need them for the simplification of texts
 - Added support to simply taxonomy terms
@@ -22,7 +28,7 @@
 - Changed handling of transients
 - Optimized support for automatic simplifications via TranslatePress
 - Optimized generating the hook documentation
-- Logging when which update of the plugin has been installed
+- Logging when and what update of the plugin has been installed
 - Updated dependencies
 
 ### Fixed
@@ -31,7 +37,7 @@
 
 ### Removed
 
-- Removed any mentions of the pro-plugin which does not exist anymore
+- Removed any mentions of the pro-plugin, which does not exist anymore
 
 ## [2.9.2] - 21.10.2025
 
