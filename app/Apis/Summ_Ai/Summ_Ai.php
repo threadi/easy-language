@@ -1051,7 +1051,7 @@ class Summ_Ai extends Base implements Api_Base {
 			$min_percent = apply_filters( 'easy_language_quota_percent', $min_percent );
 
 			// show hint it limit has been reached.
-			$percent = absint( $quota['character_spent'] ) / absint( $quota['character_limit'] );
+			$percent = absint( ! empty( $quota['character_spent'] ) ? $quota['character_spent'] : 0 ) / absint( $quota['character_limit'] );
 			if ( 1 === $percent ) {
 				// get the transients-object to add the new one.
 				$transient_obj = $transients_obj->add();
@@ -1122,7 +1122,7 @@ class Summ_Ai extends Base implements Api_Base {
 		// transform it to an array and return it.
 		$results = json_decode( $response, true );
 		if ( is_array( $results ) ) {
-			if ( is_null( $results['character_limit'] ) ) {
+			if ( empty( $results['character_limit'] ) ) {
 				$results['character_limit'] = 1000000;
 			}
 			return $results;
