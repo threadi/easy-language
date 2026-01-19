@@ -4,6 +4,7 @@
 
 ### Changed
 
+- More translatable texts
 - Updated dependencies
 
 ### Fixed
