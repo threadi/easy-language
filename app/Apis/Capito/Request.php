@@ -225,7 +225,7 @@ class Request implements Api_Requests {
 		$this->response = wp_remote_retrieve_body( $this->get_result() );
 
 		// secure http-status.
-		$this->http_status = $this->get_result()['http_response']->get_status();
+		$this->http_status = $this->get_result()['http_response']->get_status(); // @phpstan-ignore offsetAccess.nonOffsetAccessible
 
 		// log the request (with an anonymized token).
 		$args['headers']['Authorization'] = 'anonymized';

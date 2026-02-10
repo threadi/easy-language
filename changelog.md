@@ -4,6 +4,7 @@
 
 ### Changed
 
+- Optimized some checks for datatypes
 - More translatable texts
 - Updated dependencies
 
