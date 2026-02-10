@@ -9,6 +9,7 @@
 
 ### Fixed
 
+- Fixed error during uninstallation of thge plugin
 - Fixed PHP-notice for undefined quota values during usage of SUMM AI API
 
 ## [3.0.0] - 05.01.2026
