@@ -571,7 +571,7 @@ class Texts {
 
 			// get target language from a simplified object.
 			$target_languages = $post_obj->get_language();
-			$target_language  = array_key_first( $target_languages );
+			$target_language  = (string) array_key_first( $target_languages );
 
 			// get the actual title from the object.
 			$title = $pagebuilder_obj->get_title();
@@ -625,7 +625,7 @@ class Texts {
 				$original_text_obj = $this->db->get_entry_by_text( $text['text'], $source_language );
 
 				// also check if this is a simplified text of the given language.
-				if ( ! $update && false === $original_text_obj && false === $this->db->get_entry_by_simplification( trim( $text['text'] ), $target_language ) ) {
+				if ( ! $update && false === $original_text_obj && false === $this->db->get_entry_by_simplification( trim( $text['text'] ), $target_language ) ) { // @phpstan-ignore booleanNot.alwaysFalse,booleanAnd.alwaysFalse,booleanAnd.alwaysFalse
 					// if not, save the text for simplification.
 					$original_text_obj = $this->db->add( $text['text'], $source_language, 'post_content', $text['html'] );
 

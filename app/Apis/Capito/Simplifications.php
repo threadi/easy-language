@@ -68,7 +68,7 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 	 * @noinspection PhpUnused
 	 */
 	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html, bool $is_test = false ): array {
-		// map the languages with its shorthand (e.g. de_DE => de).
+		// map the languages with its shorthand (e.g., de_DE => de).
 		$source_language = $this->get_api()->get_supported_source_languages()[ $source_language ]['api_value'];
 		$target_language = $this->get_api()->get_supported_target_languages()[ $target_language ]['api_value'];
 

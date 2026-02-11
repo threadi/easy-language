@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.0.1] - 11.02.2026
+
+### Changed
+
+- Optimized some checks for datatypes
+- More translatable texts
+- Updated dependencies
+
+### Fixed
+
+- Fixed error during uninstallation of the plugin
+- Fixed PHP-notice for undefined quota values during usage of SUMM AI API
+
 ## [3.0.0] - 05.01.2026
 
 ### Added

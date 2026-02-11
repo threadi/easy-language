@@ -1797,18 +1797,19 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 			// check if all values are available and return the general error if not.
 			if ( ! isset( $count_simplifications[ $object->get_md5() ] ) || ! isset( $max_simplifications[ $object->get_md5() ] ) || ! isset( $running_simplifications[ $object->get_md5() ] ) || ! isset( $results[ $object->get_md5() ] ) ) {
-				$error_message = sprintf( '<p>Error: Simplification failed with %1$s:</p>', esc_html( $api_obj->get_title() ) ) . '<ul>';
+				/* translators: %1$s will be replaced by the API title. */
+				$error_message = sprintf( '<p>' . __( 'Error: Simplification failed with %1$s:', 'easy-language' ) . '</p>', esc_html( $api_obj->get_title() ) ) . '<ul>';
 				if ( ! isset( $count_simplifications[ $object->get_md5() ] ) ) {
-					$error_message .= '<li>counting failed</li>';
+					$error_message .= '<li>' . __( 'counting failed', 'easy-language' ) . '</li>';
 				}
 				if ( ! isset( $max_simplifications[ $object->get_md5() ] ) ) {
-					$error_message .= '<li>max value failed</li>';
+					$error_message .= '<li>' . __( 'max value failed', 'easy-language' ) . '</li>';
 				}
 				if ( ! isset( $running_simplifications[ $object->get_md5() ] ) ) {
-					$error_message .= '<li>running marker failed</li>';
+					$error_message .= '<li>' . __( 'running marker failed', 'easy-language' ) . '</li>';
 				}
 				if ( ! isset( $results[ $object->get_md5() ] ) ) {
-					$error_message .= '<li>no result returned</li>';
+					$error_message .= '<li>' . __( 'no result returned', 'easy-language' ) . '</li>';
 				}
 				$error_message .= '</ul>';
 

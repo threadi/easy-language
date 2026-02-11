@@ -301,13 +301,13 @@ class Request implements Api_Requests {
 
 		// log error if something happened.
 		if ( is_wp_error( $this->get_result() ) ) {
-			Log::get_instance()->add_log( sprintf( 'Error during request on API %1$s via %2$s: ' . $this->result->get_error_message(), esc_html( $summ_ai_obj->get_title() ), esc_html( $this->url ) ), 'error' );
+			Log::get_instance()->add_log( sprintf( 'Error during request on API %1$s via %2$s: ' . $this->get_result()->get_error_message(), esc_html( $summ_ai_obj->get_title() ), esc_html( $this->url ) ), 'error' );
 		} else {
 			// secure response.
 			$this->response = wp_remote_retrieve_body( $this->get_result() );
 
 			// secure http-status.
-			$this->http_status = $this->get_result()['http_response']->get_status();
+			$this->http_status = $this->get_result()['http_response']->get_status(); // @phpstan-ignore offsetAccess.nonOffsetAccessible
 
 			// log the request (with an anonymized token).
 			$args['headers']['Authorization'] = 'anonymized';

@@ -25,6 +25,9 @@ if ( PHP_VERSION_ID < 80100 ) { // @phpstan-ignore smaller.alwaysFalse
 // save plugin-path.
 const EASY_LANGUAGE = __FILE__;
 
+// set the version number.
+const EASY_LANGUAGE_VERSION = '@@VersionNumber@@';
+
 // embed the necessary files.
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/inc/constants.php';
