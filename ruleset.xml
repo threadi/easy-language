@@ -20,6 +20,7 @@
 	<exclude-pattern>*/legacy-classes/Divi/build/</exclude-pattern>
 	<exclude-pattern>*/blocks/*/build/</exclude-pattern>
 	<exclude-pattern>*TranslatePress</exclude-pattern>
+	<exclude-pattern>*/tests/*</exclude-pattern>
 
 	<!--
 		Require WordPress 6.2.
