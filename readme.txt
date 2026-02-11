@@ -105,24 +105,11 @@ Each release of this plugin will only be published if it fulfills the following 
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Revamped plugin for a more robust and sustainable structure
-- Added a new object to handle all plugin settings
-- Added support for any post-types that enabled title and editor as we need them for the simplification of texts
-- Added support to simply taxonomy terms
-- Added support for the PageBuilders Beaver Builder, Bold Page Builder, Brizy, Kubio, SiteOrigin, SeedProd and Visual Composer
-- Added option to reset the plugin in backend settings (in preparation for Cyber Resilience Act)
-- Added Taskfile as an alternative release building method for the plugin
-- Added check against WordPress Plugin Checker during each release
-- Added info in the footer of admin where our plugin adds options or shows settings
-- Added our own intervals for automatic simplifications
-- Added more than 100 PHP unit tests to check for potential errors
-- Requires PHP 8.1 or higher
-- Changed handling of transients
-- Optimized support for automatic simplifications via TranslatePress
-- Optimized generating the hook documentation
-- Logging when which update of the plugin has been installed
+- Optimized some checks for datatypes
+- More translatable texts
 - Updated dependencies
-- Fixed reading of HTTP status for external API responses
+- Fixed error during uninstallation of the plugin
+- Fixed PHP-notice for undefined quota values during usage of SUMM AI API
 
 ### Removed
 
