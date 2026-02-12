@@ -116,10 +116,10 @@ class Rewrite {
 		}
 		if ( 'page' === get_option( 'show_on_front' ) ) {
 			$page_id = get_option( 'page_on_front' );
-			add_rewrite_rule( '^([a-zA_Z_]{5})/?$', 'index.php?lang=$matches[1]&page_id=' . absint( $page_id ), 'top' );
+			add_rewrite_rule( '^([a-zA-Z]_[a-zA_Z]{5})/?$', 'index.php?lang=$matches[1]&page_id=' . absint( $page_id ), 'top' );
 		}
 		if ( 'posts' === get_option( 'show_on_front' ) ) {
-			add_rewrite_rule( '^([a-zA_Z_]{5})/?$', 'index.php?lang=[1]', 'top' );
+			add_rewrite_rule( '^([a-zA-Z]_[a-zA_Z]{5})/?$', 'index.php?lang=[1]', 'top' );
 		}
 	}
 
@@ -139,7 +139,7 @@ class Rewrite {
 			$slugs[] = $language['url'];
 		}
 
-		// define slug for rules.
+		// define the slug for rules.
 		$slug      = $wp_rewrite->root . '(' . implode( '|', $slugs ) . ')/';
 		$new_rules = array();
 		foreach ( $rules as $key => $rule ) {
@@ -187,7 +187,7 @@ class Rewrite {
 	}
 
 	/**
-	 * Add language-specific prefix to URLs of simplified pages.
+	 * Add the language-specific prefix to URLs of simplified pages.
 	 *
 	 * @param string  $url The generated url without projekt-url.
 	 * @param WP_Post $post The object of the post.

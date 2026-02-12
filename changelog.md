@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Optimized the rewrite rule for detecting the homepage of a simplified language
+
 ## [3.0.1] - 11.02.2026
 
 ### Changed
