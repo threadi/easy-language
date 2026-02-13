@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Apis\Summ_Ai\Summ_Ai;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
+use easyLanguage\EasyLanguage\Rewrite;
 use easyLanguage\EasyLanguage\Texts;
 
 /**
@@ -100,6 +101,9 @@ class Update {
 			}
 			if ( version_compare( $db_plugin_version, '3.0.0', '<' ) ) {
 				$this->version300();
+			}
+			if ( version_compare( $db_plugin_version, '3.0.2', '<' ) ) {
+				$this->version302();
 			}
 
 			// log this event.
@@ -284,5 +288,14 @@ class Update {
 		update_option( 'easy_language_capito_quota_interval', 'easy_language_' . get_option( 'easy_language_capito_quota_interval' ) );
 		update_option( 'easy_language_summ_ai_quota_interval', 'easy_language_' . get_option( 'easy_language_summ_ai_quota_interval' ) );
 		update_option( 'easy_language_automatic_simplification', 'easy_language_' . get_option( 'easy_language_automatic_simplification' ) );
+	}
+
+	/**
+	 * On update to version 3.0.2 or newer.
+	 *
+	 * @return void
+	 */
+	public function version302(): void {
+		Rewrite::get_instance()->set_refresh();
 	}
 }
