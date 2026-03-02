@@ -178,7 +178,7 @@ class Bricks extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return ! empty( get_post_meta( $post_object->get_id(), BRICKS_DB_PAGE_CONTENT, true ) );
+		return defined( 'BRICKS_DB_PAGE_CONTENT' ) && ! empty( get_post_meta( $post_object->get_id(), BRICKS_DB_PAGE_CONTENT, true ) );
 	}
 
 	/**
