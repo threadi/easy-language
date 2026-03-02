@@ -398,7 +398,7 @@ class Parser_Base {
 						// get page builder.
 						$new_page_builder_obj = $post_obj->get_page_builder();
 
-						// bail if page builder could not be loaded.
+						// bail if the page builder could not be loaded.
 						if ( ! $new_page_builder_obj ) {
 							continue;
 						}

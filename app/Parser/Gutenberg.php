@@ -104,9 +104,9 @@ class Gutenberg extends Parser_Base implements Parser {
 	/**
 	 * Loop through the block and get its texts.
 	 *
-	 * @param array<string,mixed>     $block The block as array.
-	 * @param array<int|string,mixed> $resulting_texts The resulting texts as array.
-	 * @return array<string,mixed>
+	 * @param array<string,mixed> $block The block as an array.
+	 * @param array<int,mixed>    $resulting_texts The resulting texts as an array.
+	 * @return array<int,mixed>
 	 */
 	private function get_block_text( array $block, array $resulting_texts ): array {
 		// get possible flow blocks.

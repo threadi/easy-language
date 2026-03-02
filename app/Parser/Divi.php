@@ -180,7 +180,7 @@ class Divi extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return edit link for Divi-object.
+	 * Return the edit link for a Divi-object.
 	 *
 	 * @return string
 	 */

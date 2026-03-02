@@ -141,12 +141,12 @@ class VisualComposer extends Parser_Base implements Parser {
 			$resulting_texts = $this->get_widgets( $editor_data['elements'], $resulting_texts );
 		}
 
-		// return resulting list.
+		// return the resulting list.
 		return $resulting_texts;
 	}
 
 	/**
-	 * Replace original text with translation.
+	 * Replace the original text with translation.
 	 * This is done 1:1 for VisualComposer.
 	 *
 	 * @param string $original_complete Complete original content.
@@ -214,20 +214,20 @@ class VisualComposer extends Parser_Base implements Parser {
 	 * Loop through the container to get the flow-text-modules.
 	 *
 	 * @param array<string,mixed> $container The container to parse.
-	 * @param array<string,mixed> $resulting_texts The resulting texts.
-	 * @return array<string,mixed>
+	 * @param array<int,mixed>    $resulting_texts The resulting texts.
+	 * @return array<int,mixed>
 	 */
 	private function get_widgets( array $container, array $resulting_texts ): array {
-		// get list of flow text widgets.
+		// get the list of flow text widgets.
 		$flow_text_widgets = $this->get_flow_text_widgets();
 
 		foreach ( $container as $section ) {
-			// bail if section is not an array.
+			// bail if the section is not an array.
 			if ( ! is_array( $section ) ) {
 				continue;
 			}
 
-			// if section is of element type "block", get its contents.
+			// if the section is of element type "block", get its contents.
 			if ( isset( $section['tag'] ) && ! empty( $flow_text_widgets[ $section['tag'] ] ) ) {
 				foreach ( $flow_text_widgets[ $section['tag'] ] as $entry_name ) {
 					if ( empty( $section[ $entry_name ] ) ) {
@@ -241,7 +241,7 @@ class VisualComposer extends Parser_Base implements Parser {
 			}
 		}
 
-		// return resulting texts.
+		// return the resulting texts.
 		return $resulting_texts;
 	}
 

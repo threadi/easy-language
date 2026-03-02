@@ -115,7 +115,7 @@ class BeaverBuilder extends Parser_Base implements Parser {
 	 *
 	 * Get the BeaverBuilder-content and parse its widgets to get the content of flow-text-widgets.
 	 *
-	 * @return array<string,mixed>
+	 * @return array<int,mixed>
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if BeaverBuilder is not active.
@@ -132,7 +132,7 @@ class BeaverBuilder extends Parser_Base implements Parser {
 			$resulting_texts = $this->get_widgets( $data, $resulting_texts );
 		}
 
-		// return resulting list.
+		// return the resulting list.
 		return $resulting_texts;
 	}
 
@@ -194,7 +194,7 @@ class BeaverBuilder extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Prevent translate-option in frontend.
+	 * Prevent the translate-option in the frontend.
 	 *
 	 * @return bool
 	 */
@@ -206,12 +206,12 @@ class BeaverBuilder extends Parser_Base implements Parser {
 	 * Loop through the container to get the flow-text-modules.
 	 *
 	 * @param array<string,mixed> $container The container to parse.
-	 * @param array<string,mixed> $resulting_texts The resulting texts.
-	 * @return array<string,mixed>
+	 * @param array<int,mixed>    $resulting_texts The resulting texts.
+	 * @return array<int,mixed>
 	 */
 	private function get_widgets( array $container, array $resulting_texts ): array {
 		foreach ( $container as $section ) {
-			// bail if section is not an array.
+			// bail if the section is not an array.
 			if ( ! $section instanceof stdClass ) {
 				continue;
 			}
@@ -245,7 +245,7 @@ class BeaverBuilder extends Parser_Base implements Parser {
 			}
 		}
 
-		// return resulting texts.
+		// return the resulting texts.
 		return $resulting_texts;
 	}
 

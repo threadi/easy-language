@@ -201,6 +201,7 @@ class PageBuilders {
 	private function get_page_builder(): array {
 		// create the list.
 		$list = array(
+			'\easyLanguage\PageBuilder\Bricks',
 			'\easyLanguage\PageBuilder\Divi',
 			'\easyLanguage\PageBuilder\Elementor',
 		);

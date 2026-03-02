@@ -2,9 +2,20 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added support for Bricks to simplify texts from this page builder
+
+### Changed
+
+- Updated dependencies
+
+## [3.0.2] - 16.02.2026
+
 ### Changed
 
 - Optimized the rewrite rule for detecting the homepage of a simplified language
+- Updated dependencies
 
 ## [3.0.1] - 11.02.2026
 

@@ -105,14 +105,7 @@ Each release of this plugin will only be published if it fulfills the following 
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Optimized some checks for datatypes
-- More translatable texts
+- Optimized the rewrite rule for detecting the homepage of a simplified language
 - Updated dependencies
-- Fixed error during uninstallation of the plugin
-- Fixed PHP-notice for undefined quota values during usage of SUMM AI API
-
-### Removed
-
-- Removed any mentions of the pro-plugin which does not exist anymore
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
