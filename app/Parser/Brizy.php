@@ -107,7 +107,7 @@ class Brizy extends Parser_Base implements Parser {
 	 *
 	 * Get the Brizy-content and parse its widgets to get the content of flow-text-widgets.
 	 *
-	 * @return array<string,mixed>
+	 * @return array<int,mixed>
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if Brizy is not active.
@@ -247,9 +247,9 @@ class Brizy extends Parser_Base implements Parser {
 	/**
 	 * Loop through the container to get the flow-text-modules.
 	 *
-	 * @param array<string,mixed>     $container The container to parse.
-	 * @param array<int|string,mixed> $resulting_texts The resulting texts.
-	 * @return array<string,mixed>
+	 * @param array<string,mixed> $container The container to parse.
+	 * @param array<int,mixed>    $resulting_texts The resulting texts.
+	 * @return array<int,mixed>
 	 */
 	private function get_widgets( array $container, array $resulting_texts ): array {
 		// get the list of flow text widgets.

@@ -108,10 +108,10 @@ class SiteOrigin extends Parser_Base implements Parser {
 	 *
 	 * Get the SiteOrigin-content and parse its widgets to get the content of flow-text-widgets.
 	 *
-	 * @return array<string,mixed>
+	 * @return array<int,mixed>
 	 */
 	public function get_parsed_texts(): array {
-		// do nothing if siteorigin is not active.
+		// do nothing if SiteOrigin is not active.
 		if ( false === $this->is_siteorgin_active() ) {
 			return array();
 		}
@@ -125,7 +125,7 @@ class SiteOrigin extends Parser_Base implements Parser {
 			$resulting_texts = $this->get_widgets( $data['widgets'], $resulting_texts );
 		}
 
-		// return resulting list.
+		// return the resulting list.
 		return $resulting_texts;
 	}
 
@@ -199,8 +199,8 @@ class SiteOrigin extends Parser_Base implements Parser {
 	 * Loop through the container to get the flow-text-modules.
 	 *
 	 * @param array<string,mixed> $container The container to parse.
-	 * @param array<string,mixed> $resulting_texts The resulting texts.
-	 * @return array<string,mixed>
+	 * @param array<int,mixed>    $resulting_texts The resulting texts.
+	 * @return array<int,mixed>
 	 */
 	private function get_widgets( array $container, array $resulting_texts ): array {
 		foreach ( $container as $sub_container ) {

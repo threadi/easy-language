@@ -65,9 +65,9 @@ class Bricks extends Parser_Base implements Parser {
 			'text-basic' => array(
 				'text',
 			),
-			'text' => array(
+			'text'       => array(
 				'text',
-			)
+			),
 		);
 
 		/**
@@ -90,7 +90,7 @@ class Bricks extends Parser_Base implements Parser {
 	private function is_flow_text_widget_html( string $widget_name ): bool {
 		$html_support_widgets = array(
 			'text-basic' => false,
-			'text' => true,
+			'text'       => true,
 		);
 
 		/**
@@ -110,7 +110,7 @@ class Bricks extends Parser_Base implements Parser {
 	 *
 	 * Get the Bricks-content and parse its widgets to get the content of flow-text-widgets.
 	 *
-	 * @return array<string,mixed>
+	 * @return array<int,mixed>
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if Bricky is not active.
@@ -123,7 +123,7 @@ class Bricks extends Parser_Base implements Parser {
 
 		// get editor contents and loop through its array.
 		$data = get_post_meta( $this->get_object_id(), BRICKS_DB_PAGE_CONTENT, true );
-		if( is_array( $data ) && ! empty( $data ) ) {
+		if ( is_array( $data ) && ! empty( $data ) ) {
 			// get the texts.
 			$resulting_texts = $this->get_widgets( $data, $resulting_texts );
 		}
@@ -149,7 +149,7 @@ class Bricks extends Parser_Base implements Parser {
 
 		// get editor contents and loop through its array.
 		$data = get_post_meta( $this->get_object_id(), BRICKS_DB_PAGE_CONTENT, true );
-		if( is_array( $data ) && ! empty( $data ) ) {
+		if ( is_array( $data ) && ! empty( $data ) ) {
 			// replace the texts.
 			$text = $this->replace_content_in_widgets( $data, $simplified_part );
 
@@ -202,9 +202,9 @@ class Bricks extends Parser_Base implements Parser {
 	/**
 	 * Loop through the container to get the flow-text-modules.
 	 *
-	 * @param array<string,mixed>     $container The container to parse.
-	 * @param array<int|string,mixed> $resulting_texts The resulting texts.
-	 * @return array<string,mixed>
+	 * @param array<string,mixed> $container The container to parse.
+	 * @param array<int,mixed>    $resulting_texts The resulting texts.
+	 * @return array<int,mixed>
 	 */
 	private function get_widgets( array $container, array $resulting_texts ): array {
 		// get the list of flow text widgets.
@@ -259,7 +259,7 @@ class Bricks extends Parser_Base implements Parser {
 					if ( empty( $section['settings'][ $entry_name ] ) ) {
 						continue;
 					}
-					$container[ $index ][ 'settings' ][ $entry_name ] = $simplified_part;
+					$container[ $index ]['settings'][ $entry_name ] = $simplified_part;
 				}
 			}
 
@@ -285,7 +285,7 @@ class Bricks extends Parser_Base implements Parser {
 		// return the edit link to open the requested object ID in Bricks.
 		return add_query_arg(
 			array(
-				'bricks'     => 'run',
+				'bricks' => 'run',
 			),
 			get_permalink( $this->get_object_id() )
 		);
