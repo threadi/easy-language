@@ -101,6 +101,7 @@ class Parsers {
 			'\easyLanguage\Parser\BeaverBuilder',
 			'\easyLanguage\Parser\BoldBuilder',
 			'\easyLanguage\Parser\Breakdance',
+			'\easyLanguage\Parser\Bricks',
 			'\easyLanguage\Parser\Brizy',
 			'\easyLanguage\Parser\Divi',
 			'\easyLanguage\Parser\Elementor',

@@ -1,6 +1,6 @@
 <?php
 /**
- * File for parsing Brizy pagebuilder for simplifications.
+ * File for parsing Bricks pagebuilder for simplifications.
  *
  * @package easy-language
  */
@@ -10,28 +10,27 @@ namespace easyLanguage\Parser;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Plugin\Helper;
 use easyLanguage\EasyLanguage\Parser;
 use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
 
 /**
- * Handler for parsing Brizy-content.
+ * Handler for parsing Bricks content.
  */
-class Brizy extends Parser_Base implements Parser {
+class Bricks extends Parser_Base implements Parser {
 	/**
 	 * Internal name of the parser.
 	 *
 	 * @var string
 	 */
-	protected string $name = 'Brizy';
+	protected string $name = 'Bricks';
 
 	/**
 	 * Instance of this object.
 	 *
-	 * @var ?Brizy
+	 * @var ?Bricks
 	 */
-	private static ?Brizy $instance = null;
+	private static ?Bricks $instance = null;
 
 	/**
 	 * Constructor for this object.
@@ -48,7 +47,7 @@ class Brizy extends Parser_Base implements Parser {
 	/**
 	 * Return the instance of this Singleton object.
 	 */
-	public static function get_instance(): Brizy {
+	public static function get_instance(): Bricks {
 		if ( is_null( self::$instance ) ) {
 			self::$instance = new self();
 		}
@@ -63,19 +62,22 @@ class Brizy extends Parser_Base implements Parser {
 	 */
 	private function get_flow_text_widgets(): array {
 		$widgets = array(
-			'RichText' => array(
+			'text-basic' => array(
 				'text',
 			),
+			'text' => array(
+				'text',
+			)
 		);
 
 		/**
-		 * Filter the possible Brizy widgets.
+		 * Filter the possible Bricks widgets.
 		 *
-		 * @since 2.10.0 Available since 2.10.0.
+		 * @since 3.1.0 Available since 3.1.0.
 		 *
 		 * @param array<string,mixed> $widgets List of widgets.
 		 */
-		return apply_filters( 'easy_language_brizy_text_widgets', $widgets );
+		return apply_filters( 'easy_language_bricks_text_widgets', $widgets );
 	}
 
 	/**
@@ -87,17 +89,18 @@ class Brizy extends Parser_Base implements Parser {
 	 */
 	private function is_flow_text_widget_html( string $widget_name ): bool {
 		$html_support_widgets = array(
-			'RichText' => true,
+			'text-basic' => false,
+			'text' => true,
 		);
 
 		/**
-		 * Filter the possible Brizy widgets with HTML support.
+		 * Filter the possible Bricks widgets with HTML support.
 		 *
-		 * @since 2.10.0 Available since 2.10.0.
+		 * @since 3.1.0 Available since 3.1.0.
 		 *
 		 * @param array $html_support_widgets List of widgets with HTML support.
 		 */
-		$html_widgets = apply_filters( 'easy_language_brizy_html_widgets', $html_support_widgets );
+		$html_widgets = apply_filters( 'easy_language_bricks_html_widgets', $html_support_widgets );
 
 		return isset( $html_widgets[ $widget_name ] );
 	}
@@ -105,13 +108,13 @@ class Brizy extends Parser_Base implements Parser {
 	/**
 	 * Return parsed texts.
 	 *
-	 * Get the Brizy-content and parse its widgets to get the content of flow-text-widgets.
+	 * Get the Bricks-content and parse its widgets to get the content of flow-text-widgets.
 	 *
 	 * @return array<string,mixed>
 	 */
 	public function get_parsed_texts(): array {
-		// do nothing if Brizy is not active.
-		if ( false === $this->is_brizy_active() ) {
+		// do nothing if Bricky is not active.
+		if ( false === $this->is_bricks_active() ) {
 			return array();
 		}
 
@@ -119,31 +122,10 @@ class Brizy extends Parser_Base implements Parser {
 		$resulting_texts = array();
 
 		// get editor contents and loop through its array.
-		$data = get_post_meta( $this->get_object_id(), 'brizy', true );
-		if ( ! empty( $data['brizy-post']['editor_data'] ) ) {
-			// decode the data as JSON string.
-			$json = base64_decode( $data['brizy-post']['editor_data'] );
-
-			// bail if decoded data is not a string.
-			if ( ! is_string( $json ) ) { // @phpstan-ignore function.alreadyNarrowedType
-				return array();
-			}
-
-			// get array from this JSON.
-			$editor_data = json_decode( $json, true );
-
-			// bail if the result is not an array.
-			if ( ! is_array( $editor_data ) ) {
-				return array();
-			}
-
-			// bail if items are missing.
-			if ( empty( $editor_data['items'] ) ) {
-				return array();
-			}
-
+		$data = get_post_meta( $this->get_object_id(), BRICKS_DB_PAGE_CONTENT, true );
+		if( is_array( $data ) && ! empty( $data ) ) {
 			// get the texts.
-			$resulting_texts = $this->get_widgets( $editor_data['items'], $resulting_texts );
+			$resulting_texts = $this->get_widgets( $data, $resulting_texts );
 		}
 
 		// return the resulting list.
@@ -160,46 +142,19 @@ class Brizy extends Parser_Base implements Parser {
 	 * @return string
 	 */
 	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
-		// do nothing if Brizy is not active.
-		if ( false === $this->is_brizy_active() ) {
+		// do nothing if Bricks is not active.
+		if ( false === $this->is_bricks_active() ) {
 			return $original_complete;
 		}
 
 		// get editor contents and loop through its array.
-		$data = get_post_meta( $this->get_object_id(), 'brizy', true );
-		if ( ! empty( $data['brizy-post']['editor_data'] ) ) {
-			// decode the data as JSON string.
-			$json = base64_decode( $data['brizy-post']['editor_data'] );
-
-			// bail if decoded data is not a string.
-			if ( ! is_string( $json ) ) { // @phpstan-ignore function.alreadyNarrowedType
-				return $original_complete;
-			}
-
-			// get array from this JSON.
-			$editor_data = json_decode( $json, true );
-
-			// bail if the result is not an array.
-			if ( ! is_array( $editor_data ) ) {
-				return $original_complete;
-			}
-
-			// bail if items are missing.
-			if ( empty( $editor_data['items'] ) ) {
-				return $original_complete;
-			}
-
+		$data = get_post_meta( $this->get_object_id(), BRICKS_DB_PAGE_CONTENT, true );
+		if( is_array( $data ) && ! empty( $data ) ) {
 			// replace the texts.
-			$text = $this->replace_content_in_widgets( $editor_data['items'], $simplified_part );
+			$text = $this->replace_content_in_widgets( $data, $simplified_part );
 
-			// encode as JSON.
-			$data['brizy-post']['editor_data'] = Helper::get_json( $text );
-
-			// encode editor data.
-			$data['brizy-post']['editor_data'] = base64_encode( $data['brizy-post']['editor_data'] );
-
-			// save the data for Brizy.
-			update_post_meta( $this->get_object_id(), 'brizy', $data );
+			// save the data for Bricks.
+			update_post_meta( $this->get_object_id(), BRICKS_DB_PAGE_CONTENT, $text );
 		}
 
 		// return the string for post_content.
@@ -207,12 +162,12 @@ class Brizy extends Parser_Base implements Parser {
 	}
 
 	/**
-	 * Return whether Brizy is active.
+	 * Return whether Bricks is active.
 	 *
 	 * @return bool
 	 */
-	private function is_brizy_active(): bool {
-		return Helper::is_plugin_active( 'brizy/brizy.php' );
+	private function is_bricks_active(): bool {
+		return \easyLanguage\PageBuilder\Bricks::get_instance()->is_active();
 	}
 
 	/**
@@ -223,7 +178,7 @@ class Brizy extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return ! empty( get_post_meta( $post_object->get_id(), 'brizy_enabled', true ) );
+		return ! empty( get_post_meta( $post_object->get_id(), BRICKS_DB_PAGE_CONTENT, true ) );
 	}
 
 	/**
@@ -232,7 +187,7 @@ class Brizy extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_active(): bool {
-		return $this->is_brizy_active();
+		return $this->is_bricks_active();
 	}
 
 	/**
@@ -261,21 +216,20 @@ class Brizy extends Parser_Base implements Parser {
 				continue;
 			}
 
-			// if the section is of element type "block", get its contents.
-			if ( isset( $section['type'] ) && ! empty( $flow_text_widgets[ $section['type'] ] ) ) {
-				foreach ( $flow_text_widgets[ $section['type'] ] as $entry_name ) {
-					if ( empty( $section['value'][ $entry_name ] ) ) {
+			// if the section contains settings, get them.
+			if ( isset( $section['settings'] ) && ! empty( $flow_text_widgets[ $section['name'] ] ) ) {
+				foreach ( $flow_text_widgets[ $section['name'] ] as $entry_name ) {
+					if ( empty( $section['settings'][ $entry_name ] ) ) {
 						continue;
 					}
 					$resulting_texts[] = array(
-						'text' => $section['value'][ $entry_name ],
-						'html' => $this->is_flow_text_widget_html( $section['type'] ),
+						'text' => $section['settings'][ $entry_name ],
+						'html' => $this->is_flow_text_widget_html( $section['name'] ),
 					);
 				}
-			} else {
-				// loop through the deeper arrays.
-				$resulting_texts = $this->get_widgets( $section['value']['items'], $resulting_texts );
 			}
+			// loop through the deeper arrays.
+			$resulting_texts = $this->get_widgets( $section['children'], $resulting_texts );
 		}
 
 		// return resulting texts.
@@ -299,22 +253,41 @@ class Brizy extends Parser_Base implements Parser {
 				continue;
 			}
 
-			// if the section is of element type "block", get its contents.
-			if ( isset( $section['type'] ) && ! empty( $flow_text_widgets[ $section['type'] ] ) ) {
-				foreach ( $flow_text_widgets[ $section['type'] ] as $entry_name ) {
-					if ( empty( $section['value'][ $entry_name ] ) ) {
+			// if the section contains settings, get them.
+			if ( isset( $section['settings'] ) && ! empty( $flow_text_widgets[ $section['name'] ] ) ) {
+				foreach ( $flow_text_widgets[ $section['name'] ] as $entry_name ) {
+					if ( empty( $section['settings'][ $entry_name ] ) ) {
 						continue;
-
 					}
-					$container[ $index ]['value'][ $entry_name ] = $simplified_part;
+					$container[ $index ][ 'settings' ][ $entry_name ] = $simplified_part;
 				}
-			} else {
-				// loop through the deeper arrays.
-				$container = $this->replace_content_in_widgets( $section['value']['items'], $simplified_part );
 			}
+
+			// loop through the deeper arrays.
+			$container[ $index ]['children'] = $this->replace_content_in_widgets( $section['children'], $simplified_part );
 		}
 
 		// return the resulting container.
 		return $container;
+	}
+
+	/**
+	 * Return the edit link for a Bricks-object.
+	 *
+	 * @return string
+	 */
+	public function get_edit_link(): string {
+		// bail if Bricks is not active.
+		if ( ! \easyLanguage\PageBuilder\Bricks::get_instance()->is_active() ) {
+			return parent::get_edit_link();
+		}
+
+		// return the edit link to open the requested object ID in Bricks.
+		return add_query_arg(
+			array(
+				'bricks'     => 'run',
+			),
+			get_permalink( $this->get_object_id() )
+		);
 	}
 }

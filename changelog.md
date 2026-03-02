@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Added support for Bricks to simplify texts from this page builder
+
+### Changed
+
+- Updated dependencies
+
 ## [3.0.2] - 16.02.2026
 
 ### Changed
