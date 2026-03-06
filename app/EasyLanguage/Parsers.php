@@ -104,16 +104,17 @@ class Parsers {
 			'\easyLanguage\Parser\Bricks',
 			'\easyLanguage\Parser\Brizy',
 			'\easyLanguage\Parser\Divi',
+			'\easyLanguage\Parser\Divi5',
 			'\easyLanguage\Parser\Elementor',
-			'\easyLanguage\Parser\Gutenberg',
 			'\easyLanguage\Parser\Kubio',
 			'\easyLanguage\Parser\Salients_WpBakery',
 			'\easyLanguage\Parser\SeedProd',
 			'\easyLanguage\Parser\SiteOrigin',
 			'\easyLanguage\Parser\Themify',
-			'\easyLanguage\Parser\Undetected',
 			'\easyLanguage\Parser\VisualComposer',
 			'\easyLanguage\Parser\WpBakery',
+			'\easyLanguage\Parser\Gutenberg',
+			'\easyLanguage\Parser\Undetected',
 		);
 
 		/**
