@@ -10,6 +10,10 @@
 
 - Updated dependencies
 
+### Fixed
+
+- Fixed wrong loading of WP_Filesystem-handler in some cases
+
 ## [3.0.2] - 16.02.2026
 
 ### Changed

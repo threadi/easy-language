@@ -816,9 +816,7 @@ class Texts {
 			Log::get_instance()->add_log( __( 'Simplifications exported.', 'easy-language' ), 'success' );
 
 			// get WP Filesystem-handler.
-			require_once ABSPATH . '/wp-admin/includes/file.php';
-			WP_Filesystem();
-			global $wp_filesystem;
+			$wp_filesystem = Helper::get_wp_filesystem();
 
 			// return header.
 			header( 'Content-Type: application/octet-stream' );

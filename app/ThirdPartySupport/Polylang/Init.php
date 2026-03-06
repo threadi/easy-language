@@ -189,7 +189,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// get file for base64.
 		$file = plugin_dir_path( EASY_LANGUAGE ) . 'gfx/' . $code . '.png';
-		WP_Filesystem();
+		\WP_Filesystem();
 		$file_contents = $wp_filesystem->get_contents( $file );
 
 		// return attribute if file-content is empty.
