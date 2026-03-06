@@ -1,6 +1,6 @@
 <?php
 /**
- * File to handle support for the page builder Divi.
+ * File to handle support for the page builder Divi 4.
  *
  * @package easy-language
  */
@@ -198,14 +198,31 @@ class Divi extends PageBuilder_Base {
 	 * @return bool
 	 */
 	public function is_active(): bool {
-		$is_divi = Helper::is_plugin_active( 'divi-builder/divi-builder.php' );
-		$theme   = wp_get_theme();
+		// first check for the plugin.
+		if ( Helper::is_plugin_active( 'divi-builder/divi-builder.php' ) ) {
+			// get the plugin version.
+			require_once ABSPATH . 'wp-admin/includes/admin.php';
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/divi-builder/divi-builder.php' );
+			if ( version_compare( $plugin_data['Version'], '5.0.0', '<' ) ) {
+				return true;
+			}
+		}
+
+		// check for the theme.
+		$theme = wp_get_theme();
 		if ( 'Divi' === $theme->get( 'Name' ) ) {
-			$is_divi = true;
+			$version = substr( $theme->get( 'Version' ), 0, 5 );
+			return version_compare( $version, '5.0.0', '<' );
 		}
+
+		// check for the parent theme.
 		if ( $theme->parent() && 'Divi' === $theme->parent()->get( 'Name' ) ) {
-			$is_divi = true;
+			$version = substr( $theme->parent()->get( 'Version' ), 0, 5 );
+			return version_compare( $version, '5.0.0', '<' );
 		}
-		return $is_divi;
+
+		// otherwise return false.
+		return false;
 	}
 }

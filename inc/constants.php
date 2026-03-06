@@ -1,6 +1,6 @@
 <?php
 /**
- * Constants used by this WordPress-plugin.
+ * Constants used by this WordPress plugin.
  *
  * @package easy-language
  */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 const EASY_LANGUAGE_SUMM_AI_PAID_API_URL = 'https://backend.summ-ai.com/api/v1/translation/';
 
 /**
- * SUMM AI API URL for free version.
+ * SUMM AI API URL for free usage.
  */
 const EASY_LANGUAGE_SUMM_AI_FREE_API_URL = 'https://api.laolaweb.com/summaiproxy/index.php';
 
@@ -54,7 +54,7 @@ const EASY_LANGUAGE_TRANSIENTS = array(
 );
 
 /**
- * Name of custom post type for switcher-entries.
+ * Name of custom post-type for switcher-entries.
  */
 const EASY_LANGUAGE_CPT_SWITCHER = 'lel_lang_switcher';
 
@@ -64,7 +64,7 @@ const EASY_LANGUAGE_CPT_SWITCHER = 'lel_lang_switcher';
 const EASY_LANGUAGE_LANGUAGE_FALLBACK = 'en_US';
 
 /**
- * Define names for progressbar during simplification.
+ * Define names for the progressbar during simplification.
  */
 const EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT   = 'easy_language_simplification_count';
 const EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX     = 'easy_language_simplification_max';
@@ -84,7 +84,7 @@ const EASY_LANGUAGE_OPTION_DELETION_RUNNING = 'easy_language_deletion_running';
 const EASY_LANGUAGE_HASH = 'easy_language_hash';
 
 /**
- * Quota for SUMM AI in free plugin.
- * Changes will not work as this is also checked by API.
+ * Quota for SUMM AI for free usage.
+ * Changes will not work as API also checks this.
  */
 const EASY_LANGUAGE_SUMM_AI_QUOTA = 9000;
