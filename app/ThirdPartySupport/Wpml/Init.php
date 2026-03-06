@@ -181,7 +181,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// get WP Filesystem-handler.
 		require_once ABSPATH . '/wp-admin/includes/file.php';
-		WP_Filesystem();
+		\WP_Filesystem();
 		global $wp_filesystem;
 
 		// check if our languages do already exist in wpml-db.
