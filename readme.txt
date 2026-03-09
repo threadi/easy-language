@@ -2,7 +2,7 @@
 Contributors: laolaweb, threadi
 Tags: easy language, leichte sprache, simplify, summ ai, capito
 Requires at least: 6.0
-Tested up to: 6.8
+Tested up to: 7.0
 Requires PHP: 8.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -105,7 +105,10 @@ Each release of this plugin will only be published if it fulfills the following 
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Optimized the rewrite rule for detecting the homepage of a simplified language
+- Added support for Bricks to simplify texts from this page builder
+- Added support for Divi 5 to simplify texts from this page builder
+- Set compatibility with WordPress 7.0
 - Updated dependencies
+- Fixed wrong loading of WP_Filesystem-handler in some cases
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
