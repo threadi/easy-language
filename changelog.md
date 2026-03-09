@@ -1,13 +1,15 @@
 # Changelog
 
-## [Unreleased]
+## [3.1.0] - 09.03.2026
 
 ### Added
 
 - Added support for Bricks to simplify texts from this page builder
+- Added support for Divi 5 to simplify texts from this page builder
 
 ### Changed
 
+- Set compatibility with WordPress 7.0
 - Updated dependencies
 
 ### Fixed
