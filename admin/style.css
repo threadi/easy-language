@@ -373,3 +373,5 @@ body.settings_page_easy_language_settings #response { min-width: 200px;width: au
 .easy_language_chatgpt_target_languages_prompts table {
 	width: 100%;
 }
+
+#lang_list-menu .ui-icon, .ui-selectmenu-text .ui-icon { width: 18px }
