@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed wrong sized easy language icon in Polylang language selection field
+
 ## [3.1.0] - 09.03.2026
 
 ### Added
