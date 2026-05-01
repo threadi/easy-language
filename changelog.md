@@ -1,10 +1,18 @@
 # Changelog
 
-## [Unreleased]
+## [3.1.1] - 01.05.2026
+
+### Changed
+
+- Hide the button to save the settings on icon management page
+- Typos
+- Updated dependencies
 
 ### Fixed
 
 - Fixed wrong sized easy language icon in Polylang language selection field
+- Fixed missing deletion of hint for multilingual plugins
+- Fixed support for simplification of Divi 5 texts
 
 ## [3.1.0] - 09.03.2026
 

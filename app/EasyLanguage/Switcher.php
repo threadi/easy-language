@@ -178,7 +178,7 @@ class Switcher {
 	}
 
 	/**
-	 * Return switcher for output in frontend via Block Editor/FSE.
+	 * Return switcher for output in the frontend via Block Editor/FSE.
 	 *
 	 * @param array<string,array<string>|bool> $attributes The settings as array.
 	 *
@@ -212,7 +212,7 @@ class Switcher {
 		// check if this object is a simplified object.
 		if ( $object->is_simplified() ) {
 			$object_id = $object->get_original_object_as_int();
-			// get original object as base for the listing.
+			// get the original object as base for the listing.
 			$object = $this->init->get_object_by_wp_object( get_post( $object_id ), $object_id );
 		}
 

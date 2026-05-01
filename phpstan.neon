@@ -27,6 +27,7 @@ parameters:
     - "#ABSPATH#"
     - "#_IN_SECONDS#"
     - "#BRICKS_DB_PAGE_CONTENT#"
+    - "#SavingUtility#"
   earlyTerminatingFunctionCalls:
     - wp_send_json
   paths:

@@ -22,7 +22,7 @@ use function Breakdance\Data\set_meta;
  */
 class Breakdance extends Parser_Base implements Parser {
 	/**
-	 * Internal name of the parser.
+	 * The internal name of this parser.
 	 *
 	 * @var string
 	 */

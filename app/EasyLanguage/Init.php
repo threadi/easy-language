@@ -1466,7 +1466,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Get our own object for given WP-object.
+	 * Return our own object for given WP-object.
 	 *
 	 * @param array<int|string,mixed>|WP_Post|WP_Post_Type|WP_Term|WP_User|null $wp_object The WP-object.
 	 * @param int                                                               $id The ID of the WP-object.
@@ -2298,7 +2298,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check nonce.
 		check_ajax_referer( 'easy-language-add-simplification-nonce', 'nonce' );
 
-		// define answer.
+		// prepare the answer.
 		$return = array(
 			'status' => 'error',
 		);
@@ -2311,10 +2311,10 @@ class Init extends Base implements ThirdPartySupport_Base {
 			wp_send_json( $return );
 		}
 
-		// get id of the original object.
+		// get the ID of the original object.
 		$original_id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
 
-		// get type of original object.
+		// get the type for the original object.
 		$original_type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
 
 		// get language.

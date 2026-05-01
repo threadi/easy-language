@@ -82,17 +82,18 @@ class Admin {
 				continue;
 			}
 
+			// set the transient name.
+			$transient_name = 'easy_language_plugin_' . $plugin_obj->get_name();
+
 			// bail if the assigned plugin is not active.
 			if ( ! $plugin_obj->is_active() ) {
+				$transients_obj->get_transient_by_name( $transient_name )->delete();
 				continue;
 			}
 
 			/**
 			 * Show hint if this is a foreign plugin.
 			 */
-			// set the transient name.
-			$transient_name = 'easy_language_plugin_' . $plugin_obj->get_name();
-
 			// get transient-object for this plugin.
 			$transient_obj = $transients_obj->get_transient_by_name( $transient_name );
 			if ( $transient_obj->is_set() ) {
