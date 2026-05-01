@@ -4,7 +4,9 @@
 
 ### Changed
 
+- Hide the button to save the settings on icon management page
 - Typos
+- Updated dependencies
 
 ### Fixed
 

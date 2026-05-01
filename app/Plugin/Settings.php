@@ -158,6 +158,7 @@ class Settings {
 		// the icon tab.
 		$icons_tab = $settings_page->add_tab( 'icons', 50 );
 		$icons_tab->set_title( __( 'Icons', 'easy-language' ) );
+		$icons_tab->set_hide_save( true );
 
 		// the log tab.
 		$logs_tab = $settings_page->add_tab( 'logs', 80 );

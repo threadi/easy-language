@@ -1466,7 +1466,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Get our own object for given WP-object.
+	 * Return our own object for given WP-object.
 	 *
 	 * @param array<int|string,mixed>|WP_Post|WP_Post_Type|WP_Term|WP_User|null $wp_object The WP-object.
 	 * @param int                                                               $id The ID of the WP-object.
