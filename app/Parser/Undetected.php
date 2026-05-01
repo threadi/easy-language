@@ -23,7 +23,7 @@ use easyLanguage\EasyLanguage\Parser_Base;
 class Undetected extends Parser_Base implements Parser {
 
 	/**
-	 * Internal name of the parser.
+	 * The internal name of this parser.
 	 *
 	 * @var string
 	 */

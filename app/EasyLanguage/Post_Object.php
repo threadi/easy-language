@@ -511,7 +511,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Add a simplification object to this object if it is a not simplifiable object.
+	 * Add a simplification object to this object if it is a simplifiable object.
 	 *
 	 * @param string   $target_language The target-language.
 	 * @param Api_Base $api_object The API to use.

@@ -22,7 +22,7 @@ use ThemifyBuilder_Data_Manager;
  */
 class Themify extends Parser_Base implements Parser {
 	/**
-	 * Internal name of the parser.
+	 * The internal name of this parser.
 	 *
 	 * @var string
 	 */

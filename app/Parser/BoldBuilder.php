@@ -21,7 +21,7 @@ use easyLanguage\EasyLanguage\Post_Object;
  */
 class BoldBuilder extends Parser_Base implements Parser {
 	/**
-	 * Internal name of the parser.
+	 * The internal name of this parser.
 	 *
 	 * @var string
 	 */

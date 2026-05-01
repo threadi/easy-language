@@ -203,6 +203,7 @@ class PageBuilders {
 		$list = array(
 			'\easyLanguage\PageBuilder\Bricks',
 			'\easyLanguage\PageBuilder\Divi',
+			'\easyLanguage\PageBuilder\Divi5',
 			'\easyLanguage\PageBuilder\Elementor',
 		);
 

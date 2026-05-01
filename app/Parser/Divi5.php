@@ -20,7 +20,7 @@ use easyLanguage\Plugin\Helper;
  */
 class Divi5 extends Parser_Base implements Parser {
 	/**
-	 * Internal name of the parser.
+	 * The internal name of this parser.
 	 *
 	 * @var string
 	 */
@@ -141,7 +141,6 @@ class Divi5 extends Parser_Base implements Parser {
 
 	/**
 	 * Replace the original text with a translation.
-	 * This is done 1:1 for Divi 5.
 	 *
 	 * @param string $original_complete Complete original content.
 	 * @param string $simplified_part The translated content.
@@ -149,7 +148,45 @@ class Divi5 extends Parser_Base implements Parser {
 	 * @return string
 	 */
 	public function get_text_with_simplifications( string $original_complete, string $simplified_part ): string {
-		return str_replace( $this->get_text(), $simplified_part, $original_complete );
+		// get possible flow blocks.
+		$flow_blocks = $this->get_flow_text_blocks();
+
+		// parse the original blocks.
+		$blocks = parse_blocks( $original_complete );
+		foreach ( $blocks as $index => $block ) {
+			$blocks[ $index ] = $this->get_text_with_simplifications_deep( $original_complete, $simplified_part, $block, $flow_blocks );
+		}
+
+		// return the resulting serialized block.
+		return serialize_blocks( $blocks ); // @phpstan-ignore argument.type
+	}
+
+	/**
+	 * Replace the string in the blocks of the given content.
+	 *
+	 * @param string              $original_complete Complete original content.
+	 * @param string              $simplified_part The translated content.
+	 * @param array<string,mixed> $block The block to check.
+	 * @param array<string,mixed> $flow_blocks The list of flow blocks we support.
+	 * @return array<string,mixed>
+	 */
+	private function get_text_with_simplifications_deep( string $original_complete, string $simplified_part, array $block, $flow_blocks ): array {
+		// replace the content, if this is a block we support.
+		if ( isset( $flow_blocks[ $block['blockName'] ] ) ) {
+			if ( ! empty( $flow_blocks[ $block['blockName'] ]['callback'] ) && is_callable( $flow_blocks[ $block['blockName'] ]['callback'] ) ) {
+				$block['attrs']['content']['innerContent']['desktop']['value'] = str_replace( $this->get_text(), $simplified_part, call_user_func( $flow_blocks[ $block['blockName'] ]['callback'], $block ) );
+			} else {
+				$block['innerHTML'] = str_replace( $this->get_text(), $simplified_part, trim( $block['innerHTML'] ) );
+			}
+		}
+
+		// loop through inner-blocks.
+		foreach ( $block['innerBlocks'] as $index => $inner_block ) {
+			$block['innerBlocks'][ $index ] = $this->get_text_with_simplifications_deep( $original_complete, $simplified_part, $inner_block, $flow_blocks );
+		}
+
+		// return the resulting block.
+		return $block;
 	}
 
 	/**

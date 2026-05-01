@@ -2,10 +2,15 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Typos
+
 ### Fixed
 
 - Fixed wrong sized easy language icon in Polylang language selection field
 - Fixed missing deletion of hint for multilingual plugins
+- Fixed support for simplification of Divi 5 texts
 
 ## [3.1.0] - 09.03.2026
 

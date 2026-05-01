@@ -54,6 +54,12 @@ class Divi extends PageBuilder_Base {
 	 * @return void
 	 */
 	public function init(): void {
+		// bail if Divi 4 is not active.
+		if ( ! $this->is_active() ) {
+			return;
+		}
+
+		// use hooks.
 		add_filter( 'et_builder_page_settings_modal_toggles', array( $this, 'add_toggle' ) );
 		add_filter( 'et_builder_page_settings_definitions', array( $this, 'add_fields' ) );
 		add_action( 'et_fb_enqueue_assets', array( $this, 'add_scripts_and_styles' ) );
