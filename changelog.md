@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fixed wrong sized easy language icon in Polylang language selection field
+- Fixed missing deletion of hint for multilingual plugins
 
 ## [3.1.0] - 09.03.2026
 
