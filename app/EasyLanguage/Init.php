@@ -1911,7 +1911,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		wp_enqueue_script(
 			'easy-language-simplifications',
 			plugins_url( '/admin/simplifications.js', EASY_LANGUAGE ),
-			array( 'jquery', 'easy-dialog', 'wp-i18n' ),
+			array( 'jquery', 'easy-dialog-for-wordpress', 'wp-i18n' ),
 			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/admin/simplifications.js' ),
 			true
 		);
