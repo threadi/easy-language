@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Renamed the dialog script handle to full compatibility with other plugins, which also use this script
+
 ## [3.1.1] - 01.05.2026
 
 ### Changed

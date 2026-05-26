@@ -221,7 +221,7 @@ class Elementor extends PageBuilder_Base {
 			wp_register_script(
 				'easy-language-elementor-admin',
 				trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'admin/elementor/elementor.js',
-				array( 'jquery', 'easy-dialog' ),
+				array( 'jquery', 'easy-dialog-for-wordpress' ),
 				Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . 'admin/elementor/elementor.js' ),
 				true
 			);

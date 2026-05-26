@@ -144,7 +144,7 @@ class Admin {
 		wp_enqueue_script(
 			'easy-language-admin',
 			plugins_url( '/admin/js.js', EASY_LANGUAGE ),
-			array( 'jquery', 'easy-dialog', 'wp-i18n' ),
+			array( 'jquery', 'easy-dialog-for-wordpress', 'wp-i18n' ),
 			Helper::get_file_version( plugin_dir_path( EASY_LANGUAGE ) . '/admin/js.js' ),
 			true
 		);
@@ -236,7 +236,7 @@ class Admin {
 		// embed script.
 		$script_asset = require $script_asset_path;
 		wp_enqueue_script(
-			'easy-dialog',
+			'easy-dialog-for-wordpress',
 			$url . 'build/index.js',
 			$script_asset['dependencies'],
 			$script_asset['version'],
@@ -247,7 +247,7 @@ class Admin {
 		$admin_css      = $url . 'build/style-index.css';
 		$admin_css_path = $path . 'build/style-index.css';
 		wp_enqueue_style(
-			'easy-dialog',
+			'easy-dialog-for-wordpress',
 			$admin_css,
 			array( 'wp-components' ),
 			Helper::get_file_version( $admin_css_path )
