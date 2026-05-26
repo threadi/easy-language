@@ -341,7 +341,7 @@ class Init {
 			Log::get_instance()->add_log( sprintf( __( 'New icon set for %1$s', 'easy-language' ), $language_code ), 'success' );
 		}
 
-		// create dialog.
+		// create the dialog.
 		$dialog_config = array(
 			'detail' => array(
 				'title'   => __( 'Icon replaced', 'easy-language' ),
@@ -350,7 +350,7 @@ class Init {
 				),
 				'buttons' => array(
 					array(
-						'action'  => 'closeDialog();',
+						'action'  => 'location.reload();',
 						'variant' => 'primary',
 						'text'    => __( 'OK', 'easy-language' ),
 					),
