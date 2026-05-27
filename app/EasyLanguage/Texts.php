@@ -925,18 +925,27 @@ class Texts {
 			return $args;
 		}
 
-		if ( array_key_exists( $args['taxonomy'][0], Init::get_instance()->get_supported_taxonomies() ) ) {
-			// get all simplified terms.
-			$query = array(
-				'hide_empty'   => false,
-				'meta_key'     => 'easy_language_simplification_original_id',
-				'meta_compare' => 'EXISTS',
-				'fields'       => 'ids',
-			);
-
-			// add them to the actual query.
-			$args['exclude'] = get_terms( $query );
+		// bail if given taxonomy is not supported.
+		if ( ! array_key_exists( $args['taxonomy'][0], Init::get_instance()->get_supported_taxonomies() ) ) {
+			return $args;
 		}
+
+		// get all simplified terms.
+		$query            = array(
+			'hide_empty'   => false,
+			'meta_key'     => 'easy_language_simplification_original_id',
+			'meta_compare' => 'EXISTS',
+			'fields'       => 'ids',
+		);
+		$simplified_terms = get_terms( $query );
+
+		// bail if no terms could be found.
+		if ( ! is_array( $simplified_terms ) || empty( $simplified_terms ) ) {
+			return $args;
+		}
+
+		// add them to the actual query.
+		$args['exclude'] = $simplified_terms;
 
 		// return resulting arguments.
 		return $args;

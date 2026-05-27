@@ -105,10 +105,9 @@ Each release of this plugin will only be published if it fulfills the following 
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added support for Bricks to simplify texts from this page builder
-- Added support for Divi 5 to simplify texts from this page builder
-- Set compatibility with WordPress 7.0
-- Updated dependencies
-- Fixed wrong loading of WP_Filesystem-handler in some cases
+- Optimized icon dialog handling
+- Renamed the dialog script handle to full compatibility with other plugins, which also use this script
+- Optimized loading of simplified terms on get_term_args
+- Fixed missing blocks in release
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
