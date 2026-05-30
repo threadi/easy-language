@@ -238,7 +238,7 @@ class Init {
 	}
 
 	/**
-	 * Run the check for compatibility of WP_LANG with the chosen API if the WordPress language is changed.
+	 * Run the check for compatibility of "WP_LANG" with the chosen API if the WordPress language is changed.
 	 *
 	 * @param string $old_value The name of the former language.
 	 * @param string $new_value The name of the new language.
@@ -278,6 +278,11 @@ class Init {
 		// check nonce.
 		check_ajax_referer( 'easy-language-reset-intro-nonce', 'nonce' );
 
+		// bail if capability is missing.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
 		// delete transient for step 1.
 		$transients_obj = Transients::get_instance();
 		$transient_obj  = $transients_obj->get_transient_by_name( 'easy_language_intro_step_1' );
@@ -303,6 +308,11 @@ class Init {
 	public function set_icon_for_language_via_ajax(): void {
 		// check nonce.
 		check_ajax_referer( 'easy-language-set-icon-for-language', 'nonce' );
+
+		// bail if capability is not given.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
 
 		// get icon from request.
 		$icon = isset( $_POST['icon'] ) ? absint( $_POST['icon'] ) : 0;
@@ -371,6 +381,13 @@ class Init {
 	public function clear_log_by_request(): void {
 		// check nonce.
 		check_admin_referer( 'easy-language-clear-log', 'nonce' );
+
+		// bail if user has not the capability for this.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			// redirect user back.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
 
 		// get db object.
 		global $wpdb;

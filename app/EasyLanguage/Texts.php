@@ -15,6 +15,7 @@ use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Languages;
 use easyLanguage\Plugin\Log;
+use easyLanguage\Plugin\Settings;
 use Gettext\Translation;
 use Gettext\Translations;
 use WP_Post;
@@ -101,7 +102,7 @@ class Texts {
 		// if the object is untrashed.
 		add_action( 'untrashed_post', array( $this, 'untrash_object' ) );
 
-		// delete simplifications if the object is really deleted.
+		// delete simplifications if the object is deleted.
 		add_action( 'before_delete_post', array( $this, 'delete_post_object' ) );
 		add_action( 'pre_delete_term', array( $this, 'pre_delete_term_object' ), 10, 2 );
 		add_action( 'delete_term', array( $this, 'delete_term_object' ), 10, 3 );
@@ -124,7 +125,7 @@ class Texts {
 		// get active api.
 		$api_object = Apis::get_instance()->get_active_api();
 
-		// get post id.
+		// get post ID.
 		$original_post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
 
 		// get target-language.
@@ -166,7 +167,7 @@ class Texts {
 	}
 
 	/**
-	 * Add term for simplification via request.
+	 * Add a term for simplification via request.
 	 *
 	 * The given object will be copied. All texts are added as texts to simplify.
 	 *
@@ -245,7 +246,7 @@ class Texts {
 			// Log event.
 			Log::get_instance()->add_log( __( 'Deleted simplified object ', 'easy-language' ) . '<i>' . $post_title . '</i>', 'success' );
 		} else {
-			// get all simplified objects for this original and delete them also.
+			// get all simplified objects for this original and delete them too.
 			foreach ( $post_obj->get_simplifications( true ) as $simplified_post_id ) {
 				wp_delete_post( $simplified_post_id, true );
 			}
@@ -285,6 +286,7 @@ class Texts {
 	 * @param string $taxonomy The taxonomy-name.
 	 *
 	 * @return void
+	 * @noinspection PhpUnusedParameterInspection
 	 */
 	public function delete_term_object( int $term_id, int $tt_id, string $taxonomy ): void {
 		// get entries by this term.
@@ -401,7 +403,7 @@ class Texts {
 		// get text id.
 		$entry_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 
-		// bail if no entry id is given.
+		// bail if no entry ID is given.
 		if ( 0 === $entry_id ) {
 			wp_safe_redirect( wp_get_referer() );
 			exit;
@@ -418,7 +420,7 @@ class Texts {
 		if ( empty( $entries ) ) {
 			// Log event.
 			/* translators: %1$s will be replaced by an ID. */
-			Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
+			Log::get_instance()->add_log( sprintf( __( 'The requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
 
 			// redirect user back.
 			wp_safe_redirect( wp_get_referer() );
@@ -435,7 +437,7 @@ class Texts {
 		if ( empty( $post_objects ) ) {
 			// Log event.
 			/* translators: %1$s will be replaced by an ID. */
-			Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
+			Log::get_instance()->add_log( sprintf( __( 'The requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
 
 			// redirect user back.
 			wp_safe_redirect( wp_get_referer() );
@@ -449,7 +451,7 @@ class Texts {
 		if ( false === $object ) {
 			// Log event.
 			/* translators: %1$s will be replaced by an ID. */
-			Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
+			Log::get_instance()->add_log( sprintf( __( 'The requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
 
 			// redirect user back.
 			wp_safe_redirect( wp_get_referer() );
@@ -579,8 +581,8 @@ class Texts {
 			// get parsed texts from the object.
 			$parsed_texts = $pagebuilder_obj->get_parsed_texts();
 
-			// delete it in DB existing texts of its object is not part of the actual content.
-			// also check for their simplifications.
+			// Delete it in DB existing texts of its object is not part of the actual content.
+			// Also check for their simplifications.
 			$query   = array(
 				'object_id'   => $post_id,
 				'object_type' => $post_obj->get_type(),
@@ -668,7 +670,7 @@ class Texts {
 	}
 
 	/**
-	 * If a simplified object is moved to trash, update the settings on its original object.
+	 * Update the settings on its original object, if a simplified object is moved to trash
 	 *
 	 * If an original object is moved to trash, also trash any simplified object from this object.
 	 *
@@ -749,7 +751,7 @@ class Texts {
 	}
 
 	/**
-	 * Return all texts in DB without any filter.
+	 * Return all texts in the database without any filter.
 	 *
 	 * @return array<Text>
 	 */
@@ -766,7 +768,10 @@ class Texts {
 	 */
 	public function export_simplifications_by_request(): void {
 		// check nonce.
-		if ( ( isset( $_REQUEST['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-export-simplifications' ) ) || empty( $_REQUEST['nonce'] ) ) {
+		check_admin_referer( 'easy-language-export-simplifications', 'nonce' );
+
+		// bail if user has not the capability.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
 			// redirect user back.
 			wp_safe_redirect( wp_get_referer() );
 			exit;
@@ -788,7 +793,7 @@ class Texts {
 			// return resulting entry-objects.
 			$entries = Db::get_instance()->get_entries( $query );
 
-			// define translations-object which will be exported as po-file.
+			// define the "Translations"-object from gettext, which will be exported as po-file.
 			$translations = Translations::create( get_option( 'blogname' ) );
 			$translations->setDescription( __( 'List of with Easy Language simplified texts.', 'easy-language' ) );
 			$translations->getHeaders()->set( 'Last-Translator', get_option( 'admin_email' ) );
@@ -863,7 +868,7 @@ class Texts {
 					// get title.
 					$title = $text->get_simplification( $target_language );
 
-					// set the query for update.
+					// set the query for the update.
 					$query = array(
 						'name' => $title,
 					);
@@ -881,7 +886,7 @@ class Texts {
 					// get description.
 					$description = $text->get_simplification( $target_language );
 
-					// set the query for update.
+					// set the query for the update.
 					$query = array(
 						'description' => $description,
 					);

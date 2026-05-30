@@ -120,9 +120,9 @@ class Uninstall {
 		do_action( 'init' );
 
 		// enable the settings.
-		\easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance()->activation();
+		Settings::get_instance()->get_settings_obj()->activation();
 
-		// get all images which have assigned 'easy_language_icon' post meta and delete them.
+		// get all images, which have assigned 'easy_language_icon' post meta and delete them.
 		$query                            = array(
 			'posts_per_page' => -1,
 			'post_type'      => 'attachment',
@@ -205,7 +205,7 @@ class Uninstall {
 		Setup::get_instance()->uninstall();
 
 		// delete all settings.
-		\easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance()->delete_settings();
+		Settings::get_instance()->get_settings_obj()->delete_settings();
 
 		/**
 		 * Remove custom settings.

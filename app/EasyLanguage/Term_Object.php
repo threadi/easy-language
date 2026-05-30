@@ -82,7 +82,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return the type of this object.
+	 * Return the object type.
 	 *
 	 * @return string
 	 */
@@ -261,7 +261,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	 * @return void
 	 */
 	public function add_language( string $target_language ): void {
-		// only for translatable object.
+		// only for a translatable object.
 		if ( false === $this->is_simplifiable() ) {
 			delete_term_meta( $this->get_id(), 'easy_language_simplified_in' );
 			return;
@@ -398,7 +398,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return a language-specific title for the type of the given object.
+	 * Return the language-specific title for the object type.
 	 *
 	 * @return string
 	 */
