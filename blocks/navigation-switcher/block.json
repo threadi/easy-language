@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/block.json",
-	"apiVersion": 2,
+	"apiVersion": 3,
 	"name": "easy-language/navigation-switcher",
 	"version": "2.0.0",
 	"title": "Language Switcher",

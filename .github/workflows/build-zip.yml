@@ -78,6 +78,14 @@ jobs:
                   search-text: '@@VersionNumber@@'
                   replacement-text: ${{ github.ref_name }}
 
+            - name: More cleanup
+              run: |
+                rm phpunit.xml.dist
+                rm -fr .github
+                rm -fr bin
+                rm -fr tests
+                rm .gitattributes
+
             - name: Run PCP check
               uses: wordpress/plugin-check-action@v1
               with:

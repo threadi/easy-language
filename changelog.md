@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Optimized some codes to fulfill the plugin check action in GitHub
+- Both blocks are now compatible with WordPress 7.0
+
 ## [3.1.2] - 27.05.2026
 
 ### Changed
