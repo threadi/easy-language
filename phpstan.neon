@@ -28,6 +28,10 @@ parameters:
     - "#_IN_SECONDS#"
     - "#BRICKS_DB_PAGE_CONTENT#"
     - "#SavingUtility#"
+    - "#get_fields#"
+    - "#get_field_object#"
+    - "#update_field#"
+    - "#acf_render_field_setting#"
   earlyTerminatingFunctionCalls:
     - wp_send_json
   paths:

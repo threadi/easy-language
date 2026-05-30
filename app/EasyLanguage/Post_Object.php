@@ -621,6 +621,17 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			// add this language as simplified language to the original post.
 			$this->add_language( $target_language );
 
+			$instance = $this;
+			/**
+			 * Run additional tasks after a new simplification object has been created.
+			 *
+			 * @since 3.2.0 Available since 3.2.0.
+			 * @param Objects $instance The simplification object.
+			 * @param int $copied_post_id The post ID of the simplification object.
+			 * @param string $source_language The source language.
+			 */
+			do_action( 'easy_language_add_post_simplification', $instance, $copied_post_id, $source_language );
+
 			// set marker to reset permalinks.
 			Rewrite::get_instance()->set_refresh();
 

@@ -446,4 +446,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 	public function is_active(): bool {
 		return Helper::is_plugin_active( 'translatepress-multilingual/index.php' ) || Helper::is_plugin_active( 'translatepress-business/index.php' );
 	}
+
+	/**
+	 * Return whether this is a language plugin.
+	 *
+	 * @return bool
+	 */
+	public function is_language_plugin(): bool {
+		return true;
+	}
 }

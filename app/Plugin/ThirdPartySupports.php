@@ -87,7 +87,9 @@ class ThirdPartySupports {
 		// create the list of plugins.
 		$plugins = array(
 			'easyLanguage\EasyLanguage\Init',
+			'easyLanguage\ThirdPartySupport\Acf',
 			'easyLanguage\ThirdPartySupport\Polylang\Init',
+			'easyLanguage\ThirdPartySupport\Scf',
 			'easyLanguage\ThirdPartySupport\Sublanguage\Init',
 			'easyLanguage\ThirdPartySupport\TranslatePress\Init',
 			'easyLanguage\ThirdPartySupport\Wpml\Init',
