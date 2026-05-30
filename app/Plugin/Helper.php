@@ -10,9 +10,9 @@ namespace easyLanguage\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Dependencies\easySettingsForWordPress\Page;
-use easyLanguage\Dependencies\easySettingsForWordPress\Section;
-use easyLanguage\Dependencies\easySettingsForWordPress\Tab;
+use easySettingsForWordPress\Page;
+use easySettingsForWordPress\Section;
+use easySettingsForWordPress\Tab;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Objects;
 use easyLanguage\EasyLanguage\Parser_Base;
@@ -786,7 +786,7 @@ class Helper {
 	 */
 	public static function get_hidden_section(): Section|false {
 		// get settings object.
-		$settings_obj = \easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance();
+		$settings_obj = Settings::get_instance()->get_settings_obj();
 
 		// create a hidden page for hidden settings.
 		$hidden_page = $settings_obj->get_page( 'hidden_page' );

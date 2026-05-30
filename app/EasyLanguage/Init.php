@@ -10,15 +10,15 @@ namespace easyLanguage\EasyLanguage;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Checkbox;
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Checkboxes;
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Number;
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Radio;
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Select;
-use easyLanguage\Dependencies\easySettingsForWordPress\Page;
-use easyLanguage\Dependencies\easySettingsForWordPress\Section;
-use easyLanguage\Dependencies\easySettingsForWordPress\Settings;
-use easyLanguage\Dependencies\easySettingsForWordPress\Tab;
+use easySettingsForWordPress\Fields\Checkbox;
+use easySettingsForWordPress\Fields\Checkboxes;
+use easySettingsForWordPress\Fields\Number;
+use easySettingsForWordPress\Fields\Radio;
+use easySettingsForWordPress\Fields\Select;
+use easySettingsForWordPress\Page;
+use easySettingsForWordPress\Section;
+use easySettingsForWordPress\Settings;
+use easySettingsForWordPress\Tab;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Base;
@@ -44,7 +44,7 @@ use WP_User;
  */
 class Init extends Base implements ThirdPartySupport_Base {
 	/**
-	 * Marker for foreign plugin (plugins which are supported by this plugin but not maintained).
+	 * Marker for a foreign plugin (plugins, which are supported by this plugin but not maintained).
 	 *
 	 * @var bool
 	 */
@@ -205,7 +205,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				continue;
 			}
 
-			// bail if the post-type is not visible in backend.
+			// bail if the post-type is invisible in the backend.
 			if ( false === $post_type_obj->show_in_menu ) {
 				continue;
 			}
@@ -1081,7 +1081,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 */
 	public function add_settings(): void {
 		// get the settings object.
-		$settings_obj = Settings::get_instance();
+		$settings_obj = \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj();
 
 		// get the settings page.
 		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
@@ -1144,7 +1144,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				'post' => '1',
 			)
 		);
-		$field = new Checkboxes();
+		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose supported post-types', 'easy-language' ) );
 		$field->set_options( $post_types );
 		$field->set_sanitize_callback( array( $this, 'validate_checkboxes' ) );
@@ -1183,7 +1183,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $general_main_section );
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
-		$field = new Checkboxes();
+		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose supported taxonomies', 'easy-language' ) );
 		$field->set_options( $taxonomies );
 		$field->set_sanitize_callback( array( $this, 'validate_checkboxes' ) );
@@ -1206,7 +1206,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $general_main_section );
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
-		$field = new Checkboxes();
+		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose languages', 'easy-language' ) );
 		/* translators: %1$s will be replaced by the settings-URL for the active API */
 		$field->set_description( ( $readonly && $active_api ) ? sprintf( __( 'Go to <a href="%1$s">API-settings</a> to choose the languages you want to use.', 'easy-language' ), esc_url( $active_api->get_settings_url() ) ) : __( 'Choose the language you want to use for simplifications of texts.', 'easy-language' ) );
@@ -1220,7 +1220,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $general_main_section );
 		$setting->set_type( 'string' );
 		$setting->set_default( 'draft' );
-		$field = new Select();
+		$field = new Select( $settings_obj );
 		$field->set_title( __( 'Set object state on plugin deactivation', 'easy-language' ) );
 		$field->set_description( __( 'If the plugin is disabled, your simplified objects will get the state set here. If plugin is reactivated they will be set to their state before.<br><strong>Hint:</strong> During uninstallation all simplified objects will be deleted regardless of the setting here.', 'easy-language' ) );
 		$field->set_options(
@@ -1237,7 +1237,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $general_main_section );
 		$setting->set_type( 'string' );
 		$setting->set_default( 'draft' );
-		$field = new Select();
+		$field = new Select( $settings_obj );
 		$field->set_title( __( 'Set object state on API change', 'easy-language' ) );
 		$field->set_description( __( 'If the API is changed, set all objects of the former API to the state set here.', 'easy-language' ) );
 		$field->set_options(
@@ -1254,8 +1254,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$permalink_setting->set_section( $general_main_section );
 		$permalink_setting->set_type( 'integer' );
 		$permalink_setting->set_default( 1 );
-		$field = new Checkbox();
-		$field->set_title( __( 'Generate permalink for translated objects', 'easy-language' ) );
+		$field = new Checkbox( $settings_obj );
+		$field->set_title( __( 'Generate a permalink for translated objects', 'easy-language' ) );
 		$field->set_description( __( 'If enabled an individual permalink will be generated from title after simplification of the title.', 'easy-language' ) );
 		$permalink_setting->set_field( $field );
 
@@ -1268,7 +1268,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$automatic_simplification_setting->set_section( $automatic_section );
 		$automatic_simplification_setting->set_type( 'integer' );
 		$automatic_simplification_setting->set_default( 1 );
-		$field = new Checkbox();
+		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Enable automatic simplifications', 'easy-language' ) );
 		$field->set_description( __( 'If enabled open simplifications will be run automatically in the intervall set below.', 'easy-language' ) );
 		$automatic_simplification_setting->set_field( $field );
@@ -1279,7 +1279,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 6 );
-		$field = new Number();
+		$field = new Number( $settings_obj );
 		$field->set_title( __( 'Number of items per run', 'easy-language' ) );
 		$field->set_description( __( 'The amount of items per automatic simplification run.', 'easy-language' ) );
 		$field->add_depend( $automatic_simplification_setting, 1 );
@@ -1290,7 +1290,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $automatic_section );
 		$setting->set_type( 'string' );
 		$setting->set_default( 'easy_language_15minutly' );
-		$field = new Select();
+		$field = new Select( $settings_obj );
 		$field->set_title( __( 'Interval for automatic simplification', 'easy-language' ) );
 		$field->set_description( __( 'Simplification are run automatically in this intervall.', 'easy-language' ) );
 		$field->set_options( Intervals::get_instance()->get_intervals_for_settings() );
@@ -1308,7 +1308,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'string' );
 		$setting->set_default( 'hide_not_translated' );
-		$field = new Radio();
+		$field = new Radio( $settings_obj );
 		$field->set_title( __( 'Choose link-mode for language switcher', 'easy-language' ) );
 		$field->set_options(
 			array(
@@ -1350,9 +1350,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $advanced_section );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 1 );
-		$field = new Checkbox();
+		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Show debug info', 'easy-language' ) );
-		$field->set_description( __( 'When activated, you can see which texts would be simplified for each object.', 'easy-language' ) );
+		$field->set_description( __( 'When activated, you can see, which texts would be simplified for each object.', 'easy-language' ) );
 		$setting->set_field( $field );
 	}
 

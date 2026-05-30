@@ -10,13 +10,13 @@ namespace easyLanguage\Apis\Capito;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Checkboxes;
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Select;
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Text;
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\TextInfo;
-use easyLanguage\Dependencies\easySettingsForWordPress\Page;
-use easyLanguage\Dependencies\easySettingsForWordPress\Section;
-use easyLanguage\Dependencies\easySettingsForWordPress\Settings;
+use easySettingsForWordPress\Fields\Checkboxes;
+use easySettingsForWordPress\Fields\Select;
+use easySettingsForWordPress\Fields\Text;
+use easySettingsForWordPress\Fields\TextInfo;
+use easySettingsForWordPress\Page;
+use easySettingsForWordPress\Section;
+use easySettingsForWordPress\Settings;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
@@ -478,13 +478,13 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Add capito settings.
+	 * Add the capito settings.
 	 *
 	 * @return void
 	 */
 	public function add_settings(): void {
 		// get the settings object.
-		$settings_obj = Settings::get_instance();
+		$settings_obj = \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj();
 
 		// get the settings page.
 		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
@@ -551,7 +551,7 @@ class Capito extends Base implements Api_Base {
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
-		$field = new Text();
+		$field = new Text( $settings_obj );
 		$field->set_title( __( 'capito API Key', 'easy-language' ) );
 		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
 		$field->set_description( $description );
@@ -564,7 +564,7 @@ class Capito extends Base implements Api_Base {
 		$setting->set_type( 'string' );
 		$setting->set_default( 'user' );
 		$setting->set_save_callback( array( $this, 'clean_team_cache' ) );
-		$field = new Select();
+		$field = new Select( $settings_obj );
 		$field->set_title( __( 'Account type', 'easy-language' ) );
 		$field->set_options(
 			array(
@@ -624,17 +624,17 @@ class Capito extends Base implements Api_Base {
 			}
 
 			if ( empty( $teams ) ) {
-				$field = new TextInfo();
+				$field = new TextInfo( $settings_obj );
 				$field->set_title( __( 'Account type', 'easy-language' ) );
 				$field->set_description( __( 'You are not assigned to any team.', 'easy-language' ) );
 			} else {
 				// create the select field for the teams.
-				$field = new Select();
+				$field = new Select( $settings_obj );
 				$field->set_title( __( 'Account type', 'easy-language' ) );
 				$field->set_options( $teams );
 			}
 		} else {
-			$field = new TextInfo();
+			$field = new TextInfo( $settings_obj );
 			$field->set_title( __( 'Account type', 'easy-language' ) );
 			$field->set_description( __( 'Choose team as account type.', 'easy-language' ) );
 		}
@@ -649,7 +649,7 @@ class Capito extends Base implements Api_Base {
 		$setting->set_section( $capito_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
-		$field = new Checkboxes();
+		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose source languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible source languages for capito-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ) );
 		$field->set_readonly( false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support );
@@ -669,7 +669,7 @@ class Capito extends Base implements Api_Base {
 		$setting->set_section( $capito_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
-		$field = new Checkboxes();
+		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible target languages for capito-simplifications.', 'easy-language' ) );
 		$field->set_readonly( false === $this->is_capito_token_set() || $foreign_translation_plugin_with_api_support );
@@ -687,7 +687,7 @@ class Capito extends Base implements Api_Base {
 		$setting->set_type( 'string' );
 		$setting->set_default( 'easy_language_daily' );
 		$setting->set_save_callback( array( $this, 'set_quota_interval' ) );
-		$field = new Select();
+		$field = new Select( $settings_obj );
 		$field->set_title( __( 'Interval for quota request', 'easy-language' ) );
 		$field->set_description( __( 'The actual API quota will be requested in this interval.', 'easy-language' ) );
 		$field->set_options( Intervals::get_instance()->get_intervals_for_settings() );

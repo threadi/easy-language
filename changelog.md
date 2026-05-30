@@ -6,6 +6,11 @@
 
 - Optimized some codes to fulfill the plugin check action in GitHub
 - Both blocks are now compatible with WordPress 7.0
+- Updates settings library
+
+### Fixed
+
+- Fixed wrong path to build the switcher block
 
 ## [3.1.2] - 27.05.2026
 
@@ -13,7 +18,7 @@
 
 - Optimized icon dialog handling
 - Renamed the dialog script handle to full compatibility with other plugins, which also use this script
-- Optimized loading of simplified terms on get_term_args
+- Optimized loading of simplified terms on "get_term_args"
 
 ### Fixed
 
@@ -47,7 +52,7 @@
 
 ### Fixed
 
-- Fixed wrong loading of WP_Filesystem-handler in some cases
+- Fixed wrong loading of WP_Filesystem-handler sometimes
 
 ## [3.0.2] - 16.02.2026
 
@@ -73,7 +78,7 @@
 
 ### Added
 
-- Revamped plugin for a more robust and sustainable structure
+- Revamped the plugin for a more robust and sustainable structure
 - Added a new object to handle all plugin settings
 - Added support for any post-types that enabled title and editor as we need them for the simplification of texts
 - Added support to simply taxonomy terms
