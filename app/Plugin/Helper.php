@@ -33,7 +33,7 @@ class Helper {
 	/**
 	 * Checks whether a given plugin is active.
 	 *
-	 * Used because WP's own function is_plugin_active() is not accessible everywhere.
+	 * Used because WPs own function is_plugin_active() is not accessible everywhere.
 	 *
 	 * @param string $plugin Path to the plugin.
 	 * @return bool
@@ -73,7 +73,7 @@ class Helper {
 			$lang = self::get_wp_lang();
 		}
 
-		// return the current language as language-code (e.g. "de_de").
+		// Return the current language as language-code (e.g., "de_de").
 		return $lang;
 	}
 
@@ -116,7 +116,7 @@ class Helper {
 	/**
 	 * Return the active Wordpress-language.
 	 *
-	 * @return string The language in locale-format (e.g. "ab_CD").
+	 * @return string The language in locale-format (e.g., "ab_CD").
 	 */
 	public static function get_wp_lang(): string {
 		$wp_language = get_locale();
@@ -141,7 +141,7 @@ class Helper {
 			$wp_language = EASY_LANGUAGE_LANGUAGE_FALLBACK;
 		}
 
-		// return language in format ab_CD (e.g. en_US).
+		// Return the language in the format "ab_CD" (e.g., en_US).
 		return $wp_language;
 	}
 
@@ -158,7 +158,7 @@ class Helper {
 			return;
 		}
 
-		// get the post type of the old entry.
+		// get the old entries post type.
 		$post_type = get_post_type( $old_id );
 
 		// bail if post type could not be read.
@@ -192,7 +192,7 @@ class Helper {
 					continue;
 				}
 
-				// loop through the values of the key and add them to the new id.
+				// loop through the values of the key and add them to the new ID.
 				foreach ( $meta_values as $meta_value ) {
 					add_post_meta( $new_id, $meta_key, wp_slash( maybe_unserialize( $meta_value ) ) );
 				}
@@ -220,7 +220,7 @@ class Helper {
 	}
 
 	/**
-	 * Check if settings-errors-entry already exists in array.
+	 * Check if settings-errors-entry already exists in an array.
 	 *
 	 * @param string                  $entry The search entry.
 	 * @param array<string|int,mixed> $error_list The list of errors.
@@ -304,7 +304,7 @@ class Helper {
 		// get first result.
 		$post = $attachment->posts[0];
 
-		// bail if attachment is not WP_Post.
+		// bail if attachment is not "WP_Post".
 		if ( ! $post instanceof WP_Post ) {
 			return false;
 		}
@@ -343,7 +343,7 @@ class Helper {
 		// get first result.
 		$post = $attachment->posts[0];
 
-		// bail if the attachment is not WP_Post.
+		// bail if the attachment is not "WP_Post".
 		if ( ! $post instanceof WP_Post ) {
 			return false;
 		}
@@ -360,7 +360,7 @@ class Helper {
 	 * @return string
 	 */
 	public static function get_icon_img_for_language_code( string $language_code ): string {
-		// get list of images from db.
+		// get list of images from the database.
 		$images = (array) get_option( 'easy_language_icons', array() );
 
 		// return image if it is in list.
@@ -374,7 +374,7 @@ class Helper {
 			// get image.
 			$image = wp_get_attachment_image( $attachment->ID, array( 18, 18 ) );
 
-			// add it to list in DB.
+			// add it to list in the database.
 			$images[ $language_code ] = $image;
 			update_option( 'easy_language_icons', $images );
 
@@ -398,7 +398,7 @@ class Helper {
 	 */
 	public static function generate_admin_bar_language_menu( string $id, WP_Admin_Bar $admin_bar, array $target_languages, Objects $my_object, string $object_type_name ): void {
 		foreach ( $target_languages as $language_code => $target_language ) {
-			/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
+			/* translators: %1$s will be replaced by the object-name (e.g., page or post), %2$s will be replaced by the language-name */
 			$title = sprintf( __( 'Show this %1$s in %2$s ', 'easy-language' ), esc_html( $object_type_name ), esc_html( $target_language['label'] ) );
 
 			// check if this object is already translated in this language.
@@ -417,9 +417,9 @@ class Helper {
 				// get the URL.
 				$url = $page_builder_obj->get_edit_link();
 			} else {
-				// create link to generate a new simplification for this object.
+				// create a link to generate a new simplification for this object.
 				$url = $my_object->get_simplification_link( $language_code );
-				/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the language-name */
+				/* translators: %1$s will be replaced by the object-name (e.g., page or post), %2$s will be replaced by the language-name */
 				$title = sprintf( __( 'Create a simplification of this %1$s in %2$s ', 'easy-language' ), esc_html( $object_type_name ), esc_html( $target_language['label'] ) );
 			}
 
@@ -469,7 +469,7 @@ class Helper {
 	}
 
 	/**
-	 * Get object by given id and type.
+	 * Get object by given ID and type.
 	 *
 	 * @param int    $object_id The object-ID.
 	 * @param string $object_type The object-type (optional).
@@ -485,7 +485,7 @@ class Helper {
 		 *
 		 * @param bool $false Return false as default.
 		 * @param int $object_id The ID of the object.
-		 * @param string $object_type The type of the object.
+		 * @param string $object_type The object type.
 		 *
 		 * @noinspection PhpConditionAlreadyCheckedInspection
 		 */
@@ -496,7 +496,7 @@ class Helper {
 	 * Get language of given object depending on third-party-plugins.
 	 *
 	 * @param int    $object_id The ID of the object.
-	 * @param string $object_type The type of object.
+	 * @param string $object_type The object type.
 	 *
 	 * @return string
 	 */
@@ -575,7 +575,7 @@ class Helper {
 			$transient_obj->set_dismissible_days( 2 );
 			$transient_obj->set_name( 'easy_language_source_language_not_supported' );
 			/* translators: %1$s will be replaced by the name of the actual language, %2$s by the API title, %3$s by the URL for WordPress settings, %5$s by a list of languages, %6$s by the URL for the API settings. */
-			$transient_obj->set_message( sprintf( __( '<strong>The language of your website (%1$s) is actually not supported as source language for simplifications via %2$s!</strong><br>You will not be able to use %3$s.<br>You will not be able to simplify any texts.<br>You have to <a href="%4$s">switch the language</a> in WordPress to one of the following supported source languages: %5$s Or <a href="%6$s">choose another API</a> which supports the language.', 'easy-language' ), '<em>' . esc_html( $language_name ) . '</em>', esc_html( $api->get_title() ), esc_html( $api->get_title() ), esc_url( self::get_wp_settings_url() ), wp_kses_post( $language_list ), esc_url( self::get_settings_page_url() ) ) );
+			$transient_obj->set_message( sprintf( __( '<strong>The language of your website (%1$s) is actually not supported as source language for simplifications via %2$s!</strong><br>You will not be able to use %3$s.<br>You will not be able to simplify any texts.<br>You have to <a href="%4$s">switch the language</a> in WordPress to one of the following supported source languages: %5$s Or <a href="%6$s">choose another API</a>, which supports the language.', 'easy-language' ), '<em>' . esc_html( $language_name ) . '</em>', esc_html( $api->get_title() ), esc_html( $api->get_title() ), esc_url( self::get_wp_settings_url() ), wp_kses_post( $language_list ), esc_url( self::get_settings_page_url() ) ) );
 			$transient_obj->set_type( 'error' );
 			$transient_obj->set_hide_on( array( Setup::get_instance()->get_setup_link() ) );
 			$transient_obj->save();
@@ -604,7 +604,7 @@ class Helper {
 			'title'   => sprintf( __( 'Used page builder is not available', 'easy-language' ), esc_html( $post_object->get_title() ) ),
 			'texts'   => array(
 				/* translators: %1$s will be replaced by the API-title */
-				'<p>' . sprintf( __( 'This %1$s has been edited with %2$s.<br>This %3$s is currently not activated in your WordPress.<br>Therefore, unfortunately, this page cannot be simplified.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $page_builder->get_name() ), esc_html( $page_builder->get_name() ) ) . '</p>',
+				'<p>' . sprintf( __( 'This %1$s has been edited with %2$s.<br>This %3$s is now not activated in your WordPress.<br>Therefore, unfortunately, this page cannot be simplified.', 'easy-language' ), esc_html( $post_object->get_type_name() ), esc_html( $page_builder->get_name() ), esc_html( $page_builder->get_name() ) ) . '</p>',
 			),
 			'buttons' => array(
 				array(
@@ -636,7 +636,7 @@ class Helper {
 			return admin_url( basename( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) ) );
 		}
 
-		// set return value for page url.
+		// set return value for the page url.
 		$page_url = '';
 
 		// get actual object.
@@ -661,7 +661,7 @@ class Helper {
 	 * Return the version of the given file.
 	 *
 	 * With WP_DEBUG or plugin-debug enabled its @filemtime().
-	 * Without this it's the plugin-version.
+	 * Without this it is the plugin-version.
 	 *
 	 * @param string $filepath The absolute path to the requested file.
 	 *
@@ -678,11 +678,11 @@ class Helper {
 			return (string) filemtime( $filepath );
 		}
 
-		// get the plugin version which as been set in release.
+		// get the plugin version, which as been set in release.
 		$plugin_version = EASY_LANGUAGE_VERSION;
 
 		/**
-		 * Filter the used file version (for JS- and CSS-files which get enqueued).
+		 * Filter the used file version (for JS- and CSS-files, which get enqueued).
 		 *
 		 * @since 2.3.0 Available since 2.3.0.
 		 *
@@ -749,7 +749,7 @@ class Helper {
 	 *
 	 * Case #1: After WP_REST_Request initialization
 	 * Case #2: Support "plain" permalink settings and check if `rest_route` starts with `/`
-	 * Case #3: It can happen that WP_Rewrite is not yet initialized,
+	 * Case #3: It can happen that "WP_Rewrite" is not yet initialized,
 	 *          so do this (wp-settings.php)
 	 * Case #4: URL Path begins with wp-json/ (your REST prefix)
 	 *          Also supports WP installations in sub-folders
@@ -837,7 +837,7 @@ class Helper {
 		\WP_Filesystem();
 		global $wp_filesystem;
 
-		// bail if wp_filesystem is not of "WP_Filesystem_Base".
+		// bail if "wp_filesystem" is not of "WP_Filesystem_Base".
 		if ( ! $wp_filesystem instanceof WP_Filesystem_Base ) {
 			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
 			require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';

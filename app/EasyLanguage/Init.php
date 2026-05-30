@@ -3123,4 +3123,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// return the dialog.
 		wp_send_json( $dialog );
 	}
+
+	/**
+	 * Return whether this is a language plugin.
+	 *
+	 * @return bool
+	 */
+	public function is_language_plugin(): bool {
+		return true;
+	}
 }

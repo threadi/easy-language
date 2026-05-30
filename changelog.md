@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added configurable possibility to simply texts in ACF and SCF fields (editor and textarea)
+
 ### Changed
 
 - Optimized some codes to fulfill the plugin check action in GitHub

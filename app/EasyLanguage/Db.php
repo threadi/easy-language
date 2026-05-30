@@ -128,7 +128,7 @@ class Db {
 	}
 
 	/**
-	 * Adds new text for simplification in DB. Returns the text-object for the given text.
+	 * Adds new text for simplification in the database. Returns the text-object for the given text.
 	 *
 	 * @param string $text The original text.
 	 * @param string $source_language The language of this text.

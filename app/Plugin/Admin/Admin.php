@@ -108,10 +108,14 @@ class Admin {
 			 * Show hint if the foreign plugin does NOT support APIs.
 			 */
 			/* translators: %1$s will be replaced by the name of the multilingual-plugin */
-			$message = sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional languages.', 'easy-language' ), $plugin_obj->get_title() );
-			if ( false === $plugin_obj->is_supporting_apis() ) {
+			$message = sprintf( __( 'You have enabled the plugin <strong>%1$s</strong>. We extend it to simplify its texts.', 'easy-language' ), $plugin_obj->get_title() );
+			if ( $plugin_obj->is_language_plugin() ) {
 				/* translators: %1$s will be replaced by the name of the multilingual-plugin */
-				$message .= '<br><br>' . sprintf( __( 'Due to limitations of %1$s, it is unfortunately not possible for us to provide automatic simplification for easy or plain language. If you want to use this, you could use the <i>Easy Language</i> plugin alongside %1$s.', 'easy-language' ), esc_html( $plugin_obj->get_title() ), esc_html( $plugin_obj->get_title() ) );
+				$message = sprintf( __( 'You have enabled the multilingual-plugin <strong>%1$s</strong>. We have added Easy and Plain language to this plugin as additional languages.', 'easy-language' ), $plugin_obj->get_title() );
+				if ( ! $plugin_obj->is_supporting_apis() ) {
+					/* translators: %1$s will be replaced by the name of the multilingual-plugin */
+					$message .= '<br><br>' . sprintf( __( 'Due to limitations of %1$s, it is unfortunately not possible for us to provide automatic simplification for easy or plain language. If you want to use this, you could use the <i>Easy Language</i> plugin alongside %1$s.', 'easy-language' ), esc_html( $plugin_obj->get_title() ), esc_html( $plugin_obj->get_title() ) );
+				}
 			}
 			$transient_obj->set_message( $message );
 			$transient_obj->save();
