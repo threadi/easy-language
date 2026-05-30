@@ -10,6 +10,7 @@ namespace easyLanguage\EasyLanguage;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Plugin\Settings;
 use easySettingsForWordPress\Fields\Checkbox;
 use easySettingsForWordPress\Fields\Checkboxes;
 use easySettingsForWordPress\Fields\Number;
@@ -17,7 +18,6 @@ use easySettingsForWordPress\Fields\Radio;
 use easySettingsForWordPress\Fields\Select;
 use easySettingsForWordPress\Page;
 use easySettingsForWordPress\Section;
-use easySettingsForWordPress\Settings;
 use easySettingsForWordPress\Tab;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Apis;
@@ -1707,6 +1707,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check nonce.
 		check_ajax_referer( 'easy-language-run-simplification-nonce', 'nonce' );
 
+		// bail if capability is not given.
+		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
+			return;
+		}
+
 		// get the object-id from the request.
 		$object_id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
 
@@ -2089,11 +2094,17 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check nonce.
 		check_ajax_referer( 'easy-language-delete-data-nonce', 'nonce' );
 
+		// bail if capability is not given.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
 		// bail if deletion is already running.
 		if ( 1 === absint( get_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING, 0 ) ) ) {
 			// Log event.
 			Log::get_instance()->add_log( __( 'Deletion of simplified texts is already running.', 'easy-language' ), 'error' );
 
+			// do nothing more.
 			return;
 		}
 
@@ -2158,6 +2169,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check nonce.
 		check_ajax_referer( 'easy-language-reset-processing-simplification-nonce', 'nonce' );
 
+		// bail if capability is not given.
+		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
+			return;
+		}
+
 		// get the object-id from request.
 		$object_id = isset( $_POST['post'] ) ? absint( $_POST['post'] ) : 0;
 
@@ -2190,6 +2206,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 	public function ajax_ignore_processing_simplification(): void {
 		// check nonce.
 		check_ajax_referer( 'easy-language-ignore-processing-simplification-nonce', 'nonce' );
+
+		// bail if capability is not given.
+		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
+			return;
+		}
 
 		// get the object-id from request.
 		$object_id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
@@ -2297,6 +2318,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 	public function add_simplification_by_ajax(): void {
 		// check nonce.
 		check_ajax_referer( 'easy-language-add-simplification-nonce', 'nonce' );
+
+		// bail if capability is not given.
+		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
+			return;
+		}
 
 		// prepare the answer.
 		$return = array(
@@ -2557,6 +2583,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check nonce.
 		check_admin_referer( 'easy-language-create-schedules', 'nonce' );
 
+		// bail if capability is missing.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
 		// check if automatic interval exist, if not create it.
 		if ( ! wp_next_scheduled( 'easy_language_automatic_simplification' ) ) {
 			// add it.
@@ -2671,6 +2702,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check nonce.
 		check_admin_referer( 'easy-language-delete-text-for-simplification', 'nonce' );
 
+		// bail if capability is missing.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			// redirect user back to list.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
 		// get requested text.
 		$text_id = ! empty( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 		if ( $text_id > 0 ) {
@@ -2700,6 +2738,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 	public function delete_all_to_simplified_texts(): void {
 		// check nonce.
 		check_admin_referer( 'easy-language-delete-all-to-simplified_texts', 'nonce' );
+
+		// bail if capability is missing.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			// redirect user back to list.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
 
 		// get all texts that should be simplified.
 		$entries = Db::get_instance()->get_entries( self::get_instance()->get_filter_for_entries_to_simplify() );
@@ -2942,7 +2987,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return $resulting_object;
 		}
 
-		// bail if class of object is not WP_Term.
+		// bail if class of object is not "WP_Term".
 		if ( ! $wp_object instanceof WP_Term ) {
 			return false;
 		}
@@ -2969,6 +3014,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check nonce.
 		check_admin_referer( 'easy-language-delete-simplification', 'nonce' );
 
+		// bail if capability is missing.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			// redirect user back to list.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
 		// get requested text.
 		$text_id = ! empty( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 		if ( $text_id > 0 ) {
@@ -2985,7 +3037,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// redirect user back to list.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( wp_get_referer() );
 		exit;
 	}
 

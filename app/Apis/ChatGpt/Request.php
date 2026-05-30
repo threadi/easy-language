@@ -1,6 +1,6 @@
 <?php
 /**
- * File for handler for each request to ChatGpt API.
+ * File for a handler for each request to ChatGpt API.
  *
  * @package easy-language
  */
@@ -15,6 +15,7 @@ use easyLanguage\Plugin\Log;
 use easyLanguage\Plugin\Log_Api;
 use easyLanguage\EasyLanguage\Db;
 use WP_Error;
+use WP_HTTP_Requests_Response;
 
 /**
  * Create and send a request to ChatGpt API. Gets the response.
@@ -219,7 +220,10 @@ class Request implements Api_Requests {
 		$this->response = wp_remote_retrieve_body( $this->get_result() );
 
 		// secure http-status.
-		$this->http_status = $this->get_result()['http_response']->get_status(); // @phpstan-ignore offsetAccess.nonOffsetAccessible
+		$result = $this->get_result();
+		if ( is_array( $result ) && ! empty( $result['http_response'] ) && $result['http_response'] instanceof WP_HTTP_Requests_Response ) {
+			$this->http_status = $result['http_response']->get_status();
+		}
 
 		// log the request (with an anonymized token).
 		$args['headers']['Authorization'] = 'anonymized';
@@ -229,7 +233,7 @@ class Request implements Api_Requests {
 		}
 		Log_Api::get_instance()->add_log( $chatgpt_obj->get_name(), $this->http_status, $args_json, 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
 
-		// save request and result in db.
+		// save request and result in the database.
 		$this->save_in_db();
 	}
 
@@ -291,7 +295,7 @@ class Request implements Api_Requests {
 	/**
 	 * Set source-language for this request.
 	 *
-	 * @param string $language The source language as string (e.g. "de_EL").
+	 * @param string $language The source language as string (e.g., "de_EL").
 	 *
 	 * @return void
 	 */
@@ -300,7 +304,7 @@ class Request implements Api_Requests {
 	}
 
 	/**
-	 * Save the data of this request in DB.
+	 * Save the data of this request in the database.
 	 *
 	 * @return void
 	 */

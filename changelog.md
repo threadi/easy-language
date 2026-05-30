@@ -5,12 +5,14 @@
 ### Changed
 
 - Optimized some codes to fulfill the plugin check action in GitHub
+- Optimized check for capability on some actions
 - Both blocks are now compatible with WordPress 7.0
 - Updates settings library
 
 ### Fixed
 
 - Fixed wrong path to build the switcher block
+- Fixed missing loading of languages for single post in Divi
 
 ## [3.1.2] - 27.05.2026
 

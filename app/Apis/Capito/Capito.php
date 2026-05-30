@@ -969,6 +969,11 @@ class Capito extends Base implements Api_Base {
 		// check nonce.
 		check_admin_referer( 'easy-language-capito-remove-token', 'nonce' );
 
+		// bail if user has not the capability for this.
+		if ( ! current_user_can( \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
 		// delete settings.
 		delete_option( 'easy_language_capito_api_key' );
 		delete_option( 'easy_language_capito_quota' );
@@ -1041,6 +1046,7 @@ class Capito extends Base implements Api_Base {
 	 * Run a token test.
 	 *
 	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function run_token_test(): void {
 		// check nonce.

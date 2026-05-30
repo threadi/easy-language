@@ -128,7 +128,7 @@ abstract class Objects {
 	}
 
 	/**
-	 * Return language-specific title for the type of the given object.
+	 * Return the language-specific title for the object type.
 	 *
 	 * @return string
 	 */
@@ -238,7 +238,7 @@ abstract class Objects {
 
 		$js_top = '';
 		/**
-		 * Set top for JS-location if the page builder which makes it necessary is actually used.
+		 * Set top for JS-location depending on the used page builder.
 		 *
 		 * @since 2.2.0 Available since 2.2.0.
 		 * @param string $js_top The top-string.
@@ -284,18 +284,18 @@ abstract class Objects {
 
 			/**
 			 * Determine all texts stored for the project that are still on "in_process".
-			 * If there are, cancel the process and give the user a choice:
+			 * If they are, cancel the process and give the user a choice:
 			 * - Go back to the failed simplifications.
 			 * - Ignore and do not simplify
 			 */
-			// define filter for entry-loading to check the max count of entries for this object.
+			// define a filter for entry-loading to check the max count of entries for this object.
 			$filter = array(
 				'object_id'   => $this->get_id(),
 				'object_type' => $this->get_type(),
 				'state'       => 'processing',
 			);
 
-			// get entries which are in process and show the error if there are any.
+			// get all entries, which are in process and show the error.
 			$entries_in_process = Db::get_instance()->get_entries( $filter );
 			if ( ! empty( $entries_in_process ) ) {
 				// set result.
@@ -332,7 +332,7 @@ abstract class Objects {
 				return 0;
 			}
 
-			// define filter for entry-loading to check max count of entries for this object.
+			// define a filter for entry-loading to check max count of entries for this object.
 			$filter = array(
 				'object_id'   => $this->get_id(),
 				'object_type' => $this->get_type(),
@@ -400,7 +400,7 @@ abstract class Objects {
 		// counter for simplifications during this run.
 		$c = 0;
 
-		// define filter to get all entries for this object that should be simplified.
+		// define a filter to get all entries for this object that should be simplified.
 		$filter = array(
 			'object_id'   => $this->get_id(),
 			'object_type' => $this->get_type(),
@@ -424,7 +424,7 @@ abstract class Objects {
 					'className' => 'wp-dialog-hint',
 					'title'     => __( 'Simplification canceled', 'easy-language' ),
 					'texts'     => array(
-						/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
+						/* translators: %1$s will be replaced by the object-name (e.g., page or post), %2$s will be replaced by the used API-title */
 						'<p>' . sprintf( __( '<strong>The texts in this %1$s are already simplified.</strong><br>%2$s was not used. Nothing has been changed.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->get_api()->get_title() ) ) . '</p>',
 					),
 					'buttons'   => array(
@@ -450,8 +450,8 @@ abstract class Objects {
 					'className' => 'wp-dialog-hint',
 					'title'     => __( 'Simplification canceled', 'easy-language' ),
 					'texts'     => array(
-						/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
-						'<p>' . sprintf( __( '<strong>Some texts in this %1$s are already simplified.</strong><br>Other missing simplifications has been run via %2$s and are insert into the text.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->get_api()->get_title() ) ) . '</p>',
+						/* translators: %1$s will be replaced by the object-name (e.g., page or post), %2$s will be replaced by the used API-title */
+						'<p>' . sprintf( __( '<strong>Some texts in this %1$s are already simplified.</strong><br>Other missing simplifications has been run via %2$s and are added into the text.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->get_api()->get_title() ) ) . '</p>',
 					),
 					'buttons'   => array(
 						array(
@@ -510,7 +510,7 @@ abstract class Objects {
 				'className' => 'wp-dialog-green',
 				'title'     => __( 'Simplification processed', 'easy-language' ),
 				'texts'     => array(
-					/* translators: %1$s will be replaced by the object-name (e.g. page or post), %2$s will be replaced by the used API-title */
+					/* translators: %1$s will be replaced by the object-name (e.g., page or post), %2$s will be replaced by the used API-title */
 					'<p>' . sprintf( __( '<strong>Simplifications have been returned from %2$s.</strong><br>They were inserted into the %1$s.', 'easy-language' ), esc_html( $this->get_type_name() ), esc_html( $simplification_obj->get_api()->get_title() ) ) . '</p>',
 				),
 				'buttons'   => array(
@@ -530,7 +530,7 @@ abstract class Objects {
 			// get the public URL of this object.
 			$public_url = $this->get_link();
 
-			// add the public URL as button on dialog, if set.
+			// add the public URL as button on the dialog, if set.
 			if ( ! empty( $public_url ) ) {
 				$dialog['buttons'][2] = $dialog['buttons'][1];
 				$dialog['buttons'][1] = $dialog['buttons'][0];
@@ -621,7 +621,7 @@ abstract class Objects {
 				),
 			);
 			if ( ! current_user_can( 'manage_options' ) ) {
-				$dialog['texts'][0] = __( '<strong>No simplifications get from API.</strong><br>Please consult an administrator to check the API-log.', 'easy-language' );
+				$dialog['texts'][0] = __( '<strong>No simplifications get from API.</strong><br>Please ask an administrator of your project to check the API log.', 'easy-language' );
 			}
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 		}
@@ -638,7 +638,7 @@ abstract class Objects {
 
 		$js_top = '';
 		/**
-		 * Set top for JS-location if the page builder which makes it necessary is actually used.
+		 * Set top for JS-location depending on the used page builder.
 		 *
 		 * @since 2.2.0 Available since 2.2.0.
 		 * @param string $js_top The top-string.
@@ -649,7 +649,7 @@ abstract class Objects {
 		if ( 0 === $c && $replaced_count > 0 ) {
 			$entry->set_state( 'in_use' );
 
-			// create dialog.
+			// create a dialog.
 			$dialog = array(
 				'className' => 'wp-dialog-success',
 				'title'     => __( 'Simplification processed', 'easy-language' ),
@@ -700,7 +700,7 @@ abstract class Objects {
 			return 0;
 		}
 
-		// set the state to in_use.
+		// set the state to "in_use".
 		$entry->set_state( 'in_use' );
 
 		// return simplification-count.
@@ -712,7 +712,7 @@ abstract class Objects {
 	 *
 	 * @return void
 	 */
-	protected function process_simplification_trigger_on_end() {}
+	protected function process_simplification_trigger_on_end(): void {}
 
 	/**
 	 * Set error marker for running simplification.

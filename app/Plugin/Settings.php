@@ -732,6 +732,11 @@ class Settings {
 		// check nonce.
 		check_admin_referer( 'easy-language-reset', 'nonce' );
 
+		// bail if user has not the capability for this.
+		if ( ! current_user_can( self::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
 		// uninstall all.
 		Uninstall::get_instance()->run();
 

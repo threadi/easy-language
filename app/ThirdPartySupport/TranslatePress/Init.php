@@ -180,7 +180,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			$languages[ $language ] = '1';
 		}
 
-		// return resulting list of locales (e.g. "de_EL").
+		// return the resulting list of locales (e.g., "de_EL").
 		return $languages;
 	}
 
@@ -191,7 +191,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return array<string,array<string,mixed>>
 	 */
 	public function add_to_wp_list( array $supported_languages_list ): array {
-		// remove our own filter to prevent loop.
+		// remove our own filter to prevent a loop.
 		remove_filter( 'trp_wp_languages', array( $this, 'add_to_wp_list' ) );
 
 		// get possible target-languages.
@@ -297,9 +297,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// add them to the list.
 		foreach ( $languages as $language_code => $language ) {
-			// check if the table exist.
+			// check if the table of our own language exist.
 			if ( ! empty( $wpdb->get_results( $wpdb->prepare( 'SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = %s', array( $trp_query->get_table_name( strtolower( $language_code ) ) ) ) ) ) ) {
-				// truncate tables.
+				// truncate the tables of our own language.
 				$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $trp_query->get_table_name( strtolower( $language_code ) ) ) ) ); // @phpstan-ignore argument.type
 				$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $trp_query->get_gettext_table_name( strtolower( $language_code ) ) ) ) ); // @phpstan-ignore argument.type
 			}
@@ -310,7 +310,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * Check for supported languages.
 	 *
 	 * @param bool  $all_are_available Whether all languages are available.
-	 * @param array<string,string> $trp_languages List of languages in translatepress.
+	 * @param array<string,string> $trp_languages List of languages in TranslatePress.
 	 * @param array<string,array<string,mixed>> $settings List of settings.
 	 *
 	 * @return bool
@@ -318,7 +318,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 **/
 	public function get_supported_languages_for_trp( bool $all_are_available, array $trp_languages, array $settings ): bool {
 		if ( in_array( $settings['trp_machine_translation_settings']['translation-engine'], array( 'summ-ai', 'capito' ), true ) ) {
-			// remove our own filter to prevent loop.
+			// remove our own filter to prevent a loop.
 			remove_filter( 'trp_mt_available_supported_languages', array( $this, 'get_supported_languages_for_trp' ) );
 
 			// get possible target-languages.
@@ -342,7 +342,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Add settings for our individual language for language-switcher in frontend.
+	 * Add settings for our individual language for language-switcher in the frontend.
 	 *
 	 * @param array<string>  $current_language The current language.
 	 * @param array<string>  $trp_published_languages The list of published languages.

@@ -1085,6 +1085,7 @@ class Summ_Ai extends Base implements Api_Base {
 	 * Get quota via link request.
 	 *
 	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function get_quota_from_api_via_link(): void {
 		// check nonce.
@@ -1261,7 +1262,12 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function remove_token(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-summ-ai-remove-token', 'nonce' );
+		check_admin_referer( 'easy-language-summ-ai-remove-token', 'nonce' );
+
+		// bail if user has not the capability for this.
+		if ( ! current_user_can( \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
 
 		// delete settings.
 		delete_option( 'easy_language_summ_ai_api_key' );

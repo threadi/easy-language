@@ -64,7 +64,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return the post-type of this object.
+	 * Return the object type.
 	 *
 	 * @return string
 	 */
@@ -368,20 +368,20 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return the parser of the pagebuilder which has been used to edit this object.
+	 * Return the parser of the pagebuilder, which has been used to edit this object.
 	 *
 	 * @return Parser_Base|false
 	 */
 	public function get_page_builder(): Parser_Base|false {
-		// check the list of supported parser for compatibility.
-		// the first one which matches will be used.
+		// Check the list of supported parser for compatibility.
+		// The first match will be used.
 		foreach ( Parsers::get_instance()->get_parsers_as_objects() as $parser_obj ) {
 			// bail if the object does not use this PageBuilder.
 			if ( ! $parser_obj->is_object_using_pagebuilder( $this ) ) {
 				continue;
 			}
 
-			// set the object id.
+			// set the object ID.
 			$parser_obj->set_object_id( $this->get_id() );
 
 			// return the parser for this parser.
@@ -465,7 +465,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return entries which are assigned to this post-object.
+	 * Return entries, which are assigned to this post-object.
 	 *
 	 * @return array<Text>
 	 */
@@ -654,7 +654,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
-	 * Return the language-specific title for the type of the given object.
+	 * Return the language-specific title for the object type.
 	 *
 	 * @return string
 	 */

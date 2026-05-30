@@ -675,11 +675,17 @@ class ChatGpt extends Base implements Api_Base {
 	 * Remove token via click.
 	 *
 	 * @return void
-	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function remove_token(): void {
 		// check nonce.
 		check_admin_referer( 'easy-language-chatgpt-remove-token', 'nonce' );
+
+		// bail if user has not the capability for this.
+		if ( ! current_user_can( \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
 
 		// delete settings.
 		delete_option( 'easy_language_chatgpt_api_key' );
@@ -691,7 +697,6 @@ class ChatGpt extends Base implements Api_Base {
 
 		// redirect user.
 		wp_safe_redirect( wp_get_referer() );
-		exit;
 	}
 
 	/**
