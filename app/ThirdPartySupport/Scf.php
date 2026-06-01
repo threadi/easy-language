@@ -72,12 +72,12 @@ class Scf extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function init(): void {
-		// bail if plugin is not enabled.
+		// bail if the plugin is not enabled.
 		if ( ! $this->is_active() ) {
 			return;
 		}
 
-		// use ACF hooks.
+		// use SCF hooks.
 		add_action( 'acf/render_field_settings', array( $this, 'extend_field_settings' ) );
 
 		// use our own hooks.
@@ -142,14 +142,19 @@ class Scf extends Base implements ThirdPartySupport_Base {
 	/**
 	 * Add meta fields to simplification.
 	 *
-	 * @param Post_Object $object The post object.
+	 * @param Post_Object $post_object The post object.
 	 * @param int         $post_id The post ID of the simplification object.
 	 * @param string      $source_language The source language.
 	 * @return void
 	 */
-	public function add_meta_fields_to_simplification( Post_Object $object, int $post_id, string $source_language ): void {
-		// get all ACF fields on this object.
-		$fields = get_fields( $object->get_id() );
+	public function add_meta_fields_to_simplification( Post_Object $post_object, int $post_id, string $source_language ): void {
+		// bail if SCF functions are not available.
+		if ( ! function_exists( 'get_fields' ) ) {
+			return;
+		}
+
+		// get all SCF fields on this object.
+		$fields = get_fields( $post_object->get_id() );
 
 		// bail if no fields are configured.
 		if ( empty( $fields ) ) {
@@ -165,7 +170,7 @@ class Scf extends Base implements ThirdPartySupport_Base {
 		// check each field for its type.
 		foreach ( $fields as $key => $content ) {
 			// get the field array with its settings.
-			$field_array = get_field_object( $key, $object->get_id() );
+			$field_array = get_field_object( $key, $post_object->get_id() );
 
 			// bail if field object could not be loaded.
 			if ( ! is_array( $field_array ) ) {
@@ -196,7 +201,7 @@ class Scf extends Base implements ThirdPartySupport_Base {
 					continue;
 				}
 			}
-			$original_meta_obj->set_object( $object->get_type(), $post_id, 0, '' );
+			$original_meta_obj->set_object( $post_object->get_type(), $post_id, 0, '' );
 			$original_meta_obj->set_state( 'to_simplify' );
 		}
 	}
@@ -213,12 +218,12 @@ class Scf extends Base implements ThirdPartySupport_Base {
 		);
 
 		/**
-		 * Filter the list of simplifiable fields in ACF.
+		 * Filter the list of simplifiable fields in SCF.
 		 *
 		 * @since 3.2.0 Available since 3.2.0.
 		 * @param array<string,bool> $types List of types.
 		 */
-		return apply_filters( 'easy_language_acf_types', $types );
+		return apply_filters( 'easy_language_scf_types', $types );
 	}
 
 	/**
@@ -253,8 +258,8 @@ class Scf extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function extend_field_settings( array $field ): void {
-		// bail if this field is not supported.
-		if ( ! array_key_exists( $field['type'], $this->get_types() ) ) {
+		// bail if this field is not supported or main SCF-function is not available.
+		if ( ! array_key_exists( $field['type'], $this->get_types() ) || ! function_exists( 'acf_render_field_setting' ) ) {
 			return;
 		}
 

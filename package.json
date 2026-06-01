@@ -1,6 +1,6 @@
 {
   "name": "@easy-language/easy-language",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Provides Blocks for WordPress.",
   "author": "laOlaWeb GmbH",
   "license": "GPL-2.0-or-later",
@@ -17,6 +17,8 @@
     "build:divi-language-field": "wp-scripts build legacy-classes/Divi/src/language_field.js --output-path=legacy-classes/Divi/build/",
     "start:navigation-switcher": "wp-scripts start blocks/navigation-switcher/src/index.js --output-path=blocks/navigation-switcher/build/",
     "build:navigation-switcher": "wp-scripts build blocks/navigation-switcher/src/index.js --output-path=blocks/navigation-switcher/build/",
+	"start:sidebar": "wp-scripts start src/sidebar.js --output-path=js/generated/",
+	"build:sidebar": "wp-scripts build src/sidebar.js --output-path=js/generated/",
     "make-pot": "wp i18n make-pot . languages/easy-language.pot --exclude=blocks/switcher/src/,blocks/navigation-switcher/src/,svn/",
     "make-json": "wp i18n make-json languages"
   },
