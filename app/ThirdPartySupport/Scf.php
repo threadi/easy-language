@@ -142,14 +142,14 @@ class Scf extends Base implements ThirdPartySupport_Base {
 	/**
 	 * Add meta fields to simplification.
 	 *
-	 * @param Post_Object $object The post object.
+	 * @param Post_Object $post_object The post object.
 	 * @param int         $post_id The post ID of the simplification object.
 	 * @param string      $source_language The source language.
 	 * @return void
 	 */
-	public function add_meta_fields_to_simplification( Post_Object $object, int $post_id, string $source_language ): void {
+	public function add_meta_fields_to_simplification( Post_Object $post_object, int $post_id, string $source_language ): void {
 		// get all ACF fields on this object.
-		$fields = get_fields( $object->get_id() );
+		$fields = get_fields( $post_object->get_id() );
 
 		// bail if no fields are configured.
 		if ( empty( $fields ) ) {
@@ -165,7 +165,7 @@ class Scf extends Base implements ThirdPartySupport_Base {
 		// check each field for its type.
 		foreach ( $fields as $key => $content ) {
 			// get the field array with its settings.
-			$field_array = get_field_object( $key, $object->get_id() );
+			$field_array = get_field_object( $key, $post_object->get_id() );
 
 			// bail if field object could not be loaded.
 			if ( ! is_array( $field_array ) ) {
@@ -196,7 +196,7 @@ class Scf extends Base implements ThirdPartySupport_Base {
 					continue;
 				}
 			}
-			$original_meta_obj->set_object( $object->get_type(), $post_id, 0, '' );
+			$original_meta_obj->set_object( $post_object->get_type(), $post_id, 0, '' );
 			$original_meta_obj->set_state( 'to_simplify' );
 		}
 	}

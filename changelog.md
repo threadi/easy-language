@@ -1,10 +1,10 @@
 # Changelog
 
-## [Unreleased]
+## [3.2.2] - 27.06.2026
 
 ### Added
 
-- Added configurable possibility to simply texts in ACF and SCF fields (editor and textarea)
+- Added configurable possibility to simplify texts in ACF and SCF fields (editor and textarea)
 
 ### Changed
 
