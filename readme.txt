@@ -105,9 +105,13 @@ Each release of this plugin will only be published if it fulfills the following 
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Optimized icon dialog handling
-- Renamed the dialog script handle to full compatibility with other plugins, which also use this script
-- Optimized loading of simplified terms on get_term_args
-- Fixed missing blocks in release
+- Added a sidebar panel in Block Editor instead of the old meta-box only for WordPress 7.0 or newer if the Block Editor is used
+- Added configurable possibility to simply text in ACF and SCF fields (editor and textarea)
+- Optimized some codes to fulfill the plugin check action in GitHub
+- Optimized check for capability on some actions
+- Both blocks are now compatible with WordPress 7.0
+- Updates settings library
+- Fixed wrong path to build the switcher block
+- Fixed missing loading of languages for single post in Divi
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
