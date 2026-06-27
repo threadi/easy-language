@@ -82,8 +82,19 @@ class PageBuilders {
 	 * @return void
 	 */
 	public function add_meta_box( string $post_type ): void {
+		global $wp_version;
+
 		// bail if the given post-type is not supported.
 		if ( ! Init::get_instance()->is_post_type_supported( $post_type ) ) {
+			return;
+		}
+
+		// do not add in WordPress 7.0 or newer if the block editor is used for this post-type.
+		if (
+			function_exists( 'use_block_editor_for_post_type' ) &&
+			version_compare( $wp_version, '7.0', '>=' ) &&
+			use_block_editor_for_post_type( $post_type )
+		) {
 			return;
 		}
 
@@ -201,6 +212,7 @@ class PageBuilders {
 	private function get_page_builder(): array {
 		// create the list.
 		$list = array(
+			'\easyLanguage\PageBuilder\BlockEditor',
 			'\easyLanguage\PageBuilder\Bricks',
 			'\easyLanguage\PageBuilder\Divi',
 			'\easyLanguage\PageBuilder\Divi5',

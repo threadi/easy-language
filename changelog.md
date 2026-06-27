@@ -1,10 +1,11 @@
 # Changelog
 
-## [3.2.2] - 27.06.2026
+## [Unreleased]
 
 ### Added
 
-- Added configurable possibility to simplify texts in ACF and SCF fields (editor and textarea)
+- Added a sidebar panel in Block Editor instead of the old meta-box only for WordPress 7.0 or newer if the Block Editor is used
+- Added configurable possibility to simply text in ACF and SCF fields (editor and textarea)
 
 ### Changed
 

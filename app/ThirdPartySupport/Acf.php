@@ -72,7 +72,7 @@ class Acf extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function init(): void {
-		// bail if plugin is not enabled.
+		// bail if the plugin is not enabled.
 		if ( ! $this->is_active() ) {
 			return;
 		}
@@ -148,6 +148,11 @@ class Acf extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function add_meta_fields_to_simplification( Post_Object $post_object, int $post_id, string $source_language ): void {
+		// bail if ACF functions are not available.
+		if ( ! function_exists( 'get_fields' ) ) {
+			return;
+		}
+
 		// get all ACF fields on this object.
 		$fields = get_fields( $post_object->get_id() );
 
@@ -253,8 +258,8 @@ class Acf extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function extend_field_settings( array $field ): void {
-		// bail if this field is not supported.
-		if ( ! array_key_exists( $field['type'], $this->get_types() ) ) {
+		// bail if this field is not supported or main ACF-function is not available.
+		if ( ! array_key_exists( $field['type'], $this->get_types() ) || ! function_exists( 'acf_render_field_setting' ) ) {
 			return;
 		}
 
