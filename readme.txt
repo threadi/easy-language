@@ -105,7 +105,8 @@ Each release of this plugin will only be published if it fulfills the following 
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added configurable possibility to simplify texts in ACF and SCF fields (editor and textarea)
+- Added a sidebar panel in Block Editor instead of the old meta-box only for WordPress 7.0 or newer if the Block Editor is used
+- Added configurable possibility to simply text in ACF and SCF fields (editor and textarea)
 - Optimized some codes to fulfill the plugin check action in GitHub
 - Optimized check for capability on some actions
 - Both blocks are now compatible with WordPress 7.0
