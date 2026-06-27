@@ -37,6 +37,7 @@ jobs:
                   cd ../../../
                   npm run build:switcher
                   npm run build:navigation-switcher
+                  npm run build:sidebar
                   cd legacy-classes/Divi/
                   npm i
                   npm run build
@@ -92,7 +93,7 @@ jobs:
                   exclude-files:
                       .gitignore,.editorconfig,.gitkeep,build/build.properties.dist
                   exclude-directories:
-                      app/Dependencies/easyTransientsForWordPress/,svn/,release/,build/
+                      app/Dependencies/easyTransientsForWordPress/,svn/,release/,build/,src/
                   ignore-codes:
                       WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
                   include-experimental: false
