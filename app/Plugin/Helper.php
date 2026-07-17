@@ -10,13 +10,13 @@ namespace easyLanguage\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Dependencies\easySettingsForWordPress\Page;
-use easyLanguage\Dependencies\easySettingsForWordPress\Section;
-use easyLanguage\Dependencies\easySettingsForWordPress\Tab;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Objects;
 use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
+use easySettingsForWordPress\Page;
+use easySettingsForWordPress\Section;
+use easySettingsForWordPress\Tab;
 use WP_Admin_Bar;
 use WP_Error;
 use WP_Filesystem_Base;
@@ -43,7 +43,7 @@ class Helper {
 	}
 
 	/**
-	 * Return the lokal URL of our plugin.
+	 * Return the local URL of our plugin.
 	 *
 	 * @return string
 	 */
@@ -52,7 +52,7 @@ class Helper {
 	}
 
 	/**
-	 * Check if WP CLI is used for actual request.
+	 * Check if WP CLI is used for the actual request.
 	 *
 	 * @return bool
 	 */
@@ -519,7 +519,7 @@ class Helper {
 			}
 		}
 
-		// fallback and use the WordPress-language.
+		// fallback and use the WordPress language.
 		return self::get_wp_lang();
 	}
 
@@ -786,7 +786,7 @@ class Helper {
 	 */
 	public static function get_hidden_section(): Section|false {
 		// get settings object.
-		$settings_obj = \easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance();
+		$settings_obj = Settings::get_instance()->get_settings_object();
 
 		// create a hidden page for hidden settings.
 		$hidden_page = $settings_obj->get_page( 'hidden_page' );

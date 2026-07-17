@@ -10,18 +10,16 @@ namespace easyLanguage\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Dependencies\easySettingsForWordPress\Export;
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Button;
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Checkbox;
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Number;
-use easyLanguage\Dependencies\easySettingsForWordPress\Fields\Radio;
-use easyLanguage\Dependencies\easySettingsForWordPress\Import;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Tables\Texts_In_Use_Table;
 use easyLanguage\EasyLanguage\Tables\Texts_To_Simplify_Table;
 use easyLanguage\Plugin\Tables\Language_Icons_Table;
 use easyLanguage\Plugin\Tables\Log_Api_Table;
 use easyLanguage\Plugin\Tables\Log_Table;
+use easySettingsForWordPress\Fields\Button;
+use easySettingsForWordPress\Fields\Checkbox;
+use easySettingsForWordPress\Fields\Number;
+use easySettingsForWordPress\Fields\Radio;
 
 /**
  * Object tot handle settings.
@@ -79,15 +77,14 @@ class Settings {
 		/**
 		 * Configure the basic settings object.
 		 */
-		$settings_obj = \easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance();
+		$settings_obj  = $this->get_settings_object();
+		$settings_page = $settings_obj->add_page( 'easy_language_settings' );
 		$settings_obj->set_slug( 'easy_language' );
 		$settings_obj->set_plugin_slug( plugin_basename( EASY_LANGUAGE ) );
 		$settings_obj->set_menu_title( _x( 'Easy Language', 'settings menu title', 'easy-language' ) );
 		$settings_obj->set_title( __( 'Easy Language Settings', 'easy-language' ) );
 		$settings_obj->set_menu_slug( 'easy_language_settings' );
 		$settings_obj->set_menu_parent_slug( 'options-general.php' );
-		$settings_obj->set_url( Helper::get_plugin_url() . '/app/Dependencies/easySettingsForWordPress/' );
-		$settings_obj->set_path( Helper::get_plugin_path() . '/app/Dependencies/easySettingsForWordPress/' );
 		$settings_obj->show_settings_link_in_plugin_list( true );
 		$settings_obj->set_translations(
 			array(
@@ -130,9 +127,6 @@ class Settings {
 		if ( Helper::is_rest_request() || Setup::get_instance()->is_completed() ) {
 			$settings_obj->init();
 		}
-
-		// create the settings page.
-		$settings_page = $settings_obj->add_page( 'easy_language_settings' );
 
 		/**
 		 * Configure all tabs for this object.
@@ -256,7 +250,7 @@ class Settings {
 		$setting->set_type( 'string' );
 		$setting->set_default( 'summ_ai' );
 		$setting->set_save_callback( array( $this, 'save_api' ) );
-		$field = new Radio();
+		$field = new Radio( $settings_obj );
 		$field->set_title( __( 'Select your API', 'easy-language' ) );
 		$field->set_options( $apis );
 		$field->set_sanitize_callback( array( self::get_instance(), 'sanitize_radio_as_string' ) );
@@ -268,7 +262,7 @@ class Settings {
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 50 );
-		$field = new Number();
+		$field = new Number( $settings_obj );
 		$field->set_title( __( 'Set max age for log entries', 'easy-language' ) );
 		$field->set_description( __( 'Older log-entries will be deleted automatically.', 'easy-language' ) );
 		$setting->set_field( $field );
@@ -279,7 +273,7 @@ class Settings {
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 60 );
-		$field = new Number();
+		$field = new Number( $settings_obj );
 		$field->set_title( __( 'Timeout for API-requests', 'easy-language' ) );
 		$field->set_description( __( 'This value is in seconds. If you get a timeout from an API try to set this to a higher value.', 'easy-language' ) );
 		$setting->set_field( $field );
@@ -290,7 +284,7 @@ class Settings {
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 1 );
-		$field = new Number();
+		$field = new Number( $settings_obj );
 		$field->set_title( __( 'Simplifications per AJAX-request', 'easy-language' ) );
 		$field->set_description( __( 'This number of simplifications is carried out per run on an API.', 'easy-language' ) );
 		$setting->set_field( $field );
@@ -301,7 +295,7 @@ class Settings {
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 1 );
-		$field = new Checkbox();
+		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Delete unused simplified texts', 'easy-language' ) );
 		$field->set_description( __( 'If this is enabled, any unused simplified texts will be deleted. To simplify the same text again, a new request must be sent to the API you are using, at the expense of your quota.<br>If disabled all simplified texts will be hold in your database. This could be at the expense of the size and performance of your database.', 'easy-language' ) );
 		$setting->set_field( $field );
@@ -331,7 +325,7 @@ class Settings {
 		$setting->set_section( $advanced_tab_main );
 		$setting->set_show_in_rest( false );
 		$setting->prevent_export( true );
-		$field = new Button();
+		$field = new Button( $settings_obj );
 		$field->set_title( __( 'Delete ALL simplified texts', 'easy-language' ) );
 		$field->set_description( __( 'After click on this button all simplified data will be deleted. Your contents will not be changed..', 'easy-language' ) );
 		$field->set_button_title( __( 'Delete now', 'easy-language' ) );
@@ -345,7 +339,7 @@ class Settings {
 		$setting->set_section( $advanced_tab_main );
 		$setting->set_show_in_rest( false );
 		$setting->prevent_export( true );
-		$field = new Button();
+		$field = new Button( $settings_obj );
 		$field->set_title( __( 'Plugin Intro', 'easy-language' ) );
 		$field->set_description( __( 'After click on this button the intro for this plugin will be re-initialized.', 'easy-language' ) );
 		$field->set_button_title( __( 'Reset Intro', 'easy-language' ) );
@@ -359,7 +353,7 @@ class Settings {
 		$setting->set_show_in_rest( true );
 		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
-		$field = new Checkbox();
+		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Debug-Mode', 'easy-language' ) );
 		$field->set_description( __( 'If enabled the plugin will log every API action.', 'easy-language' ) );
 		$setting->set_field( $field );
@@ -401,17 +395,78 @@ class Settings {
 		$advanced_plugin->set_title( __( 'Plugin handling', 'easy-language' ) );
 		$advanced_plugin->set_setting( $settings_obj );
 
-		// add import.
-		Import::get_instance()->add_settings( $settings_obj, $advanced_plugin );
+		// create import dialog.
+		$dialog = array(
+			'title'   => __( 'Import settings', 'easy-language' ),
+			'texts'   => array(
+				'<p><strong>' . __( 'Choose the JSON-file with the settings.', 'easy-language' ) . '</strong></p>',
+				'<input type="file" accept="application/json" name="import_settings_file" id="import_settings_file">',
+			),
+			'buttons' => array(
+				array(
+					'action'  => 'settings_import_file();',
+					'variant' => 'primary',
+					'text'    => __( 'Import now', 'easy-language' ),
+				),
+				array(
+					'action'  => 'closeDialog();',
+					'variant' => 'secondary',
+					'text'    => __( 'Cancel', 'easy-language' ),
+				),
+			),
+		);
 
-		// add export.
-		Export::get_instance()->add_settings( $settings_obj, $advanced_plugin );
+		// add setting.
+		$setting = $settings_obj->add_setting( 'import_settings' );
+		$setting->set_section( $advanced_plugin );
+		$setting->set_autoload( false );
+		$setting->prevent_export( true );
+		$field = new Button( $settings_obj );
+		$field->set_title( __( 'Import', 'easy-language' ) );
+		$field->set_button_title( __( 'Import now', 'easy-language' ) );
+		$field->add_class( 'easy-dialog-for-wordpress' );
+		$field->set_custom_attributes( array( 'data-dialog' => (string) wp_json_encode( $dialog ) ) );
+		$setting->set_field( $field );
+
+		// create export dialog.
+		$dialog = array(
+			'title'   => __( 'Export settings', 'easy-language' ),
+			'texts'   => array(
+				'<p><strong>' . __( 'Click on the following button to download the settings as JSON-file.', 'easy-language' ) . '</strong></p>',
+				'<p>' . __( 'You can import this JSON-file in other projects using this WordPress plugin or theme.', 'easy-language' ) . '</p>',
+			),
+			'buttons' => array(
+				array(
+					'action'  => 'closeDialog();location.href="' . $settings_obj->get_export_obj()->get_download_url() . '";',
+					'variant' => 'primary',
+					'text'    => __( 'Export now', 'easy-language' ),
+				),
+				array(
+					'action'  => 'closeDialog();',
+					'variant' => 'secondary',
+					'text'    => __( 'Cancel', 'easy-language' ),
+				),
+			),
+		);
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'export_settings' );
+		$setting->set_section( $advanced_plugin );
+		$setting->set_autoload( false );
+		$setting->prevent_export( true );
+		$field = new Button( $settings_obj );
+		$field->set_title( __( 'Export', 'easy-language' ) );
+		$field->set_button_title( __( 'Export now', 'easy-language' ) );
+		$field->set_button_url( $settings_obj->get_export_obj()->get_download_url() );
+		$field->add_class( 'easy-dialog-for-wordpress' );
+		$field->set_custom_attributes( array( 'data-dialog' => (string) wp_json_encode( $dialog ) ) );
+		$setting->set_field( $field );
 
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easyLanguageReset' );
 		$setting->set_section( $advanced_plugin );
 		$setting->prevent_export( true );
-		$field = new Button();
+		$field = new Button( $settings_obj );
 		$field->set_title( __( 'Reset plugin', 'easy-language' ) );
 		$field->set_button_title( __( 'Reset plugin', 'easy-language' ) );
 		$field->set_button_url( $reset_url );
@@ -708,5 +763,27 @@ class Settings {
 	 */
 	public function sanitize_radio_as_string( ?string $value ): string {
 		return (string) $value;
+	}
+
+	/**
+	 * Return the settings object.
+	 *
+	 * @return \easySettingsForWordPress\Settings
+	 */
+	public function get_settings_object(): \easySettingsForWordPress\Settings {
+		/**
+		 * Variable for the object.
+		 */
+		static $settings = null;
+
+		/**
+		 * Get the object one time.
+		 */
+		if ( null === $settings ) {
+			$settings = new \easySettingsForWordPress\Settings( EASY_LANGUAGE );
+		}
+
+		// return it.
+		return $settings;
 	}
 }

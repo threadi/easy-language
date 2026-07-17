@@ -177,7 +177,7 @@ class Installer {
 		}
 
 		// initiate the settings.
-		\easyLanguage\Dependencies\easySettingsForWordPress\Settings::get_instance()->activation();
+		Settings::get_instance()->get_settings_object()->activation();
 	}
 
 	/**

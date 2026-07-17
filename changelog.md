@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Updated settings library and their usage
+- Updated dependencies
+
 ## [3.1.2] - 27.05.2026
 
 ### Changed
@@ -10,7 +17,7 @@
 
 ### Fixed
 
-- Fixed missing blocks in release
+- Fixed missing blocks in the release
 
 ## [3.1.1] - 01.05.2026
 
