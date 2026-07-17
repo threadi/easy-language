@@ -159,6 +159,13 @@ class Apis {
 		// check nonce.
 		check_admin_referer( 'easy-language-export-api-log', 'nonce' );
 
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
 		// get name of the api to export.
 		$export_api = isset( $_GET['api'] ) ? sanitize_text_field( wp_unslash( $_GET['api'] ) ) : '';
 
@@ -218,14 +225,14 @@ class Apis {
 		// check nonce.
 		check_admin_referer( 'easy-language-clear-api-log', 'nonce' );
 
-		// bail if user has not the capability for this.
-		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
-			// redirect user back.
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
 			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}
 
-		// get name of the api to clear.
+		// get the name of the API to clear.
 		$clear_api = isset( $_GET['api'] ) ? sanitize_text_field( wp_unslash( $_GET['api'] ) ) : '';
 
 		// bail if no api is given.

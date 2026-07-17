@@ -12,12 +12,6 @@ namespace easyLanguage\Apis\ChatGpt;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easySettingsForWordPress\Fields\Checkboxes;
-use easySettingsForWordPress\Fields\FieldTable;
-use easySettingsForWordPress\Fields\Select;
-use easySettingsForWordPress\Fields\Text;
-use easySettingsForWordPress\Page;
-use easySettingsForWordPress\Settings;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Api_Base;
@@ -25,9 +19,15 @@ use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Language_Icon;
 use easyLanguage\Plugin\Log;
+use easyLanguage\Plugin\Settings;
 use easyLanguage\Plugin\ThirdPartySupports;
 use easyLanguage\EasyLanguage\Db;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
+use easySettingsForWordPress\Fields\Checkboxes;
+use easySettingsForWordPress\Fields\FieldTable;
+use easySettingsForWordPress\Fields\Select;
+use easySettingsForWordPress\Fields\Text;
+use easySettingsForWordPress\Page;
 use wpdb;
 
 /**
@@ -313,7 +313,7 @@ class ChatGpt extends Base implements Api_Base {
 	 */
 	public function add_settings(): void {
 		// get the settings object.
-		$settings_obj = \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj();
+		$settings_obj = Settings::get_instance()->get_settings_object();
 
 		// get the settings page.
 		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
@@ -351,7 +351,7 @@ class ChatGpt extends Base implements Api_Base {
 			$description .= '<br><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
 		}
 
-		// if foreign simplification-plugin with API-support is used, hide the language-settings.
+		// if foreign simplification-plugin with the API-support is used, hide the language-settings.
 		$foreign_translation_plugin_with_api_support = false;
 		foreach ( ThirdPartySupports::get_instance()->get_available_plugins() as $plugin_obj ) {
 			if ( $plugin_obj->is_foreign_plugin() && $plugin_obj->is_supporting_apis() && $plugin_obj->is_active() ) {
@@ -366,6 +366,7 @@ class ChatGpt extends Base implements Api_Base {
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
+		$setting->prevent_export( true );
 		$field = new Text( $settings_obj );
 		$field->set_title( __( 'ChatGPT API Key', 'easy-language' ) );
 		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
@@ -675,13 +676,14 @@ class ChatGpt extends Base implements Api_Base {
 	 * Remove token via click.
 	 *
 	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function remove_token(): void {
 		// check nonce.
 		check_admin_referer( 'easy-language-chatgpt-remove-token', 'nonce' );
 
-		// bail if user has not the capability for this.
-		if ( ! current_user_can( \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
 			wp_safe_redirect( wp_get_referer() );
 			exit;
@@ -697,6 +699,7 @@ class ChatGpt extends Base implements Api_Base {
 
 		// redirect user.
 		wp_safe_redirect( wp_get_referer() );
+		exit;
 	}
 
 	/**

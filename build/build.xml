@@ -205,7 +205,6 @@
 				<exclude name="**/Divi/package.json" />
 				<exclude name="**/Divi/*/.gitkeep" />
 			</zipfileset>
-			<zipfileset dir="${src.dir}/libs" prefix="${plugin.slug}/libs" />
 			<zipfileset dir="${src.dir}/js" prefix="${plugin.slug}/js" />
 			<zipfileset dir="${src.dir}/templates" prefix="${plugin.slug}/templates" />
 			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
@@ -214,9 +213,8 @@
 			<zipfileset dir="${src.dir}/vendor/threadi/easy-dialog-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-dialog-for-wordpress/build/" />
 			<zipfileset dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-setup-for-wordpress/build/" />
 			<zipfileset dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/lib/" prefix="${plugin.slug}/vendor/threadi/easy-setup-for-wordpress/lib/" />
-			<zipfileset dir="${src.dir}/vendor/threadi/easy-settings-for-wordpress/assets/" prefix="${plugin.slug}/vendor/threadi/easy-settings-for-wordpress/assets/" />
-			<zipfileset dir="${src.dir}/vendor/threadi/easy-settings-for-wordpress/src/" prefix="${plugin.slug}/vendor/threadi/easy-settings-for-wordpress/src/" />
 			<zipfileset dir="${src.dir}/vendor/threadi/react-dialog/build/" prefix="${plugin.slug}/vendor/threadi/react-dialog/build/" />
+			<zipfileset dir="${src.dir}/vendor/threadi/easy-settings-for-wordpress/" prefix="${plugin.slug}/vendor/threadi/easy-settings-for-wordpress/" />
             <zipfileset dir="${src.dir}" includes="wpml-config.xml" prefix="${plugin.slug}" />
 			<zipfileset dir="${src.dir}" includes="readme-release.txt" fullpath="${plugin.slug}/readme.txt" />
 			<zipfileset dir="${src.dir}" includes="composer.json" fullpath="${plugin.slug}/composer.json" />

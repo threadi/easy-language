@@ -10,13 +10,6 @@ namespace easyLanguage\Apis\Capito;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easySettingsForWordPress\Fields\Checkboxes;
-use easySettingsForWordPress\Fields\Select;
-use easySettingsForWordPress\Fields\Text;
-use easySettingsForWordPress\Fields\TextInfo;
-use easySettingsForWordPress\Page;
-use easySettingsForWordPress\Section;
-use easySettingsForWordPress\Settings;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
@@ -27,8 +20,15 @@ use easyLanguage\Plugin\Language_Icon;
 use easyLanguage\Plugin\Languages;
 use easyLanguage\Plugin\Log;
 use easyLanguage\EasyLanguage\Db;
+use easyLanguage\Plugin\Settings;
 use easyLanguage\Plugin\ThirdPartySupports;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
+use easySettingsForWordPress\Fields\Checkboxes;
+use easySettingsForWordPress\Fields\Select;
+use easySettingsForWordPress\Fields\Text;
+use easySettingsForWordPress\Fields\TextInfo;
+use easySettingsForWordPress\Page;
+use easySettingsForWordPress\Section;
 use wpdb;
 
 /**
@@ -58,7 +58,7 @@ class Capito extends Base implements Api_Base {
 	private static ?Capito $instance = null;
 
 	/**
-	 * Set max text length for single entry for this API.
+	 * Set the maximum text length for a single entry for this API.
 	 *
 	 * @var int
 	 */
@@ -157,7 +157,7 @@ class Capito extends Base implements Api_Base {
 		// wrapper for buttons.
 		$text .= $this->get_description_buttons();
 
-		// return resulting text.
+		// return the resulting text.
 		return $text;
 	}
 
@@ -384,7 +384,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return list of options this plugin is using, e.g. for clean uninstallation.
+	 * Return a list of options this plugin is using, e.g., for clean uninstallation.
 	 *
 	 * @return array<string>
 	 */
@@ -400,7 +400,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return list of transients this plugin is using, e.g. for clean uninstall.
+	 * Return a list of transients this plugin is using, e.g., for clean uninstall.
 	 *
 	 * @return array<string>
 	 */
@@ -411,7 +411,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Initialize api-specific CLI-functions for this API: none.
+	 * Initialize API-specific CLI functions for this API: none.
 	 *
 	 * @return void
 	 */
@@ -484,7 +484,7 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function add_settings(): void {
 		// get the settings object.
-		$settings_obj = \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj();
+		$settings_obj = Settings::get_instance()->get_settings_object();
 
 		// get the settings page.
 		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
@@ -508,11 +508,11 @@ class Capito extends Base implements Api_Base {
 		$capito_quota->set_title( __( 'capito Quota', 'easy-language' ) );
 		$capito_quota->set_callback( array( $this, 'show_quota' ) );
 
-		// Set description for token field if it has not been set.
+		// Set the description for the token field if it has not been set.
 		/* translators: %1$s will be replaced by the capito URL */
 		$description = sprintf( __( 'Get your capito API Token <a href="%1$s" target="_blank">here (opens new window)</a> (copy "Access Token").<br>If you have any questions about the token provided by capito, please contact their support: <a href="%2$s" target="_blank">%2$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_token_url() ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_capito_token_set() ) {
-			// Set link to test the entered token.
+			// Set the link to test the entered token.
 			$url = add_query_arg(
 				array(
 					'action' => 'easy_language_capito_test_token',
@@ -521,7 +521,7 @@ class Capito extends Base implements Api_Base {
 				get_admin_url() . 'admin.php'
 			);
 
-			// set link to remove the token.
+			// set the link to remove the token.
 			$remove_token_url = add_query_arg(
 				array(
 					'action' => 'easy_language_capito_remove_token',
@@ -551,6 +551,7 @@ class Capito extends Base implements Api_Base {
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
+		$setting->prevent_export( true );
 		$field = new Text( $settings_obj );
 		$field->set_title( __( 'capito API Key', 'easy-language' ) );
 		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
@@ -697,7 +698,7 @@ class Capito extends Base implements Api_Base {
 		// get the hidden section.
 		$hidden_section = Helper::get_hidden_section();
 
-		// bail if section could not be loaded.
+		// bail if the section could not be loaded.
 		if ( ! $hidden_section instanceof Section ) {
 			return;
 		}
@@ -807,7 +808,7 @@ class Capito extends Base implements Api_Base {
 			return $value;
 		}
 
-		// if no token has been entered, show hint.
+		// if no token has been entered, show a hint.
 		if ( empty( $value ) ) {
 			add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __( 'You did not enter an API token. All simplification options via the capito API have been disabled.', 'easy-language' ) );
 		} elseif ( 0 !== strcmp( $value, get_option( 'easy_language_capito_api_key', '' ) ) ) {
@@ -969,9 +970,11 @@ class Capito extends Base implements Api_Base {
 		// check nonce.
 		check_admin_referer( 'easy-language-capito-remove-token', 'nonce' );
 
-		// bail if user has not the capability for this.
-		if ( ! current_user_can( \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
-			return;
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
 		}
 
 		// delete settings.
@@ -1005,6 +1008,13 @@ class Capito extends Base implements Api_Base {
 	public function get_quota_from_api_via_link(): void {
 		// check nonce.
 		check_admin_referer( 'easy-language-capito-get-quota', 'nonce' );
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
 
 		// get quota.
 		$this->get_quota_from_api();
@@ -1051,6 +1061,13 @@ class Capito extends Base implements Api_Base {
 	public function run_token_test(): void {
 		// check nonce.
 		check_admin_referer( 'easy-language-capito-test-token', 'nonce' );
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
 
 		// get global transients-object.
 		$transients_obj = Transients::get_instance();

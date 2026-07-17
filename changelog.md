@@ -1,5 +1,21 @@
 # Changelog
 
+## [3.2.1] - 20.07.2026
+
+### Changed
+
+- Updated dependencies
+- API tokens will not be exported with the settings
+
+### Fixed
+
+- Fixed an error on the counter during the deletion of a simplified text
+- Fixed a faulty usage of an object type during the process to ignore objects for simplifications
+
+### Removed
+
+- Removed the unused jquery dirty library from the main plugin
+
 ## [3.2.0] - 27.06.2026
 
 ### Added
@@ -29,7 +45,7 @@
 
 ### Fixed
 
-- Fixed missing blocks in release
+- Fixed missing blocks in the release
 
 ## [3.1.1] - 01.05.2026
 

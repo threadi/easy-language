@@ -105,13 +105,10 @@ Each release of this plugin will only be published if it fulfills the following 
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added a sidebar panel in Block Editor instead of the old meta-box only for WordPress 7.0 or newer if the Block Editor is used
-- Added configurable possibility to simply text in ACF and SCF fields (editor and textarea)
-- Optimized some codes to fulfill the plugin check action in GitHub
-- Optimized check for capability on some actions
-- Both blocks are now compatible with WordPress 7.0
-- Updates settings library
-- Fixed wrong path to build the switcher block
-- Fixed missing loading of languages for single post in Divi
+- Updated dependencies
+- API tokens will not be exported with the settings
+- Fixed an error on the counter during the deletion of a simplified text
+- Fixed a faulty usage of an object type during the process to ignore objects for simplifications
+- Removed the unused jquery dirty library from the main plugin
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)

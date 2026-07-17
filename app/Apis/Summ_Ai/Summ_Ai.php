@@ -18,7 +18,6 @@ use easySettingsForWordPress\Fields\Select;
 use easySettingsForWordPress\Fields\Text;
 use easySettingsForWordPress\Page;
 use easySettingsForWordPress\Section;
-use easySettingsForWordPress\Settings;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Base;
@@ -27,6 +26,7 @@ use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Intervals;
 use easyLanguage\Plugin\Language_Icon;
 use easyLanguage\Plugin\Log;
+use easyLanguage\Plugin\Settings;
 use easyLanguage\Plugin\ThirdPartySupports;
 use easyLanguage\EasyLanguage\Db;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
@@ -631,7 +631,7 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function add_settings(): void {
 		// get the settings object.
-		$settings_obj = \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj();
+		$settings_obj = \easyLanguage\Plugin\Settings::get_instance()->get_settings_object();
 
 		// get the settings page.
 		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
@@ -703,6 +703,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
+		$setting->prevent_export( true );
 		$field = new Text( $settings_obj );
 		$field->set_title( __( 'SUMM AI API Key', 'easy-language' ) );
 		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
@@ -927,7 +928,7 @@ class Summ_Ai extends Base implements Api_Base {
 		// get the hidden section.
 		$hidden_section = Helper::get_hidden_section();
 
-		// bail if section could not be loaded.
+		// bail if the section could not be loaded.
 		if ( ! $hidden_section instanceof Section ) {
 			return;
 		}
@@ -1091,6 +1092,13 @@ class Summ_Ai extends Base implements Api_Base {
 		// check nonce.
 		check_admin_referer( 'easy-language-summ-ai-get-quota', 'nonce' );
 
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
 		// get quota in paid mode.
 		$mode = $this->get_mode();
 		$this->set_mode( 'paid' );
@@ -1197,13 +1205,20 @@ class Summ_Ai extends Base implements Api_Base {
 	}
 
 	/**
-	 * Run a token test.
+	 * Run a token test via request.
 	 *
 	 * @return void
 	 */
 	public function run_token_test(): void {
 		// check nonce.
 		check_ajax_referer( 'easy-language-summ-ai-test-token', 'nonce' );
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
 
 		// get global transients-object.
 		$transients_obj = Transients::get_instance();
@@ -1256,17 +1271,19 @@ class Summ_Ai extends Base implements Api_Base {
 	}
 
 	/**
-	 * Remove token via click.
+	 * Remove token via request.
 	 *
 	 * @return void
 	 */
 	public function remove_token(): void {
 		// check nonce.
-		check_admin_referer( 'easy-language-summ-ai-remove-token', 'nonce' );
+		check_ajax_referer( 'easy-language-summ-ai-remove-token', 'nonce' );
 
-		// bail if user has not the capability for this.
-		if ( ! current_user_can( \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
-			return;
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
 		}
 
 		// delete settings.

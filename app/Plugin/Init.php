@@ -279,7 +279,7 @@ class Init {
 		check_ajax_referer( 'easy-language-reset-intro-nonce', 'nonce' );
 
 		// bail if capability is missing.
-		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			return;
 		}
 
@@ -309,8 +309,8 @@ class Init {
 		// check nonce.
 		check_ajax_referer( 'easy-language-set-icon-for-language', 'nonce' );
 
-		// bail if capability is not given.
-		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			return;
 		}
 
@@ -382,9 +382,9 @@ class Init {
 		// check nonce.
 		check_admin_referer( 'easy-language-clear-log', 'nonce' );
 
-		// bail if user has not the capability for this.
-		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
-			// redirect user back.
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
 			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}

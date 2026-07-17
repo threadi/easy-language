@@ -10,16 +10,16 @@ namespace easyLanguage\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easySettingsForWordPress\Fields\Button;
-use easySettingsForWordPress\Fields\Checkbox;
-use easySettingsForWordPress\Fields\Number;
-use easySettingsForWordPress\Fields\Radio;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Tables\Texts_In_Use_Table;
 use easyLanguage\EasyLanguage\Tables\Texts_To_Simplify_Table;
 use easyLanguage\Plugin\Tables\Language_Icons_Table;
 use easyLanguage\Plugin\Tables\Log_Api_Table;
 use easyLanguage\Plugin\Tables\Log_Table;
+use easySettingsForWordPress\Fields\Button;
+use easySettingsForWordPress\Fields\Checkbox;
+use easySettingsForWordPress\Fields\Number;
+use easySettingsForWordPress\Fields\Radio;
 use easySettingsForWordPress\Page;
 
 /**
@@ -85,7 +85,7 @@ class Settings {
 		/**
 		 * Configure the basic settings object.
 		 */
-		$settings_obj = $this->get_settings_obj();
+		$settings_obj = $this->get_settings_object();
 		$settings_obj->set_slug( 'easy_language' );
 		$settings_obj->set_plugin_slug( EASY_LANGUAGE );
 		$settings_obj->set_menu_title( _x( 'Easy Language', 'settings menu title', 'easy-language' ) );
@@ -432,11 +432,11 @@ class Settings {
 		);
 
 		// add setting.
-		$setting = $this->get_settings_obj()->add_setting( 'import_settings' );
+		$setting = $this->get_settings_object()->add_setting( 'import_settings' );
 		$setting->set_section( $advanced_plugin );
 		$setting->set_autoload( false );
 		$setting->prevent_export( true );
-		$field = new Button( $this->get_settings_obj() );
+		$field = new Button( $this->get_settings_object() );
 		$field->set_title( __( 'Import', 'easy-language' ) );
 		$field->set_button_title( __( 'Import now', 'easy-language' ) );
 		$field->add_class( 'easy-dialog-for-wordpress' );
@@ -452,7 +452,7 @@ class Settings {
 			),
 			'buttons' => array(
 				array(
-					'action'  => 'closeDialog();location.href="' . $this->get_settings_obj()->get_export_obj()->get_download_url() . '";',
+					'action'  => 'closeDialog();location.href="' . $this->get_settings_object()->get_export_obj()->get_download_url() . '";',
 					'variant' => 'primary',
 					'text'    => __( 'Export now', 'easy-language' ),
 				),
@@ -465,18 +465,17 @@ class Settings {
 		);
 
 		// add setting.
-		$setting = $this->get_settings_obj()->add_setting( 'export_settings' );
+		$setting = $this->get_settings_object()->add_setting( 'export_settings' );
 		$setting->set_section( $advanced_plugin );
 		$setting->set_autoload( false );
 		$setting->prevent_export( true );
-		$field = new Button( $this->get_settings_obj() );
+		$field = new Button( $this->get_settings_object() );
 		$field->set_title( __( 'Export', 'easy-language' ) );
 		$field->set_button_title( __( 'Export now', 'easy-language' ) );
-		$field->set_button_url( $this->get_settings_obj()->get_export_obj()->get_download_url() );
+		$field->set_button_url( $this->get_settings_object()->get_export_obj()->get_download_url() );
 		$field->add_class( 'easy-dialog-for-wordpress' );
 		$field->set_custom_attributes( array( 'data-dialog' => (string) wp_json_encode( $dialog ) ) );
 		$setting->set_field( $field );
-
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easyLanguageReset' );
 		$setting->set_section( $advanced_plugin );
@@ -732,9 +731,11 @@ class Settings {
 		// check nonce.
 		check_admin_referer( 'easy-language-reset', 'nonce' );
 
-		// bail if user has not the capability for this.
-		if ( ! current_user_can( self::get_instance()->get_settings_obj()->get_capability() ) ) {
-			return;
+		// bail if capability is not granted.
+		if ( ! current_user_can( self::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
 		}
 
 		// uninstall all.
@@ -790,7 +791,7 @@ class Settings {
 	 *
 	 * @return \easySettingsForWordPress\Settings
 	 */
-	public function get_settings_obj(): \easySettingsForWordPress\Settings {
+	public function get_settings_object(): \easySettingsForWordPress\Settings {
 		/**
 		 * Get the object one time.
 		 */

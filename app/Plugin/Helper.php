@@ -10,13 +10,13 @@ namespace easyLanguage\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easySettingsForWordPress\Page;
-use easySettingsForWordPress\Section;
-use easySettingsForWordPress\Tab;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Objects;
 use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
+use easySettingsForWordPress\Page;
+use easySettingsForWordPress\Section;
+use easySettingsForWordPress\Tab;
 use WP_Admin_Bar;
 use WP_Error;
 use WP_Filesystem_Base;
@@ -43,7 +43,7 @@ class Helper {
 	}
 
 	/**
-	 * Return the lokal URL of our plugin.
+	 * Return the local URL of our plugin.
 	 *
 	 * @return string
 	 */
@@ -52,7 +52,7 @@ class Helper {
 	}
 
 	/**
-	 * Check if WP CLI is used for actual request.
+	 * Check if WP CLI is used for the actual request.
 	 *
 	 * @return bool
 	 */
@@ -73,7 +73,7 @@ class Helper {
 			$lang = self::get_wp_lang();
 		}
 
-		// Return the current language as language-code (e.g., "de_de").
+		// return the current language as language-code (e.g. "de_de").
 		return $lang;
 	}
 
@@ -141,7 +141,7 @@ class Helper {
 			$wp_language = EASY_LANGUAGE_LANGUAGE_FALLBACK;
 		}
 
-		// Return the language in the format "ab_CD" (e.g., en_US).
+		// return language in format ab_CD (e.g. en_US).
 		return $wp_language;
 	}
 
@@ -304,7 +304,7 @@ class Helper {
 		// get first result.
 		$post = $attachment->posts[0];
 
-		// bail if attachment is not "WP_Post".
+		// bail if the attachment is not "WP_Post".
 		if ( ! $post instanceof WP_Post ) {
 			return false;
 		}
@@ -363,12 +363,12 @@ class Helper {
 		// get list of images from the database.
 		$images = (array) get_option( 'easy_language_icons', array() );
 
-		// return image if it is in list.
+		// return the image if it is in the list.
 		if ( ! empty( $images[ $language_code ] ) ) {
 			return ' ' . wp_kses_post( $images[ $language_code ] );
 		}
 
-		// get it from media library if requested language is not in list.
+		// get it from the media library if requested language is not in list.
 		$attachment = self::get_attachment_by_language_code( $language_code );
 		if ( false !== $attachment ) {
 			// get image.
@@ -441,7 +441,7 @@ class Helper {
 	}
 
 	/**
-	 * Return URL path to icon by given language_code.
+	 * Return the URL path to the icon by given language_code.
 	 *
 	 * @param string $language_code The language code we search the icon for.
 	 *
@@ -469,7 +469,7 @@ class Helper {
 	}
 
 	/**
-	 * Get object by given ID and type.
+	 * Get the object by given ID and type.
 	 *
 	 * @param int    $object_id The object-ID.
 	 * @param string $object_type The object-type (optional).
@@ -519,7 +519,7 @@ class Helper {
 			}
 		}
 
-		// fallback and use the WordPress-language.
+		// fallback and use the WordPress language.
 		return self::get_wp_lang();
 	}
 
@@ -786,7 +786,7 @@ class Helper {
 	 */
 	public static function get_hidden_section(): Section|false {
 		// get settings object.
-		$settings_obj = Settings::get_instance()->get_settings_obj();
+		$settings_obj = Settings::get_instance()->get_settings_object();
 
 		// create a hidden page for hidden settings.
 		$hidden_page = $settings_obj->get_page( 'hidden_page' );
