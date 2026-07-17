@@ -10,3 +10,4 @@ languages/*.json
 /vendor/
 /blocks/*/build/
 /legacy-classes/Divi/build/
+/js/generated/metabox*

@@ -242,4 +242,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 	public function is_active(): bool {
 		return defined( 'POLYLANG_BASENAME' );
 	}
+
+	/**
+	 * Return whether this is a language plugin.
+	 *
+	 * @return bool
+	 */
+	public function is_language_plugin(): bool {
+		return true;
+	}
 }

@@ -10,18 +10,6 @@ namespace easyLanguage\Apis\Summ_Ai;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-use easyLanguage\Plugin\Api_Requests;
-use easyLanguage\Plugin\Api_Simplifications;
-use easyLanguage\Plugin\Base;
-use easyLanguage\Plugin\Api_Base;
-use easyLanguage\Plugin\Helper;
-use easyLanguage\Plugin\Intervals;
-use easyLanguage\Plugin\Language_Icon;
-use easyLanguage\Plugin\Log;
-use easyLanguage\Plugin\Settings;
-use easyLanguage\Plugin\ThirdPartySupports;
-use easyLanguage\EasyLanguage\Db;
-use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easySettingsForWordPress\Fields\Checkbox;
 use easySettingsForWordPress\Fields\Checkboxes;
 use easySettingsForWordPress\Fields\FieldTable;
@@ -30,6 +18,18 @@ use easySettingsForWordPress\Fields\Select;
 use easySettingsForWordPress\Fields\Text;
 use easySettingsForWordPress\Page;
 use easySettingsForWordPress\Section;
+use easySettingsForWordPress\Settings;
+use easyLanguage\Plugin\Api_Requests;
+use easyLanguage\Plugin\Api_Simplifications;
+use easyLanguage\Plugin\Base;
+use easyLanguage\Plugin\Api_Base;
+use easyLanguage\Plugin\Helper;
+use easyLanguage\Plugin\Intervals;
+use easyLanguage\Plugin\Language_Icon;
+use easyLanguage\Plugin\Log;
+use easyLanguage\Plugin\ThirdPartySupports;
+use easyLanguage\EasyLanguage\Db;
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use WP_User;
 use wpdb;
 
@@ -631,7 +631,7 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function add_settings(): void {
 		// get the settings object.
-		$settings_obj = Settings::get_instance()->get_settings_object();
+		$settings_obj = \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj();
 
 		// get the settings page.
 		$settings_page = $settings_obj->get_page( 'easy_language_settings' );
@@ -715,7 +715,7 @@ class Summ_Ai extends Base implements Api_Base {
 			'options-general.php'
 		);
 
-		// create hint for admins only.
+		// create a hint for admins only.
 		$hint = '';
 		if ( current_user_can( 'manage_options' ) ) {
 			/* translators: %1$s will be replaced by the URL for general WordPress-settings */
@@ -1085,6 +1085,7 @@ class Summ_Ai extends Base implements Api_Base {
 	 * Get quota via link request.
 	 *
 	 * @return void
+	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function get_quota_from_api_via_link(): void {
 		// check nonce.
@@ -1204,6 +1205,13 @@ class Summ_Ai extends Base implements Api_Base {
 		// check nonce.
 		check_ajax_referer( 'easy-language-summ-ai-test-token', 'nonce' );
 
+		// bail if user has not the capability for this.
+		if ( ! current_user_can( \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
 		// get global transients-object.
 		$transients_obj = Transients::get_instance();
 
@@ -1261,7 +1269,12 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function remove_token(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-summ-ai-remove-token', 'nonce' );
+		check_admin_referer( 'easy-language-summ-ai-remove-token', 'nonce' );
+
+		// bail if user has not the capability for this.
+		if ( ! current_user_can( \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
 
 		// delete settings.
 		delete_option( 'easy_language_summ_ai_api_key' );

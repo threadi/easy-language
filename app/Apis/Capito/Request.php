@@ -15,6 +15,7 @@ use easyLanguage\Plugin\Log;
 use easyLanguage\Plugin\Log_Api;
 use easyLanguage\EasyLanguage\Db;
 use WP_Error;
+use WP_HTTP_Requests_Response;
 
 /**
  * Create and send a request to capito API. Gets the response.
@@ -225,7 +226,10 @@ class Request implements Api_Requests {
 		$this->response = wp_remote_retrieve_body( $this->get_result() );
 
 		// secure http-status.
-		$this->http_status = $this->get_result()['http_response']->get_status(); // @phpstan-ignore offsetAccess.nonOffsetAccessible
+		$result = $this->get_result();
+		if ( is_array( $result ) && ! empty( $result['http_response'] ) && $result['http_response'] instanceof WP_HTTP_Requests_Response ) {
+			$this->http_status = $result['http_response']->get_status();
+		}
 
 		// log the request (with an anonymized token).
 		$args['headers']['Authorization'] = 'anonymized';

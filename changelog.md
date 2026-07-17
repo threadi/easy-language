@@ -1,11 +1,36 @@
 # Changelog
 
-## [Unreleased]
+## [3.2.1] - 20.07.2026
 
 ### Changed
 
 - Updated settings library and their usage
 - Updated dependencies
+- API tokens will not be exported with the settings
+
+### Fixed
+
+- Fixed an error on the counter during the deletion of a simplified text
+- Fixed a faulty usage of an object type during the process to ignore objects for simplifications
+
+## [3.2.0] - 27.06.2026
+
+### Added
+
+- Added a sidebar panel in Block Editor instead of the old meta-box only for WordPress 7.0 or newer if the Block Editor is used
+- Added configurable possibility to simply text in ACF and SCF fields (editor and textarea)
+
+### Changed
+
+- Optimized some codes to fulfill the plugin check action in GitHub
+- Optimized check for capability on some actions
+- Both blocks are now compatible with WordPress 7.0
+- Updates settings library
+
+### Fixed
+
+- Fixed wrong path to build the switcher block
+- Fixed missing loading of languages for single post in Divi
 
 ## [3.1.2] - 27.05.2026
 
@@ -13,7 +38,7 @@
 
 - Optimized icon dialog handling
 - Renamed the dialog script handle to full compatibility with other plugins, which also use this script
-- Optimized loading of simplified terms on get_term_args
+- Optimized loading of simplified terms on "get_term_args"
 
 ### Fixed
 
@@ -47,7 +72,7 @@
 
 ### Fixed
 
-- Fixed wrong loading of WP_Filesystem-handler in some cases
+- Fixed wrong loading of WP_Filesystem-handler sometimes
 
 ## [3.0.2] - 16.02.2026
 
@@ -73,7 +98,7 @@
 
 ### Added
 
-- Revamped plugin for a more robust and sustainable structure
+- Revamped the plugin for a more robust and sustainable structure
 - Added a new object to handle all plugin settings
 - Added support for any post-types that enabled title and editor as we need them for the simplification of texts
 - Added support to simply taxonomy terms

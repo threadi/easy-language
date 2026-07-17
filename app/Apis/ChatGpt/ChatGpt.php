@@ -323,16 +323,16 @@ class ChatGpt extends Base implements Api_Base {
 			return;
 		}
 
-		// add tab.
+		// add the tab.
 		$chatgpt_tab = $settings_page->add_tab( 'chatgpt', 20 );
 		$chatgpt_tab->set_title( __( 'ChatGPT', 'easy-language' ) );
 		$chatgpt_tab->set_tab_class( ! $this->is_active() ? 'hidden' : '' );
 
-		// add section.
+		// add the section.
 		$chatgpt_tab_main = $chatgpt_tab->add_section( 'settings_section_chatgpt', 10 );
 		$chatgpt_tab_main->set_title( __( 'ChatGPT Settings', 'easy-language' ) );
 
-		// Set the description for token field if it has not been set.
+		// set description for the token field if it has not been set.
 		/* translators: %1$s will be replaced by the ChatGPT URL */
 		$description = sprintf( __( 'Get your ChatGPT API Token <a href="%1$s" target="_blank">here (opens new window)</a>.<br>If you have any questions about the token provided by ChatGpt, please contact their support: <a href="%2$s" target="_blank">%2$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_api_management_url() ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_chatgpt_token_set() ) {
@@ -680,6 +680,13 @@ class ChatGpt extends Base implements Api_Base {
 	public function remove_token(): void {
 		// check nonce.
 		check_admin_referer( 'easy-language-chatgpt-remove-token', 'nonce' );
+
+		// bail if user has not the capability for this.
+		if ( ! current_user_can( \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
 
 		// delete settings.
 		delete_option( 'easy_language_chatgpt_api_key' );

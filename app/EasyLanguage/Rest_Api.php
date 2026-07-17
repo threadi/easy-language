@@ -60,7 +60,7 @@ class Rest_Api {
 	}
 
 	/**
-	 * Add endpoint for language options for single page.
+	 * Add an endpoint for language options for a single page.
 	 *
 	 * @return void
 	 */
@@ -124,7 +124,7 @@ class Rest_Api {
 	 */
 	public function get_language_options_for_page( WP_REST_Request $data ): array {
 		// get ID of the requested object.
-		$post_id = absint( $data['post'] );
+		$post_id = absint( $data['id'] );
 
 		// bail if the post-ID is not given.
 		if ( 0 === $post_id ) {
@@ -134,7 +134,7 @@ class Rest_Api {
 		// get WP_Post-object.
 		$wp_post_object = get_post( $post_id );
 
-		// bail if the post is not WP_Post.
+		// bail if the post is not "WP_Post".
 		if ( ! $wp_post_object instanceof WP_Post ) {
 			return array();
 		}

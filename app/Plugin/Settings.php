@@ -20,11 +20,19 @@ use easySettingsForWordPress\Fields\Button;
 use easySettingsForWordPress\Fields\Checkbox;
 use easySettingsForWordPress\Fields\Number;
 use easySettingsForWordPress\Fields\Radio;
+use easySettingsForWordPress\Page;
 
 /**
  * Object tot handle settings.
  */
 class Settings {
+	/**
+	 * The settings object.
+	 *
+	 * @var ?\easySettingsForWordPress\Settings
+	 */
+	private ?\easySettingsForWordPress\Settings $settings_obj = null;
+
 	/**
 	 * Instance of this object.
 	 *
@@ -77,18 +85,17 @@ class Settings {
 		/**
 		 * Configure the basic settings object.
 		 */
-		$settings_obj  = $this->get_settings_object();
-		$settings_page = $settings_obj->add_page( 'easy_language_settings' );
+		$settings_obj = $this->get_settings_obj();
 		$settings_obj->set_slug( 'easy_language' );
-		$settings_obj->set_plugin_slug( plugin_basename( EASY_LANGUAGE ) );
+		$settings_obj->set_plugin_slug( EASY_LANGUAGE );
 		$settings_obj->set_menu_title( _x( 'Easy Language', 'settings menu title', 'easy-language' ) );
 		$settings_obj->set_title( __( 'Easy Language Settings', 'easy-language' ) );
-		$settings_obj->set_menu_slug( 'easy_language_settings' );
-		$settings_obj->set_menu_parent_slug( 'options-general.php' );
+		$settings_obj->set_menu_slug( $this->get_menu_slug() );
+		$settings_obj->set_menu_parent_slug( $this->get_php_page() );
 		$settings_obj->show_settings_link_in_plugin_list( true );
 		$settings_obj->set_translations(
 			array(
-				'title_settings_import_file_missing' => __( 'Required file missing', 'easy-language' ),
+				'title_settings_import_file_missing' => __( 'A required file is missing', 'easy-language' ),
 				'text_settings_import_file_missing'  => __( 'Please choose a JSON-file with settings to import.', 'easy-language' ),
 				'lbl_ok'                             => __( 'OK', 'easy-language' ),
 				'lbl_cancel'                         => __( 'Cancel', 'easy-language' ),
@@ -126,6 +133,14 @@ class Settings {
 		// initialize the settings-object if setup has been completed or if this is a REST API request.
 		if ( Helper::is_rest_request() || Setup::get_instance()->is_completed() ) {
 			$settings_obj->init();
+		}
+
+		/**
+		 * Get the settings page.
+		 */
+		$settings_page = $settings_obj->get_page( $this->get_menu_slug() );
+		if ( ! $settings_page instanceof Page ) {
+			return;
 		}
 
 		/**
@@ -367,7 +382,7 @@ class Settings {
 			get_admin_url() . 'admin.php'
 		);
 
-		// create dialog.
+		// create the dialog.
 		$reset_dialog = array(
 			'title'   => __( 'Reset plugin', 'easy-language' ),
 			'texts'   => array(
@@ -417,11 +432,11 @@ class Settings {
 		);
 
 		// add setting.
-		$setting = $settings_obj->add_setting( 'import_settings' );
+		$setting = $this->get_settings_obj()->add_setting( 'import_settings' );
 		$setting->set_section( $advanced_plugin );
 		$setting->set_autoload( false );
 		$setting->prevent_export( true );
-		$field = new Button( $settings_obj );
+		$field = new Button( $this->get_settings_obj() );
 		$field->set_title( __( 'Import', 'easy-language' ) );
 		$field->set_button_title( __( 'Import now', 'easy-language' ) );
 		$field->add_class( 'easy-dialog-for-wordpress' );
@@ -437,7 +452,7 @@ class Settings {
 			),
 			'buttons' => array(
 				array(
-					'action'  => 'closeDialog();location.href="' . $settings_obj->get_export_obj()->get_download_url() . '";',
+					'action'  => 'closeDialog();location.href="' . $this->get_settings_obj()->get_export_obj()->get_download_url() . '";',
 					'variant' => 'primary',
 					'text'    => __( 'Export now', 'easy-language' ),
 				),
@@ -450,18 +465,17 @@ class Settings {
 		);
 
 		// add setting.
-		$setting = $settings_obj->add_setting( 'export_settings' );
+		$setting = $this->get_settings_obj()->add_setting( 'export_settings' );
 		$setting->set_section( $advanced_plugin );
 		$setting->set_autoload( false );
 		$setting->prevent_export( true );
-		$field = new Button( $settings_obj );
+		$field = new Button( $this->get_settings_obj() );
 		$field->set_title( __( 'Export', 'easy-language' ) );
 		$field->set_button_title( __( 'Export now', 'easy-language' ) );
-		$field->set_button_url( $settings_obj->get_export_obj()->get_download_url() );
+		$field->set_button_url( $this->get_settings_obj()->get_export_obj()->get_download_url() );
 		$field->add_class( 'easy-dialog-for-wordpress' );
 		$field->set_custom_attributes( array( 'data-dialog' => (string) wp_json_encode( $dialog ) ) );
 		$setting->set_field( $field );
-
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easyLanguageReset' );
 		$setting->set_section( $advanced_plugin );
@@ -717,6 +731,11 @@ class Settings {
 		// check nonce.
 		check_admin_referer( 'easy-language-reset', 'nonce' );
 
+		// bail if user has not the capability for this.
+		if ( ! current_user_can( self::get_instance()->get_settings_obj()->get_capability() ) ) {
+			return;
+		}
+
 		// uninstall all.
 		Uninstall::get_instance()->run();
 
@@ -766,24 +785,37 @@ class Settings {
 	}
 
 	/**
-	 * Return the settings object.
+	 * Return the configured settings object.
 	 *
 	 * @return \easySettingsForWordPress\Settings
 	 */
-	public function get_settings_object(): \easySettingsForWordPress\Settings {
-		/**
-		 * Variable for the object.
-		 */
-		static $settings = null;
-
+	public function get_settings_obj(): \easySettingsForWordPress\Settings {
 		/**
 		 * Get the object one time.
 		 */
-		if ( null === $settings ) {
-			$settings = new \easySettingsForWordPress\Settings( EASY_LANGUAGE );
+		if ( null === $this->settings_obj ) {
+			$this->settings_obj = new \easySettingsForWordPress\Settings( EASY_LANGUAGE );
 		}
 
 		// return it.
-		return $settings;
+		return $this->settings_obj;
+	}
+
+	/**
+	 * Return the menu slug for the settings.
+	 *
+	 * @return string
+	 */
+	public function get_menu_slug(): string {
+		return 'easy_language_settings';
+	}
+
+	/**
+	 * Return the PHP page the settings will be using.
+	 *
+	 * @return string
+	 */
+	private function get_php_page(): string {
+		return 'options-general.php';
 	}
 }

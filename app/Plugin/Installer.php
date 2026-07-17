@@ -177,7 +177,7 @@ class Installer {
 		}
 
 		// initiate the settings.
-		Settings::get_instance()->get_settings_object()->activation();
+		Settings::get_instance()->get_settings_obj()->activation();
 	}
 
 	/**
@@ -187,7 +187,7 @@ class Installer {
 	 */
 	public function deactivation(): void {
 		if ( is_multisite() ) {
-			// get original blog id.
+			// get original blog ID.
 			$original_blog_id = get_current_blog_id();
 
 			// loop through the blogs.

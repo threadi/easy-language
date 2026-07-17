@@ -116,4 +116,11 @@ interface ThirdPartySupport_Base {
 	 * @return bool
 	 */
 	public function is_active(): bool;
+
+	/**
+	 * Return whether this is a language plugin.
+	 *
+	 * @return bool
+	 */
+	public function is_language_plugin(): bool;
 }
