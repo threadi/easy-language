@@ -205,7 +205,7 @@ class Uninstall {
 		Setup::get_instance()->uninstall();
 
 		// delete all settings.
-		Settings::get_instance()->get_settings_obj()->delete_settings();
+		Settings::get_instance()->get_settings_object()->delete_settings();
 
 		/**
 		 * Remove custom settings.

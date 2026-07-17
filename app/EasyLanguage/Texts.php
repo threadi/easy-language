@@ -128,6 +128,13 @@ class Texts {
 		// get post ID.
 		$original_post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
 
+		// bail if capability is not granted.
+		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
 		// get target-language.
 		$target_language = isset( $_GET['language'] ) ? sanitize_text_field( wp_unslash( $_GET['language'] ) ) : '';
 
@@ -179,6 +186,13 @@ class Texts {
 	public function add_term_object_to_simplification_by_request(): void {
 		// check nonce.
 		check_admin_referer( 'easy-language-add-simplification-term', 'nonce' );
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
 
 		// get active api.
 		$api_object = Apis::get_instance()->get_active_api();
@@ -324,6 +338,13 @@ class Texts {
 		// get object id.
 		$object_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 
+		// bail if capability is not granted.
+		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
 		// get object type.
 		$object_type = isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : '';
 
@@ -355,6 +376,13 @@ class Texts {
 	public function get_term_simplification_by_request(): void {
 		// check nonce.
 		check_admin_referer( 'easy-language-get-term-simplification', 'nonce' );
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
 
 		// get api.
 		$api_obj = Apis::get_instance()->get_active_api();
@@ -405,6 +433,13 @@ class Texts {
 
 		// bail if no entry ID is given.
 		if ( 0 === $entry_id ) {
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
+			// redirect user.
 			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}
@@ -770,9 +805,9 @@ class Texts {
 		// check nonce.
 		check_admin_referer( 'easy-language-export-simplifications', 'nonce' );
 
-		// bail if user has not the capability.
-		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
-			// redirect user back.
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
 			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}

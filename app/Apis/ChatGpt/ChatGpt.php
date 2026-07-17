@@ -366,6 +366,7 @@ class ChatGpt extends Base implements Api_Base {
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
+		$setting->prevent_export( true );
 		$field = new Text( $settings_obj );
 		$field->set_title( __( 'ChatGPT API Key', 'easy-language' ) );
 		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
@@ -681,8 +682,8 @@ class ChatGpt extends Base implements Api_Base {
 		// check nonce.
 		check_admin_referer( 'easy-language-chatgpt-remove-token', 'nonce' );
 
-		// bail if user has not the capability for this.
-		if ( ! current_user_can( \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
 			wp_safe_redirect( wp_get_referer() );
 			exit;

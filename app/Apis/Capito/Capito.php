@@ -58,7 +58,7 @@ class Capito extends Base implements Api_Base {
 	private static ?Capito $instance = null;
 
 	/**
-	 * Set max text length for single entry for this API.
+	 * Set the maximum text length for a single entry for this API.
 	 *
 	 * @var int
 	 */
@@ -157,7 +157,7 @@ class Capito extends Base implements Api_Base {
 		// wrapper for buttons.
 		$text .= $this->get_description_buttons();
 
-		// return resulting text.
+		// return the resulting text.
 		return $text;
 	}
 
@@ -384,7 +384,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return list of options this plugin is using, e.g. for clean uninstallation.
+	 * Return a list of options this plugin is using, e.g., for clean uninstallation.
 	 *
 	 * @return array<string>
 	 */
@@ -400,7 +400,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Return list of transients this plugin is using, e.g. for clean uninstall.
+	 * Return a list of transients this plugin is using, e.g., for clean uninstall.
 	 *
 	 * @return array<string>
 	 */
@@ -411,7 +411,7 @@ class Capito extends Base implements Api_Base {
 	}
 
 	/**
-	 * Initialize api-specific CLI-functions for this API: none.
+	 * Initialize API-specific CLI functions for this API: none.
 	 *
 	 * @return void
 	 */
@@ -551,6 +551,7 @@ class Capito extends Base implements Api_Base {
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
+		$setting->prevent_export( true );
 		$field = new Text( $settings_obj );
 		$field->set_title( __( 'capito API Key', 'easy-language' ) );
 		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
@@ -807,7 +808,7 @@ class Capito extends Base implements Api_Base {
 			return $value;
 		}
 
-		// if no token has been entered, show hint.
+		// if no token has been entered, show a hint.
 		if ( empty( $value ) ) {
 			add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', __( 'You did not enter an API token. All simplification options via the capito API have been disabled.', 'easy-language' ) );
 		} elseif ( 0 !== strcmp( $value, get_option( 'easy_language_capito_api_key', '' ) ) ) {
@@ -969,9 +970,11 @@ class Capito extends Base implements Api_Base {
 		// check nonce.
 		check_admin_referer( 'easy-language-capito-remove-token', 'nonce' );
 
-		// bail if user has not the capability for this.
-		if ( ! current_user_can( \easyLanguage\Plugin\Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
-			return;
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
 		}
 
 		// delete settings.
@@ -1005,6 +1008,13 @@ class Capito extends Base implements Api_Base {
 	public function get_quota_from_api_via_link(): void {
 		// check nonce.
 		check_admin_referer( 'easy-language-capito-get-quota', 'nonce' );
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
 
 		// get quota.
 		$this->get_quota_from_api();
@@ -1051,6 +1061,13 @@ class Capito extends Base implements Api_Base {
 	public function run_token_test(): void {
 		// check nonce.
 		check_admin_referer( 'easy-language-capito-test-token', 'nonce' );
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
 
 		// get global transients-object.
 		$transients_obj = Transients::get_instance();

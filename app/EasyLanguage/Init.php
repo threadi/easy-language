@@ -348,7 +348,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				if ( $page_builder && current_user_can( 'edit_el_simplifier' ) ) {
 					$edit_simplification = $page_builder->get_edit_link();
 
-					// show link to add simplification for this language.
+					// show the link to add simplification for this language.
 					/* translators: %1$s is the name of the language */
 					echo '<a href="' . esc_url( $edit_simplification ) . '" class="dashicons dashicons-edit" title="' . esc_attr( sprintf( __( 'Edit simplification in %1$s.', 'easy-language' ), esc_html( $settings['label'] ) ) ) . '">&nbsp;</a>';
 				}
@@ -687,7 +687,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return;
 		}
 
-		// do not show if user has no capabilities for this.
+		// do not show if the user has no capabilities for this.
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
@@ -1943,15 +1943,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 				plugin_dir_path( EASY_LANGUAGE ) . '/languages/'
 			);
 		}
-
-		// add jquery-dirty script.
-		wp_enqueue_script(
-			'easy-language-admin-dirty-js',
-			trailingslashit( plugin_dir_url( EASY_LANGUAGE ) ) . 'libs/jquery.dirty.js',
-			array( 'jquery' ),
-			Helper::get_file_version( trailingslashit( plugin_dir_path( EASY_LANGUAGE ) ) . 'libs/jquery.dirty.js' ),
-			true
-		);
 	}
 
 	/**
@@ -2058,6 +2049,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check nonce.
 		check_ajax_referer( 'easy-language-dismiss-intro-step-2', 'nonce' );
 
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			return;
+		}
+
 		// hide pointer.
 		update_option( 'easy_language_intro_step_2', 2 );
 	}
@@ -2095,7 +2091,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		check_ajax_referer( 'easy-language-delete-data-nonce', 'nonce' );
 
 		// bail if capability is not given.
-		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			return;
 		}
 
@@ -2125,7 +2121,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			$entry->delete();
 
 			// update counter.
-			update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, absint( get_option( update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, 0 ) ) ) + 1 ); // @phpstan-ignore argument.type
+			update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, absint( get_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, 0 ) ) + 1 ); // @phpstan-ignore argument.type
 
 			// log this event.
 			/* translators: %1$d wll be replaced by an ID. */
@@ -2160,7 +2156,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Reset processing simplifications of given object to 'to_simplify'.
+	 * Reset processing simplifications of the given object to 'to_simplify'.
 	 *
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
@@ -2174,10 +2170,10 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return;
 		}
 
-		// get the object-id from request.
+		// get the object-id from the request.
 		$object_id = isset( $_POST['post'] ) ? absint( $_POST['post'] ) : 0;
 
-		// get the object-type from request.
+		// get the object-type from the request.
 		$object_type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
 
 		if ( $object_id > 0 ) {
@@ -2198,7 +2194,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Set processing simplifications of given object to 'ignore'.
+	 * Set processing simplifications of the given object to 'ignore'.
 	 *
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
@@ -2212,11 +2208,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return;
 		}
 
-		// get the object-id from request.
+		// get the object-id from the request.
 		$object_id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
 
-		// get the object-type from request.
-		$object_type = isset( $_POST['type'] ) ? absint( $_POST['type'] ) : '';
+		// get the object-type from the request.
+		$object_type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
 
 		if ( absint( $object_id ) > 0 ) {
 			$filter = array(
@@ -2359,7 +2355,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			// get the copied simplified object.
 			$copy_obj = $object->add_simplification_object( $target_language, $api_object, false );
 
-			// bail if copy does not load.
+			// bail if the copy does not load.
 			if ( ! $copy_obj instanceof Objects ) {
 				// return result.
 				wp_send_json( $return );
@@ -2498,6 +2494,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// get object id.
 		$object_id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
 
+		// bail if capability is not granted.
+		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
+			wp_send_json( $return );
+		}
+
 		// get object type.
 		$object_type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
 
@@ -2583,12 +2584,14 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check nonce.
 		check_admin_referer( 'easy-language-create-schedules', 'nonce' );
 
-		// bail if capability is missing.
-		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
-			return;
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
 		}
 
-		// check if automatic interval exist, if not create it.
+		// check if automatic intervall exist, if not create it.
 		if ( ! wp_next_scheduled( 'easy_language_automatic_simplification' ) ) {
 			// add it.
 			wp_schedule_event( time(), get_option( 'easy_language_automatic_simplification', '10minutely' ), 'easy_language_automatic_simplification' );
@@ -2607,7 +2610,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return Objects|false
 	 */
 	public function get_post_object( Objects|false $the_object, int $object_id ): Objects|false {
-		// bail if object is already found.
+		// bail if the object is already found.
 		if ( false !== $the_object ) {
 			return $the_object;
 		}
@@ -2615,7 +2618,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// we assume it is a post-object and check for it.
 		$wp_post_object = get_post( $object_id );
 
-		// bail if object could not be found.
+		// bail if the object could not be found.
 		if ( ! $wp_post_object instanceof WP_Post ) {
 			return false;
 		}
@@ -2633,7 +2636,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Add taxonomies as additional allowed object type and return the term-object, if requested.
+	 * Add taxonomies as an additional allowed object type and return the term-object, if requested.
 	 *
 	 * @param object|false $resulting_object The resulting object.
 	 * @param int          $object_id The object-ID.
@@ -2703,7 +2706,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		check_admin_referer( 'easy-language-delete-text-for-simplification', 'nonce' );
 
 		// bail if capability is missing.
-		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user back to list.
 			wp_safe_redirect( wp_get_referer() );
 			exit;
@@ -2711,18 +2714,27 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// get requested text.
 		$text_id = ! empty( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
-		if ( $text_id > 0 ) {
-			$text_obj = new Text( $text_id );
-			$text_obj->delete();
 
-			// show success-message.
-			$transients_obj = Transients::get_instance();
-			$transient_obj  = $transients_obj->add();
-			$transient_obj->set_name( 'easy_language_text_deleted' );
-			$transient_obj->set_message( '<strong>' . __( 'The chosen text is deleted.', 'easy-language' ) . '</strong>' );
-			$transient_obj->set_type( 'success' );
-			$transient_obj->save();
+		// bail if capability is not granted.
+		if ( 0 === $text_id || ! current_user_can( 'edit_el_simplifier' ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
 		}
+
+		// get the text.
+		$text_obj = new Text( $text_id );
+
+		// delete the text.
+		$text_obj->delete();
+
+		// show success-message.
+		$transients_obj = Transients::get_instance();
+		$transient_obj  = $transients_obj->add();
+		$transient_obj->set_name( 'easy_language_text_deleted' );
+		$transient_obj->set_message( '<strong>' . __( 'The chosen text is deleted.', 'easy-language' ) . '</strong>' );
+		$transient_obj->set_type( 'success' );
+		$transient_obj->save();
 
 		// redirect user back to list.
 		wp_safe_redirect( wp_get_referer() );
@@ -2739,9 +2751,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check nonce.
 		check_admin_referer( 'easy-language-delete-all-to-simplified_texts', 'nonce' );
 
-		// bail if capability is missing.
-		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
-			// redirect user back to list.
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
 			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}
@@ -3015,7 +3027,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		check_admin_referer( 'easy-language-delete-simplification', 'nonce' );
 
 		// bail if capability is missing.
-		if ( ! current_user_can( Settings::get_instance()->get_settings_obj()->get_capability() ) ) {
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user back to list.
 			wp_safe_redirect( wp_get_referer() );
 			exit;
@@ -3023,18 +3035,27 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// get requested text.
 		$text_id = ! empty( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
-		if ( $text_id > 0 ) {
-			$text_obj = new Text( $text_id );
-			$text_obj->delete();
 
-			// show success-message.
-			$transients_obj = Transients::get_instance();
-			$transient_obj  = $transients_obj->add();
-			$transient_obj->set_name( 'easy_language_text_deleted' );
-			$transient_obj->set_message( '<strong>' . __( 'The chosen text is deleted.', 'easy-language' ) . '</strong>' );
-			$transient_obj->set_type( 'success' );
-			$transient_obj->save();
+		// bail if capability is not granted.
+		if ( 0 === $text_id || ! current_user_can( 'edit_el_simplifier' ) ) {
+			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
 		}
+
+		// get the text object.
+		$text_obj = new Text( $text_id );
+
+		// delete the text.
+		$text_obj->delete();
+
+		// show success-message.
+		$transients_obj = Transients::get_instance();
+		$transient_obj  = $transients_obj->add();
+		$transient_obj->set_name( 'easy_language_text_deleted' );
+		$transient_obj->set_message( '<strong>' . __( 'The chosen text is deleted.', 'easy-language' ) . '</strong>' );
+		$transient_obj->set_type( 'success' );
+		$transient_obj->save();
 
 		// redirect user back to the list.
 		wp_safe_redirect( wp_get_referer() );
@@ -3081,6 +3102,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// bail if no config is given.
 		if ( empty( $config ) ) {
+			wp_send_json( $dialog );
+		}
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
 			wp_send_json( $dialog );
 		}
 

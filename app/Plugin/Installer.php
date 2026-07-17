@@ -177,7 +177,7 @@ class Installer {
 		}
 
 		// initiate the settings.
-		Settings::get_instance()->get_settings_obj()->activation();
+		Settings::get_instance()->get_settings_object()->activation();
 	}
 
 	/**
