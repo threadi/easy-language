@@ -2,8 +2,8 @@
 Contributors: laolaweb, threadi
 Tags: easy language, leichte sprache, simplify, summ ai, capito
 Requires at least: 6.0
-Tested up to: 7.0
-Requires PHP: 8.1
+Tested up to: 7.1
+Requires PHP: 8.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Stable tag: @@VersionNumber@@
@@ -105,10 +105,11 @@ Each release of this plugin will only be published if it fulfills the following 
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Updated dependencies
-- API tokens will not be exported with the settings
-- Fixed an error on the counter during the deletion of a simplified text
-- Fixed a faulty usage of an object type during the process to ignore objects for simplifications
-- Removed the unused jquery dirty library from the main plugin
+- Compatible with WordPress 7.1
+- Now requires PHP 8.2 or newer
+- Updated dialog lib to 2.0.0
+- Updated settings lib to 3.0.0
+- Updated dependencies for the blocks
+- Fixed an error on downloading simplifications as .po-file
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)

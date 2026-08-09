@@ -391,7 +391,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				}
 
 				// show link to view the object in frontend.
-				echo '<a href="' . esc_url( $show_link ) . '" class="dashicons dashicons-admin-site-alt3" target="_blank" title="' . esc_attr( __( 'Show in fronted (opens new window)', 'easy-language' ) ) . '">&nbsp;</a>';
+				echo '<a href="' . esc_url( $show_link ) . '" class="dashicons dashicons-admin-site-alt3" target="_blank" title="' . esc_attr( __( 'Show in fronted (open new window)', 'easy-language' ) ) . '">&nbsp;</a>';
 
 				// get link to delete this simplification if user has capability for it.
 				if ( current_user_can( 'delete_el_simplifier' ) ) {
@@ -1144,6 +1144,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				'post' => '1',
 			)
 		);
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose supported post-types', 'easy-language' ) );
 		$field->set_options( $post_types );
@@ -1183,6 +1184,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $general_main_section );
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose supported taxonomies', 'easy-language' ) );
 		$field->set_options( $taxonomies );
@@ -1206,6 +1208,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $general_main_section );
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose languages', 'easy-language' ) );
 		/* translators: %1$s will be replaced by the settings-URL for the active API */
@@ -1252,7 +1255,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add setting.
 		$permalink_setting = $settings_obj->add_setting( 'easy_language_generate_permalink' );
 		$permalink_setting->set_section( $general_main_section );
-		$permalink_setting->set_type( 'integer' );
 		$permalink_setting->set_default( 1 );
 		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Generate permalink for translated objects', 'easy-language' ) );
@@ -1266,7 +1268,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add setting.
 		$automatic_simplification_setting = $settings_obj->add_setting( 'easy_language_automatic_simplification_enabled' );
 		$automatic_simplification_setting->set_section( $automatic_section );
-		$automatic_simplification_setting->set_type( 'integer' );
 		$automatic_simplification_setting->set_default( 1 );
 		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Enable automatic simplifications', 'easy-language' ) );
@@ -1348,7 +1349,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_show_debug_info' );
 		$setting->set_section( $advanced_section );
-		$setting->set_type( 'integer' );
 		$setting->set_default( 1 );
 		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Show debug info', 'easy-language' ) );
@@ -1832,7 +1832,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 						'title'     => __( 'Error', 'easy-language' ),
 						'texts'     => array(
 							/* translators: %1$s will be replaced by the support-URL */
-							'<p>' . sprintf( __( '<strong>This error should never happen!</strong> Please contact the <a href="%1$s" target="_blank">support forum (opens new window)</a> about the following error:', 'easy-language' ), esc_url( Helper::get_plugin_support_url() ) ) . '</p>',
+							'<p>' . sprintf( __( '<strong>This error should never happen!</strong> Please contact the <a href="%1$s" target="_blank">support forum (open new window)</a> about the following error:', 'easy-language' ), esc_url( Helper::get_plugin_support_url() ) ) . '</p>',
 							$error_message,
 						),
 						'buttons'   => array(

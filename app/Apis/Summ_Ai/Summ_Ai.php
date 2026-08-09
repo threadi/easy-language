@@ -183,7 +183,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$min_percent = apply_filters( 'easy_language_quota_percent', $min_percent );
 
 		/* translators: %1$s will be replaced by the URL for SUMM AI-product-info */
-		$text = sprintf( __( '<p>Create any complicated text barrier-free and understandable with the <a href="%1$s" target="_blank"><strong>SUMM AI</strong> (opens new window)</a> AI-based tool.<br>Create simple and easy-to-understand texts on your website.</p><p>This API simplifies texts according to the official rules of the <i>Leichte Sprache e.V.</i>.<br>This specifies how texts must be written in easy language.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+		$text = sprintf( __( '<p>Create any complicated text barrier-free and understandable with the <a href="%1$s" target="_blank"><strong>SUMM AI</strong> (open new window)</a> AI-based tool.<br>Create simple and easy-to-understand texts on your website.</p><p>This API simplifies texts according to the official rules of the <i>Leichte Sprache e.V.</i>.<br>This specifies how texts must be written in easy language.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( $this->is_free_mode() ) {
 			$percent = absint( $quota['character_spent'] ) / absint( $quota['character_limit'] );
 			if ( 1 === $percent ) {
@@ -662,7 +662,7 @@ class Summ_Ai extends Base implements Api_Base {
 			$description .= sprintf( __( 'You have a free quota of %1$d characters with the plugin Easy Language.', 'easy-language' ), absint( $this->get_quota()['character_limit'] ) ) . '<br>';
 		}
 		/* translators: %1$s will be replaced by the SUMM AI URL */
-		$description .= sprintf( __( '<strong>If you want more <a href="%1$s" target="_blank">get your SUMM AI API key now (opens new window)</a></strong>.<br>If you have any questions about the key provided by SUMM AI, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+		$description .= sprintf( __( '<strong>If you want more <a href="%1$s" target="_blank">get your SUMM AI API key now (open new window)</a></strong>.<br>If you have any questions about the key provided by SUMM AI, please contact their support: <a href="%1$s" target="_blank">%1$s (open new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_summ_api_token_set() ) {
 			// set the link to test the entered token.
 			$url = add_query_arg(
@@ -684,7 +684,7 @@ class Summ_Ai extends Base implements Api_Base {
 
 			// Show other description if token is set.
 			/* translators: %1$s will be replaced by the SUMM AI URL */
-			$description  = sprintf( __( 'If you have any questions about the key provided by SUMM AI, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+			$description  = sprintf( __( 'If you have any questions about the key provided by SUMM AI, please contact their support: <a href="%1$s" target="_blank">%1$s (open new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 			$description .= '<br><a href="' . esc_url( $url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Test token', 'easy-language' ) . '</a><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
 		}
 
@@ -780,6 +780,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$setting->set_section( $summ_ai_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose source languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible source languages for SUMM AI-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ) );
@@ -807,6 +808,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$setting->set_section( $summ_ai_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new FieldTable( $settings_obj );
 		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible target languages for SUMM AI-simplifications.', 'easy-language' ) );
@@ -862,7 +864,6 @@ class Summ_Ai extends Base implements Api_Base {
 
 			// add setting.
 			$new_line = $settings_obj->add_setting( 'easy_language_summ_ai_target_languages_' . $language_code . '_new_line' );
-			$new_line->set_type( 'integer' );
 			$new_line->set_default( $settings['new_lines'] ? 1 : 0 );
 			$new_line->set_section( $hidden_section );
 			$new_line_field = new Checkbox( $settings_obj );
@@ -873,7 +874,6 @@ class Summ_Ai extends Base implements Api_Base {
 
 			// add setting.
 			$embolden_negative = $settings_obj->add_setting( 'easy_language_summ_ai_target_languages_' . $language_code . '_embolden_negative' );
-			$embolden_negative->set_type( 'integer' );
 			$embolden_negative->set_default( $settings['embolden_negative'] ? 1 : 0 );
 			$embolden_negative->set_section( $hidden_section );
 			$embolden_negative_field = new Checkbox( $settings_obj );
@@ -891,7 +891,6 @@ class Summ_Ai extends Base implements Api_Base {
 		$setting = $settings_obj->add_setting( 'easy_language_summ_ai_html_mode' );
 		$setting->set_section( $summ_ai_tab_main );
 		$setting->set_show_in_rest( true );
-		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Enable HTML-mode', 'easy-language' ) );
@@ -917,7 +916,6 @@ class Summ_Ai extends Base implements Api_Base {
 		$setting = $settings_obj->add_setting( 'easy_language_summ_ai_test' );
 		$setting->set_section( $summ_ai_tab_main );
 		$setting->set_show_in_rest( true );
-		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Enable test-marker', 'easy-language' ) );
@@ -1059,7 +1057,7 @@ class Summ_Ai extends Base implements Api_Base {
 				$transient_obj->set_dismissible_days( 2 );
 				$transient_obj->set_name( 'easy_language_summ_ai_quota' );
 				/* translators: %1%s will be replaced by the URL for SUMM AI support */
-				$transient_obj->set_message( sprintf( __( '<strong>Your quota for the SUMM AI API is completely depleted.</strong> You will not be able to request new simplifications from SUMM AI. Please contact the <a href="%1$s" target="_blank">SUMM AI support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
+				$transient_obj->set_message( sprintf( __( '<strong>Your quota for the SUMM AI API is completely depleted.</strong> You will not be able to request new simplifications from SUMM AI. Please contact the <a href="%1$s" target="_blank">SUMM AI support (open new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 				$transient_obj->set_type( 'error' );
 				$transient_obj->save();
 			} elseif ( $percent > $min_percent ) {
@@ -1068,7 +1066,7 @@ class Summ_Ai extends Base implements Api_Base {
 				$transient_obj->set_dismissible_days( 2 );
 				$transient_obj->set_name( 'easy_language_summ_ai_quota' );
 				/* translators: %1%s will be replaced by the URL for SUMM AI support */
-				$transient_obj->set_message( sprintf( __( '<strong>More than 80 percent of your quota for the SUMM AI API has already been used.</strong> Please contact the <a href="%1$s" target="_blank">SUMM AI support (opens new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
+				$transient_obj->set_message( sprintf( __( '<strong>More than 80 percent of your quota for the SUMM AI API has already been used.</strong> Please contact the <a href="%1$s" target="_blank">SUMM AI support (open new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 				$transient_obj->set_type( 'error' );
 				$transient_obj->save();
 			}

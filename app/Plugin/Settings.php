@@ -308,7 +308,6 @@ class Settings {
 		$setting = $settings_obj->add_setting( 'easy_language_delete_unused_simplifications' );
 		$setting->set_section( $advanced_tab_main );
 		$setting->set_show_in_rest( true );
-		$setting->set_type( 'integer' );
 		$setting->set_default( 1 );
 		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Delete unused simplified texts', 'easy-language' ) );
@@ -366,7 +365,6 @@ class Settings {
 		$setting = $settings_obj->add_setting( 'easy_language_debug_mode' );
 		$setting->set_section( $advanced_tab_main );
 		$setting->set_show_in_rest( true );
-		$setting->set_type( 'integer' );
 		$setting->set_default( 0 );
 		$field = new Checkbox( $settings_obj );
 		$field->set_title( __( 'Debug-Mode', 'easy-language' ) );

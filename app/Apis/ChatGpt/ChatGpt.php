@@ -133,7 +133,7 @@ class ChatGpt extends Base implements Api_Base {
 	 */
 	public function get_description(): string {
 		/* translators: %1$d will be replaced by the link to Chatgpt */
-		$text = sprintf( __( '<p><a href="%1$s" target="_blank"><strong>ChatGpt</strong> (opens new window)</a> is an AI-tool for any conversations.<br>It helps you to answer questions you have.</p><p>This API tries to simplify texts based on its on artificial intelligence.<br>The results are based on no standards for Easy or Plain language.</p><p>The number of simplifications with ChatGpt is limited to <strong>tokens</strong>.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+		$text = sprintf( __( '<p><a href="%1$s" target="_blank"><strong>ChatGpt</strong> (open new window)</a> is an AI-tool for any conversations.<br>It helps you to answer questions you have.</p><p>This API tries to simplify texts based on its on artificial intelligence.<br>The results are based on no standards for Easy or Plain language.</p><p>The number of simplifications with ChatGpt is limited to <strong>tokens</strong>.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 		/* translators: %1$s will be replaced by a URL. */
 		$text .= '<p><strong>' . __( 'You will use tokens on ChatGpt for every simplification. Please consult your ChatGpt-account about the usage.', 'easy-language' ) . ' ' . sprintf( __( 'You can see the prices for the usage <a href="%1$s" target="_blank">here</a>.', 'easy-language' ), $this->get_prices_url() ) . '</strong></p>';
 
@@ -334,7 +334,7 @@ class ChatGpt extends Base implements Api_Base {
 
 		// set description for the token field if it has not been set.
 		/* translators: %1$s will be replaced by the ChatGPT URL */
-		$description = sprintf( __( 'Get your ChatGPT API Token <a href="%1$s" target="_blank">here (opens new window)</a>.<br>If you have any questions about the token provided by ChatGpt, please contact their support: <a href="%2$s" target="_blank">%2$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_api_management_url() ), esc_url( $this->get_language_specific_support_page() ) );
+		$description = sprintf( __( 'Get your ChatGPT API Token <a href="%1$s" target="_blank">here (open new window)</a>.<br>If you have any questions about the token provided by ChatGpt, please contact their support: <a href="%2$s" target="_blank">%2$s (open new window)</a>', 'easy-language' ), esc_url( $this->get_api_management_url() ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_chatgpt_token_set() ) {
 			// set link to remove the token.
 			$remove_token_url = add_query_arg(
@@ -347,7 +347,7 @@ class ChatGpt extends Base implements Api_Base {
 
 			// Show other description if token is set.
 			/* translators: %1$s will be replaced by the Chatgpt URL */
-			$description  = sprintf( __( 'If you have any questions about the token provided by ChatGPT, please contact their support: <a href="%1$s" target="_blank">%1$s (opens new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
+			$description  = sprintf( __( 'If you have any questions about the token provided by ChatGPT, please contact their support: <a href="%1$s" target="_blank">%1$s (open new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 			$description .= '<br><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
 		}
 
@@ -414,6 +414,7 @@ class ChatGpt extends Base implements Api_Base {
 		$setting->set_section( $chatgpt_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose source languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible source languages for ChatGPT-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ) );
@@ -434,6 +435,7 @@ class ChatGpt extends Base implements Api_Base {
 		$setting->set_section( $chatgpt_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible target languages for ChatGPT-simplifications.', 'easy-language' ) );
@@ -447,6 +449,7 @@ class ChatGpt extends Base implements Api_Base {
 		$setting->set_section( $chatgpt_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
+		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new FieldTable( $settings_obj );
 		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible target languages for SUMM AI-simplifications.', 'easy-language' ) );

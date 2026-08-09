@@ -12,7 +12,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v7
 
             - name: Setup WP-CLI
               uses: godaddy-wordpress/setup-wp-cli@1
@@ -20,13 +20,8 @@ jobs:
             - name: Run package installs and builds
               run: |
                   composer install
-                  composer update
                   npm i
                   npm i concurrently
-                  cd vendor/threadi/easy-dialog-for-wordpress/
-                  npm i
-                  npm run build
-                  cd ../../../
                   cd vendor/threadi/easy-setup-for-wordpress/
                   npm i
                   npm run build
@@ -59,21 +54,21 @@ jobs:
               run: vendor/bin/phpcs -p app --standard=PHPCompatibilityWP
 
             - name: Run WordPress Coding Standard fixes
-              run: vendor/bin/phpcbf --standard=ruleset.xml .
+              run: vendor/bin/phpcbf .
               continue-on-error: true
 
             - name: Run WordPress Coding Standard checks
-              run: vendor/bin/phpcs --standard=ruleset.xml .
+              run: vendor/bin/phpcs .
 
             - name: Set version number 1
-              uses: richardrigutins/replace-in-files@v2
+              uses: richardrigutins/replace-in-files@v3
               with:
                   files: 'easy-language.php'
                   search-text: '@@VersionNumber@@'
                   replacement-text: ${{ github.ref_name }}
 
             - name: Set version number 2
-              uses: richardrigutins/replace-in-files@v2
+              uses: richardrigutins/replace-in-files@v3
               with:
                   files: 'readme.txt'
                   search-text: '@@VersionNumber@@'
@@ -105,7 +100,7 @@ jobs:
             - name: Create ZIP release
               run: |
                   cd ..
-                  zip -r -q ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/* -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/doc/*" "*/phpcs.xml" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "/.editorconfig" "*/legacy-classes/Divi/.yarn/*" "*/legacy-classes/Divi/package-lock.json" "*/legacy-classes/Divi/node_modules/*" "*/legacy-classes/Divi/.env" "*/legacy-classes/Divi/.yarnrc" "*/legacy-classes/Divi/yarn.lock" "*/legacy-classes/Divi/package.json" "*/legacy-classes/Divi/*/.gitkeep" "*/ruleset.xml"
+                  zip -r -q ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/* -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/doc/*" "*/.phpcs.xml" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "/.editorconfig" "*/legacy-classes/Divi/.yarn/*" "*/legacy-classes/Divi/package-lock.json" "*/legacy-classes/Divi/node_modules/*" "*/legacy-classes/Divi/.env" "*/legacy-classes/Divi/.yarnrc" "*/legacy-classes/Divi/yarn.lock" "*/legacy-classes/Divi/package.json" "*/legacy-classes/Divi/*/.gitkeep"
                   zip -ur ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/autoload.php
                   zip -ur ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/composer/*
                   zip -urq ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/vendor/threadi/*/build/*
@@ -116,7 +111,7 @@ jobs:
                   cp ${{ github.event.repository.name }}_${{ github.ref_name }}.zip ${{ github.event.repository.name }}/
 
             - name: Create Release
-              uses: softprops/action-gh-release@v2
+              uses: softprops/action-gh-release@v3
               if: startsWith(github.ref, 'refs/tags/')
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -22,18 +22,13 @@ jobs:
           - 3306:3306
     steps:
       - name: Check out source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Run package installs and builds
         run: |
               composer install
-              composer update
               npm i
               npm i concurrently
-              cd vendor/threadi/easy-dialog-for-wordpress/
-              npm i
-              npm run build
-              cd ../../../
               cd vendor/threadi/easy-setup-for-wordpress/
               npm i
               npm run build
