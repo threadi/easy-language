@@ -1,5 +1,19 @@
 # Changelog
 
+## [3.2.2] - 09.08.2026
+
+### Changed
+
+- Compatible with WordPress 7.1
+- Now requires PHP 8.2 or newer
+- Updated dialog lib to 2.0.0
+- Updated settings lib to 3.0.0
+- Updated dependencies for the blocks
+
+### Fixed
+
+- Fixed an error on downloading simplifications as .po-file
+
 ## [3.2.1] - 20.07.2026
 
 ### Changed

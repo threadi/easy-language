@@ -4,12 +4,6 @@ tasks:
   default:
     - task: prepare
 
-  build_dialog:
-    dir: vendor/threadi/easy-dialog-for-wordpress/
-    cmds:
-      - npm i
-      - npm run build
-
   build_directory:
     dir: vendor/threadi/easy-setup-for-wordpress/
     cmds:
@@ -28,13 +22,13 @@ tasks:
   check:
     cmds:
       - vendor/bin/phpstan analyse
-      - vendor/bin/phpcbf --standard=ruleset.xml .
-      - vendor/bin/phpcs --standard=ruleset.xml .
+      - vendor/bin/phpcbf .
+      - vendor/bin/phpcs .
 
   build_zip:
     dir: ../
     cmds:
-      - zip -rq external-files-in-media-library/releases/external-files-in-media-library_{{.CLI_ARGS}}.zip external-files-in-media-library/ -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/docs/*" "*/phpcs.xml" "*/composer.json" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/ruleset.xml" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "*/.editorconfig" "*/build/*" "*/releases/*" "*/svn/*" "*/languages/*" "*/changelog.md" "*/readme.md" "*/ruleset.xml" "*/assets/*" "*/external-files-in-media-library-dev.php" "*/readme-dev.txt" "*/phpstan.neon" "*/Taskfile.yml" "*/libs/*" "*/src/*"
+      - zip -rq external-files-in-media-library/releases/external-files-in-media-library_{{.CLI_ARGS}}.zip external-files-in-media-library/ -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/docs/*" "*/.phpcs.xml" "*/composer.json" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/phpcs.xml.dist" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "*/.editorconfig" "*/build/*" "*/releases/*" "*/svn/*" "*/languages/*" "*/changelog.md" "*/readme.md" "*/phpcs.xml.dist" "*/assets/*" "*/external-files-in-media-library-dev.php" "*/readme-dev.txt" "*/phpstan.neon" "*/Taskfile.yml" "*/libs/*" "*/src/*"
       - zip -urq external-files-in-media-library/releases/external-files-in-media-library_{{.CLI_ARGS}}.zip external-files-in-media-library/vendor/autoload.php
       - zip -urq external-files-in-media-library/releases/external-files-in-media-library_{{.CLI_ARGS}}.zip external-files-in-media-library/vendor/composer/*
       - zip -urq external-files-in-media-library/releases/external-files-in-media-library_{{.CLI_ARGS}}.zip external-files-in-media-library/vendor/gettext/*

@@ -862,7 +862,7 @@ class Texts {
 			header( 'Content-Type: application/octet-stream' );
 			header( 'Content-Disposition: inline; filename="' . sanitize_file_name( gmdate( 'YmdHi' ) . '_' . get_option( 'blogname' ) . '.po"' ) );
 			header( 'Content-Length: ' . strlen( $po ) );
-			echo $wp_filesystem->get_contents( $po ); // phpcs:ignore WordPress.Security.EscapeOutput
+			echo $po; // phpcs:ignore WordPress.Security.EscapeOutput -- generated PO file content sent as raw file download, not rendered as HTML.
 			exit;
 		}
 

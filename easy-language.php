@@ -3,7 +3,7 @@
  * Plugin Name:       Easy Language
  * Description:       This plugin adds support for easy language in WordPress.
  * Requires at least: 6.0
- * Requires PHP:      8.1
+ * Requires PHP:      8.2
  * Version:           @@VersionNumber@@
  * Author:            laOlaWeb
  * Author URI:        https://laolaweb.com
@@ -17,8 +17,8 @@
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
-// do nothing if the PHP version is not 8.1 or newer.
-if ( PHP_VERSION_ID < 80100 ) { // @phpstan-ignore smaller.alwaysFalse
+// do nothing if the PHP version is not 8.2 or newer.
+if ( PHP_VERSION_ID < 80200 ) { // @phpstan-ignore smaller.alwaysFalse
 	return;
 }
 
