@@ -533,7 +533,7 @@ class Capito extends Base implements Api_Base {
 			// Show other description if token is set.
 			/* translators: %1$s will be replaced by the capito URL */
 			$description  = sprintf( __( 'If you have any questions about the token provided by capito, please contact their support: <a href="%1$s" target="_blank">%1$s (open new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
-			$description .= '<br><a href="' . esc_url( $url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Test token', 'easy-language' ) . '</a><a href="' . esc_url( $remove_token_url ) . '" class="button button-secondary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
+			$description .= '<br><a href="' . esc_url( $url ) . '" class="button button-primary easy-language-settings-button">' . __( 'Test token', 'easy-language' ) . '</a><a href="' . esc_url( $remove_token_url ) . '" class="button button-primary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
 		}
 
 		// if foreign simplification-plugin with API-support is used, hide the language-settings.

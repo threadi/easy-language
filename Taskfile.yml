@@ -13,7 +13,6 @@ tasks:
   prepare:
     cmds:
       - composer install
-      - composer update
       - npm i
       - npm run build
       - task: build_dialog
