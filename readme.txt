@@ -105,11 +105,8 @@ Each release of this plugin will only be published if it fulfills the following 
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Compatible with WordPress 7.1
-- Now requires PHP 8.2 or newer
-- Updated dialog lib to 2.0.0
-- Updated settings lib to 3.0.0
-- Updated dependencies for the blocks
-- Fixed an error on downloading simplifications as .po-file
+- Updated dependencies
+- Changed styling of custom buttons in settings for better visibility in WordPress 7.x
+- Fixed the wrong version number in the WordPress repository
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)

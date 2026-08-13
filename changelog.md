@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.2.3] - 13.09.2026
+
+### Changed
+
+- Updated dependencies
+- Changed styling of custom buttons in settings for better visibility in WordPress 7.x
+
+### Fixed
+
+- Fixed the wrong version number in the WordPress repository
+
 ## [3.2.2] - 09.08.2026
 
 ### Changed
