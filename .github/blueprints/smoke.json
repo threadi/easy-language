@@ -1,0 +1,15 @@
+{
+    "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+    "preferredVersions": { "php": "8.4", "wp": "latest" },
+    "login": true,
+    "steps": [
+        {
+            "step": "activatePlugin",
+            "pluginPath": "easy-language/easy-language.php"
+        },
+        {
+            "step": "runPHP",
+            "code": "<?php require_once '/wordpress/wp-load.php'; if ( ! defined( 'EASY_LANGUAGE_VERSION' ) || ! class_exists( '\\\\easyLanguage\\\\Plugin\\\\Crypt' ) || ! class_exists( '\\\\CryptForWordPress\\\\Crypt' ) || ! class_exists( '\\\\Gettext\\\\Translations' ) ) { throw new Exception( 'plugin classes or constants missing' ); } file_put_contents( '/wordpress/wp-content/plugins/easy-language/smoke-result.txt', 'SMOKE_OK' );"
+        }
+    ]
+}

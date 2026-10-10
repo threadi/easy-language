@@ -79,8 +79,8 @@ class Rest_Api {
 						},
 					),
 				),
-				'permission_callback' => function () {
-					return current_user_can( 'edit_el_simplifier' );
+				'permission_callback' => function ( WP_REST_Request $request ) {
+					return current_user_can( 'edit_el_simplifier' ) && current_user_can( 'edit_post', absint( $request['id'] ) );
 				},
 			)
 		);

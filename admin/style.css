@@ -229,7 +229,7 @@ body .text-translations-table #source_language, body .text-translations-table #t
 a.easy-dialog-for-wordpress, span.easy-dialog-for-wordpress { cursor: pointer }
 
 body.easy-dialog-for-wordpress.wp-core-ui .components-modal__frame.easy-dialog:after {
-	background-image: url(/wp-content/plugins/easy-language/gfx/easy-language-icon.png);
+	background-image: url(../gfx/easy-language-icon.png);
 	width: 60px;
 	height: 60px;
 	float: right;
@@ -255,7 +255,7 @@ body.easy-dialog-for-wordpress.wp-core-ui .components-modal__header .components-
 }
 
 body.easy-dialog-for-wordpress.wp-core-ui .easy-dialog .edfw-progressbar:after {
-	background-image: url(/wp-content/plugins/easy-language/gfx/loading.svg);
+	background-image: url(../gfx/loading.svg);
 	content: "";
 	display: block;
 	height: 40px;

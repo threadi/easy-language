@@ -100,6 +100,11 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 			// transform it to array.
 			$response_array = json_decode( $response, true );
 
+			// bail if the response does not contain a simplified text.
+			if ( ! is_array( $response_array ) || empty( $response_array['translated_text'] ) || ! is_string( $response_array['translated_text'] ) ) {
+				return array();
+			}
+
 			// get the simplified text.
 			$simplified_text = $response_array['translated_text'];
 
@@ -115,6 +120,11 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 			 */
 			$simplified_text = apply_filters( 'easy_language_simplified_text', $simplified_text, $response_array, $instance );
 
+			// filter the simplified HTML text to allow only HTML, which is allowed in posts.
+			if ( $is_html ) {
+				$simplified_text = wp_kses_post( $simplified_text );
+			}
+
 			// if request-array contains 'disabled', disable all free requests.
 			if ( ! empty( $response_array['disabled'] ) ) {
 				$this->get_api()->disable_free_requests();
@@ -128,7 +138,7 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 			// return simplification to the plugin which will save it.
 			return array(
 				'translated_text' => $simplified_text,
-				'jobid'           => absint( $response_array['jobid'] ),
+				'jobid'           => absint( $response_array['jobid'] ?? 0 ),
 			);
 		}
 

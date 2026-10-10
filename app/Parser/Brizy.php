@@ -189,17 +189,27 @@ class Brizy extends Parser_Base implements Parser {
 				return $original_complete;
 			}
 
-			// replace the texts.
-			$text = $this->replace_content_in_widgets( $editor_data['items'], $simplified_part );
+			// bail if items are not an array.
+			if ( ! is_array( $editor_data['items'] ) ) {
+				return $original_complete;
+			}
+
+			// replace the texts in the items and keep the complete structure.
+			$editor_data['items'] = $this->replace_content_in_widgets( $editor_data['items'], $simplified_part );
 
 			// encode as JSON.
-			$data['brizy-post']['editor_data'] = Helper::get_json( $text );
+			$json = Helper::get_json( $editor_data );
+
+			// bail if JSON could not be created.
+			if ( empty( $json ) ) {
+				return $original_complete;
+			}
 
 			// encode editor data.
-			$data['brizy-post']['editor_data'] = base64_encode( $data['brizy-post']['editor_data'] );
+			$data['brizy-post']['editor_data'] = base64_encode( $json );
 
-			// save the data for Brizy.
-			update_post_meta( $this->get_object_id(), 'brizy', $data );
+			// save the data for Brizy (slashed, as update_post_meta() unslashes them).
+			update_post_meta( $this->get_object_id(), 'brizy', wp_slash( $data ) );
 		}
 
 		// return the string for post_content.
@@ -272,7 +282,7 @@ class Brizy extends Parser_Base implements Parser {
 						'html' => $this->is_flow_text_widget_html( $section['type'] ),
 					);
 				}
-			} else {
+			} elseif ( isset( $section['value']['items'] ) && is_array( $section['value']['items'] ) ) {
 				// loop through the deeper arrays.
 				$resulting_texts = $this->get_widgets( $section['value']['items'], $resulting_texts );
 			}
@@ -304,13 +314,18 @@ class Brizy extends Parser_Base implements Parser {
 				foreach ( $flow_text_widgets[ $section['type'] ] as $entry_name ) {
 					if ( empty( $section['value'][ $entry_name ] ) ) {
 						continue;
-
 					}
+
+					// bail if this is not the original text.
+					if ( $this->get_text() !== $section['value'][ $entry_name ] ) {
+						continue;
+					}
+
 					$container[ $index ]['value'][ $entry_name ] = $simplified_part;
 				}
-			} else {
-				// loop through the deeper arrays.
-				$container = $this->replace_content_in_widgets( $section['value']['items'], $simplified_part );
+			} elseif ( isset( $section['value']['items'] ) && is_array( $section['value']['items'] ) ) {
+				// loop through the deeper arrays and keep the complete structure.
+				$container[ $index ]['value']['items'] = $this->replace_content_in_widgets( $section['value']['items'], $simplified_part );
 			}
 		}
 

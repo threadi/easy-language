@@ -158,8 +158,21 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function admin_init(): void {
-		// bail if the WPML class does not exist.
-		if ( ! class_exists( 'WPML_Flags_Factory' ) ) {
+		// bail if the user is not allowed to manage options.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// get the marker for the actual plugin version and active languages.
+		$marker = md5( EASY_LANGUAGE_VERSION . Helper::get_json( array_keys( Languages::get_instance()->get_active_languages() ) ) );
+
+		// bail if this routine has already been run for this marker.
+		if ( get_option( 'easy_language_wpml_languages_marker', '' ) === $marker ) {
+			return;
+		}
+
+		// bail if the WPML classes do not exist.
+		if ( ! class_exists( 'WPML_Flags_Factory' ) || ! class_exists( 'SitePress_EditLanguages' ) ) {
 			// Log event.
 			Log::get_instance()->add_log( __( 'WPML-objects missing - WPML support will not be activated.', 'easy-language' ), 'error' );
 
@@ -168,6 +181,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// get db-connection.
 		global $wpdb, $sitepress;
+
+		// bail if WPML object is not available.
+		if ( ! is_object( $sitepress ) || ! method_exists( $sitepress, 'get_active_languages' ) ) {
+			return;
+		}
 
 		// marker that something has been changed in WPML.
 		$wpml_changed = false;
@@ -178,11 +196,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		foreach ( $old_active_languages as $old_active_language ) {
 			$active_languages[] = $old_active_language['code'];
 		}
-
-		// get WP Filesystem-handler.
-		require_once ABSPATH . '/wp-admin/includes/file.php';
-		\WP_Filesystem();
-		global $wp_filesystem;
 
 		// check if our languages do already exist in wpml-db.
 		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
@@ -204,16 +217,20 @@ class Init extends Base implements ThirdPartySupport_Base {
 			$base_path     = $wp_upload_dir['basedir'] . '/';
 			$path          = 'flags/';
 			$flag_path     = $base_path . $path . $language['img'];
-			if ( ! file_exists( $flag_path ) ) {
-				if ( ! file_exists( dirname( $flag_path ) ) ) {
+			$wp_filesystem = Helper::get_wp_filesystem();
+			if ( ! $wp_filesystem->exists( $flag_path ) ) {
+				// create the directory, if it does not exist.
+				if ( ! $wp_filesystem->is_dir( dirname( $flag_path ) ) ) {
 					$wp_filesystem->mkdir( dirname( $flag_path ) );
 				}
 
 				// get the icon path.
-				$icon_path = Helper::get_plugin_path() . '/gfx/' . $language['img'];
+				$icon_path = Helper::get_plugin_path() . 'gfx/' . $language['img'];
 
-				// copy the file.
-				copy( $icon_path, $flag_path );
+				// copy the file, if source exists and the target directory is writable.
+				if ( $wp_filesystem->exists( $icon_path ) && $wp_filesystem->is_writable( dirname( $flag_path ) ) ) {
+					$wp_filesystem->copy( $icon_path, $flag_path );
+				}
 			}
 
 			// collect possible simplifications.
@@ -251,12 +268,21 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// run tasks if something has been changed.
 		if ( false !== $wpml_changed ) {
 			// save the active languages (including our own).
-			$setup_instance = wpml_get_setup_instance();
-			$setup_instance->set_active_languages( $active_languages );
+			if ( function_exists( 'wpml_get_setup_instance' ) ) {
+				$setup_instance = wpml_get_setup_instance();
+				if ( is_object( $setup_instance ) && method_exists( $setup_instance, 'set_active_languages' ) ) {
+					$setup_instance->set_active_languages( $active_languages );
+				}
+			}
 
 			// clear cache in WPML.
-			icl_cache_clear();
+			if ( function_exists( 'icl_cache_clear' ) ) {
+				icl_cache_clear();
+			}
 		}
+
+		// save the marker to run this routine only once for this version and active languages.
+		update_option( 'easy_language_wpml_languages_marker', $marker, false );
 	}
 
 	/**

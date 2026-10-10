@@ -102,16 +102,16 @@ function easy_language_add_simplification_object( object_id, type, language, sim
 							title: __('%1$s ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
 							texts: [
 								/* translators: %1$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the API-title, %3$s will be replaced by the object name */
-								'<p>' + __( 'To many text-widgets in this %1$s for adhoc simplification with %2$s.<br>The texts of this %3$s will be simplified in background automatically.<br>Check the list of texts to simplify for the progress.', 'easy-language' ).replace("%1$s", data.object_type_name).replace("%2$s", data.api_title).replace("%3$s", data.object_type_name) + '</p>'
+								'<p>' + __( 'To many text-widgets in this %1$s for adhoc simplification with %2$s.<br>The texts of this %3$s will be simplified in background automatically.<br>Check the list of texts to simplify for the progress.', 'easy-language' ).replace("%1$s", easy_language_simplification_escape_html( data.object_type_name )).replace("%2$s", easy_language_simplification_escape_html( data.api_title )).replace("%3$s", easy_language_simplification_escape_html( data.object_type_name )) + '</p>'
 							],
 							buttons: [
 								{
-									'action': 'location.href="' + data.simplification_list_link + '";',
+									'action': 'location.href = ' + JSON.stringify( String( data.simplification_list_link ) ) + ';',
 									'variant': 'primary',
 									'text': __('Go to simplify list', 'easy-language')
 								},
 								{
-									'action': 'location.href="' + data.edit_link + '";',
+									'action': 'location.href = ' + JSON.stringify( String( data.edit_link ) ) + ';',
 									'variant': 'primary',
 									/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
 									'text': __('Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
@@ -132,11 +132,11 @@ function easy_language_add_simplification_object( object_id, type, language, sim
 							title: __('%1$s ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
 							texts: [
 								/* translators: %1$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the API-title */
-								'<p>' + __( 'To large texts in this %1$s for simplification with %2$s.', 'easy-language' ).replace("%1$s", data.object_type_name).replace("%2$s", data.api_title) + '</p>'
+								'<p>' + __( 'To large texts in this %1$s for simplification with %2$s.', 'easy-language' ).replace("%1$s", easy_language_simplification_escape_html( data.object_type_name )).replace("%2$s", easy_language_simplification_escape_html( data.api_title )) + '</p>'
 							],
 							buttons: [
 								{
-									'action': 'location.href="' + data.edit_link + '";',
+									'action': 'location.href = ' + JSON.stringify( String( data.edit_link ) ) + ';',
 									'variant': 'primary',
 									/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
 									'text': __('Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
@@ -160,17 +160,17 @@ function easy_language_add_simplification_object( object_id, type, language, sim
 								title: __('%1$s ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
 								texts: [
 									/* translators: %1$s and %4$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title, %3$s will be replaced by the language-name */
-									__('<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.<br>If you decide to edit this %4$s by yourself its texts will not automatically be simplified in background.</p>', 'easy-language').replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language).replace('%4$s', data.object_type_name)
+									__('<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.<br>If you decide to edit this %4$s by yourself its texts will not automatically be simplified in background.</p>', 'easy-language').replace('%1$s', easy_language_simplification_escape_html( data.object_type_name )).replace('%2$s', easy_language_simplification_escape_html( data.title )).replace('%3$s', easy_language_simplification_escape_html( data.language )).replace('%4$s', easy_language_simplification_escape_html( data.object_type_name ))
 								],
 								buttons: [
 									{
-										'action': 'easy_language_get_simplification(' + data.object_id + ', "' + data.object_type + '" );',
+										'action': 'easy_language_get_simplification( ' + parseInt( data.object_id, 10 ) + ', ' + JSON.stringify( String( data.object_type ) ) + ' );',
 										'variant': 'primary',
 										/* translators: %1$s will be replaced by the API-title */
 										'text': __('Simplify now via API %1$s', 'easy-language').replace('%1$s', data.api_title)
 									},
 									{
-										'action': 'easy_language_prevent_automatic_simplification(' + data.object_id + ', "' + data.object_type + '", true, "' + data.edit_link + '" );',
+										'action': 'easy_language_prevent_automatic_simplification( ' + parseInt( data.object_id, 10 ) + ', ' + JSON.stringify( String( data.object_type ) ) + ', true, ' + JSON.stringify( String( data.edit_link ) ) + ' );',
 										'variant': 'secondary',
 										/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
 										'text': __('Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
@@ -190,11 +190,11 @@ function easy_language_add_simplification_object( object_id, type, language, sim
 								title: __('%1$s is ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
 								texts: [
 									/* translators: %1$s and %4$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title, %3$s will be replaced by the language-name */
-									__('<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.</p>', 'easy-language').replace('%1$s', data.object_type_name).replace('%2$s', data.title).replace('%3$s', data.language).replace('%4$s', data.object_type_name)
+									__('<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.</p>', 'easy-language').replace('%1$s', easy_language_simplification_escape_html( data.object_type_name )).replace('%2$s', easy_language_simplification_escape_html( data.title )).replace('%3$s', easy_language_simplification_escape_html( data.language )).replace('%4$s', easy_language_simplification_escape_html( data.object_type_name ))
 								],
 								buttons: [
 									{
-										'action': 'location.href="' + data.edit_link + '";',
+										'action': 'location.href = ' + JSON.stringify( String( data.edit_link ) ) + ';',
 										'variant': 'primary',
 										/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
 										'text': __('Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
@@ -232,7 +232,7 @@ function easy_language_simplification_init( id, type ) {
 			],
 			buttons: [
 				{
-					'action': 'easy_language_get_simplification( ' + id + ', "' + type + '" );',
+					'action': 'easy_language_get_simplification( ' + parseInt( id, 10 ) + ', ' + JSON.stringify( String( type ) ) + ' );',
 					'variant': 'primary',
 					'text': __( 'Yes', 'easy-language' )
 				},
@@ -305,7 +305,7 @@ function easy_language_get_simplification_info( obj_id, type, initialization ) {
 							title: __('Error', 'easy-language'),
 							texts: [
 								/* translators: [error] will be replaced by the http-error-message (e.g. "Gateway timed our"), %1$s will be replaced with the Pro-URL */
-								__('<p><strong>The following error occurred during: [error]</strong> - at least one simplification could not be processed.<br><br><strong>Possible causes:</strong></p><ul><li>The server settings for WordPress hosting prevent longer lasting requests. Contact your hosters support for a solution.</li><li>The API used took too long to simplify the text. Shorten particularly long texts or contact API support for further assistance.</li><li>Use automatic simplifications in the background without the risk of hitting timeouts on your own hosting.</li></ul>', 'easy-language').replace('[error]', e.statusText)
+								__('<p><strong>The following error occurred during: [error]</strong> - at least one simplification could not be processed.<br><br><strong>Possible causes:</strong></p><ul><li>The server settings for WordPress hosting prevent longer lasting requests. Contact your hosters support for a solution.</li><li>The API used took too long to simplify the text. Shorten particularly long texts or contact API support for further assistance.</li><li>Use automatic simplifications in the background without the risk of hitting timeouts on your own hosting.</li></ul>', 'easy-language').replace('[error]', easy_language_simplification_escape_html( e.statusText ))
 							],
 							buttons: [
 								{
@@ -388,9 +388,54 @@ function easy_language_prevent_automatic_simplification( object_id, type, preven
 					location.href = link;
 				}
 				else if( command ) {
-					eval(command);
+					easy_language_run_command( command );
 				}
 			}
 		}
 	);
+}
+
+/**
+ * Run a command after an action without using eval().
+ *
+ * Only functions or known commands from the list below are supported.
+ *
+ * @param command The command (function or known command string).
+ */
+function easy_language_run_command( command ) {
+	// run the given function.
+	if( 'function' === typeof command ) {
+		command();
+		return;
+	}
+
+	// list of allowed commands.
+	let commands = {
+		'location.reload();': function() { location.reload(); },
+		'closeDialog();': function() { if( 'function' === typeof window.closeDialog ) { window.closeDialog(); } }
+	};
+
+	// run the command if it is allowed.
+	let key = String( command ).trim();
+	if( ! key.endsWith( ';' ) ) {
+		key = key + ';';
+	}
+	if( commands.hasOwnProperty( key ) ) {
+		commands[key]();
+	}
+}
+
+/**
+ * Escape a string for safe usage in HTML.
+ *
+ * @param value The value to escape.
+ * @returns {string}
+ */
+function easy_language_simplification_escape_html( value ) {
+	if( value === undefined || value === null ) {
+		return '';
+	}
+	let el = document.createElement( 'div' );
+	el.textContent = String( value );
+	return el.innerHTML.replace( /"/g, '&quot;' ).replace( /'/g, '&#039;' );
 }

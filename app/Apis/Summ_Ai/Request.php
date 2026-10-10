@@ -278,8 +278,10 @@ class Request implements Api_Requests {
 			$args['body'] = $body;
 		}
 
-		// secure request.
-		$this->request = $args;
+		// secure request (with an anonymized token, so it is never saved in the database).
+		$request                             = $args;
+		$request['headers']['Authorization'] = 'anonymized';
+		$this->request                       = $request;
 
 		// secure start-time.
 		$start_time = microtime( true );
@@ -302,7 +304,7 @@ class Request implements Api_Requests {
 
 		// log error if something happened.
 		if ( is_wp_error( $this->get_result() ) ) {
-			Log::get_instance()->add_log( sprintf( 'Error during request on API %1$s via %2$s: ' . $this->get_result()->get_error_message(), esc_html( $summ_ai_obj->get_title() ), esc_html( $this->url ) ), 'error' );
+			Log::get_instance()->add_log( sprintf( 'Error during request on API %1$s via %2$s: %3$s', esc_html( $summ_ai_obj->get_title() ), esc_html( $this->url ), esc_html( $this->get_result()->get_error_message() ) ), 'error' );
 		} else {
 			// secure response.
 			$this->response = wp_remote_retrieve_body( $this->get_result() );

@@ -16,6 +16,7 @@ use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Base;
+use easyLanguage\Plugin\Crypt;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Language_Icon;
 use easyLanguage\Plugin\Log;
@@ -25,6 +26,7 @@ use easyLanguage\EasyLanguage\Db;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easySettingsForWordPress\Fields\Checkboxes;
 use easySettingsForWordPress\Fields\FieldTable;
+use easySettingsForWordPress\Fields\Password;
 use easySettingsForWordPress\Fields\Select;
 use easySettingsForWordPress\Fields\Text;
 use easySettingsForWordPress\Page;
@@ -362,14 +364,15 @@ class ChatGpt extends Base implements Api_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_chatgpt_api_key' );
 		$setting->set_section( $chatgpt_tab_main );
-		$setting->set_show_in_rest( true );
+		$setting->set_show_in_rest( false );
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
 		$setting->prevent_export( true );
-		$field = new Text( $settings_obj );
+		$field = new Password( $settings_obj );
 		$field->set_title( __( 'ChatGPT API Key', 'easy-language' ) );
 		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
+		$field->set_value( Crypt::get_instance()->get_masked_value( 'easy_language_chatgpt_api_key' ) );
 		$field->set_description( $description );
 		$setting->set_field( $field );
 
@@ -477,7 +480,7 @@ class ChatGpt extends Base implements Api_Base {
 			// add setting.
 			$language = $settings_obj->add_setting( 'easy_language_chatgpt_target_languages_prompts_' . $language_code );
 			$language->set_type( 'string' );
-			$language->set_default( $language_prompts[ $language_code ] );
+			$language->set_default( $language_prompts[ $language_code ] ?? '' );
 			$language->set_section( $hidden_section );
 			$prompt_field = new Text( $settings_obj );
 			$prompt_field->set_title( $settings['label'] );
@@ -644,7 +647,19 @@ class ChatGpt extends Base implements Api_Base {
 	 * @noinspection PhpUnused
 	 */
 	public function validate_api_key( ?string $value ): ?string {
-		$errors = get_settings_errors();
+		// bail if the key has not been changed (the form returns the mask, the saved key will be kept).
+		if ( Crypt::MASK === $value || Crypt::get_instance()->is_encrypted( $value ) ) {
+			return $value;
+		}
+
+		$errors = array();
+		if ( function_exists( 'get_settings_errors' ) ) {
+			$errors = get_settings_errors();
+		}
+
+		if ( ! function_exists( 'add_settings_error' ) ) {
+			return $value;
+		}
 
 		/**
 		 * If a result-entry already exists, do nothing here.

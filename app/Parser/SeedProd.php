@@ -167,17 +167,27 @@ class SeedProd extends Parser_Base implements Parser {
 		// decode the JSON-string to an array.
 		$data = json_decode( $data_json, true );
 
-		// get its texts.
-		if ( is_array( $data ) && ! empty( $data['document'] ) ) {
+		// replace the texts and save the data for SeedProd, if the JSON is valid.
+		if ( is_array( $data ) && ! empty( $data['document'] ) && is_array( $data['document'] ) ) {
+			// replace the texts.
+			$document         = $data['document'];
 			$data['document'] = $this->replace_content_in_widgets( $data['document'], $simplified_part );
-		}
 
-		// save the data for SeedProd.
-		$query = array(
-			'ID'                    => $this->get_object_id(),
-			'post_content_filtered' => (string) wp_json_encode( $data ),
-		);
-		wp_insert_post( $query );
+			// get the resulting JSON.
+			$new_data_json = wp_json_encode( $data );
+
+			// save the data for SeedProd, if they have been changed and the JSON could be created.
+			if ( $document !== $data['document'] && is_string( $new_data_json ) ) {
+				wp_update_post(
+					wp_slash(
+						array(
+							'ID'                    => $this->get_object_id(),
+							'post_content_filtered' => $new_data_json,
+						)
+					)
+				);
+			}
+		}
 
 		// return the string for post_content.
 		return str_replace( $this->get_text(), $simplified_part, $original_complete );
@@ -238,7 +248,7 @@ class SeedProd extends Parser_Base implements Parser {
 			// if the section is of element type "block", get its contents.
 			if ( isset( $section['elType'] ) && 'block' === $section['elType'] ) {
 				foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-					if ( $flow_text_name !== $section['type'] ) {
+					if ( ! isset( $section['type'] ) || $flow_text_name !== $section['type'] || ! is_array( $flow_text_settings ) ) {
 						continue;
 					}
 					foreach ( $flow_text_settings as $entry_name ) {
@@ -278,7 +288,7 @@ class SeedProd extends Parser_Base implements Parser {
 			// if section is of element type "block", get its contents.
 			if ( isset( $section['elType'] ) && 'block' === $section['elType'] ) {
 				foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-					if ( $flow_text_name !== $section['type'] ) {
+					if ( ! isset( $section['type'] ) || $flow_text_name !== $section['type'] || ! is_array( $flow_text_settings ) ) {
 						continue;
 					}
 					foreach ( $flow_text_settings as $entry_name ) {
@@ -290,6 +300,9 @@ class SeedProd extends Parser_Base implements Parser {
 						}
 					}
 				}
+			} else {
+				// loop through the deeper arrays (like in get_widgets()).
+				$container[ $index ] = $this->replace_content_in_widgets( $section, $simplified_part );
 			}
 		}
 

@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transient;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Db;
+use easyLanguage\Plugin\Admin\Admin;
 use WP_Query;
 use WP_Role;
 
@@ -81,13 +82,14 @@ class Uninstall {
 	/**
 	 * Run uninstall routines for this plugin.
 	 *
+	 * Without $network_wide only the actual site will be cleaned up (e.g. for a reset of the plugin).
+	 *
+	 * @param bool $network_wide True to run the tasks in all sites of a multisite (only during uninstallation).
+	 *
 	 * @return void
 	 */
-	public function run(): void {
-		if ( is_multisite() ) {
-			// get original blog id.
-			$original_blog_id = get_current_blog_id();
-
+	public function run( bool $network_wide = false ): void {
+		if ( $network_wide && is_multisite() ) {
 			// loop through the blogs.
 			foreach ( $this->get_blogs() as $blog_id ) {
 				// switch to the blog.
@@ -95,14 +97,66 @@ class Uninstall {
 
 				// run tasks for uninstalling in this blog.
 				$this->deactivation_tasks();
-			}
 
-			// switch back to the original blog.
-			switch_to_blog( $original_blog_id );
+				// switch back to the original blog.
+				restore_current_blog();
+			}
 		} else {
-			// simply run the tasks on single-site-install.
+			// simply run the tasks on single-site-install or in the actual site.
 			$this->deactivation_tasks();
 		}
+	}
+
+	/**
+	 * Remove the encryption key of this plugin from its places.
+	 *
+	 * In a multisite the key could be saved per site (e.g. in the database), so this runs in each site.
+	 * Only use this during the uninstallation, after all encrypted values have been deleted.
+	 *
+	 * @return void
+	 */
+	public function remove_encryption_keys(): void {
+		if ( is_multisite() ) {
+			foreach ( $this->get_blogs() as $blog_id ) {
+				switch_to_blog( absint( $blog_id['blog_id'] ) );
+				Crypt::get_instance()->uninstall();
+				restore_current_blog();
+			}
+			return;
+		}
+
+		Crypt::get_instance()->uninstall();
+	}
+
+	/**
+	 * Initialize the components of this plugin which are necessary for the uninstallation.
+	 *
+	 * Replaces the global "init"-action, which would also run the hooks of other plugins.
+	 *
+	 * @return void
+	 */
+	private function init_plugin(): void {
+		// bail if the settings are already initialized (e.g. during a reset of the active plugin).
+		if ( Settings::get_instance()->get_settings_object()->has_settings() ) {
+			return;
+		}
+
+		// initialize the plugin.
+		Init::get_instance()->init();
+
+		// configure the transients.
+		Admin::get_instance()->configure_transients();
+
+		// add the main settings.
+		Settings::get_instance()->add_the_settings();
+
+		// add the settings of the APIs.
+		foreach ( Apis::get_instance()->get_available_apis() as $api_obj ) {
+			$api_obj->add_settings();
+		}
+
+		// add the general settings for simplifications.
+		\easyLanguage\EasyLanguage\Init::get_instance()->add_settings();
 	}
 
 	/**
@@ -111,13 +165,8 @@ class Uninstall {
 	 * @return void
 	 */
 	private function deactivation_tasks(): void {
-		// initialize the plugin.
-		Init::get_instance()->init();
-
-		/**
-		 * Run the global init to initialize all components.
-		 */
-		do_action( 'init' );
+		// initialize the necessary components of the plugin.
+		$this->init_plugin();
 
 		// enable the settings.
 		Settings::get_instance()->get_settings_object()->activation();
@@ -214,6 +263,11 @@ class Uninstall {
 			delete_option( $option_name );
 		}
 
+		// remove our transients.
+		foreach ( array( 'easy_language_capito_teams', 'easy_language_capito_teams_failed', 'easy_language_simplification_process_counts', 'easy_language_refresh_rewrite_rules' ) as $transient_name ) {
+			delete_transient( $transient_name );
+		}
+
 		/**
 		 * Remove our role.
 		 */
@@ -247,6 +301,9 @@ class Uninstall {
 	private function get_options(): array {
 		return array(
 			'easyLanguageVersion',
+			'easy_language_update_lock',
+			'easy_language_wpml_languages_marker',
+			'easy_language_sublanguage_languages_marker',
 		);
 	}
 }

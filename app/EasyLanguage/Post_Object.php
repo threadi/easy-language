@@ -403,7 +403,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 				'action' => 'easy_language_get_simplification',
 				'id'     => $this->get_id(),
 				'type'   => $this->get_type(),
-				'nonce'  => wp_create_nonce( 'easy-language-get-simplification' ),
+				'nonce'  => wp_create_nonce( 'easy-language-get-simplification-' . $this->get_id() ),
 			),
 			get_admin_url() . 'admin.php'
 		);
@@ -420,7 +420,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		return add_query_arg(
 			array(
 				'action'   => 'easy_language_add_simplification',
-				'nonce'    => wp_create_nonce( 'easy-language-add-simplification' ),
+				'nonce'    => wp_create_nonce( 'easy-language-add-simplification-' . $this->get_id() ),
 				'post'     => $this->get_id(),
 				'language' => $language_code,
 			),
@@ -530,8 +530,21 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 				$source_language = Helper::get_wp_lang();
 			}
 
+			// get the page builder used for this object.
+			$pagebuilder_obj = $this->get_page_builder();
+
+			// bail if the page builder could not be loaded.
+			if ( ! $pagebuilder_obj instanceof Parser_Base ) {
+				return false;
+			}
+
 			// get the array with post-data of the original.
 			$post_array = $this->get_object_as_array();
+
+			// bail if the original could not be loaded.
+			if ( empty( $post_array ) ) {
+				return false;
+			}
 
 			// remove some settings.
 			unset( $post_array['ID'], $post_array['page_template'], $post_array['guid'] );
@@ -540,10 +553,10 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			$post_array['post_author'] = get_current_user_id();
 
 			// add the copy.
-			$copied_post_id = wp_insert_post( $post_array ); // @phpstan-ignore argument.type
+			$copied_post_id = wp_insert_post( wp_slash( $post_array ), true ); // @phpstan-ignore argument.type
 
 			// bail if the post could not be created.
-			if ( is_wp_error( $copied_post_id ) ) { // @phpstan-ignore function.impossibleType
+			if ( is_wp_error( $copied_post_id ) ) {
 				return false;
 			}
 
@@ -568,14 +581,6 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			// set the language for the original object.
 			update_post_meta( $this->get_id(), 'easy_language_text_language', $source_language );
 
-			// parse text depending on the used pagebuilder for this object.
-			$pagebuilder_obj = $this->get_page_builder();
-
-			// bail if the page builder could not be loaded.
-			if ( ! $pagebuilder_obj instanceof Parser_Base ) {
-				return false;
-			}
-
 			// set settings on a page builder object.
 			$pagebuilder_obj->set_object_id( $copied_post_id );
 			$pagebuilder_obj->set_title( $this->get_title() );
@@ -599,6 +604,10 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 					// save the text for simplification.
 					$original_text_obj = $db->add( $text['text'], $source_language, 'post_content', $text['html'] );
 					if ( ! $original_text_obj instanceof Text ) {
+						// remove the copy as it could not be completed.
+						$this->delete_incomplete_copy( $copied_post_id );
+
+						// return false as the simplification object could not be created.
 						return false;
 					}
 				}
@@ -612,6 +621,10 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 				// save the text for simplification.
 				$original_title_obj = $db->add( $pagebuilder_obj->get_title(), $source_language, 'title', false );
 				if ( ! $original_title_obj instanceof Text ) {
+					// remove the copy as it could not be completed.
+					$this->delete_incomplete_copy( $copied_post_id );
+
+					// return false as the simplification object could not be created.
 					return false;
 				}
 			}
@@ -650,6 +663,24 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 
 		// return false if no simplified object has been created.
 		return false;
+	}
+
+	/**
+	 * Delete an incomplete copy of this object including its text-connections.
+	 *
+	 * @param int $copied_post_id The ID of the incomplete copy.
+	 *
+	 * @return void
+	 */
+	private function delete_incomplete_copy( int $copied_post_id ): void {
+		// remove the connections of texts to the copy.
+		$copy_obj = new Post_Object( $copied_post_id );
+		foreach ( $copy_obj->get_entries() as $entry ) {
+			$entry->delete( $copied_post_id );
+		}
+
+		// delete the copy itself.
+		wp_delete_post( $copied_post_id, true );
 	}
 
 	/**

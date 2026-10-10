@@ -321,7 +321,7 @@ class Setup {
 	 * @return void
 	 */
 	public function update_step( int $count ): void {
-		update_option( 'esfw_steps', absint( get_option( 'esfw_steps ' ) ) + $count );
+		update_option( 'esfw_steps', absint( get_option( 'esfw_steps' ) ) + $count );
 	}
 
 	/**

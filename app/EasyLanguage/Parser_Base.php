@@ -217,7 +217,7 @@ class Parser_Base {
 					<?php
 					if ( 1 === absint( get_option( 'easy_language_automatic_simplification_enabled', 0 ) ) ) {
 						?>
-						<label><input type="checkbox" name="automatic_mode_prevented" data-id="<?php echo absint( $post_object->get_id() ); ?>" class="easy-language-automatic-simplification-prevention" value="1"
+						<label><input type="checkbox" name="automatic_mode_prevented" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-object-type="<?php echo esc_attr( $post_object->get_type() ); ?>" class="easy-language-automatic-simplification-prevention" value="1"
 								<?php
 								if ( $post_object->is_automatic_mode_prevented() ) {
 									?>
@@ -290,7 +290,7 @@ class Parser_Base {
 
 					if ( $quota_state['quota_percent'] > $min_percent ) {
 						/* translators: %1$d will be replaced by a percentage value between 0 and 100. */
-						echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), $quota_state['quota_percent'] ) ) . '"></span>';
+						echo '<span class="dashicons dashicons-info-outline" title="' . esc_attr( sprintf( __( 'Quota for the used API is used for %1$d%%!', 'easy-language' ), absint( round( (float) $quota_state['quota_percent'] * 100 ) ) ) ) . '"></span>';
 					}
 					?>
 						</a>
@@ -298,7 +298,7 @@ class Parser_Base {
 					<?php
 					if ( 1 === absint( get_option( 'easy_language_automatic_simplification_enabled', 0 ) ) ) {
 						?>
-							<label><input type="checkbox" name="automatic_mode_prevented" data-id="<?php echo absint( $post_object->get_id() ); ?>" class="easy-language-automatic-simplification-prevention" value="1"
+							<label><input type="checkbox" name="automatic_mode_prevented" data-id="<?php echo absint( $post_object->get_id() ); ?>" data-object-type="<?php echo esc_attr( $post_object->get_type() ); ?>" class="easy-language-automatic-simplification-prevention" value="1"
 																												<?php
 																												if ( $post_object->is_automatic_mode_prevented() ) {
 																													?>
@@ -349,6 +349,9 @@ class Parser_Base {
 			return;
 		}
 
+		// secure the ID of the original object as the page builder object could be changed in the loop.
+		$original_object_id = $original_post_object->get_id();
+
 		// loop through the languages to show them as selection.
 		if ( ! empty( $languages ) ) {
 			?>
@@ -364,6 +367,7 @@ class Parser_Base {
 
 				// get translated post for this language (if it is not the original).
 				if ( empty( $settings['url'] ) ) {
+					$page_builder_obj->set_object_id( $original_object_id );
 					$link = $page_builder_obj->get_edit_link();
 					/* translators: %1$s will be replaced by the page-title where the original content resides */
 					$link_title   = __( 'Original content in %1$s.', 'easy-language' );
@@ -376,7 +380,7 @@ class Parser_Base {
 							'relation' => 'AND',
 							array(
 								'key'     => 'easy_language_simplification_original_id',
-								'value'   => $this->get_object_id(),
+								'value'   => $original_object_id,
 								'compare' => '=',
 							),
 							array(
@@ -420,6 +424,9 @@ class Parser_Base {
 			?>
 			</table>
 			<?php
+
+			// reset the object ID on the page builder object.
+			$page_builder_obj->set_object_id( $original_object_id );
 		}
 	}
 

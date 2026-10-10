@@ -146,12 +146,16 @@ class SiteOrigin extends Parser_Base implements Parser {
 
 		// get editor contents and loop through its array.
 		$data = get_post_meta( $this->get_object_id(), 'panels_data', true );
-		if ( ! empty( $data['widgets'] ) ) {
+		if ( is_array( $data ) && ! empty( $data['widgets'] ) && is_array( $data['widgets'] ) ) {
+			// replace the texts.
+			$widgets         = $data['widgets'];
 			$data['widgets'] = $this->replace_content_in_widgets( $data['widgets'], $simplified_part );
-		}
 
-		// save the data for siteorigin.
-		update_post_meta( $this->get_object_id(), 'panels_data', $data );
+			// save the data for siteorigin, if they have been changed (slashed, as update_post_meta() unslashes them).
+			if ( $widgets !== $data['widgets'] ) {
+				update_post_meta( $this->get_object_id(), 'panels_data', wp_slash( $data ) );
+			}
+		}
 
 		// return the string for post_content.
 		return str_replace( $this->get_text(), $simplified_part, $original_complete );
@@ -205,8 +209,13 @@ class SiteOrigin extends Parser_Base implements Parser {
 	private function get_widgets( array $container, array $resulting_texts ): array {
 		foreach ( $container as $sub_container ) {
 			foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-				if ( is_array( $sub_container ) && $sub_container['option_name'] === $flow_text_name ) {
+				if ( is_array( $sub_container ) && isset( $sub_container['option_name'] ) && $sub_container['option_name'] === $flow_text_name && is_array( $flow_text_settings ) ) {
 					foreach ( $flow_text_settings as $entry_name ) {
+						// bail if the entry does not exist or is empty.
+						if ( empty( $sub_container[ $entry_name ] ) ) {
+							continue;
+						}
+
 						$resulting_texts[] = array(
 							'text' => $sub_container[ $entry_name ],
 							'html' => $this->is_flow_text_widget_html( $entry_name ),
@@ -230,9 +239,9 @@ class SiteOrigin extends Parser_Base implements Parser {
 	private function replace_content_in_widgets( array $container, string $simplified_part ): array {
 		foreach ( $container as $index => $sub_container ) {
 			foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-				if ( is_array( $sub_container ) && $sub_container['option_name'] === $flow_text_name ) {
+				if ( is_array( $sub_container ) && isset( $sub_container['option_name'] ) && $sub_container['option_name'] === $flow_text_name && is_array( $flow_text_settings ) ) {
 					foreach ( $flow_text_settings as $entry_name ) {
-						if ( $this->get_text() === $container[ $index ][ $entry_name ] ) {
+						if ( isset( $sub_container[ $entry_name ] ) && $this->get_text() === $sub_container[ $entry_name ] ) {
 							if ( 'title' === $entry_name ) {
 								$container[ $index ][ $entry_name ] = wp_strip_all_tags( $simplified_part );
 							} else {

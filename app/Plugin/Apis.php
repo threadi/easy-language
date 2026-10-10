@@ -162,7 +162,7 @@ class Apis {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -172,7 +172,7 @@ class Apis {
 		// bail if no api is given.
 		if ( empty( $export_api ) ) {
 			// redirect user back.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -182,7 +182,7 @@ class Apis {
 		// bail if no API object could be loaded.
 		if ( ! $api_object instanceof Base ) {
 			// redirect user back.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -210,9 +210,29 @@ class Apis {
 			exit;
 		}
 		foreach ( $entries as $row ) {
-			fputcsv( $fp, $row );
+			fputcsv( $fp, array_map( array( $this, 'get_csv_safe_value' ), $row ) );
 		}
 		exit;
+	}
+
+	/**
+	 * Return a value which is safe against formula injection in spreadsheet applications.
+	 *
+	 * @param mixed $value The value of a single cell.
+	 *
+	 * @return string
+	 */
+	private function get_csv_safe_value( mixed $value ): string {
+		// convert the value to string.
+		$value = is_scalar( $value ) ? (string) $value : '';
+
+		// bail if value does not start with a character which could start a formula.
+		if ( '' === $value || ! in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+			return $value;
+		}
+
+		// prefix the value to prevent its interpretation as formula.
+		return "'" . $value;
 	}
 
 	/**
@@ -228,7 +248,7 @@ class Apis {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -238,7 +258,7 @@ class Apis {
 		// bail if no api is given.
 		if ( empty( $clear_api ) ) {
 			// redirect user back.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -248,7 +268,7 @@ class Apis {
 		// bail if no API object could be loaded.
 		if ( ! $api_object instanceof Base ) {
 			// redirect user back.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -259,7 +279,7 @@ class Apis {
 		$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . Log_Api::get_instance()->get_table_name() . ' WHERE `api` = %s', array( $api_object->get_name() ) ) );
 
 		// redirect user back.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 }

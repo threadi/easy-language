@@ -179,11 +179,21 @@ class VisualComposer extends Parser_Base implements Parser {
 				return $original_complete;
 			}
 
-			// replace the texts.
-			$text = $this->replace_content_in_widgets( $editor_data['elements'], $simplified_part );
+			// bail if elements are not an array.
+			if ( ! is_array( $editor_data['elements'] ) ) {
+				return $original_complete;
+			}
 
-			// encode as URL and save it.
-			update_post_meta( $this->get_object_id(), VCV_PREFIX . 'pageContent', rawurlencode( Helper::get_json( $text ) ) );
+			// replace the texts in the elements and keep the complete structure.
+			$editor_data['elements'] = $this->replace_content_in_widgets( $editor_data['elements'], $simplified_part );
+
+			// get the resulting JSON.
+			$json = Helper::get_json( $editor_data );
+
+			// encode as URL and save it, if the JSON could be created.
+			if ( ! empty( $json ) ) {
+				update_post_meta( $this->get_object_id(), VCV_PREFIX . 'pageContent', rawurlencode( $json ) );
+			}
 		}
 
 		// return the string for post_content.
@@ -262,14 +272,19 @@ class VisualComposer extends Parser_Base implements Parser {
 				continue;
 			}
 
-			// if section is of element type "block", get its contents.
-			if ( isset( $section['type'] ) && ! empty( $flow_text_widgets[ $section['type'] ] ) ) {
-				foreach ( $flow_text_widgets[ $section['type'] ] as $entry_name ) {
-					if ( empty( $section['value'][ $entry_name ] ) ) {
+			// if section is of element type "block", replace its contents (same structure as in get_widgets()).
+			if ( isset( $section['tag'] ) && ! empty( $flow_text_widgets[ $section['tag'] ] ) && is_array( $flow_text_widgets[ $section['tag'] ] ) ) {
+				foreach ( $flow_text_widgets[ $section['tag'] ] as $entry_name ) {
+					if ( empty( $section[ $entry_name ] ) ) {
 						continue;
-
 					}
-					$container[ $index ]['value'][ $entry_name ] = $simplified_part;
+
+					// bail if this is not the original text.
+					if ( $this->get_text() !== $section[ $entry_name ] ) {
+						continue;
+					}
+
+					$container[ $index ][ $entry_name ] = $simplified_part;
 				}
 			}
 		}

@@ -73,6 +73,9 @@ class Kubio extends Parser_Base implements Parser {
 		 *
 		 * @since 2.10.0 Available since 2.10.0.
 		 *
+		 * Each block can have a "callback" which returns the text of the block.
+		 * It gets the block name as first and the complete block as array as second parameter.
+		 *
 		 * @param array<string,mixed> $blocks List of Blocks.
 		 */
 		return apply_filters( 'easy_language_kubio_blocks', $blocks );
@@ -110,7 +113,8 @@ class Kubio extends Parser_Base implements Parser {
 		if ( isset( $flow_blocks[ $block['blockName'] ] ) ) {
 			$add_to_result = $flow_blocks[ $block['blockName'] ];
 			if ( ! empty( $flow_blocks[ $block['blockName'] ]['callback'] ) && is_callable( $flow_blocks[ $block['blockName'] ]['callback'] ) ) {
-				$add_to_result['text'] = call_user_func( $flow_blocks[ $block['blockName'] ]['callback'], $block['blockName'] );
+				// the block name is the first parameter for backwards compatibility, the complete block is the second.
+				$add_to_result['text'] = call_user_func( $flow_blocks[ $block['blockName'] ]['callback'], $block['blockName'], $block );
 			} else {
 				$add_to_result['text'] = trim( $block['innerHTML'] );
 			}

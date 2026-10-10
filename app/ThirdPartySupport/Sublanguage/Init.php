@@ -98,12 +98,30 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function wp_init(): void {
-		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
+		// bail if the user is not allowed to manage options.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// get the active languages.
+		$active_languages = Languages::get_instance()->get_active_languages();
+
+		// get the marker for the actual plugin version and active languages.
+		$marker = md5( EASY_LANGUAGE_VERSION . Helper::get_json( array_keys( $active_languages ) ) );
+
+		// bail if this routine has already been run for this marker.
+		if ( get_option( 'easy_language_sublanguage_languages_marker', '' ) === $marker ) {
+			return;
+		}
+
+		foreach ( $active_languages as $language_code => $language ) {
 			$query   = array(
-				'post_type'   => 'language',
-				'title'       => $language['label'],
-				'post_status' => array( 'any', 'trash' ),
-				'fields'      => 'ids',
+				'post_type'      => 'language',
+				'title'          => $language['label'],
+				'post_status'    => array( 'any', 'trash' ),
+				'fields'         => 'ids',
+				'posts_per_page' => 1,
+				'no_found_rows'  => true,
 			);
 			$results = new WP_Query( $query );
 			if ( 0 === $results->post_count ) {
@@ -116,6 +134,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 				wp_insert_post( $array );
 			}
 		}
+
+		// save the marker to run this routine only once for this version and active languages.
+		update_option( 'easy_language_sublanguage_languages_marker', $marker, false );
 	}
 
 	/**
@@ -159,8 +180,10 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// query the actual languages used by sublanguage.
 		$query   = array(
-			'post_type'   => 'language',
-			'post_status' => 'publish',
+			'post_type'      => 'language',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'no_found_rows'  => true,
 		);
 		$results = new WP_Query( $query );
 

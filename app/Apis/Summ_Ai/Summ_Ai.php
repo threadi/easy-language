@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 use easySettingsForWordPress\Fields\Checkbox;
 use easySettingsForWordPress\Fields\Checkboxes;
 use easySettingsForWordPress\Fields\FieldTable;
+use easySettingsForWordPress\Fields\Password;
 use easySettingsForWordPress\Fields\Radio;
 use easySettingsForWordPress\Fields\Select;
 use easySettingsForWordPress\Fields\Text;
@@ -21,6 +22,7 @@ use easySettingsForWordPress\Section;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Base;
+use easyLanguage\Plugin\Crypt;
 use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Intervals;
@@ -201,7 +203,7 @@ class Summ_Ai extends Base implements Api_Base {
 		} else {
 			$text .= '<p><strong>' . __( 'You are currently using your own paid SUMM AI API key.', 'easy-language' ) . '</strong></p>';
 		}
-		if ( $quota['character_limit'] > 0 ) {
+		if ( ! empty( $quota['character_limit'] ) && $quota['character_limit'] > 0 ) {
 			$text .= $this->get_quota_table();
 		}
 
@@ -509,8 +511,22 @@ class Summ_Ai extends Base implements Api_Base {
 			);
 		}
 
-		// return paid quota.
-		return (array) get_option( 'easy_language_summ_ai_paid_quota', 0 );
+		// get paid quota.
+		$quota = get_option( 'easy_language_summ_ai_paid_quota', array() );
+
+		// bail if quota is not an array or empty.
+		if ( empty( $quota ) || ! is_array( $quota ) ) {
+			return array();
+		}
+
+		// return paid quota with all necessary keys.
+		return array_merge(
+			array(
+				'character_spent' => 0,
+				'character_limit' => 0,
+			),
+			$quota
+		);
 	}
 
 	/**
@@ -699,14 +715,15 @@ class Summ_Ai extends Base implements Api_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_summ_ai_api_key' );
 		$setting->set_section( $summ_ai_tab_main );
-		$setting->set_show_in_rest( true );
+		$setting->set_show_in_rest( false );
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
 		$setting->prevent_export( true );
-		$field = new Text( $settings_obj );
+		$field = new Password( $settings_obj );
 		$field->set_title( __( 'SUMM AI API Key', 'easy-language' ) );
 		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
+		$field->set_value( Crypt::get_instance()->get_masked_value( 'easy_language_summ_ai_api_key' ) );
 		$field->set_description( $description );
 		$setting->set_field( $field );
 
@@ -791,8 +808,11 @@ class Summ_Ai extends Base implements Api_Base {
 		$setting->set_field( $field );
 
 		$source_languages = get_option( 'easy_language_summ_ai_source_languages', array() );
-		$languages        = array();
-		$mappings         = $this->get_mapping_languages();
+		if ( ! is_array( $source_languages ) ) {
+			$source_languages = array();
+		}
+		$languages = array();
+		$mappings  = $this->get_mapping_languages();
 		foreach ( $source_languages as $source_language => $enabled ) {
 			if ( ! empty( $mappings[ $source_language ] ) ) {
 				foreach ( $mappings[ $source_language ] as $language ) {
@@ -947,6 +967,11 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return ?string
 	 */
 	public function validate_api_key( ?string $value ): ?string {
+		// bail if the key has not been changed (the form returns the mask, the saved key will be kept).
+		if ( Crypt::MASK === $value || Crypt::get_instance()->is_encrypted( $value ) ) {
+			return $value;
+		}
+
 		$errors = array();
 		if ( function_exists( 'get_settings_errors' ) ) {
 			$errors = get_settings_errors();
@@ -1248,6 +1273,7 @@ class Summ_Ai extends Base implements Api_Base {
 
 		// redirect user.
 		wp_safe_redirect( wp_get_referer() );
+		exit;
 	}
 
 	/**
@@ -1301,6 +1327,7 @@ class Summ_Ai extends Base implements Api_Base {
 
 		// redirect user.
 		wp_safe_redirect( wp_get_referer() );
+		exit;
 	}
 
 	/**
@@ -1414,7 +1441,7 @@ class Summ_Ai extends Base implements Api_Base {
 			 * Get and show the quota we received from API.
 			 */
 			$api_quota = $this->get_quota();
-			if ( empty( $api_quota ) ) {
+			if ( empty( $api_quota ) || ! isset( $api_quota['character_spent'], $api_quota['character_limit'] ) ) {
 				$quota_text = esc_html__( 'No quota consumed so far', 'easy-language' );
 			} else {
 				$quota_text = $api_quota['character_spent'] . ' / ' . $api_quota['character_limit'];

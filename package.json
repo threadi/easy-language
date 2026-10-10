@@ -1,15 +1,15 @@
 {
   "name": "@easy-language/easy-language",
-  "version": "3.2.2",
+  "version": "3.3.0",
   "description": "Provides language-switcher Blocks for WordPress.",
   "author": "laOlaWeb GmbH",
   "license": "GPL-2.0-or-later",
   "scripts": {
-    "build": "concurrently --kill-others \"npm run build:switcher\" \"npm run build:navigation-switcher\" \"npm run build:divi-language-field\"",
+    "build": "concurrently --kill-others-on-fail \"npm run build:switcher\" \"npm run build:navigation-switcher\" \"npm run build:divi-language-field\" \"npm run build:sidebar\"",
     "format": "wp-scripts format",
     "lint:css": "wp-scripts lint-style",
     "lint:js": "wp-scripts lint-js",
-    "start": "concurrently --kill-others \"npm run start:switcher\" \"npm run start:navigation-switcher\" \"npm run start:divi-language-field\"",
+    "start": "concurrently --kill-others-on-fail \"npm run start:switcher\" \"npm run start:navigation-switcher\" \"npm run start:divi-language-field\" \"npm run start:sidebar\"",
     "packages-update": "wp-scripts packages-update",
     "start:switcher": "wp-scripts start blocks/switcher/src/index.js --output-path=blocks/switcher/build/",
     "build:switcher": "wp-scripts build blocks/switcher/src/index.js --output-path=blocks/switcher/build/",
@@ -17,17 +17,17 @@
     "build:divi-language-field": "wp-scripts build legacy-classes/Divi/src/language_field.js --output-path=legacy-classes/Divi/build/",
     "start:navigation-switcher": "wp-scripts start blocks/navigation-switcher/src/index.js --output-path=blocks/navigation-switcher/build/",
     "build:navigation-switcher": "wp-scripts build blocks/navigation-switcher/src/index.js --output-path=blocks/navigation-switcher/build/",
-	"start:sidebar": "wp-scripts start src/sidebar.js --output-path=js/generated/",
-	"build:sidebar": "wp-scripts build src/sidebar.js --output-path=js/generated/",
+    "start:sidebar": "wp-scripts start src/sidebar.js --output-path=js/generated/",
+    "build:sidebar": "wp-scripts build src/sidebar.js --output-path=js/generated/",
     "make-pot": "wp i18n make-pot . languages/easy-language.pot --exclude=blocks/switcher/src/,blocks/navigation-switcher/src/,svn/",
     "make-json": "wp i18n make-json languages"
   },
   "devDependencies": {
-    "@wordpress/scripts": "^34.1.0",
-    "npm-pack-zip": "^1.3.0"
+    "@wordpress/scripts": "^34.2",
+    "@wp-playground/cli": "^3.1.57",
+    "concurrently": "^10.0.6"
   },
   "dependencies": {
-    "@wordpress/i18n": "^6.25.0",
-    "concurrently": "^10.0.4"
+    "@wordpress/i18n": "^6.30.0"
   }
 }

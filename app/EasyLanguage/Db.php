@@ -189,10 +189,163 @@ class Db {
 	 * @param array<string,mixed> $filter Set filter (optional).
 	 * @param array<string,mixed> $order Order list (optional).
 	 * @param int                 $limit Limit the list (optional).
+	 * @param int                 $offset Offset for the list, only used together with $limit (optional).
 	 *
 	 * @return array<Text> Array of Text-objects
 	 */
-	public function get_entries( array $filter = array(), array $order = array(), int $limit = 0 ): array {
+	public function get_entries( array $filter = array(), array $order = array(), int $limit = 0, int $offset = 0 ): array {
+		global $wpdb;
+
+		// get the query parts depending on the given filter.
+		$query_parts = $this->get_query_parts( $filter, $order );
+
+		// limit the list of entries.
+		$sql_limit = '';
+		if ( absint( $limit ) > 0 ) {
+			$sql_limit = ' LIMIT ' . absint( $limit );
+
+			// add the offset.
+			if ( absint( $offset ) > 0 ) {
+				$sql_limit .= ' OFFSET ' . absint( $offset );
+			}
+		}
+
+		// define base-statement.
+		$sql = 'SELECT `id`, `original`, `lang`%1$s FROM ' . $this->get_table_name_originals() . ' AS o';
+
+		// add additional result-rows.
+		$sql = sprintf( $sql, $query_parts['select'] );
+
+		// concat sql-statement.
+		$sql .= $query_parts['join'] . $query_parts['where'] . $query_parts['order'] . $sql_limit;
+
+		// get the vars for the prepared statement.
+		$vars = $query_parts['vars'];
+
+		// prepare SQL-statement.
+		$prepared_sql = $wpdb->prepare( $sql, $vars );
+
+		// get entries.
+		$results = $wpdb->get_results( $prepared_sql, ARRAY_A );
+
+		// bail if results are empty.
+		if ( empty( $results ) ) {
+			return array();
+		}
+
+		// initialize the return array.
+		$return = array();
+
+		// loop through results and add them to the list.
+		foreach ( $results as $result ) {
+			// only add post-type-objects if not_locked is set and if they are not locked.
+			$add = true;
+			if ( ! empty( $filter['not_locked'] ) ) {
+				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
+				if ( $object ) {
+					$add = ! $object->is_locked();
+				}
+			}
+			if ( ! empty( $filter['object_state'] ) && false !== $add ) {
+				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
+				if ( $object ) {
+					$add = $object->has_state( $filter['object_state'] );
+				}
+			}
+
+			// add entry to the list.
+			if ( $add ) {
+				// create the Text-object for this text.
+				$obj = new Text( $result['id'] );
+				$obj->set_original( $result['original'] );
+				$obj->set_source_language( $result['lang'] );
+
+				// add the Text-object to the list.
+				$return[] = $obj;
+			}
+		}
+
+		// return the list.
+		return $return;
+	}
+
+	/**
+	 * Return the count of entries matching the given filter.
+	 *
+	 * @param array<string,mixed> $filter Set filter (optional).
+	 *
+	 * @return int
+	 */
+	public function count_entries( array $filter = array() ): int {
+		global $wpdb;
+
+		// use the full loading if filters are used which could only be checked via PHP.
+		if ( ! empty( $filter['not_locked'] ) || ! empty( $filter['object_state'] ) ) {
+			return count( $this->get_entries( $filter ) );
+		}
+
+		// get the query parts depending on the given filter.
+		$query_parts = $this->get_query_parts( $filter, array() );
+
+		// define the statement.
+		$sql = 'SELECT COUNT(*) FROM ' . $this->get_table_name_originals() . ' AS o' . $query_parts['join'] . $query_parts['where'];
+
+		// return the count.
+		return absint( $wpdb->get_var( $wpdb->prepare( $sql, $query_parts['vars'] ) ) );
+	}
+
+	/**
+	 * Return the IDs of all entries.
+	 *
+	 * @return array<int,int>
+	 */
+	public function get_entry_ids(): array {
+		global $wpdb;
+
+		// get the IDs.
+		$ids = $wpdb->get_col( 'SELECT `id` FROM ' . $this->get_table_name_originals() . ' ORDER BY `id` ASC' );
+
+		// return them as integers.
+		return array_map( 'absint', $ids );
+	}
+
+	/**
+	 * Return the source and target languages used by entries matching the given filter.
+	 *
+	 * @param array<string,mixed> $filter Set filter (optional).
+	 *
+	 * @return array<string,array<int,string>>
+	 */
+	public function get_languages_of_entries( array $filter = array() ): array {
+		global $wpdb;
+
+		// get the query parts depending on the given filter.
+		$query_parts = $this->get_query_parts( $filter, array() );
+
+		// get the source languages.
+		$sql              = 'SELECT DISTINCT o.`lang` FROM ' . $this->get_table_name_originals() . ' AS o' . $query_parts['join'] . $query_parts['where'];
+		$source_languages = $wpdb->get_col( $wpdb->prepare( $sql, $query_parts['vars'] ) );
+
+		// get the target languages.
+		$sql              = 'SELECT DISTINCT sl.`language` FROM ' . $this->get_table_name_simplifications() . ' AS sl WHERE sl.`oid` IN ( SELECT o.`id` FROM ' . $this->get_table_name_originals() . ' AS o' . $query_parts['join'] . $query_parts['where'] . ' )';
+		$target_languages = $wpdb->get_col( $wpdb->prepare( $sql, $query_parts['vars'] ) );
+
+		// return the resulting lists.
+		return array(
+			'source' => array_map( 'strval', $source_languages ),
+			'target' => array_map( 'strval', $target_languages ),
+		);
+	}
+
+	/**
+	 * Return the parts of the SQL-statement for the given filter and order.
+	 *
+	 * @param array<string,mixed> $filter The filter.
+	 * @param array<string,mixed> $order The order.
+	 *
+	 * @return array{select: string, join: string, where: string, order: string, vars: array<int,mixed>}
+	 */
+	private function get_query_parts( array $filter, array $order ): array {
 		global $wpdb;
 
 		// set the filter depending on parameters this function receives.
@@ -280,6 +433,12 @@ class Db {
 			if ( ! empty( $filter['not_prevented'] ) ) {
 				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
 				$sql_select .= ', oo.object_id, oo.object_type';
+
+				// exclude texts of post-objects where the automatic simplification is prevented.
+				$sql_where .= ' AND NOT EXISTS ( SELECT 1 FROM ' . $wpdb->postmeta . ' pm INNER JOIN ' . $wpdb->posts . ' pp ON pp.ID = pm.post_id WHERE pm.post_id = oo.object_id AND pp.post_type = oo.object_type AND oo.blog_id = %d AND pm.meta_key = %s AND pm.meta_value = %s )';
+				$vars[]     = absint( get_current_blog_id() );
+				$vars[]     = 'easy_language_prevent_automatic_mode';
+				$vars[]     = '1';
 			}
 			if ( ! empty( $filter['object_state'] ) ) {
 				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
@@ -288,84 +447,25 @@ class Db {
 			if ( ! empty( $filter['object_not_state'] ) ) {
 				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
 				$sql_select .= ', oo.object_id, oo.object_type';
+
+				// exclude texts of post-objects with the given post-state.
+				$sql_where .= ' AND NOT EXISTS ( SELECT 1 FROM ' . $wpdb->posts . ' ps WHERE ps.ID = oo.object_id AND ps.post_type = oo.object_type AND oo.blog_id = %d AND ps.post_status = %s )';
+				$vars[]     = absint( get_current_blog_id() );
+				$vars[]     = $filter['object_not_state'];
 			}
 			if ( ! empty( $filter['has_simplification'] ) ) {
 				$sql_join[ $this->get_table_name_simplifications() ] = ' INNER JOIN ' . $this->get_table_name_simplifications() . ' s ON s.oid = o.id';
 			}
 		}
 
-		// limit the list of entries.
-		$sql_limit = '';
-		if ( absint( $limit ) > 0 ) {
-			$sql_limit = ' LIMIT ' . absint( $limit );
-		}
-
-		// define base-statement.
-		$sql = 'SELECT `id`, `original`, `lang`%1$s FROM ' . $this->get_table_name_originals() . ' AS o';
-
-		// add additional result-rows.
-		$sql = sprintf( $sql, $sql_select );
-
-		// concat sql-statement.
-		$sql .= implode( ' ', $sql_join ) . $sql_where . $sql_order . $sql_limit;
-
-		// prepare SQL-statement.
-		$prepared_sql = $wpdb->prepare( $sql, $vars );
-
-		// get entries.
-		$results = $wpdb->get_results( $prepared_sql, ARRAY_A );
-
-		// bail if results are empty.
-		if ( empty( $results ) ) {
-			return array();
-		}
-
-		// initialize the return array.
-		$return = array();
-
-		// loop through results and add them to the list.
-		foreach ( $results as $result ) {
-			// only add post-type-objects if not_locked is set and if they are not locked.
-			$add = true;
-			if ( ! empty( $filter['not_locked'] ) ) {
-				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
-				if ( $object ) {
-					$add = ! $object->is_locked();
-				}
-			}
-			if ( ! empty( $filter['not_prevented'] ) && false !== $add ) {
-				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
-				if ( $object ) {
-					$add = ! $object->is_automatic_mode_prevented();
-				}
-			}
-			if ( ! empty( $filter['object_state'] ) && false !== $add ) {
-				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
-				if ( $object ) {
-					$add = $object->has_state( $filter['object_state'] );
-				}
-			}
-			if ( ! empty( $filter['object_not_state'] ) && false !== $add ) {
-				$object = Helper::get_object( absint( $result['object_id'] ), $result['object_type'] );
-				if ( $object ) {
-					$add = ! $object->has_state( $filter['object_not_state'] );
-				}
-			}
-
-			// add entry to the list.
-			if ( $add ) {
-				// create the Text-object for this text.
-				$obj = new Text( $result['id'] );
-				$obj->set_original( $result['original'] );
-				$obj->set_source_language( $result['lang'] );
-
-				// add the Text-object to the list.
-				$return[] = $obj;
-			}
-		}
-
-		// return the list.
-		return $return;
+		// return the parts.
+		return array(
+			'select' => $sql_select,
+			'join'   => implode( ' ', $sql_join ),
+			'where'  => $sql_where,
+			'order'  => $sql_order,
+			'vars'   => $vars,
+		);
 	}
 
 	/**

@@ -54,6 +54,9 @@ class Init {
 	 * @return void
 	 */
 	public function init(): void {
+		// initialize the encryption of sensitive settings (before anything reads them).
+		Crypt::get_instance()->init();
+
 		// initialize the settings.
 		Settings::get_instance()->init();
 
@@ -280,7 +283,7 @@ class Init {
 
 		// bail if capability is missing.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
-			return;
+			wp_send_json_error();
 		}
 
 		// delete transient for step 1.
@@ -311,7 +314,7 @@ class Init {
 
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
-			return;
+			wp_send_json_error();
 		}
 
 		// get icon from request.
@@ -321,19 +324,23 @@ class Init {
 		$language_code = isset( $_POST['language'] ) ? sanitize_text_field( wp_unslash( $_POST['language'] ) ) : '';
 
 		if ( $icon > 0 && ! empty( $language_code ) ) {
+			// bail if the given icon is not an attachment.
+			$icon_post = get_post( $icon );
+			if ( ! $icon_post instanceof \WP_Post || 'attachment' !== $icon_post->post_type ) {
+				wp_send_json_error();
+			}
+
 			// get actual assignments of the language.
 			$attachment = Helper::get_attachment_by_language_code( $language_code );
 
-			if ( ! $attachment ) {
-				return;
+			// remove the language from the actual assignment, if one exists.
+			if ( $attachment instanceof \WP_Post ) {
+				$assigned_languages = get_post_meta( $attachment->ID, 'easy_language_code', true );
+				if ( is_array( $assigned_languages ) && ! empty( $assigned_languages[ $language_code ] ) ) {
+					unset( $assigned_languages[ $language_code ] );
+					update_post_meta( $attachment->ID, 'easy_language_code', $assigned_languages );
+				}
 			}
-
-			// remove the language from this assignment.
-			$assigned_languages = get_post_meta( $attachment->ID, 'easy_language_code', true );
-			if ( ! empty( $assigned_languages[ $language_code ] ) ) {
-				unset( $assigned_languages[ $language_code ] );
-			}
-			update_post_meta( $attachment->ID, 'easy_language_code', $assigned_languages );
 
 			// add the language to the new attachment.
 			$assigned_languages = get_post_meta( $icon, 'easy_language_code', true );
@@ -385,7 +392,7 @@ class Init {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -396,7 +403,7 @@ class Init {
 		$wpdb->query( $wpdb->prepare( 'DELETE FROM `' . Log::get_instance()->get_table_name() . '` WHERE 1 = %d', array( 1 ) ) );
 
 		// redirect user back.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 

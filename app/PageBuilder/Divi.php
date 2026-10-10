@@ -163,12 +163,25 @@ class Divi extends PageBuilder_Base {
 
 		// embed the react-dialog-component.
 		$script_asset_path = Helper::get_plugin_path() . 'vendor/threadi/react-dialog/build/index.asset.php';
-		$script_asset      = require $script_asset_path;
+
+		// bail if the asset file does not exist.
+		if ( ! Helper::get_wp_filesystem( true )->exists( $script_asset_path ) ) {
+			return;
+		}
+
+		// get the asset data.
+		$script_asset = require $script_asset_path;
+
+		// bail if the asset data are not valid.
+		if ( ! is_array( $script_asset ) ) {
+			return;
+		}
+
 		wp_enqueue_script(
 			'react-dialog',
 			Helper::get_plugin_url() . 'vendor/threadi/react-dialog/build/index.js',
-			$script_asset['dependencies'],
-			$script_asset['version'],
+			isset( $script_asset['dependencies'] ) && is_array( $script_asset['dependencies'] ) ? $script_asset['dependencies'] : array(),
+			isset( $script_asset['version'] ) && is_string( $script_asset['version'] ) ? $script_asset['version'] : false,
 			true
 		);
 		$admin_css      = Helper::get_plugin_url() . 'vendor/threadi/react-dialog/build/style-index.css';
@@ -204,31 +217,42 @@ class Divi extends PageBuilder_Base {
 	 * @return bool
 	 */
 	public function is_active(): bool {
+		// use the cached result.
+		static $is_active = null;
+		if ( is_bool( $is_active ) ) {
+			return $is_active;
+		}
+
 		// first check for the plugin.
 		if ( Helper::is_plugin_active( 'divi-builder/divi-builder.php' ) ) {
 			// get the plugin version.
-			require_once ABSPATH . 'wp-admin/includes/admin.php';
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/divi-builder/divi-builder.php' );
+			if ( ! function_exists( 'get_plugin_data' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/divi-builder/divi-builder.php', false, false );
 			if ( version_compare( $plugin_data['Version'], '5.0.0', '<' ) ) {
-				return true;
+				$is_active = true;
+				return $is_active;
 			}
 		}
 
 		// check for the theme.
 		$theme = wp_get_theme();
 		if ( 'Divi' === $theme->get( 'Name' ) ) {
-			$version = substr( $theme->get( 'Version' ), 0, 5 );
-			return version_compare( $version, '5.0.0', '<' );
+			$version   = substr( (string) $theme->get( 'Version' ), 0, 5 );
+			$is_active = version_compare( $version, '5.0.0', '<' );
+			return $is_active;
 		}
 
 		// check for the parent theme.
 		if ( $theme->parent() && 'Divi' === $theme->parent()->get( 'Name' ) ) {
-			$version = substr( $theme->parent()->get( 'Version' ), 0, 5 );
-			return version_compare( $version, '5.0.0', '<' );
+			$version   = substr( (string) $theme->parent()->get( 'Version' ), 0, 5 );
+			$is_active = version_compare( $version, '5.0.0', '<' );
+			return $is_active;
 		}
 
 		// otherwise return false.
-		return false;
+		$is_active = false;
+		return $is_active;
 	}
 }

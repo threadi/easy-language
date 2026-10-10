@@ -207,8 +207,10 @@ class Request implements Api_Requests {
 			$args['body'] = $body;
 		}
 
-		// secure request.
-		$this->request = $args;
+		// secure request (with an anonymized token, so it is never saved in the database).
+		$request                             = $args;
+		$request['headers']['Authorization'] = 'anonymized';
+		$this->request                       = $request;
 
 		// secure start-time.
 		$start_time = microtime( true );

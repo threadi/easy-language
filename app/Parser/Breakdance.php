@@ -132,6 +132,11 @@ class Breakdance extends Parser_Base implements Parser {
 			return array();
 		}
 
+		// bail if the Breakdance function is not available.
+		if ( ! function_exists( 'Breakdance\Data\get_tree' ) ) {
+			return array();
+		}
+
 		// get the actual _breakdance_data to get the texts of supported widgets.
 		$data = get_tree( $this->get_object_id() );
 
@@ -175,7 +180,7 @@ class Breakdance extends Parser_Base implements Parser {
 		$flow_text_widgets = $this->get_flow_text_widgets();
 
 		// get the contents of this widget, if it is allowed.
-		if ( ! empty( $widget['data']['type'] ) && ! empty( $flow_text_widgets[ $widget['data']['type'] ] ) ) {
+		if ( ! empty( $widget['data']['type'] ) && ! empty( $flow_text_widgets[ $widget['data']['type'] ] ) && isset( $widget['data']['properties']['content']['content']['text'] ) && is_string( $widget['data']['properties']['content']['content']['text'] ) ) {
 			// add this widget with its content to the list.
 			$resulting_texts[] = array(
 				'text' => $widget['data']['properties']['content']['content']['text'],
@@ -184,14 +189,57 @@ class Breakdance extends Parser_Base implements Parser {
 		}
 
 		// loop through inner-widgets.
-		if ( ! empty( $widget['children'] ) ) {
+		if ( ! empty( $widget['children'] ) && is_array( $widget['children'] ) ) {
 			foreach ( $widget['children'] as $sub_widget ) {
+				// bail if the sub widget is not an array.
+				if ( ! is_array( $sub_widget ) ) {
+					continue;
+				}
+
 				$resulting_texts = $this->get_widgets( $sub_widget, $resulting_texts );
 			}
 		}
 
 		// return resulting list.
 		return $resulting_texts;
+	}
+
+	/**
+	 * Replace the original text with its simplification in the widget and its inner widgets.
+	 *
+	 * Uses the same structure as get_widgets().
+	 *
+	 * @param array<string,mixed> $widget The widget-array.
+	 * @param string              $simplified_part The simplified text.
+	 * @param bool                $changed Will be set to true if a text has been replaced.
+	 * @return array<string,mixed>
+	 */
+	private function replace_content_in_widgets( array $widget, string $simplified_part, bool &$changed ): array {
+		// get the list of flow-text-widgets.
+		$flow_text_widgets = $this->get_flow_text_widgets();
+
+		// replace the content of this widget, if it is allowed and matches the original text.
+		if ( ! empty( $widget['data']['type'] ) && ! empty( $flow_text_widgets[ $widget['data']['type'] ] ) && isset( $widget['data']['properties']['content']['content']['text'] ) && $this->get_text() === $widget['data']['properties']['content']['content']['text'] ) {
+			$widget['data']['properties']['content']['content']['text'] = $simplified_part;
+
+			// mark the change.
+			$changed = true;
+		}
+
+		// loop through inner-widgets.
+		if ( ! empty( $widget['children'] ) && is_array( $widget['children'] ) ) {
+			foreach ( $widget['children'] as $index => $sub_widget ) {
+				// bail if the sub widget is not an array.
+				if ( ! is_array( $sub_widget ) ) {
+					continue;
+				}
+
+				$widget['children'][ $index ] = $this->replace_content_in_widgets( $sub_widget, $simplified_part, $changed );
+			}
+		}
+
+		// return the resulting widget.
+		return $widget;
 	}
 
 	/**
@@ -209,6 +257,11 @@ class Breakdance extends Parser_Base implements Parser {
 			return $original_complete;
 		}
 
+		// bail if the Breakdance functions are not available.
+		if ( ! function_exists( 'Breakdance\Data\get_tree' ) || ! function_exists( 'Breakdance\Data\set_meta' ) ) {
+			return $original_complete;
+		}
+
 		// get the content in postmeta "_breakdance_data".
 		$data = get_tree( $this->get_object_id() );
 
@@ -218,29 +271,37 @@ class Breakdance extends Parser_Base implements Parser {
 		}
 
 		// bail if root does not exist.
-		if ( empty( $data['root']['children'] ) ) {
+		if ( empty( $data['root']['children'] ) || ! is_array( $data['root']['children'] ) ) {
 			return $original_complete;
 		}
 
-		// replace the texts.
-		foreach ( $data['root']['children'] as $index => $container ) {
-			// bail if text does not match.
-			if ( $this->get_text() !== $data['root']['children'][ $index ]['properties']['content']['content']['text'] ) {
+		// replace the texts recursively (like in get_parsed_texts()).
+		$changed = false;
+		foreach ( $data['root']['children'] as $index => $widget ) {
+			// bail if no data is set.
+			if ( ! is_array( $widget ) || empty( $widget['data'] ) ) {
 				continue;
 			}
 
-			// replace the text.
-			$data['root']['children'][ $index ]['properties']['content']['content']['text'] = $simplified_part;
+			$data['root']['children'][ $index ] = $this->replace_content_in_widgets( $widget, $simplified_part, $changed );
 		}
 
-		// save it.
-		set_meta(
-			$this->get_object_id(),
-			'_breakdance_data',
-			array(
-				'tree_json_string' => wp_json_encode( $data ),
-			)
-		);
+		// save it, if something has been changed.
+		if ( $changed ) {
+			// get the resulting JSON.
+			$json = wp_json_encode( $data );
+
+			// save it, if the JSON could be created.
+			if ( is_string( $json ) ) {
+				set_meta(
+					$this->get_object_id(),
+					'_breakdance_data',
+					array(
+						'tree_json_string' => $json,
+					)
+				);
+			}
+		}
 
 		// replacement for post_content.
 		return str_replace( $this->get_text(), $simplified_part, $original_complete );
@@ -263,7 +324,7 @@ class Breakdance extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return get_post_meta( $post_object->get_id(), '_breakdance_data', true );
+		return ! empty( get_post_meta( $post_object->get_id(), '_breakdance_data', true ) );
 	}
 
 	/**
@@ -272,7 +333,7 @@ class Breakdance extends Parser_Base implements Parser {
 	 * @return string
 	 */
 	public function get_edit_link(): string {
-		if ( $this->is_breakdance_active() ) {
+		if ( $this->is_breakdance_active() && function_exists( 'Breakdance\Admin\get_builder_loader_url' ) ) {
 			return \Breakdance\Admin\get_builder_loader_url( (string) $this->get_object_id() );
 		}
 		return parent::get_edit_link();

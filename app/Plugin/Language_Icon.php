@@ -71,7 +71,7 @@ class Language_Icon {
 		$img_path = apply_filters( 'easy_language_icon_path', $path, $file );
 
 		// bail if a file does not exist.
-		if ( ! ( ! empty( $img_path ) && file_exists( $img_path ) ) ) {
+		if ( empty( $img_path ) || ! Helper::get_wp_filesystem( true )->exists( $img_path ) ) {
 			return;
 		}
 		// check if the file exists in db.
@@ -98,6 +98,11 @@ class Language_Icon {
 					'name'     => basename( $this->file ),
 					'tmp_name' => $import_path,
 				);
+
+				// load necessary functions for media_handle_sideload (they are not loaded e.g. in frontend or via WP CLI).
+				require_once ABSPATH . 'wp-admin/includes/file.php';
+				require_once ABSPATH . 'wp-admin/includes/media.php';
+				require_once ABSPATH . 'wp-admin/includes/image.php';
 
 				// Insert the attachment to prevent removing the original file and get its attachment ID.
 				$attachment_id = media_handle_sideload( $attachment, 0, null, array( 'post_author' => get_current_user_id() ) );

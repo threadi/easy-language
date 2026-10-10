@@ -34,6 +34,13 @@ class Settings {
 	private ?\easySettingsForWordPress\Settings $settings_obj = null;
 
 	/**
+	 * Marker whether the settings have already been added in this request.
+	 *
+	 * @var bool
+	 */
+	private bool $settings_added = false;
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?Settings
@@ -82,6 +89,14 @@ class Settings {
 	 * @return void
 	 */
 	public function add_the_settings(): void {
+		// bail if the settings have already been added in this request.
+		if ( $this->settings_added ) {
+			return;
+		}
+
+		// mark the settings as added.
+		$this->settings_added = true;
+
 		/**
 		 * Configure the basic settings object.
 		 */
@@ -129,11 +144,6 @@ class Settings {
 				'drag_n_drop'                        => __( 'Hold to drag & drop', 'easy-language' ),
 			)
 		);
-
-		// initialize the settings-object if setup has been completed or if this is a REST API request.
-		if ( Helper::is_rest_request() || Setup::get_instance()->is_completed() ) {
-			$settings_obj->init();
-		}
 
 		/**
 		 * Get the settings page.
@@ -268,7 +278,7 @@ class Settings {
 		$field = new Radio( $settings_obj );
 		$field->set_title( __( 'Select your API', 'easy-language' ) );
 		$field->set_options( $apis );
-		$field->set_sanitize_callback( array( self::get_instance(), 'sanitize_radio_as_string' ) );
+		$field->set_sanitize_callback( array( self::get_instance(), 'sanitize_api' ) );
 		$setting->set_field( $field );
 
 		// add setting.
@@ -558,12 +568,14 @@ class Settings {
 				// get the previous state.
 				$new_post_state = get_post_meta( $post_type_object_id, 'easy_language_simplification_state_changed_from', true );
 
-				// update object.
-				$array = array(
-					'ID'          => $post_type_object_id,
-					'post_status' => $new_post_state,
-				);
-				wp_update_post( $array );
+				// update object, if the previous state is a known post state.
+				if ( is_string( $new_post_state ) && ! empty( $new_post_state ) && get_post_status_object( $new_post_state ) ) {
+					$array = array(
+						'ID'          => $post_type_object_id,
+						'post_status' => $new_post_state,
+					);
+					wp_update_post( $array );
+				}
 
 				// delete the setting for the previous state.
 				delete_post_meta( $post_type_object_id, 'easy_language_simplification_state_changed_from' );
@@ -577,6 +589,11 @@ class Settings {
 				$post_types_count   = count( $post_types );
 				$post_types_counter = 0;
 				foreach ( $post_types as $post_type => $enabled ) {
+					// bail if no settings for this post type are known.
+					if ( ! isset( $post_type_settings[ $post_type ] ) ) {
+						continue;
+					}
+
 					if ( ( $post_types_count - 1 ) === $post_types_counter ) {
 						$links .= ' ' . esc_html__( 'and', 'easy-language' ) . ' ';
 					}
@@ -732,11 +749,11 @@ class Settings {
 		// bail if capability is not granted.
 		if ( ! current_user_can( self::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
-		// uninstall all.
+		// uninstall all (only in the actual site of a multisite).
 		Uninstall::get_instance()->run();
 
 		$options = array();
@@ -749,7 +766,7 @@ class Settings {
 		 */
 		do_action( 'easy_language_uninstaller', $options );
 
-		// run installer tasks.
+		// run installer tasks (only in the actual site of a multisite).
 		Installer::get_instance()->activation();
 
 		/**
@@ -761,6 +778,7 @@ class Settings {
 
 		// forward user to dashboard.
 		wp_safe_redirect( get_admin_url() );
+		exit;
 	}
 
 	/**
@@ -782,6 +800,23 @@ class Settings {
 	 */
 	public function sanitize_radio_as_string( ?string $value ): string {
 		return (string) $value;
+	}
+
+	/**
+	 * Sanitize the chosen API: only names of available APIs are allowed.
+	 *
+	 * @param string|null $value The settings value.
+	 *
+	 * @return string
+	 */
+	public function sanitize_api( ?string $value ): string {
+		// return the value if it is the name of an available API.
+		if ( Apis::get_instance()->get_api_by_name( (string) $value ) instanceof Api_Base ) {
+			return (string) $value;
+		}
+
+		// return the actual value otherwise.
+		return (string) get_option( 'easy_language_api', 'summ_ai' );
 	}
 
 	/**

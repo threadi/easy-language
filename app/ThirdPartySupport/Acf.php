@@ -119,7 +119,7 @@ class Acf extends Base implements ThirdPartySupport_Base {
 	 * @return bool
 	 */
 	public function is_active(): bool {
-		return Helper::is_plugin_active( 'advanced-custom-fields/acf.php' );
+		return Helper::is_plugin_active( 'advanced-custom-fields/acf.php' ) || Helper::is_plugin_active( 'advanced-custom-fields-pro/acf.php' );
 	}
 
 	/**
@@ -237,8 +237,24 @@ class Acf extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function replace_meta_field_texts( Text $text, string $target_language, int $object_id, array $simplification_objects ): void {
+		// bail if the function to update fields is not available.
+		if ( ! function_exists( 'update_field' ) ) {
+			return;
+		}
+
 		foreach ( $simplification_objects as $simplification_object ) {
-			update_field( str_replace( 'acf_meta_', '', $simplification_object['field'] ), $text->get_simplification( $target_language ), $object_id );
+			// bail if the field is not set.
+			if ( empty( $simplification_object['field'] ) || ! is_string( $simplification_object['field'] ) ) {
+				continue;
+			}
+
+			// bail if this is not a field of this plugin.
+			if ( ! str_starts_with( $simplification_object['field'], 'acf_meta_' ) ) {
+				continue;
+			}
+
+			// update the field.
+			update_field( substr( $simplification_object['field'], strlen( 'acf_meta_' ) ), $text->get_simplification( $target_language ), $object_id );
 		}
 	}
 

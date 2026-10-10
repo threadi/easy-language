@@ -99,6 +99,24 @@ class Helper {
 	}
 
 	/**
+	 * Return the referer-URL of the actual request with the settings-page-URL as fallback.
+	 *
+	 * @return string
+	 */
+	public static function get_referer_url(): string {
+		// get the referer.
+		$referer = wp_get_referer();
+
+		// bail if no referer is given.
+		if ( ! is_string( $referer ) || empty( $referer ) ) {
+			return self::get_settings_page_url();
+		}
+
+		// return the referer.
+		return $referer;
+	}
+
+	/**
 	 * Return the API-logs-URL.
 	 *
 	 * @return string
@@ -133,7 +151,9 @@ class Helper {
 		 */
 		if ( self::is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' ) ) {
 			global $sitepress;
-			$wp_language = $sitepress->get_locale_from_language_code( apply_filters( 'wpml_default_language', null ) );
+			if ( $sitepress instanceof \SitePress ) { // @phpstan-ignore class.notFound
+				$wp_language = $sitepress->get_locale_from_language_code( apply_filters( 'wpml_default_language', null ) ); // @phpstan-ignore class.notFound
+			}
 		}
 
 		// if language not set, use the fallback language.
@@ -328,7 +348,8 @@ class Helper {
 			'meta_query'     => array(
 				array(
 					'key'     => 'easy_language_code',
-					'value'   => trim( $language_code ),
+					// search for the quoted array key in the serialized value (WP_Query escapes it via esc_like).
+					'value'   => '"' . trim( $language_code ) . '"',
 					'compare' => 'LIKE',
 				),
 			),

@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\EasyLanguage\Db;
 use WP_Role;
+use WP_Site;
 
 /**
  * Installer-object.
@@ -56,6 +57,9 @@ class Installer {
 	public function init(): void {
 		register_activation_hook( EASY_LANGUAGE, array( $this, 'activation' ) );
 		register_deactivation_hook( EASY_LANGUAGE, array( $this, 'deactivation' ) );
+
+		// run activation tasks for new sites in a multisite.
+		add_action( 'wp_initialize_site', array( $this, 'initialize_site' ), 200 );
 	}
 
 	/**
@@ -87,13 +91,12 @@ class Installer {
 	/**
 	 * Run this on activation of the plugin.
 	 *
+	 * @param bool $network_wide True if the plugin is activated network-wide in a multisite.
+	 *
 	 * @return void
 	 */
-	public function activation(): void {
-		if ( is_multisite() ) {
-			// get original blog id.
-			$original_blog_id = get_current_blog_id();
-
+	public function activation( bool $network_wide = false ): void {
+		if ( $network_wide && is_multisite() ) {
 			// loop through the blogs.
 			foreach ( $this->get_blogs() as $blog_id ) {
 				// switch to the blog.
@@ -101,14 +104,42 @@ class Installer {
 
 				// run tasks for activation in this single blog.
 				$this->activation_tasks();
-			}
 
-			// switch back to original blog.
-			switch_to_blog( $original_blog_id );
+				// switch back to original blog.
+				restore_current_blog();
+			}
 		} else {
-			// simply run the tasks on single-site-install.
+			// simply run the tasks on single-site-install or in the actual site.
 			$this->activation_tasks();
 		}
+	}
+
+	/**
+	 * Run the activation tasks for a new site in a multisite, if this plugin is network-wide active.
+	 *
+	 * @param WP_Site $site The new site.
+	 *
+	 * @return void
+	 */
+	public function initialize_site( WP_Site $site ): void {
+		// load necessary functions.
+		if ( ! function_exists( 'is_plugin_active_for_network' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		// bail if this plugin is not active network-wide.
+		if ( ! is_plugin_active_for_network( plugin_basename( EASY_LANGUAGE ) ) ) {
+			return;
+		}
+
+		// switch to the new site.
+		switch_to_blog( absint( $site->blog_id ) );
+
+		// run tasks for activation in this site.
+		$this->activation_tasks();
+
+		// switch back to the original site.
+		restore_current_blog();
 	}
 
 	/**
@@ -131,6 +162,11 @@ class Installer {
 
 		// add the settings.
 		Settings::get_instance()->add_the_settings();
+
+		// set the actual plugin version if it does not exist (prevents running updates on new installations).
+		if ( false === get_option( 'easyLanguageVersion' ) ) {
+			add_option( 'easyLanguageVersion', EASY_LANGUAGE_VERSION, '', true );
+		}
 
 		// generate random-installation-hash if it does not already exist (will never be removed or changed).
 		if ( ! get_option( EASY_LANGUAGE_HASH ) ) {
@@ -183,13 +219,12 @@ class Installer {
 	/**
 	 * On plugin deactivation.
 	 *
+	 * @param bool $network_wide True if the plugin is deactivated network-wide in a multisite.
+	 *
 	 * @return void
 	 */
-	public function deactivation(): void {
-		if ( is_multisite() ) {
-			// get original blog ID.
-			$original_blog_id = get_current_blog_id();
-
+	public function deactivation( bool $network_wide = false ): void {
+		if ( $network_wide && is_multisite() ) {
 			// loop through the blogs.
 			foreach ( $this->get_blogs() as $blog_id ) {
 				// switch to the blog.
@@ -197,12 +232,12 @@ class Installer {
 
 				// run tasks for deactivation in this single blog.
 				$this->deactivation_tasks();
-			}
 
-			// switch back to original blog.
-			switch_to_blog( $original_blog_id );
+				// switch back to original blog.
+				restore_current_blog();
+			}
 		} else {
-			// simply run the tasks on single-site-install.
+			// simply run the tasks on single-site-install or in the actual site.
 			$this->deactivation_tasks();
 		}
 	}

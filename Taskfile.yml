@@ -1,50 +1,140 @@
 version: '3'
 
+# Local alternative to the GitHub workflow .github/workflows/build-zip.yml and to build/build.xml.
+#
+# "task release -- 3.3.0" runs the same steps in the same order and creates a zip with the same
+# content: releases/3.3.0/easy-language.zip
+#
+# Not possible here (only in the GitHub workflow): the Plugin Check (PCP), the SBOM and the GitHub
+# release itself. The smoke test in WordPress Playground runs with SMOKE=true (needs Node 24).
+#
+# Needs: composer, npm, php, rsync and zip.
+#
+# Options as environment variables:
+#   SKIP_CHECKS=true  skip PHPStan, PHPCS and the PHP compatibility check
+#   SMOKE=true        run the smoke test in WordPress Playground
+#
+# Hint: "release" switches vendor/ to the release state (without dev packages) and switches it back
+# at the end. If the release stops in between, run "task prepare" to restore the development state.
+
+vars:
+  RELEASE_SLUG: easy-language
+  VERSION: '{{.CLI_ARGS}}'
+
 tasks:
   default:
     - task: prepare
 
-  build_directory:
-    dir: vendor/threadi/easy-setup-for-wordpress/
+  # install PHP packages (also runs Mozart, which copies easy-transients-for-wordpress to app/Dependencies).
+  composer_install:
     cmds:
-      - npm i
+      - composer install --no-interaction --no-progress
+
+  # build blocks, sidebar and Divi field.
+  npm_build:
+    cmds:
+      - npm ci
       - npm run build
 
+  # build react-dialog (the package ships no lock file, so npm ci is not possible here).
+  build_dialog:
+    dir: vendor/threadi/react-dialog/
+    cmds:
+      - npm install --no-audit --no-fund
+      - npm run build
+
+  # prepare the checkout for development.
   prepare:
     cmds:
-      - composer install
-      - npm i
-      - npm run build
+      - task: composer_install
+      - task: npm_build
       - task: build_dialog
-      - task: build_directory
 
+  # code checks (same as in .github/workflows/testing.yml).
   check:
     cmds:
-      - vendor/bin/phpstan analyse
-      - vendor/bin/phpcbf .
+      - composer validate --strict --no-check-publish --no-check-version
+      - vendor/bin/phpstan analyse --no-progress
       - vendor/bin/phpcs .
+      - vendor/bin/phpcs -p app --standard=PHPCompatibilityWP --runtime-set testVersion 8.2- --ignore=*/Dependencies/*
 
-  build_zip:
-    dir: ../
+  # remove dev packages and generate the release autoloader.
+  release_vendor:
     cmds:
-      - zip -rq external-files-in-media-library/releases/external-files-in-media-library_{{.CLI_ARGS}}.zip external-files-in-media-library/ -x "*/.git/*" "*/.github/*" "*/blocks/*/src/*" "*/docs/*" "*/.phpcs.xml" "*/composer.json" "*/composer.lock" "*/package.json" "*/package-lock.json" "*/phpcs.xml.dist" "*/.gitignore" "*/vendor/*" "*/node_modules/*" "*/.editorconfig" "*/build/*" "*/releases/*" "*/svn/*" "*/languages/*" "*/changelog.md" "*/readme.md" "*/phpcs.xml.dist" "*/assets/*" "*/external-files-in-media-library-dev.php" "*/readme-dev.txt" "*/phpstan.neon" "*/Taskfile.yml" "*/libs/*" "*/src/*"
-      - zip -urq external-files-in-media-library/releases/external-files-in-media-library_{{.CLI_ARGS}}.zip external-files-in-media-library/vendor/autoload.php
-      - zip -urq external-files-in-media-library/releases/external-files-in-media-library_{{.CLI_ARGS}}.zip external-files-in-media-library/vendor/composer/*
-      - zip -urq external-files-in-media-library/releases/external-files-in-media-library_{{.CLI_ARGS}}.zip external-files-in-media-library/vendor/gettext/*
-      - zip -urq external-files-in-media-library/releases/external-files-in-media-library_{{.CLI_ARGS}}.zip external-files-in-media-library/vendor/threadi/*/build/*
-      - zip -urq external-files-in-media-library/releases/external-files-in-media-library_{{.CLI_ARGS}}.zip external-files-in-media-library/vendor/threadi/*/lib/*
+      - composer install --no-dev --no-scripts --no-interaction --no-progress
+      # its classes are shipped in app/Dependencies. Without this the autoloader would also know them under their original names.
+      - rm -rf vendor/threadi/easy-transients-for-wordpress
+      - composer dump-autoload -oa --no-dev
 
+  # collect the files of the release and set the version number (same list as in the GitHub workflow).
+  collect:
+    cmds:
+      - rm -rf dist
+      - mkdir -p dist/{{.RELEASE_SLUG}}
+      # only what is listed here ends up in the zip. Nothing is deleted from the checkout.
+      # rsync stops with an error if one of these paths does not exist.
+      - >-
+        rsync -aR --exclude='.*' --exclude='node_modules/'
+        {{.RELEASE_SLUG}}.php uninstall.php index.php readme.txt wpml-config.xml composer.json
+        admin app css gfx inc templates
+        blocks/*/block.json blocks/*/build
+        js/generated
+        legacy-classes/Divi/build legacy-classes/Divi/divi.js
+        vendor/autoload.php vendor/composer
+        vendor/gettext
+        vendor/threadi/crypt-for-wordpress/src
+        vendor/threadi/easy-dialog-for-wordpress/build
+        vendor/threadi/easy-settings-for-wordpress
+        vendor/threadi/easy-setup-for-wordpress/build
+        vendor/threadi/easy-setup-for-wordpress/lib
+        vendor/threadi/react-dialog/build
+        dist/{{.RELEASE_SLUG}}/
+      # instructions for AI agents of the settings library: not needed on a website.
+      - rm -rf dist/{{.RELEASE_SLUG}}/vendor/threadi/easy-settings-for-wordpress/skills
+      # set the version number - in the copy only (via PHP, as "sed -i" works differently on macOS).
+      - >-
+        php -r 'foreach ( array_slice( $argv, 2 ) as $file ) { file_put_contents( $file, str_replace( "@@VersionNumber@@", $argv[1], file_get_contents( $file ) ) ); }'
+        '{{.VERSION}}'
+        dist/{{.RELEASE_SLUG}}/{{.RELEASE_SLUG}}.php dist/{{.RELEASE_SLUG}}/uninstall.php dist/{{.RELEASE_SLUG}}/readme.txt
+
+  # create the zip.
+  zip:
+    cmds:
+      - mkdir -p releases/{{.VERSION}}
+      - rm -f releases/{{.VERSION}}/{{.RELEASE_SLUG}}.zip
+      - cd dist && zip -rqX ../releases/{{.VERSION}}/{{.RELEASE_SLUG}}.zip {{.RELEASE_SLUG}}
+
+  # smoke test the zip in WordPress Playground (same blueprint as in the workflow).
+  smoke_test:
+    cmds:
+      - rm -rf dist/smoke
+      - mkdir -p dist/smoke
+      - unzip -q releases/{{.VERSION}}/{{.RELEASE_SLUG}}.zip -d dist/smoke
+      - test -f dist/smoke/{{.RELEASE_SLUG}}/{{.RELEASE_SLUG}}.php
+      # "--no": use the version from package-lock.json, never download another one.
+      - npx --no -- @wp-playground/cli run-blueprint --blueprint=./.github/blueprints/smoke.json --mount="$(pwd)/dist/smoke/{{.RELEASE_SLUG}}:/wordpress/wp-content/plugins/{{.RELEASE_SLUG}}"
+      - grep -qs "SMOKE_OK" dist/smoke/{{.RELEASE_SLUG}}/smoke-result.txt
+      - rm -rf dist/smoke
+
+  # switch vendor/ back to the development state.
+  restore_dev:
+    cmds:
+      - composer install --no-interaction --no-progress
+
+  # create the release zip: the same steps as .github/workflows/build-zip.yml.
   release:
+    preconditions:
+      - sh: echo '{{.VERSION}}' | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$'
+        msg: "Use a version number like 1.0.0 or 1.1.0-beta.1, e.g.: task release -- 3.3.0"
     cmds:
       - task: prepare
-      - composer dump-autoload -oa --no-dev
       - task: check
-      - cp easy-language.php easy-language-dev.php
-      - sed -i -e 's/@@VersionNumber@@/{{.CLI_ARGS}}/g' easy-language.php
-      - cp readme.txt readme-dev.txt
-      - sed -i -e 's/@@VersionNumber@@/{{.CLI_ARGS}}/g' readme.txt
-      - rm -f releases/easy-language_{{.CLI_ARGS}}.zip
-      - task: build_zip
-      - mv easy-language-dev.php easy-language.php
-      - mv readme-dev.txt readme.txt
-      - echo 'Release file generated'
+        if: '[ "$SKIP_CHECKS" != "true" ]'
+      - task: release_vendor
+      - task: collect
+      - task: zip
+      - task: smoke_test
+        if: '[ "$SMOKE" = "true" ]'
+      - task: restore_dev
+      - rm -rf dist
+      - echo 'Release file generated in releases/{{.VERSION}}/{{.RELEASE_SLUG}}.zip'

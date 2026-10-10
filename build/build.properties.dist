@@ -1,7 +1,7 @@
 # Plugin-Slug
 plugin.slug=easy-language
 
-# version number to use
+# version number to use, e.g. 3.3.0 or 3.3.0-beta.1
 plugin.version=
 
 # set path to npm-binary
@@ -9,3 +9,15 @@ npm.path=
 
 # set path to composer-binary
 composer.path=
+
+# optional: set path to npx-binary to run the smoke test in WordPress Playground (needs Node 24 and internet access)
+#npx.path=
+
+# optional: set to true to skip PHPStan, PHPCS and the PHP compatibility check
+#skip.checks=true
+
+# optional: set to true to run the PHPUnit tests (needs a database, see composer.json)
+#run.tests=true
+
+# optional: set to true to skip the smoke test even if npx.path is set
+#skip.smoke=true

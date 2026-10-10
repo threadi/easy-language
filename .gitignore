@@ -7,7 +7,12 @@ languages/*.json
 /build/languages/.gitkeep
 /build/languages/index.php
 /build/build.properties
+/build/*.txt
+/releases/
 /vendor/
 /blocks/*/build/
 /legacy-classes/Divi/build/
 /js/generated/metabox*
+/dist/
+smoke-result.txt
+/js/generated/sidebar*

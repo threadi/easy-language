@@ -29,7 +29,7 @@
 	<!--
 		Require WordPress 6.2.
 	-->
-    <config name="minimum_wp_version" value="6.2"/>
+    <config name="minimum_wp_version" value="6.6"/>
 
 	<!-- Use additional rulesets -->
 	<rule ref="WordPress-Docs"/>
