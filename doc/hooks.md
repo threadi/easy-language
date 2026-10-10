@@ -314,7 +314,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/EasyLanguage/Parser_Base.php](EasyLanguage/Parser_Base.php), [line 279](EasyLanguage/Parser_Base.php#L279-L286)
+Source: [app/EasyLanguage/Parser_Base.php](EasyLanguage/Parser_Base.php), [line 278](EasyLanguage/Parser_Base.php#L278-L285)
 
 ### `easy_language_simplification_running_timeout`
 
@@ -489,7 +489,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Apis/Summ_Ai/Summ_Ai.php](Apis/Summ_Ai/Summ_Ai.php), [line 1068](Apis/Summ_Ai/Summ_Ai.php#L1068-L1075)
+Source: [app/Apis/Summ_Ai/Summ_Ai.php](Apis/Summ_Ai/Summ_Ai.php), [line 1069](Apis/Summ_Ai/Summ_Ai.php#L1069-L1076)
 
 ### `easy_language_summ_ai_request_object`
 
@@ -1440,7 +1440,7 @@ Version | Description
 ------- | -----------
 `2.8.0` | Available since 2.8.0.
 
-Source: [app/Plugin/Tables/Log_Api_Table.php](Plugin/Tables/Log_Api_Table.php), [line 274](Plugin/Tables/Log_Api_Table.php#L274-L281)
+Source: [app/Plugin/Tables/Log_Api_Table.php](Plugin/Tables/Log_Api_Table.php), [line 264](Plugin/Tables/Log_Api_Table.php#L264-L271)
 
 ### `easy_language_status_list`
 
@@ -1535,7 +1535,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 502](Plugin/Helper.php#L502-L513)
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 503](Plugin/Helper.php#L503-L514)
 
 ### `easy_language_file_version`
 
@@ -1554,7 +1554,7 @@ Version | Description
 ------- | -----------
 `2.3.0` | Available since 2.3.0.
 
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 705](Plugin/Helper.php#L705-L713)
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 707](Plugin/Helper.php#L707-L715)
 
 ### `easy_language_post_meta_keys_to_ignore`
 
@@ -1572,7 +1572,7 @@ Version | Description
 ------- | -----------
 `2.4.0` | Available since 2.4.0.
 
-Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 724](Plugin/Helper.php#L724-L730)
+Source: [app/Plugin/Helper.php](Plugin/Helper.php), [line 726](Plugin/Helper.php#L726-L732)
 
 ### `easy_language_encrypted_options`
 

@@ -260,6 +260,7 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	 * @return void
 	 */
 	public function update_object( Objects $post_object ): void {
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Intentionally triggers the WordPress core hook save_post.
 		do_action( 'save_post', $post_object->get_id(), $post_object->get_object_as_object(), true );
 	}
 }

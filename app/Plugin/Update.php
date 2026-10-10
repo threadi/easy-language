@@ -14,7 +14,6 @@ use easyLanguage\Apis\Summ_Ai\Summ_Ai;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Db;
 use easyLanguage\EasyLanguage\Rewrite;
-use easyLanguage\EasyLanguage\Texts;
 
 /**
  * Helper-function for updates of this plugin.
@@ -114,6 +113,13 @@ class Update {
 	 * @return void
 	 */
 	private function run_updates( string $installed_plugin_version, string $db_plugin_version ): void {
+		// create the tables of this plugin if they are missing (e.g. if the plugin has not been activated via WordPress).
+		if ( ! Db::get_instance()->tables_exist() ) {
+			Log::get_instance()->create_table();
+			Log_Api::get_instance()->create_table();
+			Db::get_instance()->create_table();
+		}
+
 		// encrypt the saved API keys, which are not encrypted yet.
 		Crypt::get_instance()->migrate();
 
@@ -190,9 +196,8 @@ class Update {
 				}
 			}
 
-			// check if any texts are set.
-			$texts = Texts::get_instance()->get_texts();
-			if ( ! empty( $texts ) ) {
+			// check if any texts are set (without loading all of them).
+			if ( Db::get_instance()->has_entries() ) {
 				$setup_completed = true;
 			}
 

@@ -380,8 +380,8 @@ class Capito extends Base implements Api_Base {
 		/**
 		 * Delete our table.
 		 */
-		$sql = 'DROP TABLE IF EXISTS ' . $this->table_requests;
-		$this->wpdb->query( $sql );
+		global $wpdb;
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->table_requests ) );
 	}
 
 	/**
@@ -1143,7 +1143,8 @@ class Capito extends Base implements Api_Base {
 	 * @return array<int,mixed>
 	 */
 	public function get_log_entries(): array {
-		$results = $this->wpdb->get_results( $this->wpdb->prepare( 'SELECT `time`, `request`, `response` FROM ' . $this->table_requests . ' WHERE 1 = %d', array( 1 ) ) ); // @phpstan-ignore argument.type
+		$wpdb    = $this->wpdb;
+		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `time`, `request`, `response` FROM %i WHERE 1 = %d', array( $this->table_requests, 1 ) ) ); // @phpstan-ignore argument.type
 		if ( is_null( $results ) ) {
 			return array();
 		}

@@ -88,7 +88,7 @@ class Log {
 	 */
 	public function delete_table(): void {
 		global $wpdb;
-		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', $this->get_table_name() ) );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->get_table_name() ) );
 	}
 
 	/**
@@ -144,16 +144,7 @@ class Log {
 	 */
 	private function clean_log(): void {
 		global $wpdb;
-		$wpdb->query( $wpdb->prepare( 'DELETE FROM `' . $this->get_table_name() . '` WHERE 1 = %d AND `time` < DATE_SUB(NOW(), INTERVAL %d DAY)', array( 1, absint( get_option( 'easy_language_log_max_age', 50 ) ) ) ) );
-	}
-
-	/**
-	 * Return base-SQL-statement to get api logs.
-	 *
-	 * @return string
-	 */
-	private function get_base_sql(): string {
-		return 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM `' . $this->get_table_name() . '` WHERE 1 = %1$d';
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE 1 = %d AND `time` < DATE_SUB(NOW(), INTERVAL %d DAY)', array( $this->get_table_name(), 1, absint( get_option( 'easy_language_log_max_age', 50 ) ) ) ) );
 	}
 
 	/**
@@ -166,8 +157,8 @@ class Log {
 
 		// define the allowed columns to order the table (request value => DB column).
 		$allowed_order_by = array(
-			'date' => '`time`',
-			'time' => '`time`',
+			'date' => 'time',
+			'time' => 'time',
 		);
 
 		// order table.
@@ -181,17 +172,12 @@ class Log {
 			$order = 'DESC';
 		}
 
-		// define vars for prepared statement.
-		$vars = array(
-			1,
-			$order_by,
-			$order,
-		);
+		// get results in ascending order and return them.
+		if ( 'ASC' === $order ) {
+			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM %i WHERE 1 = %d ORDER BY %i ASC, `id` DESC', array( $this->get_table_name(), 1, $order_by ) ), ARRAY_A );
+		}
 
-		// get the SQL statement.
-		$sql = $this->get_base_sql() . ' ORDER BY %2$s %3$s, `id` DESC';
-
-		// get results and return them.
-		return $wpdb->get_results( $wpdb->prepare( $sql, $vars ), ARRAY_A );
+		// get results in descending order and return them.
+		return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM %i WHERE 1 = %d ORDER BY %i DESC, `id` DESC', array( $this->get_table_name(), 1, $order_by ) ), ARRAY_A );
 	}
 }

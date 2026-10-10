@@ -89,7 +89,7 @@ class Log_Api {
 	 */
 	public function delete_table(): void {
 		global $wpdb;
-		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS %s', $this->get_table_name() ) );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->get_table_name() ) );
 	}
 
 	/**
@@ -151,6 +151,6 @@ class Log_Api {
 	 */
 	private function clean_log(): void {
 		global $wpdb;
-		$wpdb->query( $wpdb->prepare( 'DELETE FROM `' . $this->get_table_name() . '` WHERE 1 = %d AND `time` < DATE_SUB(NOW(), INTERVAL %d DAY)', array( 1, absint( get_option( 'easy_language_log_max_age', 50 ) ) ) ) );
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE 1 = %d AND `time` < DATE_SUB(NOW(), INTERVAL %d DAY)', array( $this->get_table_name(), 1, absint( get_option( 'easy_language_log_max_age', 50 ) ) ) ) );
 	}
 }

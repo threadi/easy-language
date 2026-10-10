@@ -759,6 +759,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 */
 	protected function process_simplification_trigger_on_end(): void {
 		// trigger object-update.
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Intentionally triggers the WordPress core hook save_post_{post_type}.
 		do_action( 'save_post_' . $this->get_type(), $this->get_id(), $this->get_object_as_object(), true );
 	}
 }

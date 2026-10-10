@@ -40,6 +40,13 @@ class Db {
 	private array $simplifications = array();
 
 	/**
+	 * Whether the tables of this object exist (null if not checked in this request).
+	 *
+	 * @var ?bool
+	 */
+	private ?bool $tables_exist = null;
+
+	/**
 	 * Constructor for this object.
 	 */
 	private function __construct() {}
@@ -113,6 +120,9 @@ class Db {
             `user_id` int(11) DEFAULT 0 NOT NULL
         ) $charset_collate;";
 		dbDelta( $sql );
+
+		// check the existence of the tables again on the next request for it.
+		$this->tables_exist = null;
 	}
 
 	/**
@@ -122,9 +132,68 @@ class Db {
 	 */
 	public function delete_tables(): void {
 		global $wpdb;
-		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS `%1$s`', $this->get_table_name_originals() ) );
-		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS `%1$s`', $this->get_table_name_originals_objects() ) );
-		$wpdb->query( sprintf( 'DROP TABLE IF EXISTS `%1$s`', $this->get_table_name_simplifications() ) );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->get_table_name_originals() ) );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->get_table_name_originals_objects() ) );
+		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->get_table_name_simplifications() ) );
+
+		// the tables are gone now.
+		$this->tables_exist = false;
+	}
+
+	/**
+	 * Return whether the tables of this object exist in the database.
+	 *
+	 * The result is cached for the actual request, so the check runs only once per request.
+	 * The tables could be missing if the plugin has not been activated via WordPress (e.g. files
+	 * copied into the plugin directory or a database with another prefix).
+	 *
+	 * @return bool
+	 */
+	public function tables_exist(): bool {
+		// use the cached result.
+		if ( is_bool( $this->tables_exist ) ) {
+			return $this->tables_exist;
+		}
+
+		global $wpdb;
+
+		// get all tables of this plugin with one request.
+		$existing_tables = $wpdb->get_col( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $this->get_wpdb_prefix() . 'easy_language_' ) . '%' ) );
+
+		// check if our tables are in this list.
+		$this->tables_exist = empty(
+			array_diff(
+				array_map(
+					'strtolower',
+					array(
+						$this->get_table_name_originals(),
+						$this->get_table_name_originals_objects(),
+						$this->get_table_name_simplifications(),
+					)
+				),
+				array_map( 'strtolower', array_map( 'strval', $existing_tables ) )
+			)
+		);
+
+		// return the result.
+		return $this->tables_exist;
+	}
+
+	/**
+	 * Return whether at least one text exists in the database.
+	 *
+	 * @return bool
+	 */
+	public function has_entries(): bool {
+		// bail if our tables do not exist.
+		if ( ! $this->tables_exist() ) {
+			return false;
+		}
+
+		global $wpdb;
+
+		// check for a single entry.
+		return null !== $wpdb->get_var( $wpdb->prepare( 'SELECT `id` FROM %i LIMIT 1', $this->get_table_name_originals() ) );
 	}
 
 	/**
@@ -196,37 +265,36 @@ class Db {
 	public function get_entries( array $filter = array(), array $order = array(), int $limit = 0, int $offset = 0 ): array {
 		global $wpdb;
 
+		// bail if our tables do not exist.
+		if ( ! $this->tables_exist() ) {
+			return array();
+		}
+
 		// get the query parts depending on the given filter.
 		$query_parts = $this->get_query_parts( $filter, $order );
+
+		// get the vars for the prepared statement in the order of their placeholders (after the table name).
+		$vars = $query_parts['vars'];
 
 		// limit the list of entries.
 		$sql_limit = '';
 		if ( absint( $limit ) > 0 ) {
-			$sql_limit = ' LIMIT ' . absint( $limit );
+			$sql_limit = ' LIMIT %d';
+			$vars[]    = absint( $limit );
 
 			// add the offset.
 			if ( absint( $offset ) > 0 ) {
-				$sql_limit .= ' OFFSET ' . absint( $offset );
+				$sql_limit .= ' OFFSET %d';
+				$vars[]     = absint( $offset );
 			}
 		}
 
-		// define base-statement.
-		$sql = 'SELECT `id`, `original`, `lang`%1$s FROM ' . $this->get_table_name_originals() . ' AS o';
-
-		// add additional result-rows.
-		$sql = sprintf( $sql, $query_parts['select'] );
-
-		// concat sql-statement.
-		$sql .= $query_parts['join'] . $query_parts['where'] . $query_parts['order'] . $sql_limit;
-
-		// get the vars for the prepared statement.
-		$vars = $query_parts['vars'];
-
-		// prepare SQL-statement.
-		$prepared_sql = $wpdb->prepare( $sql, $vars );
+		// define the statement.
+		$sql = 'SELECT `id`, `original`, `lang`' . $query_parts['select'] . ' FROM %i AS o' . $query_parts['join'] . $query_parts['where'] . $query_parts['order'] . $sql_limit;
 
 		// get entries.
-		$results = $wpdb->get_results( $prepared_sql, ARRAY_A );
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts(), ORDER BY from a whitelist), all values are passed as prepare() arguments.
+		$results = $wpdb->get_results( $wpdb->prepare( $sql, $this->get_table_name_originals(), ...$vars ), ARRAY_A );
 
 		// bail if results are empty.
 		if ( empty( $results ) ) {
@@ -284,14 +352,23 @@ class Db {
 			return count( $this->get_entries( $filter ) );
 		}
 
+		// bail if our tables do not exist.
+		if ( ! $this->tables_exist() ) {
+			return 0;
+		}
+
 		// get the query parts depending on the given filter.
 		$query_parts = $this->get_query_parts( $filter, array() );
 
 		// define the statement.
-		$sql = 'SELECT COUNT(*) FROM ' . $this->get_table_name_originals() . ' AS o' . $query_parts['join'] . $query_parts['where'];
+		$sql = 'SELECT COUNT(*) FROM %i AS o' . $query_parts['join'] . $query_parts['where'];
+
+		// get the count.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts()), all values are passed as prepare() arguments.
+		$count = $wpdb->get_var( $wpdb->prepare( $sql, $this->get_table_name_originals(), ...$query_parts['vars'] ) );
 
 		// return the count.
-		return absint( $wpdb->get_var( $wpdb->prepare( $sql, $query_parts['vars'] ) ) );
+		return absint( $count );
 	}
 
 	/**
@@ -302,8 +379,13 @@ class Db {
 	public function get_entry_ids(): array {
 		global $wpdb;
 
+		// bail if our tables do not exist.
+		if ( ! $this->tables_exist() ) {
+			return array();
+		}
+
 		// get the IDs.
-		$ids = $wpdb->get_col( 'SELECT `id` FROM ' . $this->get_table_name_originals() . ' ORDER BY `id` ASC' );
+		$ids = $wpdb->get_col( $wpdb->prepare( 'SELECT `id` FROM %i ORDER BY `id` ASC', $this->get_table_name_originals() ) );
 
 		// return them as integers.
 		return array_map( 'absint', $ids );
@@ -319,16 +401,26 @@ class Db {
 	public function get_languages_of_entries( array $filter = array() ): array {
 		global $wpdb;
 
+		// bail if our tables do not exist.
+		if ( ! $this->tables_exist() ) {
+			return array(
+				'source' => array(),
+				'target' => array(),
+			);
+		}
+
 		// get the query parts depending on the given filter.
 		$query_parts = $this->get_query_parts( $filter, array() );
 
 		// get the source languages.
-		$sql              = 'SELECT DISTINCT o.`lang` FROM ' . $this->get_table_name_originals() . ' AS o' . $query_parts['join'] . $query_parts['where'];
-		$source_languages = $wpdb->get_col( $wpdb->prepare( $sql, $query_parts['vars'] ) );
+		$sql = 'SELECT DISTINCT o.`lang` FROM %i AS o' . $query_parts['join'] . $query_parts['where'];
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts()), all values are passed as prepare() arguments.
+		$source_languages = $wpdb->get_col( $wpdb->prepare( $sql, $this->get_table_name_originals(), ...$query_parts['vars'] ) );
 
 		// get the target languages.
-		$sql              = 'SELECT DISTINCT sl.`language` FROM ' . $this->get_table_name_simplifications() . ' AS sl WHERE sl.`oid` IN ( SELECT o.`id` FROM ' . $this->get_table_name_originals() . ' AS o' . $query_parts['join'] . $query_parts['where'] . ' )';
-		$target_languages = $wpdb->get_col( $wpdb->prepare( $sql, $query_parts['vars'] ) );
+		$sql = 'SELECT DISTINCT sl.`language` FROM %i AS sl WHERE sl.`oid` IN ( SELECT o.`id` FROM %i AS o' . $query_parts['join'] . $query_parts['where'] . ' )';
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts()), all values are passed as prepare() arguments.
+		$target_languages = $wpdb->get_col( $wpdb->prepare( $sql, $this->get_table_name_simplifications(), $this->get_table_name_originals(), ...$query_parts['vars'] ) );
 
 		// return the resulting lists.
 		return array(
@@ -339,6 +431,10 @@ class Db {
 
 	/**
 	 * Return the parts of the SQL-statement for the given filter and order.
+	 *
+	 * The returned SQL fragments contain only fixed SQL and placeholders. Table names are used via the
+	 * placeholder %i. The values for all placeholders in "join" and "where" are returned in "vars"
+	 * in the order of their placeholders ("join" first, then "where").
 	 *
 	 * @param array<string,mixed> $filter The filter.
 	 * @param array<string,mixed> $order The order.
@@ -355,18 +451,17 @@ class Db {
 
 		// set ordering: default goes for title first, then other fields (to show fast proceed as titles are smaller than other texts).
 		$sql_order = " ORDER BY IF( o.field = 'title', 0, 1 ) ASC";
-		if ( ! empty( $order ) && ! empty( $order['order_by'] ) && 'date' === $order['order_by'] && ! empty( $order['order'] ) && in_array(
-			$order['order'],
-			array(
-				'asc',
-				'desc',
-			),
-			true
-		) ) {
-				$sql_order = ' ORDER BY o.time ' . sanitize_text_field( $order['order'] );
+
+		// allowed orderings by date (request value => SQL fragment).
+		$allowed_date_orders = array(
+			'asc'  => ' ORDER BY o.time ASC',
+			'desc' => ' ORDER BY o.time DESC',
+		);
+		if ( ! empty( $order ) && ! empty( $order['order_by'] ) && 'date' === $order['order_by'] && ! empty( $order['order'] ) && is_string( $order['order'] ) && isset( $allowed_date_orders[ $order['order'] ] ) ) {
+			$sql_order = $allowed_date_orders[ $order['order'] ];
 		}
 
-		// init vars-array for prepared statement.
+		// init vars-array for prepared statement (only for placeholders in WHERE, the JOIN-vars are added at the end).
 		$vars = array( '1' );
 
 		if ( ! empty( $filter ) ) {
@@ -388,7 +483,7 @@ class Db {
 			}
 			if ( ! empty( $filter['lang'] ) ) {
 				if ( ! empty( $filter['target_lang'] ) ) {
-					$sql_join[ $this->get_table_name_simplifications() ] = ' LEFT JOIN ' . $this->get_table_name_simplifications() . ' s ON s.oid = o.id';
+					$sql_join[ $this->get_table_name_simplifications() ] = ' LEFT JOIN %i s ON s.oid = o.id';
 					$sql_where .= ' AND (s.language = %s OR o.lang = %s)';
 					$vars[]     = $filter['target_lang'];
 				} else {
@@ -401,7 +496,7 @@ class Db {
 				$vars[]     = $filter['field'];
 			}
 			if ( ! empty( $filter['object_id'] ) ) {
-				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
+				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN %i oo ON oo.oid = o.id';
 				$sql_select .= ', oo.object_id';
 				$sql_where  .= ' AND oo.object_id = %d';
 				$sql_where  .= ' AND oo.blog_id = %d';
@@ -413,7 +508,7 @@ class Db {
 				}
 			}
 			if ( ! empty( $filter['object_type'] ) ) {
-				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
+				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN %i oo ON oo.oid = o.id';
 				$sql_select .= ', oo.object_type';
 				$sql_where  .= ' AND oo.object_type = %s';
 				$sql_where  .= ' AND oo.blog_id = %d';
@@ -421,40 +516,43 @@ class Db {
 				$vars[]      = absint( get_current_blog_id() );
 			}
 			if ( ! empty( $filter['simplification_hash'] ) && ! empty( $filter['simplification_lang'] ) ) {
-				$sql_join[ $this->get_table_name_simplifications() ] = ' INNER JOIN ' . $this->get_table_name_simplifications() . ' s ON s.oid = o.id';
+				$sql_join[ $this->get_table_name_simplifications() ] = ' INNER JOIN %i s ON s.oid = o.id';
 				$sql_where .= ' AND s.hash = %s AND s.language = %s';
 				$vars[]     = $filter['simplification_hash'];
 				$vars[]     = $filter['simplification_lang'];
 			}
 			if ( ! empty( $filter['not_locked'] ) ) {
-				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
+				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN %i oo ON oo.oid = o.id';
 				$sql_select .= ', oo.object_id, oo.object_type';
 			}
 			if ( ! empty( $filter['not_prevented'] ) ) {
-				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
+				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN %i oo ON oo.oid = o.id';
 				$sql_select .= ', oo.object_id, oo.object_type';
 
 				// exclude texts of post-objects where the automatic simplification is prevented.
-				$sql_where .= ' AND NOT EXISTS ( SELECT 1 FROM ' . $wpdb->postmeta . ' pm INNER JOIN ' . $wpdb->posts . ' pp ON pp.ID = pm.post_id WHERE pm.post_id = oo.object_id AND pp.post_type = oo.object_type AND oo.blog_id = %d AND pm.meta_key = %s AND pm.meta_value = %s )';
+				$sql_where .= ' AND NOT EXISTS ( SELECT 1 FROM %i pm INNER JOIN %i pp ON pp.ID = pm.post_id WHERE pm.post_id = oo.object_id AND pp.post_type = oo.object_type AND oo.blog_id = %d AND pm.meta_key = %s AND pm.meta_value = %s )';
+				$vars[]     = $wpdb->postmeta;
+				$vars[]     = $wpdb->posts;
 				$vars[]     = absint( get_current_blog_id() );
 				$vars[]     = 'easy_language_prevent_automatic_mode';
 				$vars[]     = '1';
 			}
 			if ( ! empty( $filter['object_state'] ) ) {
-				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
+				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN %i oo ON oo.oid = o.id';
 				$sql_select .= ', oo.object_id, oo.object_type';
 			}
 			if ( ! empty( $filter['object_not_state'] ) ) {
-				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN ' . $this->get_table_name_originals_objects() . ' oo ON oo.oid = o.id';
+				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN %i oo ON oo.oid = o.id';
 				$sql_select .= ', oo.object_id, oo.object_type';
 
 				// exclude texts of post-objects with the given post-state.
-				$sql_where .= ' AND NOT EXISTS ( SELECT 1 FROM ' . $wpdb->posts . ' ps WHERE ps.ID = oo.object_id AND ps.post_type = oo.object_type AND oo.blog_id = %d AND ps.post_status = %s )';
+				$sql_where .= ' AND NOT EXISTS ( SELECT 1 FROM %i ps WHERE ps.ID = oo.object_id AND ps.post_type = oo.object_type AND oo.blog_id = %d AND ps.post_status = %s )';
+				$vars[]     = $wpdb->posts;
 				$vars[]     = absint( get_current_blog_id() );
 				$vars[]     = $filter['object_not_state'];
 			}
 			if ( ! empty( $filter['has_simplification'] ) ) {
-				$sql_join[ $this->get_table_name_simplifications() ] = ' INNER JOIN ' . $this->get_table_name_simplifications() . ' s ON s.oid = o.id';
+				$sql_join[ $this->get_table_name_simplifications() ] = ' INNER JOIN %i s ON s.oid = o.id';
 			}
 		}
 
@@ -464,7 +562,8 @@ class Db {
 			'join'   => implode( ' ', $sql_join ),
 			'where'  => $sql_where,
 			'order'  => $sql_order,
-			'vars'   => $vars,
+			// each JOIN contains exactly one placeholder for its table name, which is the key of the JOIN.
+			'vars'   => array_merge( array_keys( $sql_join ), $vars ),
 		);
 	}
 
@@ -475,7 +574,7 @@ class Db {
 	 */
 	public function reset_simplifications(): void {
 		global $wpdb;
-		$wpdb->query( sprintf( 'TRUNCATE TABLE `%1$s`', $this->get_table_name_simplifications() ) );
+		$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %i', $this->get_table_name_simplifications() ) );
 	}
 
 	/**

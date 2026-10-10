@@ -13,7 +13,6 @@ defined( 'ABSPATH' ) || exit;
 use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Languages;
-use WP_Query;
 
 /**
  * Object with base functions for each parser-object.
@@ -373,31 +372,11 @@ class Parser_Base {
 					$link_title   = __( 'Original content in %1$s.', 'easy-language' );
 					$link_content = '<span class="dashicons dashicons-admin-home"></span>';
 				} else {
-					$query   = array(
-						'post_type'                       => get_post_type( $post_object->get_id() ),
-						'post_status'                     => 'any',
-						'meta_query'                      => array(
-							'relation' => 'AND',
-							array(
-								'key'     => 'easy_language_simplification_original_id',
-								'value'   => $original_object_id,
-								'compare' => '=',
-							),
-							array(
-								'key'     => 'easy_language_simplification_language',
-								'value'   => $language_code,
-								'compare' => '=',
-							),
-						),
-						'fields'                          => 'ids',
-						'posts_per_page'                  => 1,
-						'do_not_use_easy_language_filter' => true,
-						'suppress_filters'                => true,
-					);
-					$results = new WP_Query( $query );
-					if ( 1 === $results->post_count ) {
+					// get the simplified object in this language (independent of language filters, e.g. from WPML).
+					$simplified_object_id = $this->get_simplified_object_id( $original_object_id, (string) get_post_type( $post_object->get_id() ), (string) $language_code );
+					if ( $simplified_object_id > 0 ) {
 						// get post as our own object.
-						$post_obj = new Post_Object( absint( $results->posts[0] ) );
+						$post_obj = new Post_Object( $simplified_object_id );
 
 						// get page builder.
 						$new_page_builder_obj = $post_obj->get_page_builder();
@@ -428,6 +407,68 @@ class Parser_Base {
 			// reset the object ID on the page builder object.
 			$page_builder_obj->set_object_id( $original_object_id );
 		}
+	}
+
+	/**
+	 * Return the ID of the simplified object of the given original object in the given language.
+	 *
+	 * Uses a direct query on the post meta to get the simplified object independent of language
+	 * filters of other plugins (e.g. WPML would only return objects in the actual admin language).
+	 * The result corresponds to a WP_Query with post_status "any", ordered by date, limited to one result.
+	 *
+	 * @param int    $original_object_id The ID of the original object.
+	 * @param string $post_type          The post type of the objects.
+	 * @param string $language_code      The language code of the simplification.
+	 *
+	 * @return int The ID of the simplified object or 0 if none exists.
+	 */
+	private function get_simplified_object_id( int $original_object_id, string $post_type, string $language_code ): int {
+		global $wpdb;
+
+		// use the default post type of WP_Query if none is given.
+		if ( empty( $post_type ) ) {
+			$post_type = 'post';
+		}
+
+		// get the matching objects, newest first.
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT p.`ID`, p.`post_status`
+					FROM %i p
+					INNER JOIN %i m1 ON ( m1.`post_id` = p.`ID` AND m1.`meta_key` = %s )
+					INNER JOIN %i m2 ON ( m2.`post_id` = p.`ID` AND m2.`meta_key` = %s )
+					WHERE p.`post_type` = %s AND m1.`meta_value` = %s AND m2.`meta_value` = %s
+					GROUP BY p.`ID`, p.`post_status`, p.`post_date`
+					ORDER BY p.`post_date` DESC',
+				$wpdb->posts,
+				$wpdb->postmeta,
+				'easy_language_simplification_original_id',
+				$wpdb->postmeta,
+				'easy_language_simplification_language',
+				$post_type,
+				(string) $original_object_id,
+				$language_code
+			),
+			ARRAY_A
+		);
+
+		// bail if no object could be found.
+		if ( empty( $results ) ) {
+			return 0;
+		}
+
+		// get the post states which are excluded by post_status "any" (e.g. trash and auto-draft).
+		$excluded_post_states = get_post_stati( array( 'exclude_from_search' => true ) );
+
+		// return the first object which is not in an excluded state.
+		foreach ( $results as $result ) {
+			if ( ! in_array( $result['post_status'], $excluded_post_states, true ) ) {
+				return absint( $result['ID'] );
+			}
+		}
+
+		// return 0 if no object could be found.
+		return 0;
 	}
 
 	/**

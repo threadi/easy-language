@@ -76,7 +76,7 @@ class Undetected extends Parser_Base implements Parser {
 		 *
 		 * @param string $content The content.
 		 */
-		$content = apply_filters( 'the_content', $content );
+		$content = apply_filters( 'the_content', $content ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Intentionally applies the WordPress core filter the_content.
 		if ( ! empty( $content ) ) {
 			return array(
 				array(
