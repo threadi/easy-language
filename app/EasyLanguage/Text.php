@@ -161,7 +161,7 @@ class Text {
 		}
 
 		// get from DB.
-		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `simplification` FROM ' . Db::get_instance()->get_table_name_simplifications() . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
+		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `simplification` FROM %i WHERE `oid` = %d AND `language` = %s', array( Db::get_instance()->get_table_name_simplifications(), $this->get_id(), $language ) ), ARRAY_A );
 		if ( ! empty( $result ) ) {
 			// save in the object.
 			$this->simplifications[ $language ] = $result['simplification'];
@@ -431,16 +431,16 @@ class Text {
 		$db = Db::get_instance();
 
 		// get from DB.
-		$prepared_sql = $wpdb->prepare(
-			'SELECT o.`id`, oo.`object_type`, oo.`object_id`, oo.`page_builder`, o.`field`, oo.`state`
-				FROM ' . $db->get_table_name_originals_objects() . ' oo
-				JOIN ' . $db->get_table_name_originals() . ' o ON (o.id = oo.oid)
-				WHERE oo.`oid` = %d AND oo.`blog_id` = %d',
-			array( $this->get_id(), get_current_blog_id() )
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT o.`id`, oo.`object_type`, oo.`object_id`, oo.`page_builder`, o.`field`, oo.`state`
+					FROM %i oo
+					JOIN %i o ON (o.id = oo.oid)
+					WHERE oo.`oid` = %d AND oo.`blog_id` = %d',
+				array( $db->get_table_name_originals_objects(), $db->get_table_name_originals(), $this->get_id(), get_current_blog_id() )
+			),
+			ARRAY_A
 		);
-
-		// get the results.
-		$results = $wpdb->get_results( $prepared_sql, ARRAY_A );
 
 		// return empty array on no results.
 		if ( empty( $results ) ) {
@@ -489,15 +489,14 @@ class Text {
 		global $wpdb;
 
 		// get from DB.
-		$prepared_sql = $wpdb->prepare(
-			'SELECT o.`time`
-				FROM ' . Db::get_instance()->get_table_name_originals() . ' o
-				WHERE o.`id` = %d',
-			array( $this->get_id() )
+		$result = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT o.`time`
+					FROM %i o
+					WHERE o.`id` = %d',
+				array( Db::get_instance()->get_table_name_originals(), $this->get_id() )
+			)
 		);
-
-		// get result.
-		$result = $wpdb->get_var( $prepared_sql );
 
 		// bail if no result could be found.
 		if ( ! is_string( $result ) ) {
@@ -578,15 +577,15 @@ class Text {
 		global $wpdb;
 
 		// get from DB.
-		$prepared_sql = $wpdb->prepare(
-			'SELECT s.`used_api`
-				FROM ' . Db::get_instance()->get_table_name_simplifications() . ' s
-				WHERE s.`oid` = %d',
-			array( $this->get_id() )
+		$result = (array) $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT s.`used_api`
+					FROM %i s
+					WHERE s.`oid` = %d',
+				array( Db::get_instance()->get_table_name_simplifications(), $this->get_id() )
+			),
+			ARRAY_A
 		);
-
-		// get result.
-		$result = (array) $wpdb->get_results( $prepared_sql, ARRAY_A );
 
 		// get API-object if its name could be read.
 		if ( ! empty( $result ) ) {
@@ -607,7 +606,7 @@ class Text {
 		global $wpdb;
 
 		// get from DB.
-		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `user_id` FROM ' . Db::get_instance()->get_table_name_simplifications() . ' WHERE `oid` = %d AND `language` = %s', array( $this->get_id(), $language ) ), ARRAY_A );
+		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `user_id` FROM %i WHERE `oid` = %d AND `language` = %s', array( Db::get_instance()->get_table_name_simplifications(), $this->get_id(), $language ) ), ARRAY_A );
 		if ( ! empty( $result ) ) {
 			// return result.
 			return $result['user_id'];
@@ -626,15 +625,14 @@ class Text {
 		global $wpdb;
 
 		// get from DB.
-		$prepared_sql = $wpdb->prepare(
-			'SELECT o.`html`
-				FROM ' . Db::get_instance()->get_table_name_originals() . ' o
-				WHERE o.`id` = %d',
-			array( $this->get_id() )
+		$result = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT o.`html`
+					FROM %i o
+					WHERE o.`id` = %d',
+				array( Db::get_instance()->get_table_name_originals(), $this->get_id() )
+			)
 		);
-
-		// get result.
-		$result = $wpdb->get_var( $prepared_sql );
 
 		// return the result (false if no entry could be found).
 		return 1 === absint( $result );

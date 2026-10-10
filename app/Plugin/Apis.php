@@ -276,7 +276,7 @@ class Apis {
 		global $wpdb;
 
 		// delete the entries.
-		$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . Log_Api::get_instance()->get_table_name() . ' WHERE `api` = %s', array( $api_object->get_name() ) ) );
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `api` = %s', array( Log_Api::get_instance()->get_table_name(), $api_object->get_name() ) ) );
 
 		// redirect user back.
 		wp_safe_redirect( Helper::get_referer_url() );

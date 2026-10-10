@@ -152,6 +152,7 @@ class Helper {
 		if ( self::is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' ) ) {
 			global $sitepress;
 			if ( $sitepress instanceof \SitePress ) { // @phpstan-ignore class.notFound
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Filter wpml_default_language of the plugin WPML to get its default language.
 				$wp_language = $sitepress->get_locale_from_language_code( apply_filters( 'wpml_default_language', null ) ); // @phpstan-ignore class.notFound
 			}
 		}
@@ -534,6 +535,7 @@ class Helper {
 		 * Consider the main language set in WPML for the web page
 		 */
 		if ( self::is_plugin_active( 'sitepress-multilingual-cms/sitepress.php' ) ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Filter wpml_post_language_details of the plugin WPML to get the language of the object.
 			$language_details = apply_filters( 'wpml_post_language_details', null, $object->get_id() );
 			if ( ! empty( $language_details ) ) {
 				return $language_details['locale'];

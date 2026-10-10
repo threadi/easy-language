@@ -200,7 +200,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check if our languages do already exist in wpml-db.
 		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
 			// check if this language is already used in WPML.
-			$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `id` FROM ' . Db::get_instance()->get_wpdb_prefix() . 'icl_languages WHERE code = %s', array( $language_code ) ) );
+			$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `id` FROM %i WHERE code = %s', array( Db::get_instance()->get_wpdb_prefix() . 'icl_languages', $language_code ) ) );
 
 			// bail if this language is already in WPML.
 			if ( ! empty( $result ) ) {

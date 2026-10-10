@@ -11,6 +11,7 @@ namespace easyLanguage\Plugin\Tables;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Plugin\Helper;
+use easyLanguage\Plugin\Log_Api;
 use WP_List_Table;
 
 /**
@@ -58,26 +59,25 @@ class Log_Api_Table extends WP_List_Table {
 			$order = 'desc';
 		}
 
-		// define vars for prepared statement.
-		$vars = array(
-			1,
-			$order_by,
-			$order,
-		);
+		// get the table name.
+		$table_name = Log_Api::get_instance()->get_table_name();
 
 		// get filter.
-		$api   = $this->get_api_filter();
-		$where = '';
+		$api = $this->get_api_filter();
+
+		// get results filtered by API and return them.
 		if ( ! empty( $api ) ) {
-			$where .= ' AND `api` = "%4$s"';
-			$vars[] = $api;
+			if ( 'asc' === $order ) {
+				return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d AND `api` = %s ORDER BY %i ASC, `id` DESC', array( $table_name, 1, $api, $order_by ) ), ARRAY_A );
+			}
+			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d AND `api` = %s ORDER BY %i DESC, `id` DESC', array( $table_name, 1, $api, $order_by ) ), ARRAY_A );
 		}
 
-		// get the SQL statement.
-		$sql = $this->get_base_sql() . $where . ' ORDER BY %2$s %3$s, `id` DESC';
-
-		// get results and return them.
-		return $wpdb->get_results( $wpdb->prepare( $sql, $vars ), ARRAY_A );
+		// get all results and return them.
+		if ( 'asc' === $order ) {
+			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d ORDER BY %i ASC, `id` DESC', array( $table_name, 1, $order_by ) ), ARRAY_A );
+		}
+		return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d ORDER BY %i DESC, `id` DESC', array( $table_name, 1, $order_by ) ), ARRAY_A );
 	}
 
 	/**
@@ -159,8 +159,7 @@ class Log_Api_Table extends WP_List_Table {
 		);
 
 		// get all apis from entries and add them to the list.
-		$sql        = $this->get_base_sql();
-		$entries    = $wpdb->get_results( $wpdb->prepare( $sql, array( 1 ) ), ARRAY_A );
+		$entries    = $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d', array( Log_Api::get_instance()->get_table_name(), 1 ) ), ARRAY_A );
 		$apis_array = array();
 		foreach ( $entries as $item ) {
 			if ( empty( $apis_array[ $item['api'] ] ) ) {
@@ -246,15 +245,6 @@ class Log_Api_Table extends WP_List_Table {
 
 		// return the API from the request.
 		return $api;
-	}
-
-	/**
-	 * Return base-SQL-statement to get api logs.
-	 *
-	 * @return string
-	 */
-	private function get_base_sql(): string {
-		return 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM `' . \easyLanguage\Plugin\Log_Api::get_instance()->get_table_name() . '` WHERE 1 = %1$d';
 	}
 
 	/**

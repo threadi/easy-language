@@ -243,6 +243,7 @@ class Themify extends Parser_Base implements Parser {
 		}
 
 		// trigger the save_post-hook for this post.
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Intentionally triggers the WordPress core hook save_post.
 		do_action( 'save_post', $post->ID, $post, true );
 	}
 

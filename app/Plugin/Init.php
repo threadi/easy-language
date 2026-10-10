@@ -400,7 +400,7 @@ class Init {
 		global $wpdb;
 
 		// clear the log.
-		$wpdb->query( $wpdb->prepare( 'DELETE FROM `' . Log::get_instance()->get_table_name() . '` WHERE 1 = %d', array( 1 ) ) );
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE 1 = %d', array( Log::get_instance()->get_table_name(), 1 ) ) );
 
 		// redirect user back.
 		wp_safe_redirect( Helper::get_referer_url() );
