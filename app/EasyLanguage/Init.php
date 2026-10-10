@@ -577,34 +577,26 @@ class Init extends Base implements ThirdPartySupport_Base {
 			$hide_simplified_posts = true;
 		}
 		if ( $hide_simplified_posts ) {
-			$query->set(
-				'meta_query',
+			// get the existing meta query (e.g. from our own posts_filter()) to merge it with ours.
+			$existing_meta_query = $query->get( 'meta_query' );
+
+			// define our meta query.
+			$meta_query = array(
 				array(
-					array(
-						'key'     => 'easy_language_simplification_original_id',
-						'compare' => 'NOT EXISTS',
-					),
-				)
+					'key'     => 'easy_language_simplification_original_id',
+					'compare' => 'NOT EXISTS',
+				),
 			);
 
 			// get language from request.
 			$language = filter_input( INPUT_GET, 'lang', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-			if ( is_null( $language ) ) {
-				return;
-			}
 
 			// check if the requested language is supported by our plugin.
 			$languages = $api->get_active_target_languages();
 
-			// bail if requested language is not supported by this API.
-			if ( empty( $languages[ $language ] ) ) {
-				return;
-			}
-
 			// change the request for post to show only them who are simplified in the given language.
-			$query->set(
-				'meta_query',
-				array(
+			if ( ! is_null( $language ) && ! empty( $languages[ $language ] ) ) {
+				$meta_query = array(
 					'relation' => 'AND',
 					array(
 						'key'     => 'easy_language_simplified_in',
@@ -615,8 +607,20 @@ class Init extends Base implements ThirdPartySupport_Base {
 						'key'     => 'easy_language_simplification_original_id',
 						'compare' => 'NOT EXISTS',
 					),
-				)
-			);
+				);
+			}
+
+			// merge it with the existing meta query.
+			if ( is_array( $existing_meta_query ) && ! empty( $existing_meta_query ) ) {
+				$meta_query = array(
+					'relation' => 'AND',
+					$existing_meta_query,
+					$meta_query,
+				);
+			}
+
+			// set the resulting meta query.
+			$query->set( 'meta_query', $meta_query );
 		}
 	}
 
@@ -826,6 +830,71 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
+	 * Return whether the given taxonomy is supported.
+	 *
+	 * @param string $taxonomy The name of the requested taxonomy.
+	 *
+	 * @return bool
+	 */
+	public function is_taxonomy_supported( string $taxonomy ): bool {
+		return ! empty( $taxonomy ) && array_key_exists( $taxonomy, $this->get_supported_taxonomies() );
+	}
+
+	/**
+	 * Return whether the actual user is allowed to edit the given object.
+	 *
+	 * Checks the object-specific capability (edit_post or edit_term) and if the post-type or taxonomy is supported.
+	 *
+	 * @param int    $object_id The ID of the object.
+	 * @param string $object_type The type of the object (post-type or taxonomy).
+	 *
+	 * @return bool
+	 */
+	public function current_user_can_edit_object( int $object_id, string $object_type ): bool {
+		// bail if no ID is given.
+		if ( 0 === $object_id ) {
+			return false;
+		}
+
+		// check terms.
+		if ( ! empty( $object_type ) && taxonomy_exists( $object_type ) ) {
+			// bail if taxonomy is not supported.
+			if ( ! $this->is_taxonomy_supported( $object_type ) ) {
+				return false;
+			}
+
+			// bail if term does not exist in this taxonomy.
+			if ( ! get_term( $object_id, $object_type ) instanceof WP_Term ) {
+				return false;
+			}
+
+			// return whether the user could edit this term.
+			return current_user_can( 'edit_term', $object_id );
+		}
+
+		// get the post.
+		$post = get_post( $object_id );
+
+		// bail if post does not exist.
+		if ( ! $post instanceof WP_Post ) {
+			return false;
+		}
+
+		// bail if the given type does not match the post-type.
+		if ( ! empty( $object_type ) && $object_type !== $post->post_type ) {
+			return false;
+		}
+
+		// bail if post-type is not supported.
+		if ( ! $this->is_post_type_supported( $post->post_type ) ) {
+			return false;
+		}
+
+		// return whether the user could edit this post.
+		return current_user_can( 'edit_post', $object_id );
+	}
+
+	/**
 	 * Run on plugin-activation.
 	 *
 	 * @return void
@@ -920,13 +989,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// set intervall for automatic simplifications.
 		if ( ! get_option( 'easy_language_automatic_simplification' ) ) {
-			update_option( 'easy_language_automatic_simplification', '10minutely' );
+			update_option( 'easy_language_automatic_simplification', 'easy_language_15minutly' );
 		}
 
 		// check if automatic interval exist, if not create it.
 		if ( ! wp_next_scheduled( 'easy_language_automatic_simplification' ) ) {
 			// add it.
-			wp_schedule_event( time(), get_option( 'easy_language_automatic_simplification', '10minutely' ), 'easy_language_automatic_simplification' );
+			wp_schedule_event( time(), get_option( 'easy_language_automatic_simplification', 'easy_language_15minutly' ), 'easy_language_automatic_simplification' );
 		}
 
 		// set db cache for icons.
@@ -1042,10 +1111,10 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// delete switcher for classic menu.
 		$query    = array(
-			'post_type'     => EASY_LANGUAGE_CPT_SWITCHER,
-			'post_status'   => 'any',
-			'post_per_page' => -1,
-			'fields'        => 'ids',
+			'post_type'      => EASY_LANGUAGE_CPT_SWITCHER,
+			'post_status'    => 'any',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
 		);
 		$switcher = new WP_Query( $query );
 		foreach ( $switcher->get_posts() as $post_id ) {
@@ -1069,6 +1138,15 @@ class Init extends Base implements ThirdPartySupport_Base {
 		foreach ( $options as $option ) {
 			delete_option( $option );
 		}
+
+		// delete the object-specific simplification markers.
+		global $wpdb;
+		foreach ( array( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS ) as $marker ) {
+			$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $wpdb->options . ' WHERE `option_name` LIKE %s', $wpdb->esc_like( $marker . '_' ) . '%' ) );
+		}
+
+		// delete the cached simplification process counts.
+		delete_transient( 'easy_language_simplification_process_counts' );
 
 		// schedule deaktivieren.
 		wp_clear_scheduled_hook( 'easy_language_automatic_simplification' );
@@ -1405,7 +1483,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				// do not show anything if the used page builder plugin is not available.
 				if ( false === $page_builder->is_active() ) {
 					/* translators: %1$s will be replaced by the name of the PageBuilder (like Elementor) */
-					echo '<span class="dashicons dashicons-warning easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) . '" title="' . esc_attr( sprintf( esc_html__( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
+					$actions[ 'easy-language-' . $language_code ] = '<span class="dashicons dashicons-warning easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_dialog_for_unavailable_page_builder( $post_object, $page_builder ) ) . '" title="' . esc_attr( sprintf( esc_html__( 'Used page builder %1$s not available', 'easy-language' ), esc_html( $page_builder->get_name() ) ) ) . '"></span>';
 				} else {
 					// create link to edit the simplification post.
 					$edit_translation = $page_builder->get_edit_link();
@@ -1566,7 +1644,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$post_types = $this->get_supported_post_types();
 		foreach ( $post_types as $post_type => $enabled ) {
 			if ( $post_type === $called_post_type && 1 === absint( $enabled ) ) {
-				remove_action( 'pre_get_posts', array( $this, 'hide_translated_objects' ) );
+				// hint: the meta_query set here will be merged with the one from hide_simplified_posts().
 				switch ( $selected_option ) {
 					case 'translated':
 						// get all objects WITH translation-objects.
@@ -1722,8 +1800,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 			// get object.
 			$object = Helper::get_object( $object_id, $object_type );
 
-			// bail if the object is not a simplified object.
-			if ( false === $object || ! $object->is_simplified() ) {
+			// bail if the object is not a simplified object or the user is not allowed to edit it.
+			if ( false === $object || ! $object->is_simplified() || ! $this->current_user_can_edit_object( $object_id, (string) $object_type ) ) {
 				// Log event.
 				/* translators: %1$d will be replaced by an ID, %2$s by a type name. */
 				Log::get_instance()->add_log( sprintf( __( 'Requested object %1$d (%2$s) is not intended to be simplified.', 'easy-language' ), $object_id, $object_type ), 'error' );
@@ -1789,31 +1867,31 @@ class Init extends Base implements ThirdPartySupport_Base {
 			$object->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping(), absint( get_option( 'easy_language_api_text_limit_per_process', 1 ) ), $initialization );
 
 			// get running simplifications.
-			$running_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, array() );
+			$running_simplifications = $object->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING );
 
 			// get max value for running simplifications.
-			$max_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, array() );
+			$max_simplifications = $object->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX );
 
 			// get count value for running simplifications.
-			$count_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, array() );
+			$count_simplifications = $object->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT );
 
 			// get the result (if set).
-			$results = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, array() );
+			$results = $object->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS );
 
 			// check if all values are available and return the general error if not.
-			if ( ! isset( $count_simplifications[ $object->get_md5() ] ) || ! isset( $max_simplifications[ $object->get_md5() ] ) || ! isset( $running_simplifications[ $object->get_md5() ] ) || ! isset( $results[ $object->get_md5() ] ) ) {
+			if ( is_null( $count_simplifications ) || is_null( $max_simplifications ) || is_null( $running_simplifications ) || is_null( $results ) ) {
 				/* translators: %1$s will be replaced by the API title. */
 				$error_message = sprintf( '<p>' . __( 'Error: Simplification failed with %1$s:', 'easy-language' ) . '</p>', esc_html( $api_obj->get_title() ) ) . '<ul>';
-				if ( ! isset( $count_simplifications[ $object->get_md5() ] ) ) {
+				if ( is_null( $count_simplifications ) ) {
 					$error_message .= '<li>' . __( 'counting failed', 'easy-language' ) . '</li>';
 				}
-				if ( ! isset( $max_simplifications[ $object->get_md5() ] ) ) {
+				if ( is_null( $max_simplifications ) ) {
 					$error_message .= '<li>' . __( 'max value failed', 'easy-language' ) . '</li>';
 				}
-				if ( ! isset( $running_simplifications[ $object->get_md5() ] ) ) {
+				if ( is_null( $running_simplifications ) ) {
 					$error_message .= '<li>' . __( 'running marker failed', 'easy-language' ) . '</li>';
 				}
-				if ( ! isset( $results[ $object->get_md5() ] ) ) {
+				if ( is_null( $results ) ) {
 					$error_message .= '<li>' . __( 'no result returned', 'easy-language' ) . '</li>';
 				}
 				$error_message .= '</ul>';
@@ -1851,10 +1929,10 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 			// collect return array.
 			$return = array(
-				absint( $count_simplifications[ $object->get_md5() ] ),
-				absint( $max_simplifications[ $object->get_md5() ] ),
-				absint( $running_simplifications[ $object->get_md5() ] ),
-				$results[ $object->get_md5() ],
+				absint( $count_simplifications ),
+				absint( $max_simplifications ),
+				absint( $running_simplifications ),
+				$results,
 			);
 			wp_send_json( $return );
 		}
@@ -2096,7 +2174,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// bail if deletion is already running.
-		if ( 1 === absint( get_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING, 0 ) ) ) {
+		if ( $this->is_deletion_running() ) {
 			// Log event.
 			Log::get_instance()->add_log( __( 'Deletion of simplified texts is already running.', 'easy-language' ), 'error' );
 
@@ -2104,32 +2182,70 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return;
 		}
 
-		// set this as running.
-		update_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING, 1 );
+		// set this as running with the actual timestamp.
+		update_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING, time(), false );
 
-		// get all simplified text-entries.
-		$entries = Db::get_instance()->get_entries();
+		try {
+			// get the IDs of all simplified text-entries.
+			$entry_ids = Db::get_instance()->get_entry_ids();
 
-		// set max entry count.
-		update_option( EASY_LANGUAGE_OPTION_DELETION_MAX, count( $entries ) );
+			// set max entry count.
+			update_option( EASY_LANGUAGE_OPTION_DELETION_MAX, count( $entry_ids ), false );
 
-		// set counter to 0.
-		update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, 0 );
+			// set counter to 0.
+			update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, 0, false );
 
-		// loop through the entries and delete them.
-		foreach ( $entries as $entry ) {
-			$entry->delete();
+			// counter for deleted entries.
+			$count = 0;
 
-			// update counter.
-			update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, absint( get_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, 0 ) ) + 1 ); // @phpstan-ignore argument.type
+			// loop through the entries in batches and delete them.
+			foreach ( array_chunk( $entry_ids, 100 ) as $batch ) {
+				// extend the time limit for each batch, if possible.
+				if ( function_exists( 'set_time_limit' ) && false === strpos( (string) ini_get( 'disable_functions' ), 'set_time_limit' ) ) {
+					set_time_limit( 60 );
+				}
 
-			// log this event.
-			/* translators: %1$d wll be replaced by an ID. */
-			Log::get_instance()->add_log( sprintf( __( 'Text %1$d deleted', 'easy-language' ), $entry->get_id() ), 'success' );
+				foreach ( $batch as $entry_id ) {
+					// delete the entry.
+					$entry = new Text( $entry_id );
+					$entry->delete();
+					++$count;
+
+					// log this event.
+					/* translators: %1$d wll be replaced by an ID. */
+					Log::get_instance()->add_log( sprintf( __( 'Text %1$d deleted', 'easy-language' ), $entry_id ), 'success' );
+				}
+
+				// update counter.
+				update_option( EASY_LANGUAGE_OPTION_DELETION_COUNT, $count, false );
+
+				// update the running marker to show that the deletion is still alive.
+				update_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING, time(), false );
+			}
+		} finally {
+			// remove running marker, also on errors.
+			delete_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING );
+		}
+	}
+
+	/**
+	 * Return whether a deletion of simplified data is actually running.
+	 *
+	 * A running marker older than 10 minutes is handled as orphaned.
+	 *
+	 * @return bool
+	 */
+	private function is_deletion_running(): bool {
+		// get the running marker, which is the timestamp of the last activity.
+		$running = absint( get_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING, 0 ) );
+
+		// bail if no deletion is running.
+		if ( 0 === $running ) {
+			return false;
 		}
 
-		// remove running marker.
-		delete_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING );
+		// return whether the marker is not orphaned.
+		return ( time() - $running ) < 10 * MINUTE_IN_SECONDS;
 	}
 
 	/**
@@ -2142,8 +2258,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check nonce.
 		check_ajax_referer( 'easy-language-get-delete-data-nonce', 'nonce' );
 
+		// bail if capability is not given.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			wp_die( '', '', array( 'response' => 403 ) );
+		}
+
 		// get running deletion.
-		$running_deletion = get_option( EASY_LANGUAGE_OPTION_DELETION_RUNNING, 0 );
+		$running_deletion = $this->is_deletion_running() ? 1 : 0;
 
 		// get max value for running deletion.
 		$max_deletions = get_option( EASY_LANGUAGE_OPTION_DELETION_MAX, 0 );
@@ -2153,6 +2274,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// collect return value.
 		echo absint( $count_deletion ) . ';' . absint( $max_deletions ) . ';' . absint( $running_deletion );
+
+		// end the request.
+		wp_die();
 	}
 
 	/**
@@ -2175,6 +2299,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// get the object-type from the request.
 		$object_type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
+
+		// bail if the user is not allowed to edit this object.
+		if ( ! $this->current_user_can_edit_object( $object_id, $object_type ) ) {
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to edit this object.', 'easy-language' ) ), 403 );
+		}
 
 		if ( $object_id > 0 ) {
 			$filter = array(
@@ -2213,6 +2342,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// get the object-type from the request.
 		$object_type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
+
+		// bail if the user is not allowed to edit this object.
+		if ( ! $this->current_user_can_edit_object( $object_id, $object_type ) ) {
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to edit this object.', 'easy-language' ) ), 403 );
+		}
 
 		if ( absint( $object_id ) > 0 ) {
 			$filter = array(
@@ -2342,7 +2476,32 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// get language.
 		$target_language = isset( $_POST['language'] ) ? sanitize_text_field( wp_unslash( $_POST['language'] ) ) : '';
 
-		if ( $original_id > 0 && ! empty( $target_language ) && ! empty( $original_type ) ) {
+		// bail if the user is not allowed to edit the original object.
+		if ( ! $this->current_user_can_edit_object( $original_id, $original_type ) ) {
+			wp_send_json_error(
+				array(
+					'status'  => 'error',
+					'message' => __( 'You are not allowed to simplify this object.', 'easy-language' ),
+				),
+				403
+			);
+		}
+
+		// get language for output its title.
+		$languages = Languages::get_instance()->get_active_languages();
+
+		// bail if the target language is not active.
+		if ( empty( $languages[ $target_language ] ) ) {
+			wp_send_json_error(
+				array(
+					'status'  => 'error',
+					'message' => __( 'The requested language is not active.', 'easy-language' ),
+				),
+				400
+			);
+		}
+
+		if ( $original_id > 0 && ! empty( $original_type ) ) {
 			// get the object.
 			$object = Helper::get_object( $original_id, $original_type );
 
@@ -2360,9 +2519,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 				// return result.
 				wp_send_json( $return );
 			}
-
-			// get language for output its title.
-			$languages = Languages::get_instance()->get_active_languages();
 
 			// get simplification-list-url.
 			$simplification_list_url = add_query_arg(
@@ -2423,9 +2579,24 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return;
 		}
 
+		// get the counts from cache.
+		$counts = get_transient( 'easy_language_simplification_process_counts' );
+
+		// get the counts via DB if they are not cached.
+		if ( ! is_array( $counts ) ) {
+			$db     = Db::get_instance();
+			$counts = array(
+				'all'         => $db->count_entries(),
+				'simplified'  => $db->count_entries( array( 'has_simplification' => true ) ),
+				'to_simplify' => $db->count_entries( $this->get_filter_for_entries_to_simplify() ),
+			);
+
+			// cache them for a short time.
+			set_transient( 'easy_language_simplification_process_counts', $counts, MINUTE_IN_SECONDS );
+		}
+
 		// get _all_ items.
-		$all_entries       = Db::get_instance()->get_entries();
-		$all_entries_count = count( $all_entries );
+		$all_entries_count = absint( $counts['all'] );
 
 		// bail if we have no entries at all.
 		if ( 0 === $all_entries_count ) {
@@ -2433,12 +2604,10 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// get already simplified items.
-		$simplified_entries       = Db::get_instance()->get_entries( array( 'has_simplification' => true ) );
-		$simplified_entries_count = count( $simplified_entries );
+		$simplified_entries_count = absint( $counts['simplified'] );
 
 		// get actual items to process the simplification in background.
-		$entries_to_simplify       = Db::get_instance()->get_entries( $this->get_filter_for_entries_to_simplify() );
-		$entries_to_simplify_count = count( $entries_to_simplify );
+		$entries_to_simplify_count = absint( $counts['to_simplify'] );
 		$processed                 = ( ( $all_entries_count - $entries_to_simplify_count ) / $all_entries_count ) * 100;
 
 		// get link to list of texts to simplify.
@@ -2494,13 +2663,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// get object id.
 		$object_id = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : 0;
 
-		// bail if capability is not granted.
-		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
-			wp_send_json( $return );
-		}
-
 		// get object type.
 		$object_type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( 'edit_el_simplifier' ) || ! $this->current_user_can_edit_object( $object_id, $object_type ) ) {
+			wp_send_json_error( array( 'message' => __( 'You are not allowed to edit this object.', 'easy-language' ) ), 403 );
+		}
 
 		// is automatic mode prevented?
 		$prevent_automatic_mode = isset( $_POST['prevent_automatic_simplification'] ) && 'true' === $_POST['prevent_automatic_simplification'];
@@ -2594,7 +2763,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check if automatic intervall exist, if not create it.
 		if ( ! wp_next_scheduled( 'easy_language_automatic_simplification' ) ) {
 			// add it.
-			wp_schedule_event( time(), get_option( 'easy_language_automatic_simplification', '10minutely' ), 'easy_language_automatic_simplification' );
+			wp_schedule_event( time(), get_option( 'easy_language_automatic_simplification', 'easy_language_15minutly' ), 'easy_language_automatic_simplification' );
 		}
 
 		// redirect user back to previous page.
@@ -2649,8 +2818,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return $resulting_object;
 		}
 
-		// we assume this is a term.
-		$term = get_term( $object_id );
+		// bail if the requested type is not a taxonomy.
+		if ( empty( $object_type ) || ! taxonomy_exists( $object_type ) ) {
+			return false;
+		}
+
+		// get the term in the given taxonomy.
+		$term = get_term( $object_id, $object_type );
 
 		// bail if term could not be loaded.
 		if ( ! $term instanceof WP_Term ) {
@@ -2663,7 +2837,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// return our object.
-		return new Term_Object( $object_id, $object_type );
+		return new Term_Object( $object_id, $term->taxonomy );
 	}
 
 	/**
@@ -2804,15 +2978,29 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// if this is an original object, check its contents.
 		if ( $term_obj->is_simplifiable() ) {
+			// get the actual texts of the term.
+			$description = get_term_field( 'description', $term_id, $args['taxonomy'] );
+			$texts       = array(
+				'taxonomy_title'       => $term_obj->get_name(),
+				'taxonomy_description' => is_string( $description ) ? $description : '',
+			);
+
 			// get all simplifications for this object in all active languages.
 			foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
 				$translated_post_id = $term_obj->get_simplification_in_language( $language_code );
 
+				// bail if no simplification exists in this language.
+				if ( 0 === $translated_post_id ) {
+					continue;
+				}
+
 				// loop through the resulting texts and check if the text has been changed (aka: is not available in simplification-db).
-				foreach ( array(
-					'taxonomy_title'       => '',
-					'taxonomy_description' => '',
-				) as $field => $text ) {
+				foreach ( $texts as $field => $text ) {
+					// bail if the text is empty.
+					if ( empty( $text ) ) {
+						continue;
+					}
+
 					$filter = array(
 						'object_id'   => $translated_post_id,
 						'object_type' => $term_obj->get_type(),
@@ -3097,16 +3285,16 @@ class Init extends Base implements ThirdPartySupport_Base {
 			),
 		);
 
-		// get debug config.
-		$config = isset( $_POST['config'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['config'] ) ) : array();
-
-		// bail if no config is given.
-		if ( empty( $config ) ) {
+		// bail if capability is not granted.
+		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json( $dialog );
 		}
 
-		// bail if capability is not granted.
-		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
+		// get debug config.
+		$config = isset( $_POST['config'] ) && is_array( $_POST['config'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['config'] ) ) : array();
+
+		// bail if no valid config is given.
+		if ( empty( $config ) || ! isset( $config['id'], $config['type'] ) ) {
 			wp_send_json( $dialog );
 		}
 

@@ -78,7 +78,11 @@ class Rewrite {
 
 		// refresh-handling.
 		add_action( 'update_option_show_on_front', array( $this, 'set_refresh' ), 10, 0 );
-		add_action( 'wp', array( $this, 'do_refresh' ) );
+
+		// refresh the rules at the end of "init": all post types and our rules are registered then,
+		// and WordPress has not parsed the request yet. So the request, which runs the refresh,
+		// is already handled with the new rules (and does not end in a 404).
+		add_action( 'init', array( $this, 'do_refresh' ), PHP_INT_MAX );
 	}
 
 	/**
@@ -99,10 +103,16 @@ class Rewrite {
 	 * @noinspection PhpUnused
 	 */
 	public function do_refresh(): void {
-		if ( is_user_logged_in() && false !== get_transient( 'easy_language_refresh_rewrite_rules' ) ) {
-			flush_rewrite_rules();
-			delete_transient( 'easy_language_refresh_rewrite_rules' );
+		// bail if no refresh is requested.
+		if ( false === get_transient( 'easy_language_refresh_rewrite_rules' ) ) {
+			return;
 		}
+
+		// remove the marker first, so parallel requests do not refresh again.
+		delete_transient( 'easy_language_refresh_rewrite_rules' );
+
+		// refresh the rules in the database. The .htaccess is not changed by our rules, so a soft flush is enough.
+		flush_rewrite_rules( false );
 	}
 
 	/**
@@ -114,12 +124,33 @@ class Rewrite {
 		foreach ( $this->init->get_supported_post_types() as $post_type => $enabled ) {
 			add_filter( $post_type . '_rewrite_rules', array( $this, 'set_rules_on_objects' ) );
 		}
+
+		// get the slugs for each actual enabled language.
+		$slugs = array();
+		foreach ( Languages::get_instance()->get_active_languages() as $language ) {
+			// bail if no URL-part is set for this language.
+			if ( empty( $language['url'] ) ) {
+				continue;
+			}
+
+			// add the slug to the list.
+			$slugs[] = preg_quote( $language['url'], '/' );
+		}
+
+		// bail if no slugs are available.
+		if ( empty( $slugs ) ) {
+			return;
+		}
+
+		// define the regex for the language-specific front page.
+		$regex = '^(' . implode( '|', $slugs ) . ')/?$';
+
 		if ( 'page' === get_option( 'show_on_front' ) ) {
 			$page_id = get_option( 'page_on_front' );
-			add_rewrite_rule( '^([a-zA-Z]_[a-zA_Z]{5})/?$', 'index.php?lang=$matches[1]&page_id=' . absint( $page_id ), 'top' );
+			add_rewrite_rule( $regex, 'index.php?lang=$matches[1]&page_id=' . absint( $page_id ), 'top' );
 		}
 		if ( 'posts' === get_option( 'show_on_front' ) ) {
-			add_rewrite_rule( '^([a-zA-Z]_[a-zA_Z]{5})/?$', 'index.php?lang=[1]', 'top' );
+			add_rewrite_rule( $regex, 'index.php?lang=$matches[1]', 'top' );
 		}
 	}
 
@@ -165,7 +196,10 @@ class Rewrite {
 	 * @return array<string>
 	 */
 	public function set_query_vars( array $query_vars ): array {
-		$query_vars[] = filter_input( INPUT_GET, 'lang', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) ? 'lang' : '';
+		// add our language-variable, also used by our rewrite rules.
+		if ( ! in_array( 'lang', $query_vars, true ) ) {
+			$query_vars[] = 'lang';
+		}
 		return $query_vars;
 	}
 

@@ -15,6 +15,7 @@ use easyLanguage\Plugin\Helper;
 use easyLanguage\EasyLanguage\Parser;
 use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
+use WP_Post;
 use ThemifyBuilder_Data_Manager;
 
 /**
@@ -129,9 +130,14 @@ class Themify extends Parser_Base implements Parser {
 		// list of resulting texts.
 		$resulting_texts = array();
 
+		// bail if the Themify data manager is not available.
+		if ( ! class_exists( ThemifyBuilder_Data_Manager::class ) || ! method_exists( ThemifyBuilder_Data_Manager::class, 'get_data' ) ) {
+			return array();
+		}
+
 		// get editor contents and loop through its array.
 		$data = ThemifyBuilder_Data_Manager::get_data( $this->get_object_id() );
-		if ( ! empty( $data ) ) {
+		if ( ! empty( $data ) && is_array( $data ) ) {
 			foreach ( $data as $container ) {
 				$resulting_texts = $this->get_widgets( (array) $container, $resulting_texts );
 			}
@@ -156,16 +162,27 @@ class Themify extends Parser_Base implements Parser {
 			return $original_complete;
 		}
 
+		// bail if the Themify data manager is not available.
+		if ( ! class_exists( ThemifyBuilder_Data_Manager::class ) || ! method_exists( ThemifyBuilder_Data_Manager::class, 'get_data' ) || ! method_exists( ThemifyBuilder_Data_Manager::class, 'save_data' ) ) {
+			return $original_complete;
+		}
+
 		// get editor contents and loop through its array.
 		$data = ThemifyBuilder_Data_Manager::get_data( $this->get_object_id() );
-		if ( ! empty( $data ) ) {
+		if ( ! empty( $data ) && is_array( $data ) ) {
+			// get the data before the replacement to detect changes.
+			$data_before = $data;
+
+			// replace the texts.
 			foreach ( $data as $name => $container ) {
 				$data[ $name ] = $this->replace_content_in_widgets( (array) $container, $simplified_part );
 			}
-		}
 
-		// save the data for themify.
-		ThemifyBuilder_Data_Manager::save_data( $data, $this->get_object_id() );
+			// save the data for themify, if they have been changed.
+			if ( $data_before !== $data ) {
+				ThemifyBuilder_Data_Manager::save_data( $data, $this->get_object_id() );
+			}
+		}
 
 		// return the string for post_content.
 		return str_replace( $this->get_text(), $simplified_part, $original_complete );
@@ -217,7 +234,16 @@ class Themify extends Parser_Base implements Parser {
 	 * @return void
 	 */
 	public function update_object( Objects $post_object ): void {
-		do_action( 'save_post' );
+		// get the post.
+		$post = get_post( $post_object->get_id() );
+
+		// bail if the post could not be loaded.
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		// trigger the save_post-hook for this post.
+		do_action( 'save_post', $post->ID, $post, true );
 	}
 
 	/**
@@ -228,30 +254,51 @@ class Themify extends Parser_Base implements Parser {
 	 * @return array<string,mixed>
 	 */
 	private function get_widgets( array $container, array $resulting_texts ): array {
+		// get the list of flow-text-widgets.
+		$flow_text_widgets = $this->get_flow_text_widgets();
+
 		foreach ( $container as $name => $sub_container ) {
-			foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-				if ( ! is_array( $sub_container ) && 'mod_name' === $name && $sub_container === $flow_text_name ) {
-					foreach ( $flow_text_settings as $entry_name => $entry ) {
-						if ( is_array( $entry ) ) {
-							foreach ( $entry as $sub_entry ) {
-								foreach ( $container['mod_settings'][ $entry_name ] as $index2 => $sub_sub_container ) {
-									if ( ! empty( $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ) ) {
-										$resulting_texts[ $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ] = array(
-											'text' => $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ],
-											'html' => $this->is_flow_text_widget_html( $flow_text_name ),
-										);
-									}
-								}
+			// loop through the deeper arrays.
+			if ( is_array( $sub_container ) ) {
+				$resulting_texts = $this->get_widgets( $sub_container, $resulting_texts );
+				continue;
+			}
+
+			// bail if this is not the name of a supported module.
+			if ( 'mod_name' !== $name || ! is_string( $sub_container ) || empty( $flow_text_widgets[ $sub_container ] ) || ! is_array( $flow_text_widgets[ $sub_container ] ) ) {
+				continue;
+			}
+
+			// bail if the module has no settings.
+			if ( empty( $container['mod_settings'] ) || ! is_array( $container['mod_settings'] ) ) {
+				continue;
+			}
+
+			// get the module name.
+			$flow_text_name = $sub_container;
+
+			foreach ( $flow_text_widgets[ $flow_text_name ] as $entry_name => $entry ) {
+				if ( is_array( $entry ) ) {
+					// bail if the setting is not a list.
+					if ( empty( $container['mod_settings'][ $entry_name ] ) || ! is_array( $container['mod_settings'][ $entry_name ] ) ) {
+						continue;
+					}
+
+					foreach ( $entry as $sub_entry ) {
+						foreach ( $container['mod_settings'][ $entry_name ] as $index2 => $sub_sub_container ) {
+							if ( ! empty( $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ) ) {
+								$resulting_texts[ $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ] = array(
+									'text' => $container['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ],
+									'html' => $this->is_flow_text_widget_html( $flow_text_name ),
+								);
 							}
-						} else {
-							$resulting_texts[ $container['mod_settings'][ $entry ] ] = array(
-								'text' => $container['mod_settings'][ $entry ],
-								'html' => $this->is_flow_text_widget_html( $flow_text_name ),
-							);
 						}
 					}
-				} elseif ( is_array( $sub_container ) ) {
-					$resulting_texts = $this->get_widgets( $sub_container, $resulting_texts );
+				} elseif ( ! empty( $container['mod_settings'][ $entry ] ) ) {
+					$resulting_texts[ $container['mod_settings'][ $entry ] ] = array(
+						'text' => $container['mod_settings'][ $entry ],
+						'html' => $this->is_flow_text_widget_html( $flow_text_name ),
+					);
 				}
 			}
 		}
@@ -268,28 +315,44 @@ class Themify extends Parser_Base implements Parser {
 	 * @return array<string,mixed>
 	 */
 	private function replace_content_in_widgets( array $container, string $simplified_part ): array {
+		// get the list of flow-text-widgets.
+		$flow_text_widgets = $this->get_flow_text_widgets();
+
 		// loop through the entries in this container.
 		foreach ( $container as $name => $sub_container ) {
 			if ( is_array( $sub_container ) ) {
 				if ( 'modules' === $name ) {
 					foreach ( $sub_container as $index => $module ) {
-						foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-							if ( $module['mod_name'] === $flow_text_name ) {
+						// bail if the module is not an array.
+						if ( ! is_array( $module ) ) {
+							continue;
+						}
+
+						foreach ( $flow_text_widgets as $flow_text_name => $flow_text_settings ) {
+							if ( isset( $module['mod_name'] ) && $module['mod_name'] === $flow_text_name && is_array( $flow_text_settings ) && isset( $module['mod_settings'] ) && is_array( $module['mod_settings'] ) ) {
 								foreach ( $flow_text_settings as $entry_name => $entry ) {
 									if ( is_array( $entry ) ) {
+										// bail if the setting is not a list.
+										if ( empty( $module['mod_settings'][ $entry_name ] ) || ! is_array( $module['mod_settings'][ $entry_name ] ) ) {
+											continue;
+										}
+
 										foreach ( $entry as $sub_entry ) {
 											foreach ( $container[ $name ][ $index ]['mod_settings'][ $entry_name ] as $index2 => $sub_sub_entry ) {
-												if ( $this->get_text() === $container[ $name ][ $index ]['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ) {
+												if ( isset( $container[ $name ][ $index ]['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ) && $this->get_text() === $container[ $name ][ $index ]['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] ) {
 													$container[ $name ][ $index ]['mod_settings'][ $entry_name ][ $index2 ][ $sub_entry ] = $simplified_part;
 												}
 											}
 										}
-									} elseif ( $this->get_text() === $container[ $name ][ $index ]['mod_settings'][ $entry ] ) {
-											$container[ $name ][ $index ]['mod_settings'][ $entry ] = $simplified_part;
+									} elseif ( isset( $container[ $name ][ $index ]['mod_settings'][ $entry ] ) && $this->get_text() === $container[ $name ][ $index ]['mod_settings'][ $entry ] ) {
+										$container[ $name ][ $index ]['mod_settings'][ $entry ] = $simplified_part;
 									}
 								}
 							}
 						}
+
+						// loop through the deeper arrays of this module (e.g. sub rows), like get_widgets() does.
+						$container[ $name ][ $index ] = $this->replace_content_in_widgets( $container[ $name ][ $index ], $simplified_part );
 					}
 				} else {
 					$container[ $name ] = $this->replace_content_in_widgets( $sub_container, $simplified_part );

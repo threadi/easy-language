@@ -44,11 +44,11 @@ const EasyLanguagePanel = () => {
 	return (
 		<PluginDocumentSettingPanel name="easy-language-panel" title={__( 'Easy Language', 'easy-language' )}>
 			{isLoading && <p>{ __( 'Loading', 'easy-language' )}</p>}
-			{error && <p style={{ color: 'red' }}>Fehler: {error}</p>}
+			{error && <p style={{ color: 'red' }}>{ __( 'Error:', 'easy-language' ) } {error}</p>}
 			{serverData && (
 				<div dangerouslySetInnerHTML={{ __html: serverData.html }} />
 			)}
 		</PluginDocumentSettingPanel>
 	);
 };
-registerPlugin('my-settings-panel', { render: EasyLanguagePanel });
+registerPlugin('easy-language-panel', { render: EasyLanguagePanel });

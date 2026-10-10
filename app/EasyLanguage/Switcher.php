@@ -12,6 +12,8 @@ defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Languages;
+use WP_Post;
+use WP_Term;
 
 /**
  * Object which handles the language switcher.
@@ -213,7 +215,7 @@ class Switcher {
 		if ( $object->is_simplified() ) {
 			$object_id = $object->get_original_object_as_int();
 			// get the original object as base for the listing.
-			$object = $this->init->get_object_by_wp_object( get_post( $object_id ), $object_id );
+			$object = $this->init->get_object_by_wp_object( $this->get_wp_object( $object, $object_id ), $object_id );
 		}
 
 		// bail if post type is not supported.
@@ -324,7 +326,7 @@ class Switcher {
 		if ( $object->is_simplified() ) {
 			$object_id = $object->get_original_object_as_int();
 			// get new object as base for the listing.
-			$object = $this->init->get_object_by_wp_object( get_post( $object_id ), $object_id );
+			$object = $this->init->get_object_by_wp_object( $this->get_wp_object( $object, $object_id ), $object_id );
 			if ( false === $object ) {
 				return $items;
 			}
@@ -351,62 +353,119 @@ class Switcher {
 			return $items;
 		}
 
+		// collect the resulting list of menu items.
+		$new_items = array();
+
+		// count of additional added menu items to correct the menu order of following items.
+		$offset = 0;
+
 		// loop through the possible menu-items.
-		foreach ( $items as $index => $item ) {
-			if ( EASY_LANGUAGE_CPT_SWITCHER === $item->object ) {
-				// get icon-setting.
-				$show_icons = 'on' === get_post_meta( $item->ID, 'easy-language-icons', true );
+		foreach ( $items as $item ) {
+			// bail if this is not a language switcher item.
+			if ( EASY_LANGUAGE_CPT_SWITCHER !== $item->object ) {
+				// correct the menu order if previous items have been added.
+				if ( $offset > 0 ) { // @phpstan-ignore greater.alwaysFalse
+					$item              = clone $item;
+					$item->menu_order += $offset; // @phpstan-ignore property.notFound
+				}
 
-				// get the post-item of this menu-item (this is not the page!).
-				$post_id  = get_post_meta( $item->ID, '_menu_item_object_id', true );
-				$post_obj = new Post_Object( $post_id );
+				// add the item to the list.
+				$new_items[] = $item;
+				continue;
+			}
 
-				// do nothing if none could be loaded.
-				if ( null === $post_id || EASY_LANGUAGE_CPT_SWITCHER !== $post_obj->get_type() ) {
+			// get icon-setting.
+			$show_icons = 'on' === get_post_meta( $item->ID, 'easy-language-icons', true );
+
+			// get the post-item of this menu-item (this is not the page!).
+			$post_id = absint( get_post_meta( $item->ID, '_menu_item_object_id', true ) );
+
+			// do nothing if no ID could be loaded.
+			if ( 0 === $post_id ) {
+				$new_items[] = $item;
+				continue;
+			}
+
+			// get the switcher post as object.
+			$post_obj = new Post_Object( $post_id );
+
+			// do nothing if the object is not a switcher.
+			if ( EASY_LANGUAGE_CPT_SWITCHER !== $post_obj->get_type() ) {
+				$new_items[] = $item;
+				continue;
+			}
+
+			// language-counter.
+			$language_counter = 0;
+
+			// loop through the active languages and create a single menu item for each.
+			foreach ( $languages as $language_code => $settings ) {
+				// bail if not translated pages should not be linked.
+				if ( 'hide_not_translated' === get_option( 'easy_language_switcher_link', '' )
+					&& ! $object->is_simplified_in_language( $language_code )
+					&& key( $object->get_language() ) !== $language_code ) {
 					continue;
 				}
 
-				// get actual index.
-				$new_index = $index;
-
-				// language-counter.
-				$language_counter = 0;
-
-				// loop through the active languages and create a single menu item for each.
-				foreach ( $languages as $language_code => $settings ) {
-					// bail if not translated pages should not be linked.
-					if ( 'hide_not_translated' === get_option( 'easy_language_switcher_link', '' )
-						&& ! $object->is_simplified_in_language( $language_code )
-						&& key( $object->get_language() ) !== $language_code ) {
-						continue;
-					}
-
-					// bail if icon is requested, but not available for this language.
-					if ( $show_icons && empty( $settings['icon'] ) ) {
-						continue;
-					}
-
-					// create own object for this menu item.
-					$new_item = clone $items[ $index ];
-					// set title for menu item.
-					$new_item->title = $show_icons ? Helper::get_icon_img_for_language_code( $language_code ) : $settings['label']; // @phpstan-ignore property.notFound
-					// set the menu order.
-					$new_item->menu_order = $items[ $index ]->menu_order + $language_counter; // @phpstan-ignore property.notFound
-					// set URL for menu item.
-					$new_item->url = $object->get_language_specific_url( empty( $settings['url'] ) ? $permalink : $settings['url'], $language_code ); // @phpstan-ignore property.notFound
-
-					// merge items.
-					array_splice( $items, $new_index, 1, array( $new_item ) );
-
-					// update key for next language.
-					++$new_index;
-					++$language_counter;
+				// bail if icon is requested, but not available for this language.
+				if ( $show_icons && empty( $settings['icon'] ) ) {
+					continue;
 				}
+
+				// create own object for this menu item.
+				$new_item = clone $item;
+				// set title for menu item.
+				$new_item->title = $show_icons ? Helper::get_icon_img_for_language_code( $language_code ) : $settings['label']; // @phpstan-ignore property.notFound
+				// set the menu order.
+				$new_item->menu_order = $item->menu_order + $offset + $language_counter; // @phpstan-ignore property.notFound
+				// set URL for menu item.
+				$new_item->url = $object->get_language_specific_url( empty( $settings['url'] ) ? $permalink : $settings['url'], $language_code ); // @phpstan-ignore property.notFound
+
+				// add the item to the list.
+				$new_items[] = $new_item;
+
+				// update counter for next language.
+				++$language_counter;
 			}
+
+			// keep the original item if no language item has been added.
+			if ( 0 === $language_counter ) {
+				$new_items[] = $item;
+				continue;
+			}
+
+			// update the offset for the following menu items.
+			$offset += $language_counter - 1;
 		}
 
 		// return resulting list of menu items.
-		return $items;
+		return $new_items;
+	}
+
+	/**
+	 * Return the WP-object for the given ID depending on the type of the given object.
+	 *
+	 * @param Objects $easy_language_object The object which defines the type (post or term).
+	 * @param int     $object_id The ID of the requested WP-object.
+	 *
+	 * @return WP_Post|WP_Term|null
+	 */
+	private function get_wp_object( Objects $easy_language_object, int $object_id ): WP_Post|WP_Term|null {
+		// get the term if this is a term-object.
+		if ( $easy_language_object instanceof Term_Object ) {
+			$term = get_term( $object_id, $easy_language_object->get_type() );
+
+			// bail if term could not be loaded.
+			if ( ! $term instanceof WP_Term ) {
+				return null;
+			}
+
+			// return the term.
+			return $term;
+		}
+
+		// return the post in all other cases.
+		return get_post( $object_id );
 	}
 
 	/**

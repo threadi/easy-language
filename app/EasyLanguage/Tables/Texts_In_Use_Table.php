@@ -41,21 +41,11 @@ class Texts_In_Use_Table extends WP_List_Table {
 	}
 
 	/**
-	 * Get the table data.
+	 * Return the query for the entries of this table.
 	 *
-	 * @return array<Text>
+	 * @return array<string,mixed>
 	 */
-	private function table_data(): array {
-		// order table.
-		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( ! array_key_exists( $order_by, $this->get_sortable_columns() ) ) {
-			$order_by = 'date';
-		}
-		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( in_array( $order, array( 'asc', 'desc' ), true ) ) {
-			$order = 'desc';
-		}
-
+	private function get_query(): array {
 		// define query for entries.
 		$query = array(
 			'state'              => 'in_use',
@@ -70,13 +60,38 @@ class Texts_In_Use_Table extends WP_List_Table {
 			$query['target_lang'] = $lang;
 		}
 
+		// return the query.
+		return $query;
+	}
+
+	/**
+	 * Get the table data.
+	 *
+	 * @param int $per_page Entries per page.
+	 * @param int $offset The offset for the entries.
+	 *
+	 * @return array<Text>
+	 */
+	private function table_data( int $per_page, int $offset ): array {
+		// order table.
+		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( ! array_key_exists( $order_by, $this->get_sortable_columns() ) ) {
+			$order_by = 'date';
+		}
+		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		if ( ! in_array( $order, array( 'asc', 'desc' ), true ) ) {
+			$order = 'desc';
+		}
+
 		// return resulting entry-objects.
 		return Db::get_instance()->get_entries(
-			$query,
+			$this->get_query(),
 			array(
 				'order_by' => $order_by,
 				'order'    => $order,
-			)
+			),
+			$per_page,
+			$offset
 		);
 	}
 
@@ -90,8 +105,21 @@ class Texts_In_Use_Table extends WP_List_Table {
 		$hidden   = $this->get_hidden_columns();
 		$sortable = $this->get_sortable_columns();
 
+		// get the pagination settings.
+		$per_page     = $this->get_items_per_page( 'easy_language_texts_in_use_per_page' );
+		$current_page = $this->get_pagenum();
+		$total_items  = Db::get_instance()->count_entries( $this->get_query() );
+
+		// set the pagination.
+		$this->set_pagination_args(
+			array(
+				'total_items' => $total_items,
+				'per_page'    => $per_page,
+			)
+		);
+
 		$this->_column_headers = array( $columns, $hidden, $sortable );
-		$this->items           = $this->table_data();
+		$this->items           = $this->table_data( $per_page, ( $current_page - 1 ) * $per_page );
 	}
 
 	/**
@@ -155,22 +183,22 @@ class Texts_In_Use_Table extends WP_List_Table {
 			case 'simplification':
 				$texts = '';
 				foreach ( $target_languages as $language_code => $target_language ) {
-					$texts .= wp_strip_all_tags( $item->get_simplification( $language_code ) );
+					$texts .= esc_html( wp_strip_all_tags( $item->get_simplification( $language_code ) ) );
 				}
 				return $texts;
 
 			// get original as not formatted text.
 			case 'original':
-				return wp_strip_all_tags( $item->get_original() );
+				return esc_html( wp_strip_all_tags( $item->get_original() ) );
 
 			// show source language.
 			case 'source_language':
 				$language  = $item->get_source_language();
 				$languages = $languages_obj->get_possible_source_languages();
 				if ( ! empty( $languages[ $language ] ) ) {
-					return $languages[ $language ]['label'];
+					return esc_html( $languages[ $language ]['label'] );
 				}
-				return __( 'Unknown', 'easy-language' );
+				return esc_html__( 'Unknown', 'easy-language' );
 
 			// show target language.
 			case 'target_language':
@@ -178,11 +206,11 @@ class Texts_In_Use_Table extends WP_List_Table {
 					if ( $api_obj ) {
 						$languages = $api_obj->get_active_target_languages();
 						if ( ! empty( $languages[ $language_code ] ) ) {
-							return $languages[ $language_code ]['label'];
+							return esc_html( $languages[ $language_code ]['label'] );
 						}
 					}
 				}
-				return __( 'Unknown', 'easy-language' );
+				return esc_html__( 'Unknown', 'easy-language' );
 
 			// show options.
 			case 'options':
@@ -241,7 +269,7 @@ class Texts_In_Use_Table extends WP_List_Table {
 			// show used API.
 			case 'used_api':
 				if ( $api_obj ) {
-					return $api_obj->get_title();
+					return esc_html( $api_obj->get_title() );
 				}
 				return '';
 
@@ -252,14 +280,14 @@ class Texts_In_Use_Table extends WP_List_Table {
 					if ( $user_id > 0 ) {
 						$user = new WP_User( $user_id );
 						if ( current_user_can( 'edit_users' ) ) {
-							return '<a href="' . get_edit_user_link( $user->ID ) . '">' . esc_html( $user->display_name ) . '</a>';
+							return '<a href="' . esc_url( get_edit_user_link( $user->ID ) ) . '">' . esc_html( $user->display_name ) . '</a>';
 						}
 						return esc_html( $user->display_name );
 					}
 				}
 
 				// return hint that this translation was run without login.
-				return '<i>' . __( 'without login', 'easy-language' ) . '</i>';
+				return '<i>' . esc_html__( 'without login', 'easy-language' ) . '</i>';
 
 			// show hint where this text is used.
 			case 'used_in':
@@ -292,30 +320,30 @@ class Texts_In_Use_Table extends WP_List_Table {
 
 		// define initial list.
 		$list = array(
-			'all' => '<a href="' . esc_url( $url ) . '">' . __( 'All', 'easy-language' ) . '</a>',
+			'all' => '<a href="' . esc_url( $url ) . '">' . esc_html__( 'All', 'easy-language' ) . '</a>',
 		);
 
-		// get all languages from items and add their languages to the list.
+		// get all languages from items via DB and add their languages to the list.
 		$query           = array(
 			'state'            => 'in_use',
 			'object_not_state' => 'trash',
 		);
-		$entries         = Db::get_instance()->get_entries( $query );
+		$used_languages  = Db::get_instance()->get_languages_of_entries( $query );
 		$languages_array = array();
-		foreach ( $entries as $item ) {
-			// get object of the used api.
-			$api_obj = $item->get_api();
-			if ( false !== $api_obj && empty( $languages_array[ $item->get_source_language() ] ) ) {
-				// get source languages of this api.
-				$source_languages = $api_obj->get_active_source_languages();
 
-				if ( ! empty( $source_languages[ $item->get_source_language() ] ) ) {
-					// add the source language to list.
-					$languages_array[ $item->get_source_language() ] = $source_languages[ $item->get_source_language() ]['label'];
-				}
+		// add the source languages.
+		$source_languages = Languages::get_instance()->get_possible_source_languages();
+		foreach ( $used_languages['source'] as $language_code ) {
+			if ( ! empty( $source_languages[ $language_code ] ) ) {
+				$languages_array[ $language_code ] = $source_languages[ $language_code ]['label'];
 			}
-			foreach ( $item->get_target_languages() as $language_code => $target_language ) {
-				$languages_array[ $language_code ] = $target_language;
+		}
+
+		// add the target languages.
+		$target_languages = Languages::get_instance()->get_possible_target_languages();
+		foreach ( $used_languages['target'] as $language_code ) {
+			if ( ! empty( $target_languages[ $language_code ] ) ) {
+				$languages_array[ $language_code ] = $target_languages[ $language_code ]['label'];
 			}
 		}
 

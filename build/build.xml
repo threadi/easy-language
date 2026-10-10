@@ -1,233 +1,281 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Local fallback for the GitHub workflow .github/workflows/build-zip.yml.
+
+	It runs the same steps in the same order and creates a zip with the same content:
+	the same files, the same vendor packages and the same version number.
+
+	Not possible here (only in the GitHub workflow): the Plugin Check (PCP), the SBOM
+	and the GitHub release itself. The smoke test in WordPress Playground runs here too,
+	if npx is set in build.properties (see "smoke-test").
+
+	Usage in this directory:
+	  ant build    - creates ../releases/<version>/easy-language.zip
+	  ant init     - prepares the checkout for development
+	  ant -p       - lists all targets
+
+	Hint: "build" switches vendor/ to the release state (without dev packages) and switches it back
+	at the end. If the build stops in between, run "ant init" to restore the development state.
+-->
 <project name="easy-language" basedir="." default="help">
 
-	<taskdef resource="net/sf/antcontrib/antlib.xml">
-		<classpath>
-			<pathelement location="libs/ant-contrib-1.0b3.jar"/>
-		</classpath>
-	</taskdef>
+	<!-- load the local configuration. -->
+	<loadproperties srcFile="build.properties" />
 
-    <!-- Include config file containing  -->
-    <loadproperties srcFile="build.properties" />
+	<!-- directories. -->
+	<property name="src.dir" location="../" />
+	<property name="build.dir" location="../releases" />
+	<property name="dist.dir" location="../dist" />
+	<property name="log.dir" location="./" />
 
-    <!-- Sets variables which can later be used. -->
-    <property name="src.dir" location="../" />
-    <property name="build.dir" location="../releases" />
-    <property name="log.dir" location="./" />
+	<!-- check the configuration. -->
+	<fail unless="plugin.slug" message="plugin.slug is missing in build.properties." />
+	<fail unless="plugin.version" message="plugin.version is missing in build.properties." />
+	<fail unless="npm.path" message="npm.path is missing in build.properties." />
+	<fail unless="composer.path" message="composer.path is missing in build.properties." />
+	<fail message="Do not run as root!">
+		<condition>
+			<equals arg1="root" arg2="${user.name}" />
+		</condition>
+	</fail>
 
-    <!-- check for necessary vars -->
-    <fail unless="plugin.slug" />
-    <fail unless="plugin.version" />
-    <fail unless="npm.path" />
-	<fail unless="composer.path" />
-    <fail message="Do not run as root!">
-        <condition>
-            <equals arg1="root" arg2="${user.name}"/>
-        </condition>
-    </fail>
+	<!-- only version numbers like 1.0.0 or 1.1.0-beta.1 (same rule as in the GitHub workflow). -->
+	<fail message="'${plugin.version}' is not a version number like 1.0.0 or 1.1.0-beta.1.">
+		<condition>
+			<not>
+				<matches string="${plugin.version}" pattern="^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$" />
+			</not>
+		</condition>
+	</fail>
 
-    <!-- install npm -->
-    <target name="npm-install">
-        <delete file="${log.dir}/npm-install1.txt"/>
-        <delete file="${log.dir}/npm-install2.txt"/>
-		<delete file="${log.dir}/npm-install3.txt"/>
-		<delete file="${log.dir}/npm-install4.txt"/>
-		<delete file="${log.dir}/npm-install5.txt"/>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install1.txt">
-            <arg line="i"/>
-        </exec>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install2.txt">
-            <arg line="i concurrently"/>
-        </exec>
-		<exec dir="${src.dir}/vendor/threadi/easy-dialog-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install3.txt">
-			<arg line="install"/>
-		</exec>
-		<exec dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install4.txt">
-			<arg line="install"/>
-		</exec>
-		<exec dir="${src.dir}/vendor/threadi/react-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install5.txt">
-			<arg line="install"/>
-		</exec>
-    </target>
+	<!-- the directory of the release inside dist (= the folder name in the zip). -->
+	<property name="release.dir" location="${dist.dir}/${plugin.slug}" />
+	<property name="release.zip" location="${build.dir}/${plugin.version}/${plugin.slug}.zip" />
 
-	<!-- install composer -->
+	<!-- install PHP packages (also runs Mozart, which copies easy-transients-for-wordpress to app/Dependencies). -->
 	<target name="composer-install">
-		<delete file="${log.dir}/composer-install.txt"/>
-		<delete file="${log.dir}/composer-update.txt"/>
 		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-install.txt">
-			<arg line="install"/>
-		</exec>
-		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-update.txt">
-			<arg line="update"/>
+			<arg line="install --no-interaction --no-progress" />
 		</exec>
 	</target>
 
-	<!-- generate autoloader for release -->
-	<target name="autoloader-generation" depends="composer-install">
-		<delete file="${log.dir}/autoloader-generation.txt"/>
-		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/autoloader-generation.txt">
-			<arg line="dump-autoload -oa --no-dev"/>
+	<!-- build blocks, sidebar and Divi field. -->
+	<target name="npm-build">
+		<exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-install.txt">
+			<arg line="ci" />
+		</exec>
+		<exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build.txt">
+			<arg line="run build" />
 		</exec>
 	</target>
 
-	<!-- PHP Unit Tests -->
-	<target name="php-unit-tests" depends="composer-install">
-		<delete file="${log.dir}/php-unit-tests-1.txt"/>
-		<delete file="${log.dir}/php-unit-tests-2.txt"/>
-		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/php-unit-tests-1.txt">
-			<arg line="test-install-during-build"/>
+	<!-- build react-dialog (the package ships no lock file, so npm ci is not possible here). -->
+	<target name="react-dialog-build" depends="composer-install">
+		<exec dir="${src.dir}/vendor/threadi/react-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/react-dialog-install.txt">
+			<arg line="install --no-audit --no-fund" />
 		</exec>
-		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/php-unit-tests-2.txt">
-			<arg line="test"/>
+		<exec dir="${src.dir}/vendor/threadi/react-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/react-dialog-build.txt">
+			<arg line="run build" />
 		</exec>
 	</target>
 
-    <!-- build the Blocks via npm -->
-    <target name="npm-build" depends="npm-install">
-        <delete file="${log.dir}/npm-build1.txt"/>
-        <delete file="${log.dir}/npm-build2.txt"/>
-		<delete file="${log.dir}/npm-build3.txt"/>
-		<delete file="${log.dir}/npm-build4.txt"/>
-		<delete file="${log.dir}/npm-build5.txt"/>
-		<delete file="${log.dir}/npm-build6.txt"/>
-		<delete file="${log.dir}/npm-build7.txt"/>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build1.txt">
-            <arg line="run build:switcher"/>
-        </exec>
-        <exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build2.txt">
-            <arg line="run build:navigation-switcher"/>
-        </exec>
-		<exec dir="${src.dir}" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build3.txt">
-			<arg line="run build:sidebar"/>
-		</exec>
-		<exec dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build4.txt">
-			<arg line="run build"/>
-		</exec>
-		<exec dir="${src.dir}/vendor/threadi/react-dialog/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build5.txt">
-			<arg line="run build"/>
-		</exec>
-		<exec dir="${src.dir}/legacy-classes/Divi/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build6.txt">
-			<arg line="install"/>
-		</exec>
-		<exec dir="${src.dir}/legacy-classes/Divi/" failonerror="true" executable="${npm.path}" output="${log.dir}/npm-build7.txt">
-			<arg line="run build"/>
-		</exec>
-    </target>
+	<!-- prepare the checkout for development. -->
+	<target name="init" description="prepares the checkout for development" depends="composer-install,npm-build,react-dialog-build" />
 
-	<!-- generate hook documentation -->
-	<target name="generate-documentation" depends="npm-build">
-		<exec dir="${src.dir}" failonerror="false" executable="vendor/bin/wp-documentor">
-			<arg line="parse app --format=markdown --output=doc/hooks.md --prefix=easy_language_ --exclude=Section.php --exclude=Tab.php --exclude=Import.php --exclude=Export.php --exclude=Field_Base.php --exclude=Settings.php --exclude=Page.php --exclude=Rest.php --exclude=Transients.php --exclude=Post_Object.php"/>
+	<!-- code checks (same as in .github/workflows/testing.yml). Skip them with skip.checks=true. -->
+	<target name="checks" description="runs PHPStan, PHPCS and the PHP compatibility check" depends="composer-install" unless="${skip.checks}">
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}">
+			<arg line="validate --strict --no-check-publish --no-check-version" />
 		</exec>
-	</target>
-
-    <!-- set version number in plugin-file for the release -->
-    <target name="setVersionNumber">
-        <delete file="${build.dir}/${plugin.slug}-release.php"/>
-        <copy file="${src.dir}/${plugin.slug}.php" tofile="${src.dir}/${plugin.slug}-release.php"/>
-        <replace file="${src.dir}/${plugin.slug}-release.php">
-            <replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
-        </replace>
-
-		<delete file="${src.dir}/uninstall-release.php"/>
-		<copy file="${src.dir}/uninstall.php" tofile="${src.dir}/uninstall-release.php"/>
-		<replace file="${src.dir}/uninstall-release.php">
-			<replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
-		</replace>
-
-		<delete file="${build.dir}/readme-release.txt"/>
-		<copy file="${src.dir}/readme.txt" tofile="${src.dir}/readme-release.txt"/>
-		<replace file="${src.dir}/readme-release.txt">
-			<replacefilter token="@@VersionNumber@@" value="${plugin.version}" />
-		</replace>
-    </target>
-
-	<!-- check WCS compatibility -->
-	<target name="check-wcs" depends="composer-install">
-		<exec dir="${src.dir}" failonerror="false" executable="vendor/bin/phpcbf">
-			<arg line="."/>
+		<exec dir="${src.dir}" failonerror="true" executable="vendor/bin/phpstan">
+			<arg line="analyse --no-progress" />
 		</exec>
 		<exec dir="${src.dir}" failonerror="true" executable="vendor/bin/phpcs">
-			<arg line="."/>
+			<arg line="." />
+		</exec>
+		<exec dir="${src.dir}" failonerror="true" executable="vendor/bin/phpcs">
+			<arg line="-p app --standard=PHPCompatibilityWP --runtime-set testVersion 8.2- --ignore=*/Dependencies/*" />
 		</exec>
 	</target>
 
-	<!-- check PHPStan -->
-	<target name="check-phpstan" depends="composer-install">
-		<exec dir="${src.dir}" failonerror="false" executable="vendor/bin/phpstan">
-			<arg line="analyse"/>
+	<!-- PHPUnit tests (need a database, see composer.json). Run them with run.tests=true. -->
+	<target name="php-unit-tests" description="runs the PHPUnit tests" depends="composer-install" if="${run.tests}">
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/php-unit-tests-1.txt">
+			<arg line="test-install-during-build" />
+		</exec>
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/php-unit-tests-2.txt">
+			<arg line="test" />
 		</exec>
 	</target>
 
-	<!-- check PHPCompatibility -->
-	<target name="check-php-compatibility" depends="composer-install">
-		<exec dir="${src.dir}" failonerror="false" executable="vendor/bin/phpcs">
-			<arg line="-p app --standard=PHPCompatibilityWP"/>
+	<!-- generate the hook documentation (not part of the release). -->
+	<target name="generate-documentation" description="generates doc/hooks.md" depends="composer-install">
+		<exec dir="${src.dir}" failonerror="true" executable="vendor/bin/wp-documentor">
+			<arg line="parse app --format=markdown --output=doc/hooks.md --prefix=easy_language_ --exclude=Section.php --exclude=Tab.php --exclude=Import.php --exclude=Export.php --exclude=Field_Base.php --exclude=Settings.php --exclude=Page.php --exclude=Rest.php --exclude=Transients.php --exclude=Post_Object.php" />
 		</exec>
 	</target>
 
-	<!-- generate autoloader for dev -->
-	<target name="autoloader-generation-dev">
-		<delete file="${log.dir}/autoloader-generation-dev.txt"/>
-		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/autoloader-generation-dev.txt">
-			<arg line="dump-autoload -oa"/>
+	<!-- remove dev packages and generate the release autoloader. -->
+	<target name="release-vendor">
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-install-no-dev.txt">
+			<arg line="install --no-dev --no-scripts --no-interaction --no-progress" />
+		</exec>
+		<!-- its classes are shipped in app/Dependencies. Without this the autoloader would also know them under their original names. -->
+		<delete dir="${src.dir}/vendor/threadi/easy-transients-for-wordpress" />
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/autoloader-generation.txt">
+			<arg line="dump-autoload -oa --no-dev" />
 		</exec>
 	</target>
 
-    <!-- init project -->
-    <target name="init" description="initialize the project" depends="composer-install,npm-build,autoloader-generation-dev" />
+	<!-- collect the files of the release and set the version number (same list as in the GitHub workflow). -->
+	<target name="collect">
+		<!-- stop with an error if one of the paths does not exist (as rsync does in the workflow). -->
+		<fail message="A path of the release is missing - did all builds run?">
+			<condition>
+				<not>
+					<and>
+						<available file="${src.dir}/${plugin.slug}.php" />
+						<available file="${src.dir}/uninstall.php" />
+						<available file="${src.dir}/index.php" />
+						<available file="${src.dir}/readme.txt" />
+						<available file="${src.dir}/wpml-config.xml" />
+						<available file="${src.dir}/composer.json" />
+						<available file="${src.dir}/admin" type="dir" />
+						<available file="${src.dir}/app" type="dir" />
+						<available file="${src.dir}/app/Dependencies" type="dir" />
+						<available file="${src.dir}/css" type="dir" />
+						<available file="${src.dir}/gfx" type="dir" />
+						<available file="${src.dir}/inc" type="dir" />
+						<available file="${src.dir}/templates" type="dir" />
+						<available file="${src.dir}/blocks/switcher/build" type="dir" />
+						<available file="${src.dir}/blocks/navigation-switcher/build" type="dir" />
+						<available file="${src.dir}/js/generated" type="dir" />
+						<available file="${src.dir}/legacy-classes/Divi/build" type="dir" />
+						<available file="${src.dir}/legacy-classes/Divi/divi.js" />
+						<available file="${src.dir}/vendor/autoload.php" />
+						<available file="${src.dir}/vendor/composer" type="dir" />
+						<available file="${src.dir}/vendor/gettext" type="dir" />
+						<available file="${src.dir}/vendor/threadi/crypt-for-wordpress/src" type="dir" />
+						<available file="${src.dir}/vendor/threadi/easy-dialog-for-wordpress/build" type="dir" />
+						<available file="${src.dir}/vendor/threadi/easy-settings-for-wordpress" type="dir" />
+						<available file="${src.dir}/vendor/threadi/easy-setup-for-wordpress/build" type="dir" />
+						<available file="${src.dir}/vendor/threadi/easy-setup-for-wordpress/lib" type="dir" />
+						<available file="${src.dir}/vendor/threadi/react-dialog/build" type="dir" />
+					</and>
+				</not>
+			</condition>
+		</fail>
 
-    <!-- create release-zip -->
-    <target name="build" description="builds a new release" depends="init,php-unit-tests,generate-documentation,check-phpstan,check-php-compatibility,check-wcs,setVersionNumber,autoloader-generation">
-        <delete file="${build.dir}/${plugin.slug}_${plugin.version}.zip"/>
-        <zip destfile="${build.dir}/${plugin.slug}_${plugin.version}.zip">
-			<zipfileset dir="${src.dir}/admin" prefix="${plugin.slug}/admin" />
-            <zipfileset dir="${src.dir}/app" prefix="${plugin.slug}/app" />
-			<zipfileset dir="${src.dir}/blocks/navigation-switcher/" includes="block.json" prefix="${plugin.slug}/blocks/navigation-switcher/" />
-			<zipfileset dir="${src.dir}/blocks/navigation-switcher/build" prefix="${plugin.slug}/blocks/navigation-switcher/build" />
-			<zipfileset dir="${src.dir}/blocks/switcher/" includes="block.json" prefix="${plugin.slug}/blocks/switcher/" />
-			<zipfileset dir="${src.dir}/blocks/switcher/build" prefix="${plugin.slug}/blocks/switcher/build" />
-			<zipfileset dir="${src.dir}/blocks/" includes="components.js" prefix="${plugin.slug}/blocks/" />
-			<zipfileset dir="${src.dir}/css" prefix="${plugin.slug}/css" />
-			<zipfileset dir="${src.dir}/gfx" prefix="${plugin.slug}/gfx" />
-            <zipfileset dir="${src.dir}/inc" prefix="${plugin.slug}/inc" />
-			<zipfileset dir="${src.dir}/legacy-classes" prefix="${plugin.slug}/legacy-classes">
-				<exclude name="**/Divi/.yarn/**" />
-				<exclude name="**/Divi/package-lock.json" />
-				<exclude name="**/Divi/node_modules/**" />
-				<exclude name="**/Divi/.env" />
-				<exclude name="**/Divi/.yarnrc" />
-				<exclude name="**/Divi/yarn.lock" />
-				<exclude name="**/Divi/package.json" />
-				<exclude name="**/Divi/*/.gitkeep" />
-			</zipfileset>
-			<zipfileset dir="${src.dir}/js" prefix="${plugin.slug}/js" />
-			<zipfileset dir="${src.dir}/templates" prefix="${plugin.slug}/templates" />
-			<zipfileset dir="${src.dir}/vendor" includes="autoload.php" prefix="${plugin.slug}/vendor" />
-			<zipfileset dir="${src.dir}/vendor/gettext" prefix="${plugin.slug}/vendor/gettext" />
-			<zipfileset dir="${src.dir}/vendor/composer" prefix="${plugin.slug}/vendor/composer" />
-			<zipfileset dir="${src.dir}/vendor/threadi/easy-dialog-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-dialog-for-wordpress/build/" />
-			<zipfileset dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/build/" prefix="${plugin.slug}/vendor/threadi/easy-setup-for-wordpress/build/" />
-			<zipfileset dir="${src.dir}/vendor/threadi/easy-setup-for-wordpress/lib/" prefix="${plugin.slug}/vendor/threadi/easy-setup-for-wordpress/lib/" />
-			<zipfileset dir="${src.dir}/vendor/threadi/react-dialog/build/" prefix="${plugin.slug}/vendor/threadi/react-dialog/build/" />
-			<zipfileset dir="${src.dir}/vendor/threadi/easy-settings-for-wordpress/" prefix="${plugin.slug}/vendor/threadi/easy-settings-for-wordpress/" />
-            <zipfileset dir="${src.dir}" includes="wpml-config.xml" prefix="${plugin.slug}" />
-			<zipfileset dir="${src.dir}" includes="readme-release.txt" fullpath="${plugin.slug}/readme.txt" />
-			<zipfileset dir="${src.dir}" includes="composer.json" fullpath="${plugin.slug}/composer.json" />
-			<zipfileset dir="${src.dir}" includes="uninstall-release.php" fullpath="${plugin.slug}/uninstall.php" />
-            <zipfileset dir="${src.dir}" includes="${plugin.slug}-release.php" fullpath="${plugin.slug}/${plugin.slug}.php" />
-        </zip>
-		<delete file="${src.dir}/${plugin.slug}-release.php"/>
-		<delete file="${src.dir}/uninstall-release.php"/>
-		<delete file="${src.dir}/readme-release.txt"/>
-    </target>
+		<delete dir="${dist.dir}" />
+		<mkdir dir="${release.dir}" />
 
-    <target name="help">
-        <java classname="org.apache.tools.ant.Main">
-            <arg value="-projecthelp" />
-            <arg value="-buildfile" />
-            <arg value="build.xml" />
-        </java>
-    </target>
+		<!-- only what is listed here ends up in the zip. Nothing is deleted from the checkout. -->
+		<copy todir="${release.dir}" preservelastmodified="true">
+			<fileset dir="${src.dir}">
+				<include name="${plugin.slug}.php" />
+				<include name="uninstall.php" />
+				<include name="index.php" />
+				<include name="readme.txt" />
+				<include name="wpml-config.xml" />
+				<include name="composer.json" />
+				<include name="admin/**" />
+				<include name="app/**" />
+				<include name="css/**" />
+				<include name="gfx/**" />
+				<include name="inc/**" />
+				<include name="templates/**" />
+				<include name="blocks/*/block.json" />
+				<include name="blocks/*/build/**" />
+				<include name="js/generated/**" />
+				<include name="legacy-classes/Divi/build/**" />
+				<include name="legacy-classes/Divi/divi.js" />
+				<include name="vendor/autoload.php" />
+				<include name="vendor/composer/**" />
+				<include name="vendor/gettext/**" />
+				<include name="vendor/threadi/crypt-for-wordpress/src/**" />
+				<include name="vendor/threadi/easy-dialog-for-wordpress/build/**" />
+				<include name="vendor/threadi/easy-settings-for-wordpress/**" />
+				<include name="vendor/threadi/easy-setup-for-wordpress/build/**" />
+				<include name="vendor/threadi/easy-setup-for-wordpress/lib/**" />
+				<include name="vendor/threadi/react-dialog/build/**" />
+				<!-- as in the workflow: no hidden files and no node_modules. -->
+				<exclude name="**/.*" />
+				<exclude name="**/.*/**" />
+				<exclude name="**/node_modules/**" />
+			</fileset>
+		</copy>
+
+		<!-- instructions for AI agents of the settings library: not needed on a website. -->
+		<delete dir="${release.dir}/vendor/threadi/easy-settings-for-wordpress/skills" />
+
+		<!-- set the version number - in the copy only. -->
+		<replace dir="${release.dir}" token="@@VersionNumber@@" value="${plugin.version}">
+			<include name="${plugin.slug}.php" />
+			<include name="uninstall.php" />
+			<include name="readme.txt" />
+		</replace>
+	</target>
+
+	<!-- create the zip. -->
+	<target name="zip">
+		<delete file="${release.zip}" />
+		<mkdir dir="${build.dir}/${plugin.version}" />
+		<zip destfile="${release.zip}" basedir="${dist.dir}" includes="${plugin.slug}/**" defaultexcludes="no" />
+		<echo message="Release created: ${release.zip}" />
+	</target>
+
+	<!-- smoke test the zip in WordPress Playground (same blueprint as in the workflow). Needs npx.path, Node 24 and internet access. -->
+	<target name="smoke-test" description="tests the zip in WordPress Playground" if="npx.path" unless="${skip.smoke}">
+		<property name="smoke.dir" location="${dist.dir}/smoke" />
+		<delete dir="${smoke.dir}" />
+		<unzip src="${release.zip}" dest="${smoke.dir}" />
+		<fail message="The zip does not contain ${plugin.slug}/${plugin.slug}.php.">
+			<condition>
+				<not>
+					<available file="${smoke.dir}/${plugin.slug}/${plugin.slug}.php" />
+				</not>
+			</condition>
+		</fail>
+		<!-- the option "no": use the version from package-lock.json, never download another one. -->
+		<exec dir="${src.dir}" failonerror="true" executable="${npx.path}" output="${log.dir}/smoke-test.txt">
+			<arg value="--no" />
+			<arg value="--" />
+			<arg value="@wp-playground/cli" />
+			<arg value="run-blueprint" />
+			<arg value="--blueprint=./.github/blueprints/smoke.json" />
+			<arg value="--mount=${smoke.dir}/${plugin.slug}:/wordpress/wp-content/plugins/${plugin.slug}" />
+		</exec>
+		<loadfile property="smoke.result" srcFile="${smoke.dir}/${plugin.slug}/smoke-result.txt" failonerror="false" />
+		<fail message="SMOKE_OK not found in smoke-result.txt - see ${log.dir}/smoke-test.txt.">
+			<condition>
+				<not>
+					<contains string="${smoke.result}" substring="SMOKE_OK" />
+				</not>
+			</condition>
+		</fail>
+		<delete dir="${smoke.dir}" />
+		<echo message="Smoke test passed." />
+	</target>
+
+	<!-- switch vendor/ back to the development state. -->
+	<target name="restore-dev">
+		<exec dir="${src.dir}" failonerror="true" executable="${composer.path}" output="${log.dir}/composer-install-dev.txt">
+			<arg line="install --no-interaction --no-progress" />
+		</exec>
+	</target>
+
+	<!-- create the release zip: the same steps as .github/workflows/build-zip.yml. -->
+	<target name="build" description="builds the release zip" depends="init,checks,php-unit-tests,release-vendor,collect,zip,smoke-test,restore-dev">
+		<delete dir="${dist.dir}" />
+		<echo message="Done: ${release.zip}" />
+	</target>
+
+	<target name="help">
+		<java classname="org.apache.tools.ant.Main">
+			<arg value="-projecthelp" />
+			<arg value="-buildfile" />
+			<arg value="build.xml" />
+		</java>
+	</target>
 
 </project>

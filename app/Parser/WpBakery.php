@@ -15,11 +15,14 @@ use easyLanguage\Plugin\Helper;
 use easyLanguage\EasyLanguage\Parser;
 use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
+use WP_Post;
 
 /**
  * Handler for parsing wp bakery-content.
  */
 class WpBakery extends Parser_Base implements Parser {
+	use Shortcode_Replacement;
+
 	/**
 	 * The internal name of this parser.
 	 *
@@ -150,7 +153,10 @@ class WpBakery extends Parser_Base implements Parser {
 					}
 				}
 				foreach ( $matches[2] as $key => $value ) {
-					foreach ( shortcode_parse_atts( $matches[3][ $key ] ) as $attribute => $attribute_value ) {
+					// get the attributes of this shortcode.
+					$shortcode_attributes = shortcode_parse_atts( $matches[3][ $key ] );
+
+					foreach ( $shortcode_attributes as $attribute => $attribute_value ) {
 						if ( ! empty( $attribute_value ) && in_array( $attribute, $attributes, true ) ) {
 							$resulting_texts[] = array(
 								'text' => $attribute_value,
@@ -181,7 +187,8 @@ class WpBakery extends Parser_Base implements Parser {
 			return $original_complete;
 		}
 
-		return str_replace( $this->get_text(), $simplified_part, $original_complete );
+		// replace the text only in the supported shortcodes and attributes.
+		return $this->replace_text_in_shortcodes( $original_complete, $this->get_text(), $simplified_part, $this->get_flow_text_shortcodes() );
 	}
 
 	/**
@@ -210,11 +217,19 @@ class WpBakery extends Parser_Base implements Parser {
 	 * @return string
 	 */
 	public function get_edit_link(): string {
+		// get the post type of this object.
+		$post_type = get_post_type( $this->get_object_id() );
+
+		// use page as fallback.
+		if ( ! is_string( $post_type ) ) {
+			$post_type = 'page';
+		}
+
 		return add_query_arg(
 			array(
 				'vc_action' => 'vc_inline',
 				'post_id'   => $this->get_object_id(),
-				'post_type' => 'page',
+				'post_type' => $post_type,
 			),
 			get_admin_url() . 'post.php'
 		);
@@ -246,6 +261,15 @@ class WpBakery extends Parser_Base implements Parser {
 	 * @return void
 	 */
 	public function update_object( Objects $post_object ): void {
-		do_action( 'save_post' );
+		// get the post.
+		$post = get_post( $post_object->get_id() );
+
+		// bail if the post could not be loaded.
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		// trigger the save_post-hook for this post.
+		do_action( 'save_post', $post->ID, $post, true );
 	}
 }

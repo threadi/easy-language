@@ -1,5 +1,33 @@
 # Changelog
 
+## [3.3.0] - 10.10.2026
+
+### Added
+
+- API keys are now saved encrypted (via Crypt for WordPress); existing keys are migrated automatically during the update
+- Smoke test of the release zip in WordPress Playground, SBOM and Plugin Check in the release workflow
+- Dependabot for GitHub Actions
+
+### Changed
+
+- Updated dependencies
+- Now requires WordPress 6.6 or newer
+- API keys are no longer readable via REST API and are shown masked in the settings
+- Simplification requests now also check the permission for the respective object
+- Reset of the plugin only affects the actual site in multisite
+- Lists of texts are now paginated
+- GitHub Actions are pinned to commits and run with minimal permissions
+- Removed the Ant build
+
+### Fixed
+
+- API tokens were saved in the request log tables; existing entries are cleaned up during the update
+- Possible SQL injection via sort order in the log
+- Page builder data (Bricks, Brizy, Visual Composer, SeedProd, Beaver Builder, Breakdance, Divi 5, Themify) could be damaged when simplified texts were saved
+- Automatic simplification was not scheduled after some updates due to an unknown cron interval
+- Missing gettext library in the release zip broke the export of translations
+- Many smaller bugs, missing checks and PHP warnings
+
 ## [3.2.3] - 13.09.2026
 
 ### Changed

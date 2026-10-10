@@ -38,11 +38,12 @@ class Log_Api_Table extends WP_List_Table {
 	 * @return array<string,mixed>
 	 */
 	private function table_data(): array {
-		// check nonce.
+		// check nonce (headers are already sent at this point, so show a hint instead of a redirect).
 		if ( isset( $_REQUEST['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-table-log-api' ) ) {
-			// redirect user back.
-			wp_safe_redirect( wp_get_referer() );
-			exit;
+			?>
+			<div class="notice notice-error inline"><p><?php echo esc_html__( 'The link you followed has expired. Please reload the page and try again.', 'easy-language' ); ?></p></div>
+			<?php
+			return array();
 		}
 
 		global $wpdb;
@@ -205,7 +206,8 @@ class Log_Api_Table extends WP_List_Table {
 				),
 				get_admin_url() . 'admin.php'
 			);
-			?><a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Export as CSV', 'easy-language' ); ?></a>
+			?>
+			<a href="<?php echo esc_url( $url ); ?>" class="button"><?php echo esc_html__( 'Export as CSV', 'easy-language' ); ?></a>
 			<?php
 
 			// define clear URL.

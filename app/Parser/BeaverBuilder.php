@@ -154,11 +154,18 @@ class BeaverBuilder extends Parser_Base implements Parser {
 		// get editor contents and loop through its array.
 		$data = get_post_meta( $this->get_object_id(), '_fl_builder_data', true );
 		if ( is_array( $data ) && ! empty( $data ) ) {
-			$data['document'] = $this->replace_content_in_widgets( $data, $simplified_part );
-		}
+			// get the data before the replacement to detect changes.
+			$data_before = serialize( $data ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
 
-		// save the data for BeaverBuilder.
-		update_post_meta( $this->get_object_id(), '_fl_builder_data', $data );
+			// replace the text in the modules.
+			$data = $this->replace_content_in_widgets( $data, $simplified_part );
+
+			// save the data for BeaverBuilder, if they have been changed.
+			if ( serialize( $data ) !== $data_before ) { // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
+				// slash the data deep (incl. objects) as update_post_meta() unslashes them.
+				update_post_meta( $this->get_object_id(), '_fl_builder_data', map_deep( $data, 'wp_slash' ) );
+			}
+		}
 
 		// return the string for post_content.
 		return str_replace( $this->get_text(), $simplified_part, $original_complete );
@@ -170,7 +177,7 @@ class BeaverBuilder extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	private function is_beaverbuilder_active(): bool {
-		return Helper::is_plugin_active( 'beaver-builder-lite-version/fl-builder.php' );
+		return Helper::is_plugin_active( 'beaver-builder-lite-version/fl-builder.php' ) || Helper::is_plugin_active( 'bb-plugin/fl-builder.php' );
 	}
 
 	/**

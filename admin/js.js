@@ -37,7 +37,7 @@ jQuery( document ).ready(
 									],
 									buttons: [
 										{
-											'action': 'location.href = "' + easyLanguageJsVars.admin_start + '";',
+											'action': 'location.href = ' + JSON.stringify( String( easyLanguageJsVars.admin_start ) ) + ';',
 											'variant': 'primary',
 											'text': __( 'OK', 'easy-language' )
 										}
@@ -108,11 +108,11 @@ jQuery( document ).ready(
 						title: __( 'Delete simplified %1$s', 'easy-language' ).replace('%1$s', $(this).data('object-type-name')),
 						texts: [
 							/* translators: %1$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title */
-							'<p><strong>' + __( 'Do you really want to delete the simplified %1$s <i>%2$s</i>?', 'easy-language' ).replace('%1$s', $(this).data('object-type-name')).replace('%2$s', $(this).data('title')) + '</strong></p>'
+							'<p><strong>' + __( 'Do you really want to delete the simplified %1$s <i>%2$s</i>?', 'easy-language' ).replace('%1$s', easy_language_escape_html( $(this).data('object-type-name') )).replace('%2$s', easy_language_escape_html( $(this).data('title') )) + '</strong></p>'
 						],
 						buttons: [
 							{
-								'action': 'location.href="' + $(this).attr('href') + '";',
+								'action': 'location.href = ' + JSON.stringify( String( $(this).attr('href') ) ) + ';',
 								'variant': 'primary',
 								'text': __( 'Yes', 'easy-language' )
 							},
@@ -162,7 +162,7 @@ jQuery( document ).ready(
 					title: __( 'Unknown pagebuilder', 'easy-language' ),
 					texts: [
 						/* translators: %1$s and %3$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title */
-						'<p>' + __( 'The %1$s <i>%2$s</i> has been created with an unknown pagebuilder or the classic editor.<br><strong>Are you sure you want to create simplified text for this %3$s?</strong>', 'easy-language' ).replace('%1$s', $(this).data('object-type-name')).replace('%2$s', $(this).data('title')).replace('%3$s', $(this).data('object-type-name')) + '</p>'
+						'<p>' + __( 'The %1$s <i>%2$s</i> has been created with an unknown pagebuilder or the classic editor.<br><strong>Are you sure you want to create simplified text for this %3$s?</strong>', 'easy-language' ).replace('%1$s', easy_language_escape_html( $(this).data('object-type-name') )).replace('%2$s', easy_language_escape_html( $(this).data('title') )).replace('%3$s', easy_language_escape_html( $(this).data('object-type-name') )) + '</p>'
 					],
 					buttons: [
 						{
@@ -283,4 +283,19 @@ function easy_language_get_data_deletion_info() {
  */
 function easy_language_create_dialog( config ) {
 	document.body.dispatchEvent(new CustomEvent("easy-dialog-for-wordpress", config));
+}
+
+/**
+ * Escape a string for safe usage in HTML.
+ *
+ * @param value The value to escape.
+ * @returns {string}
+ */
+function easy_language_escape_html( value ) {
+	if( value === undefined || value === null ) {
+		return '';
+	}
+	let el = document.createElement( 'div' );
+	el.textContent = String( value );
+	return el.innerHTML.replace( /"/g, '&quot;' ).replace( /'/g, '&#039;' );
 }

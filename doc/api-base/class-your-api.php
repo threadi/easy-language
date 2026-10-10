@@ -2,16 +2,21 @@
 /**
  * File for handler for things the Test Api supports.
  *
- * @package easy-language-test-apo
+ * @package easy-language-test-api
  */
 
 namespace easyLanguage\Apis\Your_Api;
 
-use easyLanguage\Base;
-use easyLanguage\Api_Base;
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
+use easyLanguage\Plugin\Api_Base;
+use easyLanguage\Plugin\Api_Requests;
+use easyLanguage\Plugin\Api_Simplifications;
+use easyLanguage\Plugin\Base;
 
 /**
- * Define what SUMM AI supports and what not.
+ * Define what Your API supports and what not.
  */
 class Your_Api extends Base implements Api_Base {
 
@@ -52,10 +57,11 @@ class Your_Api extends Base implements Api_Base {
 	 * Return the instance of this Singleton object.
 	 */
 	public static function get_instance(): Your_Api {
-		if ( ! static::$instance instanceof static ) {
-			static::$instance = new static();
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
 		}
-		return static::$instance;
+
+		return self::$instance;
 	}
 
 	/**
@@ -176,43 +182,26 @@ class Your_Api extends Base implements Api_Base {
 	public function uninstall(): void {}
 
 	/**
-	 * Return active target languages.
+	 * Return active source languages.
 	 *
-	 * @return array
+	 * This example API uses all supported source languages.
+	 *
+	 * @return array<string,array<string,mixed>>
 	 */
-	public function get_active_target_languages(): array {
-		// get actual enabled target-languages.
-		$target_languages = get_option( 'easy_language_target_languages', array() );
-		if( !is_array($target_languages) ) {
-			$target_languages = array();
-		}
-
-		// define resulting list
-		$list = array();
-
-		foreach( $this->get_supported_target_languages() as $language_code => $language ) {
-			if( !empty($target_languages[$language_code]) ) {
-				$list[$language_code] = $language;
-			}
-		}
-
-		return $list;
+	public function get_active_source_languages(): array {
+		return $this->get_supported_source_languages();
 	}
 
 	/**
-	 * We to not add settings for this plugin.
+	 * Return active target languages.
 	 *
-	 * @param string $tab The tab.
-	 * @return void
-	 */
-	public function add_settings_tab( string $tab ): void {}
-
-	/**
-	 * We to not add settings for this plugin.
+	 * This example API uses all supported target languages.
 	 *
-	 * @return void
+	 * @return array<string,array<string,mixed>>
 	 */
-	public function add_settings_page(): void {}
+	public function get_active_target_languages(): array {
+		return $this->get_supported_target_languages();
+	}
 
 	/**
 	 * We to not add settings for this plugin.
@@ -231,14 +220,14 @@ class Your_Api extends Base implements Api_Base {
 	/**
 	 * Return the simplification-object.
 	 *
-	 * @return Simplifications
+	 * @return Api_Simplifications
 	 */
-	public function get_simplifications_obj(): Simplifications {
+	public function get_simplifications_obj(): Api_Simplifications {
 		// get the object.
 		$obj = Simplifications::get_instance();
 
-		// initialize it.
-		$obj->init( $this );
+		// set the API.
+		$obj->set_api( $this );
 
 		// return resulting object.
 		return $obj;
@@ -256,17 +245,38 @@ class Your_Api extends Base implements Api_Base {
 	/**
 	 * Return request-object for this API.
 	 *
-	 * @return Request
+	 * @return Api_Requests
 	 */
-	public function get_request_object() {
+	public function get_request_object(): Api_Requests {
 		return new Request();
 	}
 
+	/**
+	 * Deactivate-routines for the API, called during plugin-deactivation.
+	 *
+	 * @return void
+	 */
 	public function deactivate(): void {
 		// tasks to run on deactivation of this API.
 	}
 
+	/**
+	 * Enable-routines for the API, called on the new API if another API is chosen.
+	 *
+	 * @return void
+	 */
 	public function enable(): void {
 		// tasks to run on activation of this API.
+	}
+
+	/**
+	 * Return language-specific request text for the API.
+	 *
+	 * @param string $target_language The target-language.
+	 *
+	 * @return string
+	 */
+	public function get_request_text_by_language( string $target_language ): string {
+		return '';
 	}
 }

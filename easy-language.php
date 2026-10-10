@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Easy Language
  * Description:       This plugin adds support for easy language in WordPress.
- * Requires at least: 6.0
+ * Requires at least: 6.6
  * Requires PHP:      8.2
  * Version:           @@VersionNumber@@
  * Author:            laOlaWeb

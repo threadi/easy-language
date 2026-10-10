@@ -41,6 +41,20 @@ class Texts {
 	private Db $db;
 
 	/**
+	 * Marker whether we are actually searching for simplified terms.
+	 *
+	 * @var bool
+	 */
+	private bool $hiding_terms = false;
+
+	/**
+	 * List of simplified term IDs per taxonomies.
+	 *
+	 * @var array<string,array<int,int>>
+	 */
+	private array $simplified_terms = array();
+
+	/**
 	 * Constructor for this object.
 	 */
 	private function __construct() {
@@ -119,20 +133,25 @@ class Texts {
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function add_post_object_to_simplification_by_request(): void {
+		// get post ID.
+		$original_post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+
 		// check nonce.
-		check_admin_referer( 'easy-language-add-simplification', 'nonce' );
+		check_admin_referer( 'easy-language-add-simplification-' . $original_post_id, 'nonce' );
 
 		// get active api.
 		$api_object = Apis::get_instance()->get_active_api();
 
-		// get post ID.
-		$original_post_id = isset( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
-
 		// bail if capability is not granted.
-		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
-			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
-			exit;
+		if ( ! current_user_can( 'edit_el_simplifier' ) || ! Init::get_instance()->current_user_can_edit_object( $original_post_id, (string) get_post_type( $original_post_id ) ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to simplify this object.', 'easy-language' ),
+				'',
+				array(
+					'response'  => 403,
+					'back_link' => true,
+				)
+			);
 		}
 
 		// get target-language.
@@ -184,14 +203,23 @@ class Texts {
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function add_term_object_to_simplification_by_request(): void {
-		// check nonce.
-		check_admin_referer( 'easy-language-add-simplification-term', 'nonce' );
+		// get term id.
+		$original_term_id  = isset( $_GET['term'] ) ? absint( $_GET['term'] ) : 0;
+		$original_taxonomy = isset( $_GET['taxonomy'] ) ? sanitize_text_field( wp_unslash( $_GET['taxonomy'] ) ) : '';
 
-		// bail if capability is not granted.
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
-			exit;
+		// check nonce.
+		check_admin_referer( 'easy-language-add-simplification-term-' . $original_term_id, 'nonce' );
+
+		// bail if capability is not granted or the taxonomy is not supported.
+		if ( ! current_user_can( 'edit_el_simplifier' ) || ! Init::get_instance()->current_user_can_edit_object( $original_term_id, $original_taxonomy ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to simplify this object.', 'easy-language' ),
+				'',
+				array(
+					'response'  => 403,
+					'back_link' => true,
+				)
+			);
 		}
 
 		// get active api.
@@ -199,10 +227,6 @@ class Texts {
 
 		// get target-language.
 		$target_language = isset( $_GET['language'] ) ? sanitize_text_field( wp_unslash( $_GET['language'] ) ) : '';
-
-		// get term id.
-		$original_term_id  = isset( $_GET['term'] ) ? absint( $_GET['term'] ) : 0;
-		$original_taxonomy = isset( $_GET['taxonomy'] ) ? sanitize_text_field( wp_unslash( $_GET['taxonomy'] ) ) : '';
 
 		if ( $original_term_id > 0 && ! empty( $target_language ) && $api_object ) {
 			// get term-object.
@@ -324,8 +348,11 @@ class Texts {
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function get_post_simplification_by_request(): void {
+		// get object id.
+		$object_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
+
 		// check nonce.
-		check_admin_referer( 'easy-language-get-simplification', 'nonce' );
+		check_admin_referer( 'easy-language-get-simplification-' . $object_id, 'nonce' );
 
 		// get api.
 		$api_obj = Apis::get_instance()->get_active_api();
@@ -335,18 +362,20 @@ class Texts {
 			exit;
 		}
 
-		// get object id.
-		$object_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
-
-		// bail if capability is not granted.
-		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
-			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
-			exit;
-		}
-
 		// get object type.
 		$object_type = isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : '';
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( 'edit_el_simplifier' ) || ! Init::get_instance()->current_user_can_edit_object( $object_id, $object_type ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to simplify this object.', 'easy-language' ),
+				'',
+				array(
+					'response'  => 403,
+					'back_link' => true,
+				)
+			);
+		}
 
 		if ( $object_id > 0 ) {
 			// Log event.
@@ -374,14 +403,25 @@ class Texts {
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function get_term_simplification_by_request(): void {
-		// check nonce.
-		check_admin_referer( 'easy-language-get-term-simplification', 'nonce' );
+		// get object id.
+		$object_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 
-		// bail if capability is not granted.
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
-			exit;
+		// get taxonomy.
+		$taxonomy = isset( $_GET['taxonomy'] ) ? sanitize_text_field( wp_unslash( $_GET['taxonomy'] ) ) : '';
+
+		// check nonce.
+		check_admin_referer( 'easy-language-get-term-simplification-' . $object_id, 'nonce' );
+
+		// bail if capability is not granted or the taxonomy is not supported.
+		if ( ! current_user_can( 'edit_el_simplifier' ) || ! Init::get_instance()->current_user_can_edit_object( $object_id, $taxonomy ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to simplify this object.', 'easy-language' ),
+				'',
+				array(
+					'response'  => 403,
+					'back_link' => true,
+				)
+			);
 		}
 
 		// get api.
@@ -391,12 +431,6 @@ class Texts {
 			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
 			exit;
 		}
-
-		// get object id.
-		$object_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
-
-		// get taxonomy.
-		$taxonomy = isset( $_GET['taxonomy'] ) ? sanitize_text_field( wp_unslash( $_GET['taxonomy'] ) ) : '';
 
 		if ( $object_id > 0 && ! empty( $taxonomy ) ) {
 			// run simplification of this object.
@@ -416,8 +450,11 @@ class Texts {
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
 	public function get_simplification_of_entry_by_request(): void {
+		// get text id.
+		$entry_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
+
 		// check nonce.
-		check_admin_referer( 'easy-language-get-simplification-of-entry', 'nonce' );
+		check_admin_referer( 'easy-language-get-simplification-of-entry-' . $entry_id, 'nonce' );
 
 		// get api.
 		$api_obj = Apis::get_instance()->get_active_api();
@@ -427,9 +464,6 @@ class Texts {
 			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}
-
-		// get text id.
-		$entry_id = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
 
 		// bail if no entry ID is given.
 		if ( 0 === $entry_id ) {
@@ -479,6 +513,18 @@ class Texts {
 			exit;
 		}
 
+		// bail if the user is not allowed to edit the object.
+		if ( ! Init::get_instance()->current_user_can_edit_object( absint( $post_objects[0]['object_id'] ), $post_objects[0]['object_type'] ) ) {
+			wp_die(
+				esc_html__( 'You are not allowed to simplify this object.', 'easy-language' ),
+				'',
+				array(
+					'response'  => 403,
+					'back_link' => true,
+				)
+			);
+		}
+
 		// get the object of the first one.
 		$object = Helper::get_object( absint( $post_objects[0]['object_id'] ), $post_objects[0]['object_type'] );
 
@@ -493,8 +539,14 @@ class Texts {
 			exit;
 		}
 
+		// mark simplification for this object as running.
+		$object->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, time() );
+
 		// call simplification for each text on this object.
 		$object->process_simplification( $api_obj->get_simplifications_obj(), $api_obj->get_mapping_languages(), $entry );
+
+		// remove running marker to mark end of process.
+		$object->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
 
 		// redirect user back to the editor.
 		wp_safe_redirect( wp_get_referer() );
@@ -544,12 +596,20 @@ class Texts {
 				// set original text to simplify in pagebuilder-object.
 				$pagebuilder_obj->set_text( $post_obj->get_content() );
 
+				// get the parsed texts only once.
+				$parsed_texts = $pagebuilder_obj->get_parsed_texts();
+
 				// get all simplifications for this object in all active languages.
 				foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
 					$translated_post_id = $post_obj->get_simplification_in_language( $language_code );
 
+					// bail if no simplification exists in this language.
+					if ( 0 === $translated_post_id ) {
+						continue;
+					}
+
 					// loop through the resulting texts and check if the text has been changed (aka: is not available in translation-db).
-					foreach ( $pagebuilder_obj->get_parsed_texts() as $text ) {
+					foreach ( $parsed_texts as $text ) {
 						// bail if the text is empty.
 						if ( empty( $text['text'] ) ) {
 							continue;
@@ -560,9 +620,12 @@ class Texts {
 							'object_type' => $post_obj->get_type(),
 							'hash'        => $this->db->get_string_hash( $text['text'] ),
 						);
-						if ( ! empty( Db::get_instance()->get_entries( $filter ) ) ) {
+						if ( empty( $this->db->get_entries( $filter, array(), 1 ) ) ) {
 							// mark the object as changed as translated content has been changed or new content has been added in the given language.
 							$post_obj->mark_as_changed_in_language( $language_code );
+
+							// no further checks necessary for this language.
+							break;
 						}
 					}
 				}
@@ -572,8 +635,7 @@ class Texts {
 		// if this is a simplified object, update the simplified contents and reset the changed-marker on its original.
 		if ( $post_obj->is_simplified() ) {
 			// bail if a simplification of this object is actually running.
-			$running_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, array() );
-			if ( ! empty( $running_simplifications[ $post_obj->get_md5() ] ) && absint( $running_simplifications[ $post_obj->get_md5() ] ) > 0 ) {
+			if ( $post_obj->is_simplification_running() ) {
 				return;
 			}
 
@@ -616,6 +678,9 @@ class Texts {
 			// get parsed texts from the object.
 			$parsed_texts = $pagebuilder_obj->get_parsed_texts();
 
+			// get the list of the parsed texts as strings.
+			$parsed_text_list = array_map( 'trim', array_map( 'strval', array_column( $parsed_texts, 'text' ) ) );
+
 			// Delete it in DB existing texts of its object is not part of the actual content.
 			// Also check for their simplifications.
 			$query   = array(
@@ -634,22 +699,36 @@ class Texts {
 					// get the simplification.
 					$simplification = trim( $entry->get_simplification( $target_language ) );
 
-					// TODO Debugging $parse_texts more precisely: how do you get to the text that needs to be deleted?
+					// delete the connection to this object if the text is not part of the actual content anymore.
 					if ( false === $entry->is_field( 'title' )
-						&& false === in_array( $simplification, $parsed_texts, true ) // @phpstan-ignore function.impossibleType,identical.alwaysTrue
-						&& false === in_array( $entry->get_original(), $parsed_texts, true ) // @phpstan-ignore function.impossibleType,identical.alwaysTrue
+						&& false === in_array( $simplification, $parsed_text_list, true )
+						&& false === in_array( trim( $entry->get_original() ), $parsed_text_list, true )
 					) {
-						$entry->delete();
+						$entry->delete( $post_id );
 					} elseif ( $simplification !== $title && false !== $entry->is_field( 'title' ) ) {
-						$entry->delete();
+						$entry->delete( $post_id );
 					}
 				}
 			}
 
+			// collect the texts which are already known for this object (originals and their simplifications).
+			$known_texts = array();
+			foreach ( $this->db->get_entries( $query ) as $entry ) {
+				$known_texts[] = trim( $entry->get_original() );
+				if ( ! empty( $target_language ) ) {
+					$known_texts[] = trim( $entry->get_simplification( $target_language ) );
+				}
+			}
+
 			// loop through the resulting texts and compare them with the existing texts in the object.
-			foreach ( $pagebuilder_obj->get_parsed_texts() as $index => $text ) {
+			foreach ( $parsed_texts as $index => $text ) {
 				// bail if the text is empty.
 				if ( empty( $text['text'] ) ) {
+					continue;
+				}
+
+				// bail if the text is already known for this object.
+				if ( in_array( trim( $text['text'] ), $known_texts, true ) ) {
 					continue;
 				}
 
@@ -662,7 +741,7 @@ class Texts {
 				$original_text_obj = $this->db->get_entry_by_text( $text['text'], $source_language );
 
 				// also check if this is a simplified text of the given language.
-				if ( ! $update && false === $original_text_obj && false === $this->db->get_entry_by_simplification( trim( $text['text'] ), $target_language ) ) { // @phpstan-ignore booleanNot.alwaysFalse,booleanAnd.alwaysFalse,booleanAnd.alwaysFalse
+				if ( false === $original_text_obj && false === $this->db->get_entry_by_simplification( trim( $text['text'] ), $target_language ) ) {
 					// if not, save the text for simplification.
 					$original_text_obj = $this->db->add( $text['text'], $source_language, 'post_content', $text['html'] );
 
@@ -815,7 +894,7 @@ class Texts {
 		// get language to export.
 		$export_language_code = isset( $_GET['lang'] ) ? sanitize_text_field( wp_unslash( $_GET['lang'] ) ) : '';
 
-		if ( ! empty( $export_language_code ) && class_exists( 'Translations' ) ) {
+		if ( ! empty( $export_language_code ) && class_exists( Translations::class ) ) {
 
 			// define query for entries.
 			$query = array(
@@ -890,13 +969,23 @@ class Texts {
 		// get log object.
 		$log = Log::get_instance();
 
-		// get taxonomy from request.
-		$taxonomy = isset( $_REQUEST['type'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['type'] ) ) : '';
-
 		/**
 		 * Replace content depending on the field.
 		 */
 		foreach ( $simplification_objects as $simplification_object ) {
+			// bail if this entry is not for the requested object.
+			if ( absint( $simplification_object['object_id'] ) !== $object_id ) {
+				continue;
+			}
+
+			// get the taxonomy from the simplification object.
+			$taxonomy = (string) $simplification_object['object_type'];
+
+			// bail if this is not a taxonomy.
+			if ( ! taxonomy_exists( $taxonomy ) ) {
+				continue;
+			}
+
 			switch ( $simplification_object['field'] ) {
 				// simplify the title of the term.
 				case 'taxonomy_title':
@@ -970,22 +1059,38 @@ class Texts {
 			return $args;
 		}
 
-		// get all simplified terms.
-		$query            = array(
-			'hide_empty'   => false,
-			'meta_key'     => 'easy_language_simplification_original_id',
-			'meta_compare' => 'EXISTS',
-			'fields'       => 'ids',
-		);
-		$simplified_terms = get_terms( $query );
-
-		// bail if no terms could be found.
-		if ( ! is_array( $simplified_terms ) || empty( $simplified_terms ) ) {
+		// bail if we are already searching for simplified terms (prevents recursion through our own query).
+		if ( $this->hiding_terms ) {
 			return $args;
 		}
 
-		// add them to the actual query.
-		$args['exclude'] = $simplified_terms;
+		// get the cache key for the requested taxonomies.
+		$cache_key = implode( ',', array_map( 'strval', (array) $args['taxonomy'] ) );
+
+		// get all simplified terms of the requested taxonomies, if not already loaded during this request.
+		if ( ! isset( $this->simplified_terms[ $cache_key ] ) ) {
+			$this->hiding_terms = true;
+			$query              = array(
+				'taxonomy'     => $args['taxonomy'],
+				'hide_empty'   => false,
+				'meta_key'     => 'easy_language_simplification_original_id',
+				'meta_compare' => 'EXISTS',
+				'fields'       => 'ids',
+			);
+			$simplified_terms   = get_terms( $query );
+			$this->hiding_terms = false;
+
+			// secure the result.
+			$this->simplified_terms[ $cache_key ] = is_array( $simplified_terms ) ? array_map( 'absint', $simplified_terms ) : array();
+		}
+
+		// bail if no terms could be found.
+		if ( empty( $this->simplified_terms[ $cache_key ] ) ) {
+			return $args;
+		}
+
+		// add them to the actual query and keep existing excludes.
+		$args['exclude'] = array_unique( array_merge( wp_parse_id_list( $args['exclude'] ?? array() ), $this->simplified_terms[ $cache_key ] ) );
 
 		// return resulting arguments.
 		return $args;

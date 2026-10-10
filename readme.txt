@@ -1,7 +1,7 @@
 === Easy Language ===
 Contributors: laolaweb, threadi
 Tags: easy language, leichte sprache, simplify, summ ai, capito
-Requires at least: 6.0
+Requires at least: 6.6
 Tested up to: 7.1
 Requires PHP: 8.2
 License: GPL-2.0-or-later
@@ -79,7 +79,7 @@ The plugin has not been tested with all available plugins. It is expected to be 
 
 We also provide Shortcodes as documented [here](https://github.com/threadi/easy-language/blob/master/doc/shortcodes.md).
 
-You find some documentations [on this plugin page](https://plugins.thomaszwirner.de/en/plugin/easy-language/) and [in GitHub](https://github.com/threadi/easy-language/tree/master/docs).
+You find some documentations [on this plugin page](https://plugins.thomaszwirner.de/en/plugin/easy-language/) and [in GitHub](https://github.com/threadi/easy-language/tree/master/doc).
 
 The development repository is on [GitHub](https://github.com/threadi/easy-language).
 
@@ -105,8 +105,14 @@ Each release of this plugin will only be published if it fulfills the following 
 == Changelog ==
 
 = @@VersionNumber@@ =
+- Added encryption of API keys, existing keys are migrated automatically
+- Now requires WordPress 6.6 or newer
+- Simplification requests now also check the permission for the respective object
+- Reset of the plugin only affects the actual site in multisite
+- Fixed API tokens in the request log
+- Fixed possible damage to page builder data when saving simplified texts
+- Fixed scheduling of the automatic simplification after updates
+- Fixed many smaller bugs and PHP warnings
 - Updated dependencies
-- Changed styling of custom buttons in settings for better visibility in WordPress 7.x
-- Fixed the wrong version number in the WordPress repository
 
 [older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)

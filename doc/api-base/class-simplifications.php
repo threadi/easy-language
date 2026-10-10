@@ -7,74 +7,65 @@
 
 namespace easyLanguage\Apis\Your_Api;
 
-use easyLanguage\Multilingual_Plugins;
+// prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
+use easyLanguage\Plugin\Api_Simplifications;
+use easyLanguage\Plugin\Simplification_Base;
 
 /**
- * SimplificationS-Handling for this plugin.
+ * Simplifications-Handling for this API.
  */
-class Simplifications {
-    /**
-     * Instance of this object.
-     *
-     * @var ?Simplifications
-     */
-    private static ?Simplifications $instance = null;
+class Simplifications extends Simplification_Base implements Api_Simplifications {
+	/**
+	 * Instance of this object.
+	 *
+	 * @var ?Simplifications
+	 */
+	private static ?Simplifications $instance = null;
 
-    /**
-     * Init-Object of this API.
-     *
-     * @var Your_Api
-     */
-    public Your_Api $init;
+	/**
+	 * Constructor for Init-Handler.
+	 */
+	private function __construct() {}
 
-    /**
-     * Constructor for Init-Handler.
-     */
-    private function __construct() {}
+	/**
+	 * Prevent cloning of this object.
+	 *
+	 * @return void
+	 */
+	private function __clone() {}
 
-    /**
-     * Prevent cloning of this object.
-     *
-     * @return void
-     */
-    private function __clone() {}
+	/**
+	 * Return the instance of this Singleton object.
+	 */
+	public static function get_instance(): Simplifications {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self();
+		}
 
-    /**
-     * Return the instance of this Singleton object.
-     */
-    public static function get_instance(): Simplifications
-    {
-        if (!static::$instance instanceof static) {
-            static::$instance = new static();
-        }
+		return self::$instance;
+	}
 
-        return static::$instance;
-    }
-
-    /**
-     * Initialize this object.
-     *
-     * @param Your_Api $init
-     * @return void
-     */
-    public function init( Your_Api $init ): void {
-        $this->init = $init;
-    }
-
-    /**
-     * Call API to simplify a single text.
-     *
-     * @param string $text_to_translate
-     * @param string $source_language
-     * @param string $target_language
-     *
-     * @return array
-     * @noinspection PhpUnused
-     * @noinspection PhpUnusedParameterInspection*/
-    public function call_api( string $text_to_translate, string $source_language, string $target_language ): array {
-        return array(
-            'translated_text' => 'Das ist der per Test-API übersetzte Text in leichter Sprache.',
-            'jobid' => 42
-        );
-    }
+	/**
+	 * Call API to simplify a single text.
+	 *
+	 * The API object is available via $this->get_api().
+	 * Use $this->get_api()->get_request_object() to create a request for your API.
+	 *
+	 * @param string $text_to_translate The text to simplify.
+	 * @param string $source_language The source language of the text.
+	 * @param string $target_language The target language of the text.
+	 * @param bool   $is_html Marker if the text contains HTML-Code.
+	 * @param bool   $is_test Marker if this is a test request.
+	 *
+	 * @return array<string,int|string> Array with 'translated_text' and 'jobid' or an empty array on error.
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html, bool $is_test = false ): array {
+		return array(
+			'translated_text' => 'Das ist der per Test-API übersetzte Text in leichter Sprache.',
+			'jobid'           => 42,
+		);
+	}
 }

@@ -11,6 +11,7 @@ namespace easyLanguage\PageBuilder\Elementor;
 defined( 'ABSPATH' ) || exit;
 
 use Elementor\Base_Data_Control;
+use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
 
 /**
@@ -79,6 +80,14 @@ class Languages extends Base_Data_Control {
 			// get the original-object.
 			$original_post_object = new Post_Object( $original_post_id );
 
+			// get the page builder object.
+			$page_builder = $original_post_object->get_page_builder();
+
+			// bail if the page builder could not be loaded.
+			if ( ! $page_builder instanceof Parser_Base ) {
+				return;
+			}
+
 			?>
 			<# if ( data.description ) { #>
 				<div class="elementor-control-field-description">{{{ data.description }}}</div>
@@ -87,7 +96,7 @@ class Languages extends Base_Data_Control {
 			<div class="elementor-control-field easy-language-table">
 				<div class="elementor-control-input-wrapper">
 					<?php
-						$original_post_object->get_page_builder()->get_language_switch( $post_id );
+						$page_builder->get_language_switch( $post_id );
 					?>
 				</div>
 			</div>

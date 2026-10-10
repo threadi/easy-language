@@ -68,9 +68,18 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 	 * @noinspection PhpUnused
 	 */
 	public function call_api( string $text_to_translate, string $source_language, string $target_language, bool $is_html, bool $is_test = false ): array {
+		// get the supported languages.
+		$supported_source_languages = $this->get_api()->get_supported_source_languages();
+		$supported_target_languages = $this->get_api()->get_supported_target_languages();
+
+		// bail if the mapping for one of the languages is missing.
+		if ( ! isset( $supported_source_languages[ $source_language ]['api_value'], $supported_target_languages[ $target_language ]['api_value'] ) ) {
+			return array();
+		}
+
 		// map the languages with its shorthand (e.g., de_DE => de).
-		$source_language = $this->get_api()->get_supported_source_languages()[ $source_language ]['api_value'];
-		$target_language = $this->get_api()->get_supported_target_languages()[ $target_language ]['api_value'];
+		$source_language = $supported_source_languages[ $source_language ]['api_value'];
+		$target_language = $supported_target_languages[ $target_language ]['api_value'];
 
 		// build request.
 		$request_obj = $this->get_api()->get_request_object();
@@ -98,6 +107,11 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 			// transform it to array.
 			$response_array = json_decode( $response, true );
 
+			// bail if the response does not contain a simplified text.
+			if ( ! is_array( $response_array ) || empty( $response_array['content'] ) || ! is_string( $response_array['content'] ) ) {
+				return array();
+			}
+
 			// get the simplified text.
 			$simplified_text = $response_array['content'];
 
@@ -112,6 +126,11 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 			 * @param Simplifications $instance The simplification object.
 			 */
 			$simplified_text = apply_filters( 'easy_language_simplified_text', $simplified_text, $response_array, $instance );
+
+			// filter the simplified HTML text to allow only HTML, which is allowed in posts.
+			if ( $is_html ) {
+				$simplified_text = wp_kses_post( $simplified_text );
+			}
 
 			// return simplification to the plugin which will save it.
 			return array(

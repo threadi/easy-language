@@ -213,9 +213,6 @@ class Text {
 		if ( $wpdb->last_error ) {
 			Log::get_instance()->add_log( __( 'Error during adding simplification of text in DB: ', 'easy-language' ) . $wpdb->last_error, 'error' );
 		} else {
-			// change the state of text to "simplified".
-			$this->set_state( 'simplified' );
-
 			// save simplification in the object.
 			$this->simplifications[ $target_language ] = $translated_text;
 		}
@@ -226,20 +223,40 @@ class Text {
 	 *
 	 * @param int    $object_id The object-ID where the text should be replaced.
 	 * @param string $target_language The target language for the translated text.
+	 * @param string $object_type The object-type (e.g. post-type or taxonomy) of the object.
 	 *
 	 * @return bool
 	 */
-	public function replace_original_with_simplification( int $object_id, string $target_language ): bool {
-		// get simplification objects.
-		$simplification_objects = $this->get_objects();
+	public function replace_original_with_simplification( int $object_id, string $target_language, string $object_type = '' ): bool {
+		// get simplification objects, but only those of the requested object.
+		$simplification_objects = array();
+		foreach ( $this->get_objects() as $simplification_object ) {
+			// bail if this is not the requested object.
+			if ( absint( $simplification_object['object_id'] ) !== $object_id ) {
+				continue;
+			}
+
+			// bail if this is not the requested object type.
+			if ( ! empty( $object_type ) && $object_type !== $simplification_object['object_type'] ) {
+				continue;
+			}
+
+			// add it to the list.
+			$simplification_objects[] = $simplification_object;
+		}
 
 		// bail if translation-objects could not be loaded.
 		if ( empty( $simplification_objects ) ) {
 			return false;
 		}
 
+		// use the object type of the first matching entry if none is given.
+		if ( empty( $object_type ) ) {
+			$object_type = $simplification_objects[0]['object_type'];
+		}
+
 		// get object.
-		$object = Helper::get_object( $object_id );
+		$object = Helper::get_object( $object_id, $object_type );
 
 		// bail of the object is not an Objects object.
 		if ( ! $object instanceof Objects ) {
@@ -278,7 +295,7 @@ class Text {
 					}
 
 					// save it.
-					wp_update_post( $array );
+					wp_update_post( wp_slash( $array ) );
 
 					// run pagebuilder-specific tasks to update settings or trigger third party events.
 					$obj->update_object( $object );
@@ -305,10 +322,9 @@ class Text {
 					// update post-entry.
 					$array = array(
 						'ID'           => $object_id,
-						'post_type'    => $translation_object['object_type'],
 						'post_content' => $content,
 					);
-					wp_update_post( $array );
+					wp_update_post( wp_slash( $array ) );
 					break;
 				default:
 					$instance = $this;
@@ -481,10 +497,15 @@ class Text {
 		);
 
 		// get result.
-		$result = (array) $wpdb->get_results( $prepared_sql, ARRAY_A );
+		$result = $wpdb->get_var( $prepared_sql );
+
+		// bail if no result could be found.
+		if ( ! is_string( $result ) ) {
+			return '';
+		}
 
 		// return the time.
-		return $result[0]['time'];
+		return $result;
 	}
 
 	/**
@@ -613,9 +634,9 @@ class Text {
 		);
 
 		// get result.
-		$result = (array) $wpdb->get_results( $prepared_sql, ARRAY_A );
+		$result = $wpdb->get_var( $prepared_sql );
 
-		// return the result.
-		return 1 === absint( $result[0]['html'] );
+		// return the result (false if no entry could be found).
+		return 1 === absint( $result );
 	}
 }

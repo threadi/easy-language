@@ -98,6 +98,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		add_filter( 'trp_mt_available_supported_languages', array( $this, 'get_supported_languages_for_trp' ), 10, 3 );
 		add_filter( 'trp_ls_floating_current_language', array( $this, 'set_current_language_fields' ), 10, 3 );
 		add_filter( 'trp_flags_path', array( $this, 'set_flag' ), 10, 2 );
+		add_filter( 'trp_flag_file_name', array( $this, 'set_flag_file_name' ), 10, 2 );
 		add_action( 'trp_machine_translation_extra_settings_middle', array( $this, 'add_settings' ), 40, 0 );
 		add_filter( 'trp_machine_translation_sanitize_settings', array( $this, 'sanitize_settings' ), 10, 1 );
 	}
@@ -317,16 +318,19 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @noinspection PhpUnusedParameterInspection
 	 **/
 	public function get_supported_languages_for_trp( bool $all_are_available, array $trp_languages, array $settings ): bool {
-		if ( in_array( $settings['trp_machine_translation_settings']['translation-engine'], array( 'summ-ai', 'capito' ), true ) ) {
+		// get the used translation engine.
+		$translation_engine = $settings['trp_machine_translation_settings']['translation-engine'] ?? '';
+
+		if ( in_array( $translation_engine, array( 'summ-ai', 'capito' ), true ) ) {
 			// remove our own filter to prevent a loop.
 			remove_filter( 'trp_mt_available_supported_languages', array( $this, 'get_supported_languages_for_trp' ) );
 
 			// get possible target-languages.
 			$languages = Languages::get_instance()->get_possible_target_languages();
 
-			// add them to the list.
+			// check if one of our languages is used in TranslatePress.
 			foreach ( $languages as $language_code => $language ) {
-				if ( in_array( $language_code, $languages, true ) ) {
+				if ( in_array( $language_code, $trp_languages, true ) ) {
 					// re-add our own filter.
 					add_filter( 'trp_mt_available_supported_languages', array( $this, 'get_supported_languages_for_trp' ), 10, 3 );
 
@@ -370,23 +374,63 @@ class Init extends Base implements ThirdPartySupport_Base {
 	/**
 	 * Change the path for our own language-flag.
 	 *
+	 * The filter "trp_flags_path" expects the directory (URL) of the flags, the file name is added by TranslatePress
+	 * (filterable via "trp_flag_file_name").
+	 *
 	 * @param string $flags_path Path to the flags.
 	 * @param string $searched_language_code Checked language-code.
 	 * @return string
 	 */
 	public function set_flag( string $flags_path, string $searched_language_code ): string {
+		// get the URL of our icon for this language.
+		$icon_url = $this->get_flag_url( $searched_language_code );
+
+		// bail if this is not one of our languages or no icon is set.
+		if ( empty( $icon_url ) ) {
+			return $flags_path;
+		}
+
+		// return the directory of our icon.
+		return trailingslashit( dirname( $icon_url ) );
+	}
+
+	/**
+	 * Change the file name for our own language-flag.
+	 *
+	 * @param string $flag_file_name The file name of the flag.
+	 * @param string $searched_language_code Checked language-code.
+	 * @return string
+	 */
+	public function set_flag_file_name( string $flag_file_name, string $searched_language_code ): string {
+		// get the URL of our icon for this language.
+		$icon_url = $this->get_flag_url( $searched_language_code );
+
+		// bail if this is not one of our languages or no icon is set.
+		if ( empty( $icon_url ) ) {
+			return $flag_file_name;
+		}
+
+		// return the file name of our icon.
+		return wp_basename( $icon_url );
+	}
+
+	/**
+	 * Return the URL of the flag for one of our own languages.
+	 *
+	 * @param string $searched_language_code Checked language-code.
+	 * @return string
+	 */
+	private function get_flag_url( string $searched_language_code ): string {
 		// get possible target-languages.
 		$languages = Languages::get_instance()->get_possible_target_languages();
 
-		// add them to the list.
-		foreach ( $languages as $language_code => $language ) {
-			if ( $language_code === $searched_language_code ) {
-				$flags_path = Helper::get_icon_path_for_language_code( $language_code );
-			}
+		// bail if this is not one of our languages.
+		if ( ! isset( $languages[ $searched_language_code ] ) ) {
+			return '';
 		}
 
-		// return the given path.
-		return $flags_path;
+		// return the URL of the icon.
+		return Helper::get_icon_path_for_language_code( $searched_language_code );
 	}
 
 	/**

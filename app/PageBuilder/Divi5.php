@@ -69,32 +69,43 @@ class Divi5 extends PageBuilder_Base {
 	 * @return bool
 	 */
 	public function is_active(): bool {
+		// use the cached result.
+		static $is_active = null;
+		if ( is_bool( $is_active ) ) {
+			return $is_active;
+		}
+
 		// first check for the plugin.
 		if ( Helper::is_plugin_active( 'divi-builder/divi-builder.php' ) ) {
 			// get the plugin version.
-			require_once ABSPATH . 'wp-admin/includes/admin.php';
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/divi-builder/divi-builder.php' );
+			if ( ! function_exists( 'get_plugin_data' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/divi-builder/divi-builder.php', false, false );
 			if ( version_compare( $plugin_data['Version'], '5.0.0', '>=' ) ) {
-				return true;
+				$is_active = true;
+				return $is_active;
 			}
 		}
 
 		// check for the theme.
 		$theme = wp_get_theme();
 		if ( 'Divi' === $theme->get( 'Name' ) ) {
-			$version = substr( $theme->get( 'Version' ), 0, 5 );
-			return version_compare( $version, '5.0.0', '>=' );
+			$version   = substr( (string) $theme->get( 'Version' ), 0, 5 );
+			$is_active = version_compare( $version, '5.0.0', '>=' );
+			return $is_active;
 		}
 
 		// check for the parent theme.
 		if ( $theme->parent() && 'Divi' === $theme->parent()->get( 'Name' ) ) {
-			$version = substr( $theme->parent()->get( 'Version' ), 0, 5 );
-			return version_compare( $version, '5.0.0', '>=' );
+			$version   = substr( (string) $theme->parent()->get( 'Version' ), 0, 5 );
+			$is_active = version_compare( $version, '5.0.0', '>=' );
+			return $is_active;
 		}
 
 		// otherwise return false.
-		return false;
+		$is_active = false;
+		return $is_active;
 	}
 
 	/**
@@ -125,6 +136,11 @@ class Divi5 extends PageBuilder_Base {
 
 		// bail if we do not have any Divi 5 content.
 		if ( ! $has_d5_content ) {
+			return $data;
+		}
+
+		// bail if the Divi utility is not available.
+		if ( ! class_exists( SavingUtility::class ) || ! method_exists( SavingUtility::class, 'maybe_add_slash' ) ) {
 			return $data;
 		}
 

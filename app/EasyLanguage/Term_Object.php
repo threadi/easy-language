@@ -186,9 +186,11 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 			if ( 'link_translated' === get_option( 'easy_language_switcher_link', '' ) ) {
 				$url = get_term_link( $this->get_simplification_in_language( $language_code ) );
 			} elseif ( 'page' === get_option( 'show_on_front' ) ) {
-				$object_id = absint( get_option( 'page_on_front', 0 ) );
-				$object    = new Term_Object( $object_id, $this->get_type() );
-				$url       = get_term_link( $object->get_simplification_in_language( $language_code ) );
+				// link to the simplification of the front page, which is always a post-object.
+				$object_id            = absint( get_option( 'page_on_front', 0 ) );
+				$object               = new Post_Object( $object_id );
+				$simplified_object_id = $object->get_simplification_in_language( $language_code );
+				$url                  = $simplified_object_id > 0 ? get_permalink( $simplified_object_id ) : get_home_url();
 			} elseif ( 'posts' === get_option( 'show_on_front' ) ) {
 				$url = get_home_url();
 			}
@@ -312,7 +314,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 			array(
 				'action'   => 'easy_language_get_term_simplification',
 				'id'       => $this->get_id(),
-				'nonce'    => wp_create_nonce( 'easy-language-get-term-simplification' ),
+				'nonce'    => wp_create_nonce( 'easy-language-get-term-simplification-' . $this->get_id() ),
 				'taxonomy' => $this->get_type(),
 			),
 			get_admin_url() . 'admin.php'
@@ -330,7 +332,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 		return add_query_arg(
 			array(
 				'action'   => 'easy_language_add_simplification_term',
-				'nonce'    => wp_create_nonce( 'easy-language-add-simplification-term' ),
+				'nonce'    => wp_create_nonce( 'easy-language-add-simplification-term-' . $this->get_id() ),
 				'term'     => $this->get_id(),
 				'taxonomy' => $this->get_type(),
 				'language' => $language_code,
@@ -471,12 +473,9 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 		// save the API used for this simplification.
 		update_term_meta( $copied_term_id, 'easy_language_api', $api_object->get_name() );
 
-		// get name and description as translatable texts.
-		$title = get_term_field( 'name', $copied_term_id, $this->get_type() );
-		if ( ! is_string( $title ) ) {
-			$title = '';
-		}
-		$description = get_term_field( 'description', $copied_term_id, $this->get_type() );
+		// get name and description of the original term as translatable texts.
+		$title       = $this->get_name();
+		$description = get_term_field( 'description', $this->get_id(), $this->get_type() );
 		if ( ! is_string( $description ) ) {
 			$description = '';
 		}

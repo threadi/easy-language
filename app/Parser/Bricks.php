@@ -153,8 +153,8 @@ class Bricks extends Parser_Base implements Parser {
 			// replace the texts.
 			$text = $this->replace_content_in_widgets( $data, $simplified_part );
 
-			// save the data for Bricks.
-			update_post_meta( $this->get_object_id(), BRICKS_DB_PAGE_CONTENT, $text );
+			// save the data for Bricks (slashed, as update_post_meta() unslashes them).
+			update_post_meta( $this->get_object_id(), BRICKS_DB_PAGE_CONTENT, wp_slash( $text ) );
 		}
 
 		// return the string for post_content.
@@ -217,7 +217,7 @@ class Bricks extends Parser_Base implements Parser {
 			}
 
 			// if the section contains settings, get them.
-			if ( isset( $section['settings'] ) && ! empty( $flow_text_widgets[ $section['name'] ] ) ) {
+			if ( isset( $section['settings'], $section['name'] ) && is_array( $section['settings'] ) && is_string( $section['name'] ) && ! empty( $flow_text_widgets[ $section['name'] ] ) && is_array( $flow_text_widgets[ $section['name'] ] ) ) {
 				foreach ( $flow_text_widgets[ $section['name'] ] as $entry_name ) {
 					if ( empty( $section['settings'][ $entry_name ] ) ) {
 						continue;
@@ -228,6 +228,12 @@ class Bricks extends Parser_Base implements Parser {
 					);
 				}
 			}
+
+			// bail if no deeper arrays are present.
+			if ( empty( $section['children'] ) || ! is_array( $section['children'] ) ) {
+				continue;
+			}
+
 			// loop through the deeper arrays.
 			$resulting_texts = $this->get_widgets( $section['children'], $resulting_texts );
 		}
@@ -254,13 +260,24 @@ class Bricks extends Parser_Base implements Parser {
 			}
 
 			// if the section contains settings, get them.
-			if ( isset( $section['settings'] ) && ! empty( $flow_text_widgets[ $section['name'] ] ) ) {
+			if ( isset( $section['settings'], $section['name'] ) && is_array( $section['settings'] ) && is_string( $section['name'] ) && ! empty( $flow_text_widgets[ $section['name'] ] ) && is_array( $flow_text_widgets[ $section['name'] ] ) ) {
 				foreach ( $flow_text_widgets[ $section['name'] ] as $entry_name ) {
 					if ( empty( $section['settings'][ $entry_name ] ) ) {
 						continue;
 					}
+
+					// bail if this is not the original text.
+					if ( $this->get_text() !== $section['settings'][ $entry_name ] ) {
+						continue;
+					}
+
 					$container[ $index ]['settings'][ $entry_name ] = $simplified_part;
 				}
+			}
+
+			// bail if no deeper arrays are present.
+			if ( empty( $section['children'] ) || ! is_array( $section['children'] ) ) {
+				continue;
 			}
 
 			// loop through the deeper arrays.
@@ -282,12 +299,20 @@ class Bricks extends Parser_Base implements Parser {
 			return parent::get_edit_link();
 		}
 
+		// get the permalink.
+		$permalink = get_permalink( $this->get_object_id() );
+
+		// bail if no permalink could be loaded.
+		if ( ! is_string( $permalink ) ) {
+			return parent::get_edit_link();
+		}
+
 		// return the edit link to open the requested object ID in Bricks.
 		return add_query_arg(
 			array(
 				'bricks' => 'run',
 			),
-			get_permalink( $this->get_object_id() )
+			$permalink
 		);
 	}
 }

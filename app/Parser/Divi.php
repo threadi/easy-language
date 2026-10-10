@@ -18,6 +18,8 @@ use easyLanguage\EasyLanguage\Post_Object;
  * Handler for parsing Divi-content.
  */
 class Divi extends Parser_Base implements Parser {
+	use Shortcode_Replacement;
+
 	/**
 	 * The internal name of this parser.
 	 *
@@ -134,7 +136,10 @@ class Divi extends Parser_Base implements Parser {
 				}
 			} elseif ( ! empty( $attributes ) && ! empty( $matches[2] ) && ! empty( $matches[3] ) ) {
 				foreach ( $matches[2] as $key => $value ) {
-					foreach ( shortcode_parse_atts( $matches[3][ $key ] ) as $attribute => $attribute_value ) {
+					// get the attributes of this shortcode.
+					$shortcode_attributes = shortcode_parse_atts( $matches[3][ $key ] );
+
+					foreach ( $shortcode_attributes as $attribute => $attribute_value ) {
 						if ( ! empty( $attribute_value ) && in_array( $attribute, $attributes, true ) ) {
 							$resulting_texts[] = array(
 								'text' => $attribute_value,
@@ -165,7 +170,8 @@ class Divi extends Parser_Base implements Parser {
 			return $original_complete;
 		}
 
-		return str_replace( $this->get_text(), $simplified_part, $original_complete );
+		// replace the text only in the supported shortcodes and attributes.
+		return $this->replace_text_in_shortcodes( $original_complete, $this->get_text(), $simplified_part, $this->get_flow_text_shortcodes() );
 	}
 
 	/**
@@ -185,16 +191,27 @@ class Divi extends Parser_Base implements Parser {
 	 * @return string
 	 */
 	public function get_edit_link(): string {
-		if ( \easyLanguage\PageBuilder\Divi::get_instance()->is_active() ) {
-			return add_query_arg(
-				array(
-					'et_fb'     => '1',
-					'PageSpeed' => 'Off',
-				),
-				et_fb_prepare_ssl_link( get_permalink( $this->get_object_id() ) )
-			);
+		// bail if Divi is not active or its function is not available.
+		if ( ! \easyLanguage\PageBuilder\Divi::get_instance()->is_active() || ! function_exists( 'et_fb_prepare_ssl_link' ) ) {
+			return parent::get_edit_link();
 		}
-		return parent::get_edit_link();
+
+		// get the permalink.
+		$permalink = get_permalink( $this->get_object_id() );
+
+		// bail if no permalink could be loaded.
+		if ( ! is_string( $permalink ) ) {
+			return parent::get_edit_link();
+		}
+
+		// return the link to the Divi builder.
+		return add_query_arg(
+			array(
+				'et_fb'     => '1',
+				'PageSpeed' => 'Off',
+			),
+			et_fb_prepare_ssl_link( $permalink )
+		);
 	}
 
 	/**
@@ -203,7 +220,12 @@ class Divi extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function hide_translate_menu_in_frontend(): bool {
-		return et_core_is_fb_enabled();
+		// bail if the Divi function is not available.
+		if ( ! function_exists( 'et_core_is_fb_enabled' ) ) {
+			return false;
+		}
+
+		return (bool) et_core_is_fb_enabled();
 	}
 
 	/**

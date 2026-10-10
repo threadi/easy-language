@@ -14,6 +14,7 @@ use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Base;
+use easyLanguage\Plugin\Crypt;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Intervals;
 use easyLanguage\Plugin\Language_Icon;
@@ -25,7 +26,7 @@ use easyLanguage\Plugin\ThirdPartySupports;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easySettingsForWordPress\Fields\Checkboxes;
 use easySettingsForWordPress\Fields\Select;
-use easySettingsForWordPress\Fields\Text;
+use easySettingsForWordPress\Fields\Password;
 use easySettingsForWordPress\Fields\TextInfo;
 use easySettingsForWordPress\Page;
 use easySettingsForWordPress\Section;
@@ -142,11 +143,11 @@ class Capito extends Base implements Api_Base {
 		// get quota.
 		$quota = $this->get_quota();
 
-		/* translators: %1$d will be replaced by the link to capito */
+		/* translators: %1$s will be replaced by the link to capito */
 		$text = sprintf( __( '<p><a href="%1$s" target="_blank"><strong>capito digital</strong> (open new window)</a> is an AI-based tool for <i>Easy language</i>.<br>It helps you write better texts.</p><p>This API simplifies texts based on the Common European Framework of Reference for Languages.<br>This describes the <i>complexity of languages according to proficiency levels</i> (A1, A2, B1 ..).</p><p>The number of simplifications with capito digital is limited to <strong>quotas</strong>.</p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( $quota['character_limit'] > 0 ) {
 			/* translators: %1$d will be replaced by the characters spent for capito, %2$d will be the quota for capito, %3$d will be the rest quota */
-			$text .= sprintf( __( '<p><strong>Actual character spent:</strong> %1$d<br><strong>Quota limit:</strong> %2$d<br><strong>Rest quota:</strong> %3$d</strong></p>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ), $quota['character_spent'], $quota['character_limit'], absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) );
+			$text .= sprintf( __( '<p><strong>Actual character spent:</strong> %1$d<br><strong>Quota limit:</strong> %2$d<br><strong>Rest quota:</strong> %3$d</strong></p>', 'easy-language' ), $quota['character_spent'], $quota['character_limit'], absint( $quota['character_limit'] ) - absint( $quota['character_spent'] ) );
 		} elseif ( ! empty( $quota['unlimited'] ) ) {
 			$text .= '<p><strong>' . __( 'Unlimited quota', 'easy-language' ) . '</strong></p>';
 		} elseif ( -1 === $quota['character_limit'] ) {
@@ -267,7 +268,7 @@ class Capito extends Base implements Api_Base {
 				'label'       => __( 'German B1', 'easy-language' ),
 				'enabled'     => true,
 				'description' => __( 'capito compares this with Einfache Sprache', 'easy-language' ),
-				'url'         => 'de_a2',
+				'url'         => 'de_b1',
 				'api_value'   => 'b1',
 				'icon'        => 'icon-de-el',
 				'img'         => 'de_EL.svg',
@@ -547,14 +548,15 @@ class Capito extends Base implements Api_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_capito_api_key' );
 		$setting->set_section( $capito_tab_main );
-		$setting->set_show_in_rest( true );
+		$setting->set_show_in_rest( false );
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
 		$setting->prevent_export( true );
-		$field = new Text( $settings_obj );
+		$field = new Password( $settings_obj );
 		$field->set_title( __( 'capito API Key', 'easy-language' ) );
 		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
+		$field->set_value( Crypt::get_instance()->get_masked_value( 'easy_language_capito_api_key' ) );
 		$field->set_description( $description );
 		$setting->set_field( $field );
 
@@ -586,7 +588,8 @@ class Capito extends Base implements Api_Base {
 			// use cached value.
 			$teams = get_transient( 'easy_language_capito_teams' );
 
-			if ( empty( $teams ) ) {
+			// request the teams only in backend on our settings page and if the last request has not failed during the last hour.
+			if ( empty( $teams ) && $this->is_teams_request_allowed() ) {
 				$teams = array();
 
 				// send request to get list of teams for this token.
@@ -622,6 +625,16 @@ class Capito extends Base implements Api_Base {
 						set_transient( 'easy_language_capito_teams', $teams, WEEK_IN_SECONDS );
 					}
 				}
+
+				// prevent new requests for one hour if no teams could be loaded.
+				if ( empty( $teams ) ) {
+					set_transient( 'easy_language_capito_teams_failed', 1, HOUR_IN_SECONDS );
+				}
+			}
+
+			// use an empty list if no valid list is available.
+			if ( ! is_array( $teams ) ) {
+				$teams = array();
 			}
 
 			if ( empty( $teams ) ) {
@@ -793,6 +806,11 @@ class Capito extends Base implements Api_Base {
 	 * @noinspection PhpUnused
 	 */
 	public function validate_api_key( ?string $value ): ?string {
+		// bail if the key has not been changed (the form returns the mask, the saved key will be kept).
+		if ( Crypt::MASK === $value || Crypt::get_instance()->is_encrypted( $value ) ) {
+			return $value;
+		}
+
 		$errors = array();
 		if ( function_exists( 'get_settings_errors' ) ) {
 			$errors = get_settings_errors();
@@ -817,7 +835,7 @@ class Capito extends Base implements Api_Base {
 		} elseif ( 0 !== strcmp( $value, get_option( 'easy_language_capito_api_key', '' ) ) ) {
 			// if token has been changed, get the quota and delete settings hint.
 			$request = $this->get_test_request_response( $value );
-			if ( in_array( $request->get_http_status(), array( 401, 404 ), true ) ) {
+			if ( 200 !== $request->get_http_status() ) {
 				// show hint if token is not valid for API.
 				/* translators: %1$s is replaced by the URL for the API-log */
 				add_settings_error( 'easy_language_capito_api_key', 'easy_language_capito_api_key', sprintf( __( '<strong>Token could not be verified.</strong> Please view <a href="%1$s">the log</a> to check the reason.', 'easy-language' ), esc_url( Helper::get_api_logs_page_url() ) ) );
@@ -956,10 +974,10 @@ class Capito extends Base implements Api_Base {
 			}
 		} else {
 			// delete quota-array in db.
-			delete_option( 'easy_language_capito_ai_quota' );
+			delete_option( 'easy_language_capito_quota' );
 
 			// delete hint.
-			$transients_obj->get_transient_by_name( 'easy_language_capito_ai_quota' )->delete();
+			$transients_obj->get_transient_by_name( 'easy_language_capito_quota' )->delete();
 		}
 	}
 
@@ -1042,11 +1060,6 @@ class Capito extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function enable(): void {
-		// bail if this is run via REST API.
-		if ( ! Helper::is_rest_request() ) {
-			return;
-		}
-
 		// save language-icons in db.
 		foreach ( $this->get_supported_target_languages() as $language_code => $settings ) {
 			$icon_obj = new Language_Icon();
@@ -1205,7 +1218,39 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function clean_team_cache( mixed $value ): mixed {
 		delete_transient( 'easy_language_capito_teams' );
+		delete_transient( 'easy_language_capito_teams_failed' );
 		return $value;
+	}
+
+	/**
+	 * Return whether the list of teams could be requested from the API.
+	 *
+	 * Only allowed in backend on our settings page or on saving the settings,
+	 * and only if the last request has not failed during the last hour.
+	 *
+	 * @return bool
+	 */
+	private function is_teams_request_allowed(): bool {
+		global $pagenow;
+
+		// bail if this is not the backend.
+		if ( ! is_admin() || wp_doing_ajax() || wp_doing_cron() ) {
+			return false;
+		}
+
+		// bail if the last request has failed during the last hour.
+		if ( get_transient( 'easy_language_capito_teams_failed' ) ) {
+			return false;
+		}
+
+		// allow it on saving the settings.
+		if ( 'options.php' === $pagenow ) {
+			return true;
+		}
+
+		// allow it on our settings page.
+		$page = (string) filter_input( INPUT_GET, 'page', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		return Settings::get_instance()->get_menu_slug() === $page;
 	}
 
 	/**

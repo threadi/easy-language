@@ -48,7 +48,7 @@ class TranslatePress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 		}
 
 		// return request result.
-		return Simplifications::get_instance()->call_api( $source_language, $language_code, $string_to_translate, false, $this->is_test );
+		return Simplifications::get_instance()->call_api( (string) $string_to_translate, (string) $source_language, (string) $language_code, false, $this->is_test );
 	}
 
 	/**
@@ -59,7 +59,7 @@ class TranslatePress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 	 * @param string|null $source_language_code          language code of the language that we will be translating from. Not equal to the language code.
 	 * @return array                                array with the translation strings and the preserved keys or an empty array if something went wrong.
 	 */
-	public function translate_array( array $new_strings, string $target_language_code, string $source_language_code = null ): array {
+	public function translate_array( array $new_strings, string $target_language_code, ?string $source_language_code = null ): array {
 		if ( null === $source_language_code ) {
 			$source_language_code = $this->settings['default-language'];
 		}
@@ -105,7 +105,7 @@ class TranslatePress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 					$translation_response = json_decode( $response['body'] );
 					if ( ! empty( $translation_response->translated_text ) ) {
 						// update the simplification string.
-						$translated_strings[ $key ] = nl2br( $translation_response->translated_text );
+						$translated_strings[ $key ] = wp_kses_post( nl2br( (string) $translation_response->translated_text ) );
 					}
 
 					// break if configured quota is exceeded.

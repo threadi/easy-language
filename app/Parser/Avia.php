@@ -18,6 +18,8 @@ use easyLanguage\EasyLanguage\Post_Object;
  * Handler for parsing Avia-content.
  */
 class Avia extends Parser_Base implements Parser {
+	use Shortcode_Replacement;
+
 	/**
 	 * The internal name of this parser.
 	 *
@@ -132,7 +134,10 @@ class Avia extends Parser_Base implements Parser {
 				}
 			} elseif ( ! empty( $attributes ) && ! empty( $matches[2] ) && ! empty( $matches[3] ) ) {
 				foreach ( $matches[2] as $key => $value ) {
-					foreach ( shortcode_parse_atts( $matches[3][ $key ] ) as $attribute => $attribute_value ) {
+					// get the attributes of this shortcode.
+					$shortcode_attributes = shortcode_parse_atts( $matches[3][ $key ] );
+
+					foreach ( $shortcode_attributes as $attribute => $attribute_value ) {
 						if ( in_array( $attribute, $attributes, true ) && ! empty( $attribute_value ) ) {
 							$resulting_texts[] = array(
 								'text' => $attribute_value,
@@ -163,29 +168,37 @@ class Avia extends Parser_Base implements Parser {
 			return $original_complete;
 		}
 
+		// replace the text only in the supported shortcodes and attributes.
+		$content = $this->replace_text_in_shortcodes( $original_complete, $this->get_text(), $simplified_part, $this->get_flow_text_shortcodes() );
+
+		// bail if Avia builder function is not available.
+		if ( ! function_exists( 'Avia_Builder' ) ) {
+			return $content;
+		}
+
 		// get the avia builder object.
 		$avia_builder = Avia_Builder();
 
 		// bail if builder is not available.
-		if ( is_null( $avia_builder ) ) {
-			return $original_complete;
+		if ( ! is_object( $avia_builder ) || ! method_exists( $avia_builder, 'update_post_content' ) ) {
+			return $content;
 		}
 
+		// remove the block markers for the Avia content.
 		$text = str_replace(
 			array(
-				$this->get_text(),
 				'<!-- wp:shortcode -->',
 				'<!-- /wp:shortcode -->',
 			),
-			array( $simplified_part, '', '' ),
-			$original_complete
+			array( '', '' ),
+			$content
 		);
 
 		// save the updated Avia content.
 		$avia_builder->update_post_content( $this->get_object_id(), $text );
 
 		// return the content for post_content.
-		return str_replace( $this->get_text(), $simplified_part, $original_complete );
+		return $content;
 	}
 
 	/**

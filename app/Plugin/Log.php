@@ -164,15 +164,20 @@ class Log {
 	public function get_entries(): array {
 		global $wpdb;
 
+		// define the allowed columns to order the table (request value => DB column).
+		$allowed_order_by = array(
+			'date' => '`time`',
+			'time' => '`time`',
+		);
+
 		// order table.
 		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( is_null( $order_by ) ) {
+		if ( ! is_string( $order_by ) || ! isset( $allowed_order_by[ $order_by ] ) ) {
 			$order_by = 'date';
 		}
-		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( ! is_null( $order ) ) {
-			$order = sanitize_sql_orderby( (string) $order );
-		} else {
+		$order_by = $allowed_order_by[ $order_by ];
+		$order    = strtoupper( (string) filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS ) );
+		if ( ! in_array( $order, array( 'ASC', 'DESC' ), true ) ) {
 			$order = 'DESC';
 		}
 

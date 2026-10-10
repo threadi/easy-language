@@ -62,6 +62,9 @@ class Admin {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_additional_scripts' ), PHP_INT_MAX );
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_dialog' ), PHP_INT_MAX );
 		add_filter( 'admin_footer_text', array( $this, 'show_plugin_hint_in_footer' ), 0 );
+
+		// secure the dismiss of transients, before the handler of the transients-library runs.
+		add_action( 'wp_ajax_efw_dismiss_admin_notice', array( $this, 'secure_dismiss_transient' ), 1 );
 	}
 
 	/**
@@ -187,7 +190,7 @@ class Admin {
 	public function configure_transients(): void {
 		$transients_obj = Transients::get_instance();
 		$transients_obj->set_slug( 'easy_language' );
-		$transients_obj->set_capability( 'manage_options' );
+		$transients_obj->set_capability( $this->get_transients_capability() );
 		$transients_obj->set_template( 'grouped.php' );
 		$transients_obj->set_display_method( 'grouped' );
 		$transients_obj->set_url( Helper::get_plugin_url() . '/app/Dependencies/easyTransientsForWordPress/' );
@@ -201,6 +204,40 @@ class Admin {
 			)
 		);
 		$transients_obj->init();
+	}
+
+	/**
+	 * Return the capability necessary to see and dismiss the transients of this plugin.
+	 *
+	 * @return string
+	 */
+	private function get_transients_capability(): string {
+		return 'manage_options';
+	}
+
+	/**
+	 * Secure the AJAX-request to dismiss a transient.
+	 *
+	 * The AJAX-action is shared by all plugins using the transients-library. If the actual user is not allowed
+	 * to dismiss our transients or the requested transient is not one of our plugin, we remove only our own
+	 * handler for this request. The handlers of other plugins are not affected.
+	 *
+	 * @return void
+	 */
+	public function secure_dismiss_transient(): void {
+		// get the transients-object.
+		$transients_obj = Transients::get_instance();
+
+		// get the requested transient name.
+		$option_name = filter_input( INPUT_POST, 'option_name', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+
+		// bail if the user has the capability and the transient is one of this plugin.
+		if ( current_user_can( $this->get_transients_capability() ) && is_string( $option_name ) && ! empty( $option_name ) && $transients_obj->is_transient_set( $option_name ) ) {
+			return;
+		}
+
+		// remove our handler for this request.
+		remove_action( 'wp_ajax_efw_dismiss_admin_notice', array( $transients_obj, 'dismiss_transient_via_ajax' ) );
 	}
 
 	/**
@@ -224,8 +261,11 @@ class Admin {
 		$path = Helper::get_plugin_path() . 'vendor/threadi/easy-dialog-for-wordpress/';
 		$url  = Helper::get_plugin_url() . 'vendor/threadi/easy-dialog-for-wordpress/';
 
+		// get the local filesystem handler.
+		$wp_filesystem = Helper::get_wp_filesystem( true );
+
 		// bail if the path does not exist.
-		if ( ! file_exists( $path ) ) {
+		if ( ! $wp_filesystem->exists( $path ) ) {
 			return;
 		}
 
@@ -233,7 +273,7 @@ class Admin {
 		$script_asset_path = $path . 'build/index.asset.php';
 
 		// bail if the script does not exist.
-		if ( ! file_exists( $script_asset_path ) ) {
+		if ( ! $wp_filesystem->exists( $script_asset_path ) ) {
 			return;
 		}
 
@@ -280,8 +320,13 @@ class Admin {
 		// get requested the post-type.
 		$post_type = (string) filter_input( INPUT_GET, 'post_type' );
 
+		// use the default post-type "post" if no post-type is requested on edit.php.
+		if ( 'edit.php' === $pagenow && empty( $post_type ) ) {
+			$post_type = 'post';
+		}
+
 		// if this page is a supported post-type listing, show a hint.
-		if ( 'edit.php' === $pagenow || Init::get_instance()->is_post_type_supported( $post_type ) ) {
+		if ( 'edit.php' === $pagenow && Init::get_instance()->is_post_type_supported( $post_type ) ) {
 			/* translators: %1$s will be replaced by the plugin name. */
 			return $content . ' ' . sprintf( __( 'This page is extended by the plugin %1$s.', 'easy-language' ), '<em>' . Helper::get_plugin_name() . '</em>' );
 		}

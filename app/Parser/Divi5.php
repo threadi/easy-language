@@ -13,7 +13,6 @@ defined( 'ABSPATH' ) || exit;
 use easyLanguage\EasyLanguage\Parser;
 use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
-use easyLanguage\Plugin\Helper;
 
 /**
  * Handler for parsing Divi 5-blocks.
@@ -66,7 +65,7 @@ class Divi5 extends Parser_Base implements Parser {
 			'divi/text'           => array(
 				'html'     => true,
 				'callback' => function ( $content ) {
-					return $content['attrs']['content']['innerContent']['desktop']['value'];
+					return $content['attrs']['content']['innerContent']['desktop']['value'] ?? '';
 				},
 			),
 			'divi/heading'        => array(
@@ -172,12 +171,44 @@ class Divi5 extends Parser_Base implements Parser {
 	 */
 	private function get_text_with_simplifications_deep( string $original_complete, string $simplified_part, array $block, $flow_blocks ): array {
 		// replace the content, if this is a block we support.
-		if ( isset( $flow_blocks[ $block['blockName'] ] ) ) {
+		if ( isset( $block['blockName'] ) && is_string( $block['blockName'] ) && isset( $flow_blocks[ $block['blockName'] ] ) ) {
 			if ( ! empty( $flow_blocks[ $block['blockName'] ]['callback'] ) && is_callable( $flow_blocks[ $block['blockName'] ]['callback'] ) ) {
-				$block['attrs']['content']['innerContent']['desktop']['value'] = str_replace( $this->get_text(), $simplified_part, call_user_func( $flow_blocks[ $block['blockName'] ]['callback'], $block ) );
+				// get the text via callback.
+				$text = call_user_func( $flow_blocks[ $block['blockName'] ]['callback'], $block );
+
+				// replace the text only if the callback returned a string which contains the original text.
+				if ( is_string( $text ) && str_contains( $text, $this->get_text() ) ) {
+					// make sure the attributes are an array.
+					if ( ! isset( $block['attrs'] ) || ! is_array( $block['attrs'] ) ) {
+						$block['attrs'] = array();
+					}
+
+					// set the simplified text.
+					$block['attrs']['content']['innerContent']['desktop']['value'] = str_replace( $this->get_text(), $simplified_part, $text );
+				}
 			} else {
-				$block['innerHTML'] = str_replace( $this->get_text(), $simplified_part, trim( $block['innerHTML'] ) );
+				// replace the text in the inner content, which is used by serialize_blocks().
+				if ( isset( $block['innerContent'] ) && is_array( $block['innerContent'] ) ) {
+					foreach ( $block['innerContent'] as $content_index => $inner_content ) {
+						// bail if this is not a string (e.g. a placeholder for an inner block).
+						if ( ! is_string( $inner_content ) ) {
+							continue;
+						}
+
+						$block['innerContent'][ $content_index ] = str_replace( $this->get_text(), $simplified_part, $inner_content );
+					}
+				}
+
+				// replace the text also in the inner HTML.
+				if ( isset( $block['innerHTML'] ) && is_string( $block['innerHTML'] ) ) {
+					$block['innerHTML'] = str_replace( $this->get_text(), $simplified_part, $block['innerHTML'] );
+				}
 			}
+		}
+
+		// bail if no inner blocks are present.
+		if ( empty( $block['innerBlocks'] ) || ! is_array( $block['innerBlocks'] ) ) {
+			return $block;
 		}
 
 		// loop through inner-blocks.
@@ -228,32 +259,8 @@ class Divi5 extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_active(): bool {
-		// first check for the plugin.
-		if ( Helper::is_plugin_active( 'divi-builder/divi-builder.php' ) ) {
-			// get the plugin version.
-			require_once ABSPATH . 'wp-admin/includes/admin.php';
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-			$plugin_data = get_plugin_data( WP_PLUGIN_DIR . '/divi-builder/divi-builder.php' );
-			if ( version_compare( $plugin_data['Version'], '5.0.0', '>=' ) ) {
-				return true;
-			}
-		}
-
-		// check for the theme.
-		$theme = wp_get_theme();
-		if ( 'Divi' === $theme->get( 'Name' ) ) {
-			$version = substr( $theme->get( 'Version' ), 0, 5 );
-			return version_compare( $version, '5.0.0', '>=' );
-		}
-
-		// check for the parent theme.
-		if ( $theme->parent() && 'Divi' === $theme->parent()->get( 'Name' ) ) {
-			$version = substr( $theme->parent()->get( 'Version' ), 0, 5 );
-			return version_compare( $version, '5.0.0', '>=' );
-		}
-
-		// otherwise return false.
-		return false;
+		// use the cached check of the page builder object.
+		return \easyLanguage\PageBuilder\Divi5::get_instance()->is_active();
 	}
 
 	/**
@@ -267,13 +274,26 @@ class Divi5 extends Parser_Base implements Parser {
 			return parent::get_edit_link();
 		}
 
+		// bail if the Divi function is not available.
+		if ( ! function_exists( 'et_fb_prepare_ssl_link' ) ) {
+			return parent::get_edit_link();
+		}
+
+		// get the permalink.
+		$permalink = get_permalink( $this->get_object_id() );
+
+		// bail if no permalink could be loaded.
+		if ( ! is_string( $permalink ) ) {
+			return parent::get_edit_link();
+		}
+
 		// return the edit link for Divi 5.
 		return add_query_arg(
 			array(
 				'et_fb'     => '1',
 				'PageSpeed' => 'Off',
 			),
-			et_fb_prepare_ssl_link( get_permalink( $this->get_object_id() ) )
+			et_fb_prepare_ssl_link( $permalink )
 		);
 	}
 }

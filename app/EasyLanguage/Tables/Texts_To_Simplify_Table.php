@@ -50,16 +50,19 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	/**
 	 * Get the table data.
 	 *
+	 * @param int $per_page Entries per page.
+	 * @param int $offset The offset for the entries.
+	 *
 	 * @return array<Text>
 	 */
-	private function table_data(): array {
+	private function table_data( int $per_page, int $offset ): array {
 		// order table.
 		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		if ( ! array_key_exists( $order_by, $this->get_sortable_columns() ) ) {
 			$order_by = 'date';
 		}
 		$order = filter_input( INPUT_GET, 'order', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		if ( in_array( $order, array( 'asc', 'desc' ), true ) ) {
+		if ( ! in_array( $order, array( 'asc', 'desc' ), true ) ) {
 			$order = 'desc';
 		}
 
@@ -69,7 +72,9 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 			array(
 				'order_by' => $order_by,
 				'order'    => $order,
-			)
+			),
+			$per_page,
+			$offset
 		);
 	}
 
@@ -83,8 +88,21 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 		$hidden   = $this->get_hidden_columns();
 		$sortable = $this->get_sortable_columns();
 
+		// get the pagination settings.
+		$per_page     = $this->get_items_per_page( 'easy_language_texts_to_simplify_per_page' );
+		$current_page = $this->get_pagenum();
+		$total_items  = Db::get_instance()->count_entries( Init::get_instance()->get_filter_for_entries_to_simplify() );
+
+		// set the pagination.
+		$this->set_pagination_args(
+			array(
+				'total_items' => $total_items,
+				'per_page'    => $per_page,
+			)
+		);
+
 		$this->_column_headers = array( $columns, $hidden, $sortable );
-		$this->items           = $this->table_data();
+		$this->items           = $this->table_data( $per_page, ( $current_page - 1 ) * $per_page );
 	}
 
 	/**
@@ -166,7 +184,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 		switch ( $column_name ) {
 			case 'options':
 				$options = array(
-					'<a href="' . esc_url( $delete_link ) . '" class="dashicons dashicons-trash easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_json( $dialog_simplification ) ) . '" title="' . __( 'Delete this text.', 'easy-language' ) . '">&nbsp;</a>',
+					'<a href="' . esc_url( $delete_link ) . '" class="dashicons dashicons-trash easy-dialog-for-wordpress" data-dialog="' . esc_attr( Helper::get_json( $dialog_simplification ) ) . '" title="' . esc_attr__( 'Delete this text.', 'easy-language' ) . '">&nbsp;</a>',
 				);
 
 				// get the item ID.
@@ -180,13 +198,13 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 
 				// if no API is active, show a hint.
 				if ( ! $api_object instanceof Api_Base ) {
-					$options[0] = '<span class="dashicons dashicons-translation" title="' . esc_attr( __( 'No API active!', 'easy-language' ) ) . '">&nbsp;</a>';
+					$options[0] = '<span class="dashicons dashicons-translation" title="' . esc_attr( __( 'No API active!', 'easy-language' ) ) . '">&nbsp;</span>';
 				}
 
 				// if the API is not configured, show an hint.
 				if ( $api_object instanceof Api_Base && false === $api_object->is_configured() ) {
 					/* translators: %1$s will be replaced by the name of the API */
-					$options[0] = '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'API %1$s is not configured.', 'easy-language' ), esc_html( $api_object->get_title() ) ) ) . '">&nbsp;</a>';
+					$options[0] = '<span class="dashicons dashicons-translation" title="' . esc_attr( sprintf( __( 'API %1$s is not configured.', 'easy-language' ), esc_html( $api_object->get_title() ) ) ) . '">&nbsp;</span>';
 				}
 
 				// if API is configured, show an option to simplify the item.
@@ -196,7 +214,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 						array(
 							'action' => 'easy_language_get_simplification_of_entry',
 							'id'     => $item_id,
-							'nonce'  => wp_create_nonce( 'easy-language-get-simplification-of-entry' ),
+							'nonce'  => wp_create_nonce( 'easy-language-get-simplification-of-entry-' . $item_id ),
 						),
 						get_admin_url() . 'admin.php'
 					);
@@ -278,17 +296,17 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 				$language  = $item->get_source_language();
 				$languages = $languages_obj->get_possible_source_languages();
 				if ( ! empty( $languages[ $language ] ) ) {
-					return $languages[ $language ]['label'];
+					return esc_html( $languages[ $language ]['label'] );
 				}
-				return __( 'Unknown', 'easy-language' );
+				return esc_html__( 'Unknown', 'easy-language' );
 
 			// get target languages.
 			case 'target_language':
-				return implode( ',', $item->get_target_languages() );
+				return esc_html( implode( ',', $item->get_target_languages() ) );
 
 			// show original text.
 			case 'original':
-				return wp_strip_all_tags( $item->get_original() );
+				return esc_html( wp_strip_all_tags( $item->get_original() ) );
 
 			// show hint where this text is used.
 			case 'used_in':

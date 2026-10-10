@@ -174,6 +174,20 @@ abstract class Objects {
 	}
 
 	/**
+	 * Return the name of the object-specific option for the given marker.
+	 *
+	 * Each object uses its own option to prevent race conditions between parallel processes
+	 * which would otherwise overwrite their values in one shared option.
+	 *
+	 * @param string $option The marker (e.g. EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING).
+	 *
+	 * @return string
+	 */
+	public function get_marker_option_name( string $option ): string {
+		return $option . '_' . $this->get_md5();
+	}
+
+	/**
 	 * Set marker during simplification.
 	 *
 	 * @param string                                                  $option The option to change.
@@ -182,9 +196,49 @@ abstract class Objects {
 	 * @return void
 	 */
 	public function set_array_marker_during_simplification( string $option, string|int|array $value ): void {
-		$actual_value                     = get_option( $option, array() );
-		$actual_value[ $this->get_md5() ] = $value;
-		update_option( $option, $actual_value );
+		update_option( $this->get_marker_option_name( $option ), $value, false );
+	}
+
+	/**
+	 * Return the value of a marker during simplification for this object.
+	 *
+	 * @param string $option The marker to read.
+	 *
+	 * @return mixed The value or null if the marker is not set.
+	 */
+	public function get_marker_during_simplification( string $option ): mixed {
+		return get_option( $this->get_marker_option_name( $option ), null );
+	}
+
+	/**
+	 * Return whether a simplification of this object is actually running.
+	 *
+	 * A running marker which is older than the timeout is handled as orphaned (e.g. after a PHP-timeout).
+	 *
+	 * @return bool
+	 */
+	public function is_simplification_running(): bool {
+		// get the running marker.
+		$running = absint( $this->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING ) );
+
+		// bail if no simplification is running.
+		if ( 0 === $running ) {
+			return false;
+		}
+
+		$timeout  = 10 * MINUTE_IN_SECONDS;
+		$instance = $this;
+		/**
+		 * Filter the timeout after which a running simplification is handled as orphaned.
+		 *
+		 * @since 3.3.0 Available since 3.3.0.
+		 * @param int $timeout The timeout in seconds.
+		 * @param Objects $instance The object.
+		 */
+		$timeout = absint( apply_filters( 'easy_language_simplification_running_timeout', $timeout, $instance ) );
+
+		// return whether the marker is not older than the timeout.
+		return ( time() - $running ) < $timeout;
 	}
 
 	/**
@@ -195,11 +249,7 @@ abstract class Objects {
 	 * @return void
 	 */
 	public function cleanup_simplification_marker( string $marker ): void {
-		$values = get_option( $marker, array() );
-		if ( isset( $values[ $this->get_md5() ] ) ) {
-			unset( $values[ $this->get_md5() ] );
-		}
-		update_option( $marker, $values );
+		delete_option( $this->get_marker_option_name( $marker ) );
 	}
 
 	/**
@@ -233,9 +283,6 @@ abstract class Objects {
 	 * @return int
 	 */
 	public function process_simplifications( Api_Simplifications $simplification_obj, array $language_mappings, int $limit = 0, bool $initialization = true ): int {
-		// get object-hash.
-		$hash = $this->get_md5();
-
 		$js_top = '';
 		/**
 		 * Set top for JS-location depending on the used page builder.
@@ -247,16 +294,11 @@ abstract class Objects {
 
 		// initialize the simplification.
 		if ( false !== $initialization ) {
-			$simplification_results = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, array() );
-			if ( ! empty( $simplification_results[ $hash ] ) ) {
-				// remove previous results.
-				unset( $simplification_results[ $hash ] );
-			}
-			update_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $simplification_results );
+			// remove previous results.
+			$this->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS );
 
 			// do not run simplification if it is already running in another process for this object.
-			$simplification_running = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, array() );
-			if ( ! empty( $simplification_running[ $hash ] ) && absint( $simplification_running[ $hash ] ) > 0 ) {
+			if ( $this->is_simplification_running() ) {
 				// set result.
 				$dialog = array(
 					'className' => 'wp-dialog-error',
@@ -395,6 +437,9 @@ abstract class Objects {
 
 			// set counter for simplified texts to 0.
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, 0 );
+		} elseif ( absint( $this->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING ) ) > 0 ) {
+			// refresh the running marker, so a running process is not treated as orphaned.
+			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, time() );
 		}
 
 		// counter for simplifications during this run.
@@ -413,13 +458,13 @@ abstract class Objects {
 		// if no more texts to simplify found, break the process and show a hint depending on progress.
 		if ( empty( $entries ) ) {
 			// get max value.
-			$simplification_max = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, array() );
+			$simplification_max = absint( $this->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX ) );
 
 			// get actual count.
-			$simplification_counts = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, array() );
+			$simplification_count = $this->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT );
 
 			// set result if count is 0.
-			if ( isset( $simplification_counts[ $hash ] ) && 0 === absint( $simplification_counts[ $hash ] ) ) {
+			if ( ! is_null( $simplification_count ) && 0 === absint( $simplification_count ) ) {
 				$dialog = array(
 					'className' => 'wp-dialog-hint',
 					'title'     => __( 'Simplification canceled', 'easy-language' ),
@@ -474,13 +519,13 @@ abstract class Objects {
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
 			// set max value as count.
-			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, absint( $simplification_max[ $hash ] ) );
+			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, $simplification_max );
 
 			// remove running marker to mark the end of the process.
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
 
 			// return max value.
-			return absint( $simplification_max[ $hash ] );
+			return $simplification_max;
 		}
 
 		// initialize CLI process.
@@ -491,9 +536,9 @@ abstract class Objects {
 			$c += $this->process_simplification( $simplification_obj, $language_mappings, $entry );
 
 			// update counter for simplification of texts.
-			$simplification_count_in_loop = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, array() );
-			if ( is_array( $simplification_count_in_loop ) && isset( $simplification_count_in_loop[ $hash ] ) ) {
-				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, ++$simplification_count_in_loop[ $hash ] );
+			$simplification_count_in_loop = $this->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT );
+			if ( ! is_null( $simplification_count_in_loop ) ) {
+				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, absint( $simplification_count_in_loop ) + 1 );
 			}
 
 			// show progress on CLI.
@@ -546,13 +591,13 @@ abstract class Objects {
 		}
 
 		// get count value for running simplifications.
-		$count_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, array() );
+		$count_simplifications = $this->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT );
 
 		// get max value for running simplifications.
-		$max_simplifications = get_option( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, array() );
+		$max_simplifications = $this->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX );
 
 		// remove marker for running simplification on this object.
-		if ( isset( $count_simplifications[ $hash ], $max_simplifications[ $hash ] ) && absint( $max_simplifications[ $hash ] ) <= absint( $count_simplifications[ $hash ] ) ) {
+		if ( ! is_null( $count_simplifications ) && ! is_null( $max_simplifications ) && absint( $max_simplifications ) <= absint( $count_simplifications ) ) {
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
 
 			$this->process_simplification_trigger_on_end();
@@ -630,7 +675,7 @@ abstract class Objects {
 		$replaced_count = 0;
 		foreach ( $language_mappings as $source_language => $target_languages ) {
 			foreach ( $target_languages as $target_language ) {
-				if ( false !== $entry->has_simplification_in_language( $target_language ) && $source_language === $entry->get_source_language() && $entry->replace_original_with_simplification( $this->get_id(), $target_language ) ) {
+				if ( false !== $entry->has_simplification_in_language( $target_language ) && $source_language === $entry->get_source_language() && $entry->replace_original_with_simplification( $this->get_id(), $target_language, $this->get_type() ) ) {
 					++$replaced_count;
 				}
 			}
@@ -644,6 +689,14 @@ abstract class Objects {
 		 * @param string $js_top The top-string.
 		 */
 		$js_top = apply_filters( 'easy_language_js_top', $js_top );
+
+		// reset the state to "to_simplify" if the API returned errors and nothing has been simplified or replaced.
+		if ( false !== $api_errors && 0 === $c && 0 === $replaced_count ) {
+			$entry->set_state( 'to_simplify' );
+
+			// return 0 as nothing has been simplified.
+			return 0;
+		}
 
 		// set the state to "in_use" to mark text as simplified and inserted.
 		if ( 0 === $c && $replaced_count > 0 ) {
@@ -761,7 +814,8 @@ abstract class Objects {
 
 		// get chars to simplify.
 		$filter  = array(
-			'object_id' => $this->get_id(),
+			'object_id'   => $this->get_id(),
+			'object_type' => $this->get_type(),
 		);
 		$entries = Db::get_instance()->get_entries( $filter );
 		foreach ( $entries as $entry ) {

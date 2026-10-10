@@ -11,6 +11,7 @@ namespace easyLanguage\Parser;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\EasyLanguage\Objects;
+use Elementor\Core\Base\Document;
 use Elementor\Core\Files\CSS\Post as Post_CSS;
 use Elementor\Plugin;
 use easyLanguage\EasyLanguage\Parser;
@@ -136,11 +137,19 @@ class Elementor extends Parser_Base implements Parser {
 		// define returning list.
 		$resulting_texts = array();
 
+		// get the Elementor document.
+		$document = $this->get_document();
+
+		// bail if document could not be loaded.
+		if ( ! $document instanceof Document ) {
+			return array();
+		}
+
 		// get the actual elementor_data to get the texts of supported widgets.
-		$data = Plugin::$instance->documents->get( $this->get_object_id() )->get_elements_data();
+		$data = $document->get_elements_data();
 		if ( ! empty( $data ) ) {
 			foreach ( $data as $container ) {
-				if ( ! empty( $container['elements'] ) ) {
+				if ( ! empty( $container['elements'] ) && is_array( $container['elements'] ) ) {
 					foreach ( $container['elements'] as $widget ) {
 						$resulting_texts = $this->get_widgets( (array) $widget, $resulting_texts );
 					}
@@ -167,18 +176,38 @@ class Elementor extends Parser_Base implements Parser {
 			return $original_complete;
 		}
 
+		// get the Elementor document.
+		$document = $this->get_document();
+
+		// bail if document could not be loaded.
+		if ( ! $document instanceof Document ) {
+			return $original_complete;
+		}
+
 		// replace content in postmeta "_elementor_data".
-		$data = Plugin::$instance->documents->get( $this->get_object_id() )->get_elements_data();
+		$data = $document->get_elements_data();
 		if ( ! empty( $data ) ) {
 			foreach ( $data as $index1 => $container ) {
-				if ( ! empty( $container['elements'] ) ) {
+				if ( ! empty( $container['elements'] ) && is_array( $container['elements'] ) ) {
 					foreach ( $container['elements'] as $index2 => $widget ) {
+						// bail if widget is not an array.
+						if ( ! is_array( $widget ) ) {
+							continue;
+						}
+
 						$data[ $index1 ]['elements'][ $index2 ] = $this->replace_content_in_widgets( $widget, $simplified_part );
 					}
 				}
 			}
+
+			// get the resulting JSON.
+			$json = wp_json_encode( $data );
+
+			// save it, if the JSON could be created.
+			if ( is_string( $json ) ) {
+				update_post_meta( $this->get_object_id(), '_elementor_data', wp_slash( $json ) );
+			}
 		}
-		update_post_meta( $this->get_object_id(), '_elementor_data', wp_slash( (string) wp_json_encode( $data ) ) );
 
 		// replacement for post_content.
 		return str_replace( $this->get_text(), $simplified_part, $original_complete );
@@ -198,6 +227,11 @@ class Elementor extends Parser_Base implements Parser {
 		if ( ! empty( $widget['widgetType'] ) && ! empty( $flow_text_widgets[ $widget['widgetType'] ] ) ) {
 			foreach ( $flow_text_widgets[ $widget['widgetType'] ] as $name => $text ) {
 				if ( is_array( $text ) ) {
+					// bail if the setting is not a list.
+					if ( empty( $widget['settings'][ $name ] ) || ! is_array( $widget['settings'][ $name ] ) ) {
+						continue;
+					}
+
 					foreach ( $widget['settings'][ $name ] as $index => $content ) {
 						foreach ( $text as $content_key ) {
 							if ( ! empty( $widget['settings'][ $name ][ $index ][ $content_key ] ) ) {
@@ -217,8 +251,18 @@ class Elementor extends Parser_Base implements Parser {
 			}
 		}
 
+		// bail if no inner-widgets are present.
+		if ( empty( $widget['elements'] ) || ! is_array( $widget['elements'] ) ) {
+			return $resulting_texts;
+		}
+
 		// loop through inner-widgets.
 		foreach ( $widget['elements'] as $sub_widget ) {
+			// bail if the sub widget is not an array.
+			if ( ! is_array( $sub_widget ) ) {
+				continue;
+			}
+
 			$resulting_texts = $this->get_widgets( $sub_widget, $resulting_texts );
 		}
 
@@ -240,21 +284,36 @@ class Elementor extends Parser_Base implements Parser {
 		if ( ! empty( $widget['widgetType'] ) && ! empty( $flow_text_widgets[ $widget['widgetType'] ] ) ) {
 			foreach ( $flow_text_widgets[ $widget['widgetType'] ] as $name => $text ) {
 				if ( is_array( $text ) ) {
+					// bail if the setting is not a list.
+					if ( empty( $widget['settings'][ $name ] ) || ! is_array( $widget['settings'][ $name ] ) ) {
+						continue;
+					}
+
 					foreach ( $widget['settings'][ $name ] as $index => $content ) {
 						foreach ( $text as $content_key ) {
-							if ( $this->get_text() === $widget['settings'][ $name ][ $index ][ $content_key ] ) {
+							if ( isset( $widget['settings'][ $name ][ $index ][ $content_key ] ) && $this->get_text() === $widget['settings'][ $name ][ $index ][ $content_key ] ) {
 								$widget['settings'][ $name ][ $index ][ $content_key ] = $simplified_text;
 							}
 						}
 					}
-				} elseif ( $this->get_text() === $widget['settings'][ $text ] ) {
+				} elseif ( isset( $widget['settings'][ $text ] ) && $this->get_text() === $widget['settings'][ $text ] ) {
 						$widget['settings'][ $text ] = $simplified_text;
 				}
 			}
 		}
 
+		// bail if no inner-widgets are present.
+		if ( empty( $widget['elements'] ) || ! is_array( $widget['elements'] ) ) {
+			return $widget;
+		}
+
 		// loop through inner-widgets.
 		foreach ( $widget['elements'] as $index => $sub_widget ) {
+			// bail if the sub widget is not an array.
+			if ( ! is_array( $sub_widget ) ) {
+				continue;
+			}
+
 			$widget['elements'][ $index ] = $this->replace_content_in_widgets( $sub_widget, $simplified_text );
 		}
 
@@ -288,10 +347,38 @@ class Elementor extends Parser_Base implements Parser {
 	 * @return string
 	 */
 	public function get_edit_link(): string {
-		if ( $this->is_elementor_active() ) {
-			return Plugin::$instance->documents->get( $this->get_object_id() )->get_edit_url();
+		// get the Elementor document.
+		$document = $this->get_document();
+
+		// bail if document could not be loaded.
+		if ( ! $document instanceof Document ) {
+			return parent::get_edit_link();
 		}
-		return parent::get_edit_link();
+
+		return $document->get_edit_url();
+	}
+
+	/**
+	 * Return the Elementor document of the actual object.
+	 *
+	 * @return Document|null
+	 */
+	private function get_document(): ?Document {
+		// bail if Elementor is not active.
+		if ( ! $this->is_elementor_active() || ! class_exists( Plugin::class ) || ! class_exists( Document::class ) ) {
+			return null;
+		}
+
+		// get the document.
+		$document = Plugin::$instance->documents->get( $this->get_object_id() );
+
+		// bail if document could not be loaded.
+		if ( ! $document instanceof Document ) {
+			return null;
+		}
+
+		// return the document.
+		return $document;
 	}
 
 	/**
@@ -311,6 +398,11 @@ class Elementor extends Parser_Base implements Parser {
 	 * @return void
 	 */
 	public function update_object( Objects $post_object ): void {
+		// bail if the Elementor CSS class is not available.
+		if ( ! class_exists( Post_CSS::class ) ) {
+			return;
+		}
+
 		// update object-specific css.
 		$post_css = Post_CSS::create( $post_object->get_id() );
 		$post_css->update();

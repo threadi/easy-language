@@ -11,6 +11,7 @@ namespace easyLanguage\ThirdPartySupport\Polylang;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Plugin\Base;
+use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Languages;
 use easyLanguage\Plugin\ThirdPartySupport_Base;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
@@ -178,27 +179,37 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return $flags;
 		}
 
-		global $wp_filesystem;
-
-		if ( ! function_exists( 'WP_Filesystem' ) ) {
-			require_once wp_normalize_path( ABSPATH . '/wp-admin/includes/file.php' );
-		}
+		// cache for the flag sources per language code.
+		static $flag_sources = array();
 
 		// set URL.
 		$flags['url'] = plugins_url( 'gfx/' . $code . '.png', EASY_LANGUAGE );
 
-		// get file for base64.
-		$file = plugin_dir_path( EASY_LANGUAGE ) . 'gfx/' . $code . '.png';
-		\WP_Filesystem();
-		$file_contents = $wp_filesystem->get_contents( $file );
+		// get the source from cache, if it has been loaded before.
+		if ( ! isset( $flag_sources[ $code ] ) ) {
+			// set empty source as default.
+			$flag_sources[ $code ] = '';
 
-		// return attribute if file-content is empty.
-		if ( empty( $file_contents ) ) {
+			// get file for base64.
+			$file = plugin_dir_path( EASY_LANGUAGE ) . 'gfx/' . $code . '.png';
+
+			// get the content of the local plugin file.
+			$wp_filesystem = Helper::get_wp_filesystem( true );
+			$file_contents = $wp_filesystem->exists( $file ) ? $wp_filesystem->get_contents( $file ) : false;
+
+			// set the source if file-content is not empty.
+			if ( ! empty( $file_contents ) ) {
+				$flag_sources[ $code ] = 'data:image/png;base64,' . base64_encode( $file_contents );
+			}
+		}
+
+		// return attribute if source is empty.
+		if ( empty( $flag_sources[ $code ] ) ) {
 			return $flags;
 		}
 
 		// set src for flag.
-		$flags['src'] = 'data:image/png;base64,' . base64_encode( $file_contents );
+		$flags['src'] = $flag_sources[ $code ];
 
 		// return result.
 		return $flags;

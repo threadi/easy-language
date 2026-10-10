@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Apis\Summ_Ai\Summ_Ai;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
+use easyLanguage\EasyLanguage\Db;
 use easyLanguage\EasyLanguage\Rewrite;
 use easyLanguage\EasyLanguage\Texts;
 
@@ -25,6 +26,16 @@ class Update {
 	 * @var ?Update
 	 */
 	private static ?Update $instance = null;
+
+	/**
+	 * Name of the option used as lock during updates.
+	 */
+	private const LOCK_OPTION = 'easy_language_update_lock';
+
+	/**
+	 * Seconds after which a lock is treated as orphaned.
+	 */
+	private const LOCK_TIMEOUT = 10 * MINUTE_IN_SECONDS;
 
 	/**
 	 * Constructor for Init-Handler.
@@ -80,40 +91,68 @@ class Update {
 			)
 			&& version_compare( $installed_plugin_version, $db_plugin_version, '>' )
 		) {
-			if ( version_compare( $installed_plugin_version, '2.1.0', '>=' ) ) { // @phpstan-ignore if.alwaysFalse
-				$this->version210();
+			// bail if an update is already running in another process.
+			if ( ! $this->set_lock() ) {
+				return;
 			}
 
-			if ( version_compare( $db_plugin_version, '2.1.0', '<' ) ) {
-				$this->version210();
+			try {
+				$this->run_updates( $installed_plugin_version, (string) $db_plugin_version );
+			} finally {
+				// release the lock in every case.
+				$this->release_lock();
 			}
-			if ( version_compare( $db_plugin_version, '2.3.0', '<' ) ) {
-				$this->version230();
-			}
-			if ( version_compare( $db_plugin_version, '2.4.0', '<' ) ) {
-				$this->version240();
-			}
-			if ( version_compare( $db_plugin_version, '2.5.0', '<' ) ) {
-				$this->version250();
-			}
-			if ( version_compare( $db_plugin_version, '2.9.0', '<' ) ) {
-				$this->version290();
-			}
-			if ( version_compare( $db_plugin_version, '3.0.0', '<' ) ) {
-				$this->version300();
-			}
-			if ( version_compare( $db_plugin_version, '3.0.2', '<' ) ) {
-				$this->version302();
-			}
-
-			// log this event.
-			/* translators: %1$s and %2$s are replaced by the old and new version. */
-			Log::get_instance()->add_log( sprintf( __( 'Easy Language has been updated from %1$s to %2$s.', 'easy-language' ), $db_plugin_version, $installed_plugin_version ), 'success' );
-
-			// save the new plugin-version in DB.
-			delete_option( 'easyLanguageVersion' );
-			add_option( 'easyLanguageVersion', $installed_plugin_version, '', true );
 		}
+	}
+
+	/**
+	 * Run the updates from the given db-version to the given installed version.
+	 *
+	 * @param string $installed_plugin_version The version of the plugin files.
+	 * @param string $db_plugin_version        The version which was last installed.
+	 *
+	 * @return void
+	 */
+	private function run_updates( string $installed_plugin_version, string $db_plugin_version ): void {
+		// encrypt the saved API keys, which are not encrypted yet.
+		Crypt::get_instance()->migrate();
+
+		if ( version_compare( $installed_plugin_version, '2.1.0', '>=' ) ) {
+			$this->version210();
+		}
+
+		if ( version_compare( $db_plugin_version, '2.1.0', '<' ) ) {
+			$this->version210();
+		}
+		if ( version_compare( $db_plugin_version, '2.3.0', '<' ) ) {
+			$this->version230();
+		}
+		if ( version_compare( $db_plugin_version, '2.4.0', '<' ) ) {
+			$this->version240();
+		}
+		if ( version_compare( $db_plugin_version, '2.5.0', '<' ) ) {
+			$this->version250();
+		}
+		if ( version_compare( $db_plugin_version, '2.9.0', '<' ) ) {
+			$this->version290();
+		}
+		if ( version_compare( $db_plugin_version, '3.0.0', '<' ) ) {
+			$this->version300();
+		}
+		if ( version_compare( $db_plugin_version, '3.0.2', '<' ) ) {
+			$this->version302();
+		}
+		if ( version_compare( $db_plugin_version, '3.3.0', '<' ) ) {
+			$this->version330();
+		}
+
+		// log this event.
+		/* translators: %1$s and %2$s are replaced by the old and new version. */
+		Log::get_instance()->add_log( sprintf( __( 'Easy Language has been updated from %1$s to %2$s.', 'easy-language' ), $db_plugin_version, $installed_plugin_version ), 'success' );
+
+		// save the new plugin-version in DB.
+		delete_option( 'easyLanguageVersion' );
+		add_option( 'easyLanguageVersion', $installed_plugin_version, '', true );
 	}
 
 	/**
@@ -122,15 +161,18 @@ class Update {
 	 * @return void
 	 */
 	private function version210(): void {
-		// update schedule interval from 5minutely or minutely to 10minutely.
+		// get the interval to use for the automatic simplification.
+		$interval = $this->get_automatic_simplification_interval();
+
+		// update schedule interval from old, not registered intervals to a registered interval.
 		if ( ! wp_next_scheduled( 'easy_language_automatic_simplification' ) ) {
 			// add it.
-			wp_schedule_event( time(), '10minutely', 'easy_language_automatic_simplification' );
+			$this->schedule_automatic_simplification( $interval );
 		} else {
 			$scheduled_event = wp_get_scheduled_event( 'easy_language_automatic_simplification' );
-			if ( $scheduled_event && in_array( $scheduled_event->schedule, array( '5minutely', 'minutely' ), true ) ) {
+			if ( $scheduled_event && in_array( $scheduled_event->schedule, array( '5minutely', 'minutely', '10minutely' ), true ) && array_key_exists( $interval, wp_get_schedules() ) ) {
 				wp_clear_scheduled_hook( 'easy_language_automatic_simplification' );
-				wp_schedule_event( time(), '10minutely', 'easy_language_automatic_simplification' );
+				$this->schedule_automatic_simplification( $interval );
 			}
 		}
 
@@ -285,9 +327,189 @@ class Update {
 		delete_option( 'easy_language_summ_ai_target_languages_embolden_negative' );
 
 		// migrate the interval settings for our schedules.
-		update_option( 'easy_language_capito_quota_interval', 'easy_language_' . get_option( 'easy_language_capito_quota_interval' ) );
-		update_option( 'easy_language_summ_ai_quota_interval', 'easy_language_' . get_option( 'easy_language_summ_ai_quota_interval' ) );
-		update_option( 'easy_language_automatic_simplification', 'easy_language_' . get_option( 'easy_language_automatic_simplification' ) );
+		$this->migrate_interval_setting( 'easy_language_capito_quota_interval' );
+		$this->migrate_interval_setting( 'easy_language_summ_ai_quota_interval' );
+		$this->migrate_interval_setting( 'easy_language_automatic_simplification' );
+	}
+
+	/**
+	 * Add the prefix of our own intervals to the value of an interval setting.
+	 *
+	 * Only changes the value if the prefix is missing and the prefixed value is a registered interval.
+	 *
+	 * @param string $option The option name.
+	 *
+	 * @return void
+	 */
+	private function migrate_interval_setting( string $option ): void {
+		// get the actual value.
+		$value = get_option( $option, '' );
+
+		// bail if value is not a string or empty.
+		if ( ! is_string( $value ) || '' === $value ) {
+			return;
+		}
+
+		// get the prefix of our intervals.
+		$prefix = Intervals::get_instance()->get_prefix();
+
+		// bail if the value has already the prefix.
+		if ( str_starts_with( $value, $prefix ) ) {
+			return;
+		}
+
+		// bail if the prefixed value is not a registered interval.
+		if ( ! array_key_exists( $prefix . $value, Intervals::get_instance()->get_intervals_for_settings() ) ) {
+			return;
+		}
+
+		// save the prefixed value.
+		update_option( $option, $prefix . $value );
+	}
+
+	/**
+	 * Return the registered interval to use for the automatic simplification.
+	 *
+	 * Uses the saved setting, if it is a registered interval, otherwise our 15-minute interval.
+	 *
+	 * @return string
+	 */
+	private function get_automatic_simplification_interval(): string {
+		// get the list of registered intervals.
+		$schedules = wp_get_schedules();
+
+		// get the saved setting.
+		$value = get_option( 'easy_language_automatic_simplification', '' );
+		if ( is_string( $value ) && '' !== $value ) {
+			// use the setting if it is a registered interval.
+			if ( array_key_exists( $value, $schedules ) ) {
+				return $value;
+			}
+
+			// use the setting with our prefix if this is a registered interval (for settings before 3.0.0).
+			$prefixed_value = Intervals::get_instance()->get_prefix() . $value;
+			if ( array_key_exists( $prefixed_value, $schedules ) ) {
+				return $prefixed_value;
+			}
+		}
+
+		// return our default interval.
+		return Intervals::get_instance()->get_prefix() . '15minutly';
+	}
+
+	/**
+	 * Schedule the automatic simplification with the given interval and log any error.
+	 *
+	 * @param string $interval The interval to use.
+	 *
+	 * @return void
+	 */
+	private function schedule_automatic_simplification( string $interval ): void {
+		$result = wp_schedule_event( time(), $interval, 'easy_language_automatic_simplification', array(), true );
+
+		// bail if scheduling was successful.
+		if ( ! is_wp_error( $result ) ) {
+			return;
+		}
+
+		// log the error.
+		/* translators: %1$s will be replaced by an error message. */
+		Log::get_instance()->add_log( sprintf( __( 'Automatic simplification could not be scheduled: %1$s', 'easy-language' ), $result->get_error_message() ), 'error' );
+	}
+
+	/**
+	 * On update to version 3.3.0 or newer.
+	 *
+	 * Anonymizes the API tokens in the saved requests of our APIs.
+	 *
+	 * @return void
+	 */
+	public function version330(): void {
+		global $wpdb;
+
+		// get the table names of our APIs (see the Request classes of each API).
+		$prefix = Db::get_instance()->get_wpdb_prefix();
+		$tables = array(
+			$prefix . 'easy_language_capito',
+			$prefix . 'easy_language_chatgpt',
+			$prefix . 'easy_language_summ_ai',
+		);
+
+		// define the search pattern for not anonymized entries.
+		$like            = '%' . $wpdb->esc_like( '"Authorization":"' ) . '%';
+		$like_anonymized = '%' . $wpdb->esc_like( '"Authorization":"anonymized"' ) . '%';
+
+		foreach ( $tables as $table ) {
+			// bail if table does not exist.
+			if ( $table !== $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) ) ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+				continue;
+			}
+
+			// loop through the entries in batches.
+			$last_id = 0;
+			do {
+				// @phpstan-ignore argument.type
+				$entries = $wpdb->get_results( $wpdb->prepare( 'SELECT `id`, `request` FROM `' . $table . '` WHERE `id` > %d AND `request` LIKE %s AND `request` NOT LIKE %s ORDER BY `id` ASC LIMIT %d', array( $last_id, $like, $like_anonymized, 500 ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+
+				// bail if no entries found.
+				if ( ! is_array( $entries ) || empty( $entries ) ) {
+					break;
+				}
+
+				// get the count of entries in this batch.
+				$entries_count = count( $entries );
+
+				foreach ( $entries as $entry ) {
+					$last_id = absint( $entry['id'] );
+
+					// replace the value of the Authorization header (also on not valid JSON, e.g. truncated entries).
+					$request = preg_replace( '/"Authorization":"(?:[^"\\\\]|\\\\.)*"/', '"Authorization":"anonymized"', (string) $entry['request'] );
+
+					// bail if nothing has been changed.
+					if ( ! is_string( $request ) || $request === $entry['request'] ) {
+						continue;
+					}
+
+					// save the anonymized request.
+					$wpdb->update( $table, array( 'request' => $request ), array( 'id' => $last_id ), array( '%s' ), array( '%d' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+				}
+			} while ( 500 === $entries_count );
+		}
+	}
+
+	/**
+	 * Set the lock for running updates.
+	 *
+	 * Removes an orphaned lock, which is older than 10 minutes.
+	 *
+	 * Hint: we do not use add_option() as it does not fail on existing entries in the database.
+	 *
+	 * @return bool True if the lock has been set, false if another process is running the update.
+	 */
+	private function set_lock(): bool {
+		global $wpdb;
+
+		// remove an orphaned lock.
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM `' . $wpdb->options . '` WHERE `option_name` = %s AND CAST(`option_value` AS UNSIGNED) < %d', array( self::LOCK_OPTION, time() - self::LOCK_TIMEOUT ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
+
+		// set the lock (fails if the lock exists, as the option name is unique).
+		$result = $wpdb->query( $wpdb->prepare( 'INSERT IGNORE INTO `' . $wpdb->options . '` (`option_name`, `option_value`, `autoload`) VALUES (%s, %s, %s)', array( self::LOCK_OPTION, (string) time(), 'no' ) ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared
+
+		// clear the cache for this option.
+		wp_cache_delete( self::LOCK_OPTION, 'options' );
+		wp_cache_delete( 'notoptions', 'options' );
+
+		// return whether the lock has been set by this process.
+		return 1 === $result;
+	}
+
+	/**
+	 * Release the lock for running updates.
+	 *
+	 * @return void
+	 */
+	private function release_lock(): void {
+		delete_option( self::LOCK_OPTION );
 	}
 
 	/**

@@ -171,7 +171,7 @@ class Languages {
 			'de_DE',
 			'de_DE_formal',
 			'de_CH',
-			'de_ch-informal',
+			'de_CH_informal',
 			'de_AT',
 		);
 

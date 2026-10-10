@@ -12,7 +12,8 @@ After checkout go through the following steps:
 
 1. copy _build/build.properties.dist_ to _build/build.properties_.
 2. modify the build/build.properties file - note the comments in the file.
-3. after that the plugin can be activated in WordPress.
+3. execute the following command in _build/_: `ant init`
+4. after that the plugin can be activated in WordPress.
 
 ### Using Taskfile
 
@@ -21,21 +22,31 @@ After checkout go through the following steps:
 
 ## Release
 
-### from local environment with ant
+### from local environment with ant (fallback for GitHub)
 
-1. increase the version number in _build/build.properties_.
-2. execute the following command in _build/_: `ant build`
-3. after that you will find a zip file in the release directory which could be used in WordPress to install it.
+Runs the same steps as the GitHub action and creates a zip with the same content.
+Not available locally: the Plugin Check (PCP), the SBOM and the GitHub release itself.
+
+1. set the version number in _build/build.properties_.
+2. optional: set _npx.path_ there to run the smoke test in WordPress Playground (needs Node 24).
+3. execute the following command in _build/_: `ant build`
+4. after that you will find the zip in _releases/<version>/easy-language.zip_.
 
 ### from local environment with Taskfile
 
-1. execute the following command in main directory: `task release -- 3.0.0` - adjust the version number.
-2. after that you will find a zip file in the release directory which could be used in WordPress to install it.
+Runs the same steps as the GitHub action and creates a zip with the same content (needs composer, npm, php, rsync and zip).
+Not available locally: the Plugin Check (PCP), the SBOM and the GitHub release itself.
+
+1. execute the following command in main directory: `task release -- 3.3.0` - adjust the version number.
+2. optional: prefix it with `SKIP_CHECKS=true` to skip PHPStan and PHPCS, or with `SMOKE=true` to run the smoke test in WordPress Playground (needs Node 24).
+3. after that you will find the zip in _releases/<version>/easy-language.zip_.
 
 ### on GitHub
 
-1. Create a new tag with the new version number.
-2. The release zip will be created by GitHub action.
+1. Add a section for the new version to _changelog.md_ (e.g. `## [3.3.0] - 01.11.2026`).
+2. Create a new tag with the new version number (e.g. `3.3.0`).
+3. The GitHub action builds the zip, checks it (Plugin Check, smoke test in WordPress Playground) and attaches it together with an SBOM to the release.
+4. A manual run of the action with a version number creates a test build without a release.
 
 ## Translations
 
@@ -45,7 +56,7 @@ I recommend using [PoEdit](https://poedit.net/) to translate texts for this plug
 
 Run in the main directory:
 
-`wp i18n make-pot . languages/easy-language.pot --exclude=classes/multilingual-plugins/easy-language/blocks/navigation-switcher/src/,classes/multilingual-plugins/easy-language/blocks/switcher/src/,svn/`
+`wp i18n make-pot . languages/easy-language.pot --exclude=blocks/switcher/src/,blocks/navigation-switcher/src/,svn/`
 
 ### update translation-file
 
@@ -64,8 +75,6 @@ Run in the main directory:
 Run in the main directory:
 
 `wp i18n make-json languages`
-
-OR use ant in build/-directory: `ant json-translations`
 
 ### Requirements
 
@@ -105,7 +114,7 @@ Hint: this check runs against the VIP-GO-platform which is not our target for th
 
 ### Run
 
-`vendor/bin/phpcs --extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/classes/multilingual-plugins/easy-language/pagebuilder/divi/build/,*/classes/multilingual-plugins/easy-language/blocks/*/build/,*translatepress* --standard=WordPress-VIP-Go .`
+`vendor/bin/phpcs --extensions=php --ignore=*/vendor/*,*/doc/*,*/svn/*,*/node_modules/*,*/gettext-helper.php,*/legacy-classes/Divi/build/,*/blocks/*/build/,*/js/generated/,*translatepress* --standard=WordPress-VIP-Go .`
 
 ## Check PHP compatibility
 

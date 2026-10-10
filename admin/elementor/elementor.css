@@ -34,7 +34,7 @@
 .easy-dialog p { margin: 1em 0 }
 
 body.easy-dialog-for-wordpress.elementor-editor-active .components-modal__frame.easy-dialog:after {
-	background-image: url(/wp-content/plugins/easy-language/gfx/easy-language-icon.png);
+	background-image: url(../../gfx/easy-language-icon.png);
 	width: 60px;
 	height: 60px;
 	float: right;

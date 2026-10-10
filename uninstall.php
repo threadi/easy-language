@@ -22,8 +22,8 @@ if ( PHP_VERSION_ID < 80200 ) { // @phpstan-ignore smaller.alwaysFalse
 	return;
 }
 
-// save plugin-path.
-const EASY_LANGUAGE = __FILE__;
+// save plugin-path (the main plugin file, not this uninstall file).
+const EASY_LANGUAGE = __DIR__ . '/easy-language.php';
 
 // set the version number.
 const EASY_LANGUAGE_VERSION = '@@VersionNumber@@';
@@ -33,6 +33,11 @@ require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/inc/constants.php';
 
 /**
- * Run install-routines.
+ * Run uninstall-routines in all sites.
  */
-Uninstall::get_instance()->run();
+Uninstall::get_instance()->run( true );
+
+/**
+ * Remove the encryption key of this plugin (e.g. from wp-config.php) in all sites.
+ */
+Uninstall::get_instance()->remove_encryption_keys();
