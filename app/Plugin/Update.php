@@ -454,7 +454,7 @@ class Update {
 			$last_id = 0;
 			do {
 				// @phpstan-ignore argument.type
-				$entries = $wpdb->get_results( $wpdb->prepare( 'SELECT `id`, `request` FROM `' . $table . '` WHERE `id` > %d AND `request` LIKE %s AND `request` NOT LIKE %s ORDER BY `id` ASC LIMIT %d', array( $last_id, $like, $like_anonymized, 500 ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$entries = $wpdb->get_results( $wpdb->prepare( 'SELECT `id`, `request` FROM %i WHERE `id` > %d AND `request` LIKE %s AND `request` NOT LIKE %s ORDER BY `id` ASC LIMIT %d', array( $table, $last_id, $like, $like_anonymized, 500 ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
 				// bail if no entries found.
 				if ( ! is_array( $entries ) || empty( $entries ) ) {

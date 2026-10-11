@@ -68,15 +68,19 @@ class Log_Api_Table extends WP_List_Table {
 		// get results filtered by API and return them.
 		if ( ! empty( $api ) ) {
 			if ( 'asc' === $order ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
 				return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d AND `api` = %s ORDER BY %i ASC, `id` DESC', array( $table_name, 1, $api, $order_by ) ), ARRAY_A );
 			}
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
 			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d AND `api` = %s ORDER BY %i DESC, `id` DESC', array( $table_name, 1, $api, $order_by ) ), ARRAY_A );
 		}
 
 		// get all results and return them.
 		if ( 'asc' === $order ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
 			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d ORDER BY %i ASC, `id` DESC', array( $table_name, 1, $order_by ) ), ARRAY_A );
 		}
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
 		return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d ORDER BY %i DESC, `id` DESC', array( $table_name, 1, $order_by ) ), ARRAY_A );
 	}
 
@@ -159,6 +163,7 @@ class Log_Api_Table extends WP_List_Table {
 		);
 
 		// get all apis from entries and add them to the list.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
 		$entries    = $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d', array( Log_Api::get_instance()->get_table_name(), 1 ) ), ARRAY_A );
 		$apis_array = array();
 		foreach ( $entries as $item ) {

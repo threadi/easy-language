@@ -43,7 +43,7 @@ const EASY_LANGUAGE_CAPITO_SUBSCRIPTION_URL = 'https://api.capito.ai/v2/account/
 /**
  * CHATGPT API URL for simplifications.
  */
-const EASY_LANGUAGE_CHATGPT_API_URL = 'https://api.openai.com/v1/chat/completions';
+const EASY_LANGUAGE_CHATGPT_API_URL = 'https://api.openai.com/v1/chat/completions'; // phpcs:ignore PluginCheck.CodeAnalysis.AIProvider.DirectIntegration -- the plugin itself is the integration of the ChatGPT API, the URL is used only with the API key configured by the user
 
 /**
  * Set transient-based hints for the backend.

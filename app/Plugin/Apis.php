@@ -276,6 +276,7 @@ class Apis {
 		global $wpdb;
 
 		// delete the entries.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
 		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `api` = %s', array( Log_Api::get_instance()->get_table_name(), $api_object->get_name() ) ) );
 
 		// redirect user back.

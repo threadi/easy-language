@@ -200,6 +200,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// check if our languages do already exist in wpml-db.
 		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $language ) {
 			// check if this language is already used in WPML.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- table of the plugin WPML, no API available to check for an existing language; the result must be up to date
 			$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `id` FROM %i WHERE code = %s', array( Db::get_instance()->get_wpdb_prefix() . 'icl_languages', $language_code ) ) );
 
 			// bail if this language is already in WPML.

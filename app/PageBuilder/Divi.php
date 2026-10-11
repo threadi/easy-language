@@ -88,6 +88,7 @@ class Divi extends PageBuilder_Base {
 	public function add_fields( array $fields ): array {
 		// add our custom fields where user can change language-settings.
 		$fields['easy-language-simplify-texts'] = array(
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- key of a Divi field definition, not a query argument
 			'meta_key'             => 'easy_language_divi_languages',
 			'type'                 => 'easy-language-language-options',
 			'show_in_bb'           => true,

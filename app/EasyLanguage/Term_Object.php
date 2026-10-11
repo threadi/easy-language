@@ -126,6 +126,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	 */
 	public function get_simplification_in_language( string $language_code ): int {
 		$query  = array(
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- the simplified terms are linked to their originals via term meta, there is no other way to query them
 			'meta_query'                      => array(
 				'relation' => 'AND',
 				array(

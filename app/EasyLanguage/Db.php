@@ -132,8 +132,11 @@ class Db {
 	 */
 	public function delete_tables(): void {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
 		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->get_table_name_originals() ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
 		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->get_table_name_originals_objects() ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
 		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->get_table_name_simplifications() ) );
 
 		// the tables are gone now.
@@ -158,6 +161,7 @@ class Db {
 		global $wpdb;
 
 		// get all tables of this plugin with one request.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- checks the existence of the custom tables of this plugin, the result is cached in this object for the request
 		$existing_tables = $wpdb->get_col( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $this->get_wpdb_prefix() . 'easy_language_' ) . '%' ) );
 
 		// check if our tables are in this list.
@@ -193,6 +197,7 @@ class Db {
 		global $wpdb;
 
 		// check for a single entry.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		return null !== $wpdb->get_var( $wpdb->prepare( 'SELECT `id` FROM %i LIMIT 1', $this->get_table_name_originals() ) );
 	}
 
@@ -229,6 +234,7 @@ class Db {
 			'html'     => $html,
 			'field'    => $field,
 		);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$wpdb->insert( $this->get_table_name_originals(), $query );
 
 		// log error.
@@ -293,7 +299,7 @@ class Db {
 		$sql = 'SELECT `id`, `original`, `lang`' . $query_parts['select'] . ' FROM %i AS o' . $query_parts['join'] . $query_parts['where'] . $query_parts['order'] . $sql_limit;
 
 		// get entries.
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts(), ORDER BY from a whitelist), all values are passed as prepare() arguments.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts(), ORDER BY from a whitelist), all values are passed as prepare() arguments.; custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$results = $wpdb->get_results( $wpdb->prepare( $sql, $this->get_table_name_originals(), ...$vars ), ARRAY_A );
 
 		// bail if results are empty.
@@ -364,7 +370,7 @@ class Db {
 		$sql = 'SELECT COUNT(*) FROM %i AS o' . $query_parts['join'] . $query_parts['where'];
 
 		// get the count.
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts()), all values are passed as prepare() arguments.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts()), all values are passed as prepare() arguments.; custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$count = $wpdb->get_var( $wpdb->prepare( $sql, $this->get_table_name_originals(), ...$query_parts['vars'] ) );
 
 		// return the count.
@@ -385,6 +391,7 @@ class Db {
 		}
 
 		// get the IDs.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$ids = $wpdb->get_col( $wpdb->prepare( 'SELECT `id` FROM %i ORDER BY `id` ASC', $this->get_table_name_originals() ) );
 
 		// return them as integers.
@@ -414,12 +421,12 @@ class Db {
 
 		// get the source languages.
 		$sql = 'SELECT DISTINCT o.`lang` FROM %i AS o' . $query_parts['join'] . $query_parts['where'];
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts()), all values are passed as prepare() arguments.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts()), all values are passed as prepare() arguments.; custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$source_languages = $wpdb->get_col( $wpdb->prepare( $sql, $this->get_table_name_originals(), ...$query_parts['vars'] ) );
 
 		// get the target languages.
 		$sql = 'SELECT DISTINCT sl.`language` FROM %i AS sl WHERE sl.`oid` IN ( SELECT o.`id` FROM %i AS o' . $query_parts['join'] . $query_parts['where'] . ' )';
-		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts()), all values are passed as prepare() arguments.
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts()), all values are passed as prepare() arguments.; custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$target_languages = $wpdb->get_col( $wpdb->prepare( $sql, $this->get_table_name_simplifications(), $this->get_table_name_originals(), ...$query_parts['vars'] ) );
 
 		// return the resulting lists.

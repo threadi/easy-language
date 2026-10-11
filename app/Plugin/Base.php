@@ -260,11 +260,12 @@ abstract class Base {
 		foreach ( $post_types as $post_type => $enabled ) {
 			$post_types_array[] = $post_type;
 		}
-		$query   = array(
+		$query = array(
 			'post_type'                       => $post_types_array,
 			'posts_per_page'                  => -1,
 			'post_status'                     => array( 'any', 'trash' ),
 			'fields'                          => 'ids',
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- the simplified objects are linked to their originals via post meta, there is no other way to query them
 			'meta_query'                      => array(
 				array(
 					'key'     => 'easy_language_api',

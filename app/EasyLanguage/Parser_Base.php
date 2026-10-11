@@ -431,6 +431,7 @@ class Parser_Base {
 		}
 
 		// get the matching objects, newest first.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- gets the simplification via post meta independent of language filters of other plugins (see method description); used only in the editor, the result must be up to date
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
 				'SELECT p.`ID`, p.`post_status`

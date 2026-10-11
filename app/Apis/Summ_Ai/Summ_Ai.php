@@ -426,6 +426,7 @@ class Summ_Ai extends Base implements Api_Base {
 		 * Delete our table.
 		 */
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
 		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->table_requests ) );
 	}
 
@@ -615,7 +616,8 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return array<int,mixed>
 	 */
 	public function get_log_entries(): array {
-		$wpdb    = $this->wpdb;
+		$wpdb = $this->wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom request table of this API, no WP API available; entries change with every request, so no object cache
 		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `time`, `request`, `response` FROM %i WHERE 1 = %d', array( $this->table_requests, 1 ) ) ); // @phpstan-ignore argument.type
 		if ( is_null( $results ) ) {
 			return array();

@@ -161,6 +161,7 @@ class Text {
 		}
 
 		// get from DB.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `simplification` FROM %i WHERE `oid` = %d AND `language` = %s', array( Db::get_instance()->get_table_name_simplifications(), $this->get_id(), $language ) ), ARRAY_A );
 		if ( ! empty( $result ) ) {
 			// save in the object.
@@ -207,6 +208,7 @@ class Text {
 			'jobid'          => $job_id,
 			'user_id'        => $user_id,
 		);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$wpdb->insert( Db::get_instance()->get_table_name_simplifications(), $query );
 
 		// log error.
@@ -371,6 +373,7 @@ class Text {
 		global $wpdb;
 
 		// update the state of this text to the given state-string.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$wpdb->update( Db::get_instance()->get_table_name_originals(), array( 'state' => $state ), array( 'id' => $this->get_id() ) );
 
 		// log any DB-errors.
@@ -394,6 +397,7 @@ class Text {
 
 		// delete the connection between text and given object_id.
 		if ( $object_id > 0 ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 			$wpdb->delete(
 				Db::get_instance()->get_table_name_originals_objects(),
 				array(
@@ -403,6 +407,7 @@ class Text {
 				)
 			);
 		} else {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 			$wpdb->delete(
 				Db::get_instance()->get_table_name_originals_objects(),
 				array(
@@ -414,7 +419,9 @@ class Text {
 
 		// if this text is used only from 1 object, delete it complete, including its simplifications.
 		if ( 1 === $object_count && 1 === absint( get_option( 'easy_language_delete_unused_simplifications', 0 ) ) ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 			$wpdb->delete( Db::get_instance()->get_table_name_originals(), array( 'id' => $this->get_id() ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 			$wpdb->delete( Db::get_instance()->get_table_name_simplifications(), array( 'oid' => $this->get_id() ) );
 		}
 	}
@@ -431,6 +438,7 @@ class Text {
 		$db = Db::get_instance();
 
 		// get from DB.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
 				'SELECT o.`id`, oo.`object_type`, oo.`object_id`, oo.`page_builder`, o.`field`, oo.`state`
@@ -472,6 +480,7 @@ class Text {
 			'blog_id'      => get_current_blog_id(),
 			'page_builder' => $page_builder,
 		);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$wpdb->insert( Db::get_instance()->get_table_name_originals_objects(), $query );
 
 		// log error.
@@ -489,6 +498,7 @@ class Text {
 		global $wpdb;
 
 		// get from DB.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$result = $wpdb->get_var(
 			$wpdb->prepare(
 				'SELECT o.`time`
@@ -577,6 +587,7 @@ class Text {
 		global $wpdb;
 
 		// get from DB.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$result = (array) $wpdb->get_results(
 			$wpdb->prepare(
 				'SELECT s.`used_api`
@@ -606,6 +617,7 @@ class Text {
 		global $wpdb;
 
 		// get from DB.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$result = $wpdb->get_row( $wpdb->prepare( 'SELECT `user_id` FROM %i WHERE `oid` = %d AND `language` = %s', array( Db::get_instance()->get_table_name_simplifications(), $this->get_id(), $language ) ), ARRAY_A );
 		if ( ! empty( $result ) ) {
 			// return result.
@@ -625,6 +637,7 @@ class Text {
 		global $wpdb;
 
 		// get from DB.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$result = $wpdb->get_var(
 			$wpdb->prepare(
 				'SELECT o.`html`

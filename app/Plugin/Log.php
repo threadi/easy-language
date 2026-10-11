@@ -88,6 +88,7 @@ class Log {
 	 */
 	public function delete_table(): void {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
 		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->get_table_name() ) );
 	}
 
@@ -121,6 +122,7 @@ class Log {
 		/**
 		 * Insert log entry.
 		 */
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
 		$wpdb->insert(
 			$this->get_table_name(),
 			array(
@@ -144,6 +146,7 @@ class Log {
 	 */
 	private function clean_log(): void {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
 		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE 1 = %d AND `time` < DATE_SUB(NOW(), INTERVAL %d DAY)', array( $this->get_table_name(), 1, absint( get_option( 'easy_language_log_max_age', 50 ) ) ) ) );
 	}
 
@@ -174,10 +177,12 @@ class Log {
 
 		// get results in ascending order and return them.
 		if ( 'ASC' === $order ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
 			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM %i WHERE 1 = %d ORDER BY %i ASC, `id` DESC', array( $this->get_table_name(), 1, $order_by ) ), ARRAY_A );
 		}
 
 		// get results in descending order and return them.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
 		return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM %i WHERE 1 = %d ORDER BY %i DESC, `id` DESC', array( $this->get_table_name(), 1, $order_by ) ), ARRAY_A );
 	}
 }
