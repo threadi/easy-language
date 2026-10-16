@@ -1,5 +1,21 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Support for the page builders Fusion (by Agency Dominion), Oxygen (classic), Pagelayer and Zion Builder
+- Headings in Kubio are now simplified too
+- Language switcher as element in Bold Page Builder, Breakdance, Fusion, Oxygen, Pagelayer, WPBakery and Zion Builder
+
+### Changed
+
+- Kubio pages are now also detected if they were not saved in the Kubio editor
+
+### Fixed
+
+- Simplification of a page ended with "no result returned" if its source or target language was not enabled for the API; it now explains which languages must be enabled and keeps the texts to simplify
+
 ## [3.3.0] - 10.10.2026
 
 ### Added

@@ -63,7 +63,10 @@ class Kubio extends Parser_Base implements Parser {
 	 */
 	private function get_flow_text_blocks(): array {
 		$blocks = array(
-			'kubio/text' => array(
+			'kubio/text'    => array(
+				'html' => true,
+			),
+			'kubio/heading' => array(
 				'html' => true,
 			),
 		);
@@ -151,7 +154,18 @@ class Kubio extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return function_exists( 'has_blocks' ) && has_blocks( $post_object->get_content() ) && ! empty( get_post_meta( $post_object->get_id(), 'saved_in_kubio', true ) );
+		// bail if the content does not contain blocks.
+		if ( ! function_exists( 'has_blocks' ) || ! has_blocks( $post_object->get_content() ) ) {
+			return false;
+		}
+
+		// Kubio sets this marker only if the object has been saved in the Kubio editor.
+		if ( ! empty( get_post_meta( $post_object->get_id(), 'saved_in_kubio', true ) ) ) {
+			return true;
+		}
+
+		// check the content for Kubio-blocks, if Kubio is active.
+		return $this->is_active() && str_contains( $post_object->get_content(), '<!-- wp:kubio/' );
 	}
 
 	/**

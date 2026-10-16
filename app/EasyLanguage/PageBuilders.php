@@ -213,10 +213,17 @@ class PageBuilders {
 		// create the list.
 		$list = array(
 			'\easyLanguage\PageBuilder\BlockEditor',
+			'\easyLanguage\PageBuilder\BoldBuilder',
+			'\easyLanguage\PageBuilder\Breakdance',
 			'\easyLanguage\PageBuilder\Bricks',
 			'\easyLanguage\PageBuilder\Divi',
 			'\easyLanguage\PageBuilder\Divi5',
 			'\easyLanguage\PageBuilder\Elementor',
+			'\easyLanguage\PageBuilder\Fusion',
+			'\easyLanguage\PageBuilder\Oxygen',
+			'\easyLanguage\PageBuilder\Pagelayer',
+			'\easyLanguage\PageBuilder\WpBakery',
+			'\easyLanguage\PageBuilder\ZionBuilder',
 		);
 
 		/**

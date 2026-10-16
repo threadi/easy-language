@@ -14,6 +14,7 @@ use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Helper;
+use easyLanguage\Plugin\Log;
 use WP_Post;
 use WP_Term;
 
@@ -629,23 +630,51 @@ abstract class Objects {
 		// marker if API-errors happened.
 		$api_errors = false;
 
+		// marker if the source language of the text and the target language of this object are part of the mappings.
+		$language_supported = false;
+
 		// send the request for each active mapping between source-language and target-languages.
 		foreach ( $language_mappings as $source_language => $target_languages ) {
 			foreach ( $target_languages as $target_language ) {
-				// only if this text is not already simplified in source-language matching the target-language.
-				if ( ! empty( $object_language[ $target_language ] ) && false === $entry->has_simplification_in_language( $target_language ) && $source_language === $entry->get_source_language() ) {
-					// call API to get simplification of the given entry.
-					$results = $simplification_obj->call_api( $entry->get_original(), $source_language, $target_language, $entry->is_html() );
+				// bail if this mapping does not match the target language of this object and the source language of the text.
+				if ( empty( $object_language[ $target_language ] ) || $source_language !== $entry->get_source_language() ) {
+					continue;
+				}
 
-					// save simplification if results are available.
-					if ( ! empty( $results ) ) {
-						$entry->set_simplification( (string) $results['translated_text'], $target_language, $simplification_obj->get_api()->get_name(), absint( $results['jobid'] ) );
-						++$c;
-					} else {
-						$api_errors = true;
-					}
+				// mark the languages as supported.
+				$language_supported = true;
+
+				// bail if this text is already simplified in the target language.
+				if ( false !== $entry->has_simplification_in_language( $target_language ) ) {
+					continue;
+				}
+
+				// call API to get simplification of the given entry.
+				$results = $simplification_obj->call_api( $entry->get_original(), $source_language, $target_language, $entry->is_html() );
+
+				// save simplification if results are available.
+				if ( ! empty( $results ) ) {
+					$entry->set_simplification( (string) $results['translated_text'], $target_language, $simplification_obj->get_api()->get_name(), absint( $results['jobid'] ) );
+					++$c;
+				} else {
+					$api_errors = true;
 				}
 			}
+		}
+
+		// bail if the languages are not enabled for the API: the text could not be simplified.
+		if ( ! $language_supported ) {
+			// show the reason.
+			$this->set_language_not_supported_result( $simplification_obj->get_api(), $entry );
+
+			// the text is still to simplify.
+			$entry->set_state( 'to_simplify' );
+
+			// stop the running process, as the other texts of this object will not be simplified either.
+			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
+
+			// return 0 as nothing has been simplified.
+			return 0;
 		}
 
 		// set the result if we have not got any simplification from API and no simplifications are available.
@@ -758,6 +787,91 @@ abstract class Objects {
 
 		// return simplification-count.
 		return $c;
+	}
+
+	/**
+	 * Set the result for a text, which could not be simplified, because its source language or the target language
+	 * of this object is not enabled for the used API.
+	 *
+	 * @param Api_Base $api_obj The used API.
+	 * @param Text     $entry The text.
+	 *
+	 * @return void
+	 */
+	private function set_language_not_supported_result( Api_Base $api_obj, Text $entry ): void {
+		// get the label of the source language.
+		$source_language_code = $entry->get_source_language();
+		$source_languages     = $api_obj->get_supported_source_languages();
+		$source_language      = ! empty( $source_languages[ $source_language_code ]['label'] ) ? (string) $source_languages[ $source_language_code ]['label'] : $source_language_code;
+
+		// get the label of the target language.
+		$target_language_code = $this->get_simplification_language_code();
+		$target_languages     = $api_obj->get_supported_target_languages();
+		$target_language      = ! empty( $target_languages[ $target_language_code ]['label'] ) ? (string) $target_languages[ $target_language_code ]['label'] : $target_language_code;
+		if ( '' === $target_language ) {
+			$target_language = __( 'unknown language', 'easy-language' );
+		}
+
+		// create the text.
+		/* translators: %1$s will be replaced by the API-title, %2$s by the source language, %3$s by the target language. */
+		$text = sprintf( __( '<strong>%1$s did not simplify any text.</strong><br>The texts are written in %2$s and should be simplified to %3$s. This combination of languages is not enabled in the settings of %1$s.', 'easy-language' ), esc_html( $api_obj->get_title() ), '<i>' . esc_html( $source_language ) . '</i>', '<i>' . esc_html( $target_language ) . '</i>' );
+
+		// create the dialog.
+		$dialog = array(
+			'className' => 'wp-dialog-error',
+			'title'     => __( 'Simplification canceled', 'easy-language' ),
+			'texts'     => array(
+				'<p>' . $text . '</p>',
+			),
+			'buttons'   => array(
+				array(
+					'action'  => 'location.reload();',
+					'variant' => 'primary',
+					'text'    => __( 'OK', 'easy-language' ),
+				),
+			),
+		);
+
+		// add the link to the settings for users, which could change them.
+		if ( current_user_can( 'manage_options' ) ) {
+			$js_top = '';
+			/**
+			 * Set top for JS-location depending on the used page builder.
+			 *
+			 * @since 2.2.0 Available since 2.2.0.
+			 * @param string $js_top The top-string.
+			 */
+			$js_top = apply_filters( 'easy_language_js_top', $js_top );
+
+			$dialog['texts'][0] .= '<p>' . __( 'Please enable both languages in the settings and start the simplification again.', 'easy-language' ) . '</p>';
+			array_unshift(
+				$dialog['buttons'],
+				array(
+					'action'  => $js_top . 'location.href="' . esc_url( $api_obj->get_settings_url() ) . '";',
+					'variant' => 'primary',
+					'text'    => __( 'Go to settings', 'easy-language' ),
+				)
+			);
+			$dialog['buttons'][1]['variant'] = 'secondary';
+		} else {
+			$dialog['texts'][0] .= '<p>' . __( 'Please ask an administrator of your project to enable both languages in the settings.', 'easy-language' ) . '</p>';
+		}
+
+		// save the result.
+		$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
+
+		// log the event.
+		/* translators: %1$s will be replaced by the object-title, %2$s by the API-title, %3$s by the source language, %4$s by the target language. */
+		Log::get_instance()->add_log( sprintf( __( 'Simplification of %1$s canceled: the languages %3$s → %4$s are not enabled for %2$s.', 'easy-language' ), '<i>' . esc_html( $this->get_title() ) . '</i>', esc_html( $api_obj->get_title() ), esc_html( $source_language_code ), esc_html( '' !== $target_language_code ? $target_language_code : $target_language ) ), 'error' );
+	}
+
+	/**
+	 * Return the code of the target language of this simplified object, even if the language is not active.
+	 *
+	 * @return string
+	 */
+	public function get_simplification_language_code(): string {
+		return '';
 	}
 
 	/**

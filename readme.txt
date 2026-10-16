@@ -41,7 +41,7 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 - Multisite support
 - Own role for users to only simplify texts
 
-== Compatible with many page builders ==
+== Compatible with the following page builders ==
 
 - Avada
 - Avia
@@ -53,13 +53,17 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 - Classic Editor
 - Divi
 - Elementor
+- Fusion (by Agency Dominion)
 - Kubio
+- Oxygen (classic)
+- Pagelayer
 - Salient
 - SeedProd
 - SiteOrigin
 - Themify
 - Visual Composer
 - WPBakery
+- Zion Builder
 
 == Compatible with multilingual-plugins ==
 

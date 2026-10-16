@@ -82,6 +82,15 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
+	 * Return the code of the target language of this simplified object, even if the language is not active.
+	 *
+	 * @return string
+	 */
+	public function get_simplification_language_code(): string {
+		return (string) get_term_meta( $this->get_id(), 'easy_language_simplification_language', true );
+	}
+
+	/**
 	 * Return the object type.
 	 *
 	 * @return string

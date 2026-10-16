@@ -17,6 +17,7 @@ parameters:
     - "#et_fb_prepare_ssl_link#"
     - "#et_core_is_fb_enabled#"
     - "#Breakdance#"
+    - "#ZionBuilder#"
     - "#Avia_Builder#"
     - "#wp_safe_redirect#"
     - "#Gettext#"
@@ -42,6 +43,8 @@ parameters:
   excludePaths:
   	- app/Dependencies/
   	- app/PageBuilder/Elementor/
+  	- app/PageBuilder/Oxygen/
+  	- app/PageBuilder/ZionBuilder/
   	- app/ThirdPartySupport/TranslatePress/TranslatePress_Capito_Machine_Translator.php
   	- app/ThirdPartySupport/TranslatePress/TranslatePress_Summ_Ai_Machine_Translator.php
   scanFiles:
