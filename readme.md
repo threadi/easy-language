@@ -45,7 +45,7 @@ Not available locally: the Plugin Check (PCP), the SBOM and the GitHub release i
 
 1. Add a section for the new version to _changelog.md_ (e.g. `## [3.3.0] - 01.11.2026`).
 2. Create a new tag with the new version number (e.g. `3.3.0`).
-3. The GitHub action builds the zip, checks it (Plugin Check, smoke test in WordPress Playground) and attaches it together with an SBOM to the release.
+3. The GitHub action builds the zip, checks it (Plugin Check, smoke test in WordPress Playground, E2E tests) and attaches it together with an SBOM to the release. The release is only published if the E2E tests have run successfully.
 4. A manual run of the action with a version number creates a test build without a release.
 
 ## Translations
@@ -137,3 +137,28 @@ Be sure to have run `composer install` or `composer update` before.
 ### Run
 
 `composer test`
+
+## E2E tests
+
+The E2E tests run with [Playwright](https://playwright.dev/) against WordPress Playground, which is started by Playwright itself.
+They check the settings, the simplification of pages in the backend (list of pages and block editor), the language switcher
+and the simplified pages in the frontend, the blocks and the permissions.
+
+The ChatGPT API is replaced by a mock (_tests/e2e/mu-plugins/_), which adds "Leicht gesagt: " in front of every text.
+No account at OpenAI and no network access for the API is needed. The test data (API, users and pages) is created by _tests/e2e/setup.php_.
+
+### Preparation
+
+1. `composer install`
+2. `npm ci` and `npm run build`
+3. build react-dialog in _vendor/threadi/react-dialog/_ with `npm install` and `npm run build`
+4. `npx playwright install chromium`
+
+Or use `task prepare` for steps 1 to 3.
+
+### Run
+
+`npm run test:e2e`
+
+Optional environment variables are described in _playwright.config.ts_, e.g. to use a local copy of WordPress instead of downloading it.
+The tests also run in the GitHub action "Build release zip", the report of Playwright is attached to its run.

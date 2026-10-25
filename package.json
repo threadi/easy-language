@@ -24,9 +24,11 @@
     "start:divi5": "wp-scripts start divi5/src/index.js --output-path=divi5/build/ --config divi5/webpack.config.js",
     "build:divi5": "wp-scripts build divi5/src/index.js --output-path=divi5/build/ --config divi5/webpack.config.js",
     "make-pot": "wp i18n make-pot . languages/easy-language.pot --exclude=blocks/switcher/src/,blocks/navigation-switcher/src/,brizy/src/,divi5/src/,svn/",
-    "make-json": "wp i18n make-json languages"
+    "make-json": "wp i18n make-json languages",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "@wordpress/scripts": "^34.2",
     "@wp-playground/cli": "^3.1.57",
     "concurrently": "^10.0.6"

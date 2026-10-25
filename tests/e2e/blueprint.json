@@ -1,0 +1,25 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"landingPage": "/wp-admin/",
+	"steps": [
+		{
+			"step": "setSiteOptions",
+			"options": {
+				"permalink_structure": "/%postname%/",
+				"blogname": "Easy Language E2E"
+			}
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php'; global $wpdb; $wpdb->replace( $wpdb->options, array( 'option_name' => 'WPLANG', 'option_value' => 'de_DE', 'autoload' => 'on' ) );"
+		},
+		{
+			"step": "activatePlugin",
+			"pluginPath": "easy-language/easy-language.php"
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php'; require '/wordpress/wp-content/plugins/easy-language/tests/e2e/setup.php';"
+		}
+	]
+}

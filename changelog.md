@@ -7,6 +7,7 @@
 - API keys are now saved encrypted (via Crypt for WordPress); existing keys are migrated automatically during the update
 - Smoke test of the release zip in WordPress Playground, SBOM and Plugin Check in the release workflow
 - Dependabot for GitHub Actions
+- E2E tests with Playwright in WordPress Playground (settings, simplification in the list of pages and in the block editor, language switcher, simplified pages, blocks, permissions); the release is only published if they succeed
 - New display "Toggle" for the language switcher (blocks, classic menu, shortcode, Elementor), optionally greyed out on pages without simplification
 - Design settings for the toggle: colors (on, off, thumb), size and rounding
 - Language switcher as native widget in Avada, Beaver Builder, Bold Page Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Enfold, Fusion, Live Composer, Nimble Builder, Oxygen 6, SiteOrigin, Themify Builder, Visual Composer, WPBakery (also Salient) and Zion Builder (with the same settings as the block)

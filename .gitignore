@@ -18,3 +18,7 @@ languages/*.json
 /dist/
 smoke-result.txt
 /js/generated/sidebar*
+/test-results/
+/playwright-report/
+/tests/e2e/.auth/
+/tmp/
