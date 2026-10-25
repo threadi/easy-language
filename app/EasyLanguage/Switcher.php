@@ -1968,7 +1968,6 @@ class Switcher {
 			Helper::get_file_version( Helper::get_plugin_path() . 'admin/menu-switcher.js' ),
 			true
 		);
-		wp_set_script_translations( 'easy-language-menu-switcher', 'easy-language', Helper::get_plugin_path() . 'languages/' );
 
 		// add the styles.
 		wp_enqueue_style(
@@ -1994,7 +1993,6 @@ class Switcher {
 		foreach ( array( 'easy-language/switcher', 'easy-language/navigation-switcher' ) as $block_name ) {
 			$handle = generate_block_asset_handle( $block_name, 'editorScript' );
 			wp_add_inline_script( $handle, 'window.easyLanguageSwitcher = ' . wp_json_encode( $data ) . ';', 'before' );
-			wp_set_script_translations( $handle, 'easy-language', Helper::get_plugin_path() . 'languages/' );
 		}
 	}
 

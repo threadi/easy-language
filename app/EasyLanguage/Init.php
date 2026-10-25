@@ -2028,14 +2028,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 				'debug_info_nonce'                       => wp_create_nonce( 'easy-language-get-debug-info' ),
 			)
 		);
-
-		if ( function_exists( 'wp_set_script_translations' ) ) {
-			wp_set_script_translations(
-				'easy-language-simplifications',
-				'easy-language',
-				plugin_dir_path( EASY_LANGUAGE ) . '/languages/'
-			);
-		}
 	}
 
 	/**
