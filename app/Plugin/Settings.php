@@ -79,6 +79,9 @@ class Settings {
 		// set all settings for this plugin.
 		add_action( 'init', array( $this, 'add_the_settings' ) );
 
+		// create the descriptions of the APIs again after the complete initialization.
+		add_action( 'admin_init', array( $this, 'refresh_api_options' ) );
+
 		// misc.
 		add_action( 'admin_action_easy_language_reset', array( $this, 'reset_plugin_by_request' ) );
 	}
@@ -238,39 +241,11 @@ class Settings {
 		$logs_tab_main->set_callback( array( $this, 'render_logs' ) );
 		$logs_tab_main->set_setting( $settings_obj );
 
-		// get the active API object.
-		$active_api_obj = Apis::get_instance()->get_active_api();
-
 		/**
 		 * Configure all settings for this object.
 		 */
 		// get the list of supported APIs.
-		$apis = array();
-		foreach ( Apis::get_instance()->get_available_apis() as $api_obj ) {
-			// collect the description for this API.
-			$description = '';
-
-			if ( $active_api_obj && $api_obj->get_name() === $active_api_obj->get_name() ) {
-				$description .= '<p id="easy-language-active-api">' . __( 'Active', 'easy-language' ) . '</p>';
-			}
-
-			// get the API-own logo, if it exists.
-			$logo_url = $api_obj->get_logo_url();
-			if ( ! empty( $logo_url ) ) {
-				$description .= '<img src="' . esc_url( $logo_url ) . '" alt="' . esc_attr( $api_obj->get_title() ) . '">';
-			}
-
-			// show api-title.
-			$description .= '<h2>' . esc_html( $api_obj->get_title() ) . '</h2>';
-
-			// show api-description, if available.
-			if ( ! empty( $api_obj->get_description() ) ) {
-				$description .= $api_obj->get_description();
-			}
-
-			// add the description.
-			$apis[ $api_obj->get_name() ] = $description;
-		}
+		$apis = $this->get_api_options();
 
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_api' );
@@ -526,6 +501,77 @@ class Settings {
 
 		// initialize the settings.
 		$settings_obj->init();
+	}
+
+	/**
+	 * Return the options for the choice of the API: the description of each API, which is shown in its box.
+	 *
+	 * @return array<string,string>
+	 */
+	public function get_api_options(): array {
+		// get the active API object.
+		$active_api_obj = Apis::get_instance()->get_active_api();
+
+		// get the list of supported APIs.
+		$apis = array();
+		foreach ( Apis::get_instance()->get_available_apis() as $api_obj ) {
+			// collect the description for this API.
+			$description = '';
+
+			if ( $active_api_obj && $api_obj->get_name() === $active_api_obj->get_name() ) {
+				$description .= '<p id="easy-language-active-api">' . __( 'Active', 'easy-language' ) . '</p>';
+			}
+
+			// get the API-own logo, if it exists.
+			$logo_url = $api_obj->get_logo_url();
+			if ( ! empty( $logo_url ) ) {
+				$description .= '<img src="' . esc_url( $logo_url ) . '" alt="' . esc_attr( $api_obj->get_title() ) . '">';
+			}
+
+			// show api-title.
+			$description .= '<h2>' . esc_html( $api_obj->get_title() ) . '</h2>';
+
+			// show api-description, if available.
+			if ( ! empty( $api_obj->get_description() ) ) {
+				$description .= $api_obj->get_description();
+			}
+
+			// add the description.
+			$apis[ $api_obj->get_name() ] = $description;
+		}
+
+		// return the list.
+		return $apis;
+	}
+
+	/**
+	 * Create the descriptions of the APIs again after the complete initialization of WordPress.
+	 *
+	 * The settings are added on "init" with priority 10. At this time, WordPress has not yet passed the
+	 * API keys of its connectors to its AI client (this happens on "init" with priority 20), so the state
+	 * of APIs depending on them (like the API via WordPress connectors) would be wrong.
+	 *
+	 * @return void
+	 */
+	public function refresh_api_options(): void {
+		// get the setting.
+		$setting = $this->get_settings_object()->get_setting( 'easy_language_api' );
+
+		// bail if the setting is not available.
+		if ( ! $setting instanceof \easySettingsForWordPress\Setting ) {
+			return;
+		}
+
+		// get the field.
+		$field = $setting->get_field();
+
+		// bail if the field is not the radio field.
+		if ( ! $field instanceof Radio ) {
+			return;
+		}
+
+		// set the actual descriptions.
+		$field->set_options( $this->get_api_options() );
 	}
 
 	/**
@@ -828,13 +874,28 @@ class Settings {
 	 * @return string
 	 */
 	public function sanitize_api( ?string $value ): string {
-		// return the value if it is the name of an available API.
-		if ( Apis::get_instance()->get_api_by_name( (string) $value ) instanceof Api_Base ) {
-			return (string) $value;
+		// get the actual value.
+		$actual_value = (string) get_option( 'easy_language_api', 'summ_ai' );
+
+		// get the requested API.
+		$api_obj = Apis::get_instance()->get_api_by_name( (string) $value );
+
+		// return the actual value if the requested API is unknown.
+		if ( ! $api_obj instanceof Api_Base ) {
+			return $actual_value;
 		}
 
-		// return the actual value otherwise.
-		return (string) get_option( 'easy_language_api', 'summ_ai' );
+		// do not allow to activate an API which could not be used (e.g. the API via WordPress connectors without a connector).
+		if ( $actual_value !== $value && method_exists( $api_obj, 'is_available' ) && ! $api_obj->is_available() ) {
+			if ( function_exists( 'add_settings_error' ) ) {
+				/* translators: %1$s will be replaced by the API title. */
+				add_settings_error( 'easy_language_api', 'easy_language_api_not_available', sprintf( __( 'The API %1$s could not be activated as it is not available.', 'easy-language' ), esc_html( $api_obj->get_title() ) ) );
+			}
+			return $actual_value;
+		}
+
+		// return the value.
+		return (string) $value;
 	}
 
 	/**

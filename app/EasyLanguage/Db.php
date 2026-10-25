@@ -17,6 +17,10 @@ use easyLanguage\Plugin\Log;
  * DB-object for our own plugin.
  */
 class Db {
+	/**
+	 * Name of the transient which caches the counts of texts for the progress in the admin bar.
+	 */
+	public const TRANSIENT_PROCESS_COUNTS = 'easy_language_simplification_process_counts';
 
 	/**
 	 * Instance of this object.
@@ -184,6 +188,17 @@ class Db {
 	}
 
 	/**
+	 * Delete the cached counts of texts, so the progress in the admin bar is up to date on the next request.
+	 *
+	 * Must be called on every change which affects the count of texts, their state or their simplifications.
+	 *
+	 * @return void
+	 */
+	public function clear_process_counts(): void {
+		delete_transient( self::TRANSIENT_PROCESS_COUNTS );
+	}
+
+	/**
 	 * Return whether at least one text exists in the database.
 	 *
 	 * @return bool
@@ -245,6 +260,9 @@ class Db {
 		// get DB-id.
 		$id = $wpdb->insert_id;
 		if ( absint( $id ) ) {
+			// the counts of texts have been changed.
+			$this->clear_process_counts();
+
 			// optimized the text-object.
 			$text_obj = new Text( $id );
 			$text_obj->set_original( $text );
@@ -582,6 +600,9 @@ class Db {
 	public function reset_simplifications(): void {
 		global $wpdb;
 		$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %i', $this->get_table_name_simplifications() ) );
+
+		// the counts of simplified texts have been changed.
+		$this->clear_process_counts();
 	}
 
 	/**

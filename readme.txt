@@ -23,6 +23,7 @@ To auto-translate your text, you can use the service (API) from
 - [SUMM AI](https://summ-ai.com)
 - [capito](https://www.capito.eu)
 - [OpenAI (ChatGPT)](https://chat.openai.com)
+- the AI connectors of WordPress (Settings > Connectors, WordPress 7.0 or newer)
 
 == Requirements ==
 
@@ -36,6 +37,7 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 
 - Simplify your contents into easy or plain language
 - Auto-simplify using the API of SUMM AI, capito or OpenAI (ChatGPT)
+- Auto-simplify using the AI connectors of WordPress (e.g. Anthropic, Google or OpenAI, WordPress 7.0 or newer)
 - Edit your simplified contents manually
 - Add a language switcher by shortcode at any position on your website
 - Multisite support

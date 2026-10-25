@@ -99,6 +99,7 @@ class Apis {
 			'easyLanguage\Apis\Capito\Capito',
 			'easyLanguage\Apis\Summ_Ai\Summ_Ai',
 			'easyLanguage\Apis\ChatGpt\ChatGpt',
+			'easyLanguage\Apis\Wp_Ai\Wp_Ai',
 			'easyLanguage\Apis\No_Api\No_Api',
 		);
 

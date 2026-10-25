@@ -168,6 +168,23 @@ body .text-translations-table #source_language, body .text-translations-table #t
     background-color: #fff;
 }
 
+/* APIs which could not be used (e.g. no connector for the API via WordPress Connectors) could not be chosen. */
+.easy_language_api input[type='radio']:not(:checked) + label:has(.easy-language-api-unavailable) {
+	cursor: not-allowed;
+	opacity: .7;
+	pointer-events: none;
+}
+
+.easy_language_api input[type='radio'] + label:has(.easy-language-api-unavailable) a {
+	pointer-events: auto;
+}
+
+.easy_language_api .easy-language-api-unavailable {
+	border-left: 4px solid #dba617;
+	background-color: #fcf9e8;
+	padding: 6px 8px;
+}
+
 .easy-language-transient .notice-dismiss:before {
 	display: inline-block;
 	float: right;

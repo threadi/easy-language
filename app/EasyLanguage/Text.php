@@ -179,6 +179,9 @@ class Text {
 
 		// remove it from the object.
 		unset( $this->simplifications[ $language ] );
+
+		// the counts of simplified texts have been changed.
+		Db::get_instance()->clear_process_counts();
 	}
 
 	/**
@@ -267,6 +270,9 @@ class Text {
 		} else {
 			// save simplification in the object.
 			$this->simplifications[ $target_language ] = $translated_text;
+
+			// the counts of simplified texts have been changed.
+			$this->db->clear_process_counts();
 		}
 	}
 
@@ -426,6 +432,9 @@ class Text {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 		$wpdb->update( Db::get_instance()->get_table_name_originals(), array( 'state' => $state ), array( 'id' => $this->get_id() ) );
 
+		// the counts of texts to simplify have been changed.
+		Db::get_instance()->clear_process_counts();
+
 		// log any DB-errors.
 		if ( $wpdb->last_error ) {
 			Log::get_instance()->add_log( __( 'Error during updating state of entry in DB:', 'easy-language' ) . ' <code>' . wp_json_encode( $wpdb->last_error ) . '</code>', 'error' );
@@ -474,6 +483,9 @@ class Text {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 			$wpdb->delete( Db::get_instance()->get_table_name_simplifications(), array( 'oid' => $this->get_id() ) );
 		}
+
+		// the counts of texts have been changed.
+		Db::get_instance()->clear_process_counts();
 	}
 
 	/**
@@ -537,6 +549,9 @@ class Text {
 		if ( $wpdb->last_error ) {
 			Log::get_instance()->add_log( __( 'Error during adding object to original in DB: ', 'easy-language' ) . $wpdb->last_error, 'error' );
 		}
+
+		// the counts of texts to simplify have been changed (they depend on the objects using the texts).
+		Db::get_instance()->clear_process_counts();
 	}
 
 	/**

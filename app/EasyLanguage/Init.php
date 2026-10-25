@@ -1156,7 +1156,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// delete the cached simplification process counts.
-		delete_transient( 'easy_language_simplification_process_counts' );
+		delete_transient( Db::TRANSIENT_PROCESS_COUNTS );
 
 		// schedule deaktivieren.
 		wp_clear_scheduled_hook( 'easy_language_automatic_simplification' );
@@ -2617,7 +2617,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// get the counts from cache.
-		$counts = get_transient( 'easy_language_simplification_process_counts' );
+		$counts = get_transient( Db::TRANSIENT_PROCESS_COUNTS );
 
 		// get the counts via DB if they are not cached.
 		if ( ! is_array( $counts ) ) {
@@ -2629,7 +2629,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			);
 
 			// cache them for a short time.
-			set_transient( 'easy_language_simplification_process_counts', $counts, MINUTE_IN_SECONDS );
+			set_transient( Db::TRANSIENT_PROCESS_COUNTS, $counts, MINUTE_IN_SECONDS );
 		}
 
 		// get _all_ items.

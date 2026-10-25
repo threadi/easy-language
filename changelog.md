@@ -22,6 +22,9 @@
 - Abilities to change data: create-simplification, save-text-simplification (AI clients can save their own simplifications without using an API quota), set-text-state, set-automatic-prevention and run-simplification (via the active API in the background)
 - New settings tab "Abilities" to enable or disable the abilities, to allow only read-only or all abilities and to check whether the project can use them
 - Filters easy_language_abilities and easy_language_abilities_checks
+- New API "WordPress Connectors" to simplify texts in Einfache and Leichte Sprache with the AI connectors of WordPress (WordPress 7.0 or newer); it could only be activated if a connector for text generation is connected
+- Settings for the API "WordPress Connectors": choice of the connector and of the source and target languages
+- Filters easy_language_wp_ai_instruction, easy_language_wp_ai_request_object, easy_language_wp_ai_source_languages, easy_language_wp_ai_target_languages and easy_language_wp_ai_mapping_languages
 
 ### Changed
 
@@ -40,6 +43,7 @@
 
 ### Fixed
 
+- Progress of the simplifications in the admin bar was shown up to one minute after all texts had been simplified
 - Quota with more spent characters than its limit is now handled as used up (before only a rest of exactly 0)
 - Simplification via API in the backend is canceled with a hint if the quota is used up, no request is sent
 - Dialog after adding a simplification no longer hangs if the quota is used up or not sufficient for all texts
