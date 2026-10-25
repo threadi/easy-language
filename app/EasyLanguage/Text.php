@@ -148,6 +148,56 @@ class Text {
 	}
 
 	/**
+	 * Return the simplification of this text in the given language as it is saved in DB.
+	 *
+	 * Returns an empty string if no simplification exists.
+	 *
+	 * @param string $language The language we search.
+	 * @return string
+	 */
+	public function get_raw_simplification( string $language ): string {
+		return $this->get_translation_from_db( $language );
+	}
+
+	/**
+	 * Delete the simplification of this text in the given language.
+	 *
+	 * @param string $language The language.
+	 * @return void
+	 */
+	public function delete_simplification( string $language ): void {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
+		$wpdb->delete(
+			Db::get_instance()->get_table_name_simplifications(),
+			array(
+				'oid'      => $this->get_id(),
+				'language' => $language,
+			)
+		);
+
+		// remove it from the object.
+		unset( $this->simplifications[ $language ] );
+	}
+
+	/**
+	 * Return the state of this text.
+	 *
+	 * @return string
+	 */
+	public function get_state(): string {
+		global $wpdb;
+
+		// get from DB.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
+		$result = $wpdb->get_var( $wpdb->prepare( 'SELECT `state` FROM %i WHERE `id` = %d', array( Db::get_instance()->get_table_name_originals(), $this->get_id() ) ) );
+
+		// return the state.
+		return is_string( $result ) ? $result : '';
+	}
+
+	/**
 	 * Return the translation of this text in the given language.
 	 *
 	 * @param string $language The language we search.

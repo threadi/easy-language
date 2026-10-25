@@ -125,6 +125,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// get our own REST API-support-handler.
 		Rest_Api::get_instance()->init();
 
+		// get our own abilities-handler (WordPress Abilities API since 6.9).
+		Abilities::get_instance()->init();
+
 		// add settings.
 		add_action( 'init', array( $this, 'add_settings' ), 30 );
 
@@ -1023,6 +1026,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @return void
 	 */
 	public function deactivation(): void {
+		// remove scheduled simplifications requested via abilities.
+		wp_unschedule_hook( Abilities::CRON_HOOK );
+
 		// get new state setting.
 		$new_state_setting = get_option( 'easy_language_state_on_deactivation', 'draft' );
 
@@ -1877,6 +1883,35 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 			// get info if this is a simplification-initialization.
 			$initialization = isset( $_POST['initialization'] ) ? filter_var( wp_unslash( $_POST['initialization'] ), FILTER_VALIDATE_BOOLEAN ) : false;
+
+			// do not start a simplification if the quota of the API is used up.
+			if ( $initialization && Helper::is_quota_used_up( $api_obj ) ) {
+				/* translators: %1$d will be replaced by an ID, %2$s by a type name, %3$s by the API title. */
+				Log::get_instance()->add_log( sprintf( __( 'Simplification of %1$d (%2$s) canceled as the quota of %3$s is used up.', 'easy-language' ), $object_id, $object_type, $api_obj->get_title() ), 'error' );
+
+				// collect return array.
+				$return = array(
+					1,
+					1,
+					0,
+					array(
+						'className' => 'wp-dialog-error',
+						'title'     => __( 'Quota used up', 'easy-language' ),
+						'texts'     => array(
+							/* translators: %1$s will be replaced by the API title. */
+							'<p>' . sprintf( __( '<strong>The quota of %1$s is used up.</strong><br>Nothing has been simplified.', 'easy-language' ), esc_html( $api_obj->get_title() ) ) . '</p>',
+						),
+						'buttons'   => array(
+							array(
+								'action'  => 'location.reload();',
+								'variant' => 'primary',
+								'text'    => __( 'OK', 'easy-language' ),
+							),
+						),
+					),
+				);
+				wp_send_json( $return );
+			}
 
 			// run simplification of X text-entries on the given object.
 			$object->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping(), absint( get_option( 'easy_language_api_text_limit_per_process', 1 ) ), $initialization );

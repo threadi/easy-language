@@ -150,6 +150,86 @@ function easy_language_add_simplification_object( object_id, type, language, sim
 					}
 					easy_language_create_dialog( dialog_config );
 				}
+				else if( 'ok' === data.status && "auto" === simplification_mode && "exceeded" === data.quota_state.status ) {
+					let dialog_config = {
+						detail: {
+							className: 'wp-dialog-error',
+							title: __('Quota used up', 'easy-language'),
+							texts: [
+								/* translators: %1$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title, %3$s will be replaced by the language-name, %4$s will be replaced by the API-title */
+								'<p>' + __( 'The %1$s <i>%2$s</i> has been created in %3$s.<br><strong>The quota of %4$s is used up, so its texts have not been simplified.</strong>', 'easy-language' ).replace('%1$s', easy_language_simplification_escape_html( data.object_type_name )).replace('%2$s', easy_language_simplification_escape_html( data.title )).replace('%3$s', easy_language_simplification_escape_html( data.language )).replace('%4$s', easy_language_simplification_escape_html( data.api_title )) + '</p>'
+							],
+							buttons: [
+								{
+									'action': 'location.href = ' + JSON.stringify( String( data.edit_link ) ) + ';',
+									'variant': 'primary',
+									/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
+									'text': __('Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
+								},
+								{
+									'action': 'location.reload();',
+									'text': __('Cancel', 'easy-language')
+								}
+							]
+						}
+					}
+					easy_language_create_dialog( dialog_config );
+				}
+				else if( 'ok' === data.status && "auto" === simplification_mode && "above_limit" === data.quota_state.status ) {
+					let dialog_config = {
+						detail: {
+							title: __('%1$s ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
+							texts: [
+								/* translators: %1$s will be replaced by the API-title, %2$s by a number of characters, %3$s by the object type name (e.g. page or post), %4$s by a number of characters */
+								'<p>' + __( 'The remaining quota of %1$s (%2$s characters) is not enough for all texts of this %3$s (%4$s characters).<br>Some texts may not be simplified.', 'easy-language' ).replace('%1$s', easy_language_simplification_escape_html( data.api_title )).replace('%2$s', parseInt( data.quota_state.quota_rest, 10 )).replace('%3$s', easy_language_simplification_escape_html( data.object_type_name )).replace('%4$s', parseInt( data.quota_state.chars_count, 10 )) + '</p>'
+							],
+							buttons: [
+								{
+									'action': 'easy_language_get_simplification( ' + parseInt( data.object_id, 10 ) + ', ' + JSON.stringify( String( data.object_type ) ) + ' );',
+									'variant': 'primary',
+									'text': __('Simplify anyway', 'easy-language')
+								},
+								{
+									'action': 'location.href = ' + JSON.stringify( String( data.edit_link ) ) + ';',
+									'variant': 'secondary',
+									/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
+									'text': __('Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
+								},
+								{
+									'action': 'location.reload();',
+									'text': __('Cancel', 'easy-language')
+								}
+							]
+						}
+					}
+					easy_language_create_dialog( dialog_config );
+				}
+				else if( 'ok' === data.status && "auto" === simplification_mode ) {
+					// fallback for any other quota state: never leave the user in the waiting dialog.
+					let dialog_config = {
+						detail: {
+							/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
+							title: __('%1$s ready for simplification', 'easy-language').replace('%1$s', data.object_type_name),
+							texts: [
+								/* translators: %1$s will be replaced by the object type name (e.g. page or post), %2$s will be replaced by the object-title, %3$s will be replaced by the language-name */
+								__('<p>The %1$s <i>%2$s</i> has been created in %3$s.<br>Its texts are not yet simplified.</p>', 'easy-language').replace('%1$s', easy_language_simplification_escape_html( data.object_type_name )).replace('%2$s', easy_language_simplification_escape_html( data.title )).replace('%3$s', easy_language_simplification_escape_html( data.language ))
+							],
+							buttons: [
+								{
+									'action': 'location.href = ' + JSON.stringify( String( data.edit_link ) ) + ';',
+									'variant': 'primary',
+									/* translators: %1$s will be replaced by the object type name (e.g. page or post) */
+									'text': __('Edit %1$s', 'easy-language').replace('%1$s', data.object_type_name)
+								},
+								{
+									'action': 'location.reload();',
+									'text': __('Cancel', 'easy-language')
+								}
+							]
+						}
+					}
+					easy_language_create_dialog( dialog_config );
+				}
 				else if( 'ok' === data.status && "manually" === simplification_mode ) {
 					// create dialog.
 					let dialog_config = {};

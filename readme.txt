@@ -40,6 +40,7 @@ With [capito](https://www.capito.eu) and [SUMM AI](https://summ-ai.com) it is po
 - Add a language switcher by shortcode at any position on your website
 - Multisite support
 - Own role for users to only simplify texts
+- Abilities for AI clients via the WordPress Abilities API (WordPress 6.9 or newer, requires an MCP plugin)
 
 == Compatible with many page builders ==
 
