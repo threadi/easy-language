@@ -151,6 +151,9 @@ class Update {
 		if ( version_compare( $db_plugin_version, '3.3.0', '<' ) ) {
 			$this->version330();
 		}
+		if ( version_compare( $db_plugin_version, '4.0.0', '<' ) ) {
+			$this->version400();
+		}
 
 		// log this event.
 		/* translators: %1$s and %2$s are replaced by the old and new version. */
@@ -524,5 +527,18 @@ class Update {
 	 */
 	public function version302(): void {
 		Rewrite::get_instance()->set_refresh();
+	}
+
+	/**
+	 * To run on update to (exact) version 4.0.0.
+	 *
+	 * Existing installations keep the output of their existing language switchers (shortcodes, Elementor widgets
+	 * and blocks inserted before this version) via the compatibility mode.
+	 *
+	 * @return void
+	 */
+	public function version400(): void {
+		// enable the compatibility mode for the language switcher (this runs only once per site via the DB version).
+		update_option( 'easy_language_switcher_compatibility', 1, true );
 	}
 }

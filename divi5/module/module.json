@@ -1,0 +1,16 @@
+{
+  "name": "easy-language/divi-switcher",
+  "title": "Language Switcher",
+  "titles": "Language Switchers",
+  "moduleIcon": "easy-language/divi-switcher",
+  "moduleClassName": "easy_language_switcher",
+  "moduleOrderClassName": "easy_language_switcher",
+  "category": "module",
+  "childrenName": [],
+  "attributes": {
+    "module": {
+      "type": "object",
+      "selector": "{{selector}}"
+    }
+  }
+}

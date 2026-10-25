@@ -79,7 +79,10 @@ tasks:
         admin app css gfx inc templates
         blocks/*/block.json blocks/*/build
         js/generated
-        legacy-classes/Divi/build legacy-classes/Divi/divi.js
+        legacy-classes/Divi/build legacy-classes/Divi/divi.js legacy-classes/Divi/Switcher_Module.php
+        legacy-classes/BoldBuilder legacy-classes/Breakdance legacy-classes/LiveComposer legacy-classes/Nimble
+        legacy-classes/Themify legacy-classes/VisualComposer legacy-classes/Avia legacy-classes/BeaverBuilder legacy-classes/SiteOrigin
+        brizy/build brizy/editor-icon.css divi5/build divi5/module
         vendor/autoload.php vendor/composer
         vendor/gettext
         vendor/threadi/crypt-for-wordpress/src

@@ -12,6 +12,11 @@
 /blocks/*/src/ export-ignore
 /blocks/components.js export-ignore
 /legacy-classes/Divi/src/ export-ignore
+/brizy/src/ export-ignore
+/divi5/src/ export-ignore
+/divi5/webpack.config.js export-ignore
+/blocks/switcher-edit.js export-ignore
+/blocks/switcher-editor.scss export-ignore
 /phpunit.xml.dist export-ignore
 /phpstan.neon export-ignore
 /.phpcs.xml.dist export-ignore

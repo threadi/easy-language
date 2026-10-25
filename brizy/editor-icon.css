@@ -1,0 +1,13 @@
+/**
+ * Icon of the language switcher element in the list of elements of the Brizy editor.
+ *
+ * Brizy only supports names of its own icon font for elements, so the icon is replaced with the Easy Language logo.
+ * The selector uses the ID of our element ("EasyLanguageSwitcher"), which Brizy adds as data attribute.
+ */
+.brz-ed-sidebar__add-elements__item[data-brz-sortable-subtype="EasyLanguageSwitcher"] .brz-ed-sidebar__add-elements__icon .brz-icon-svg {
+	background: url(../gfx/easy-language-icon.svg) center / contain no-repeat;
+}
+
+.brz-ed-sidebar__add-elements__item[data-brz-sortable-subtype="EasyLanguageSwitcher"] .brz-ed-sidebar__add-elements__icon .brz-icon-svg use {
+	display: none;
+}

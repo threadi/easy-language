@@ -61,6 +61,63 @@ class Divi5 extends PageBuilder_Base {
 
 		// use hooks.
 		add_filter( 'wp_insert_post_data', array( $this, 'fix_product_duplication_slashing' ), 1 );
+		add_action( 'init', array( $this, 'register_modules' ) );
+		add_action( 'divi_visual_builder_assets_before_enqueue_scripts', array( $this, 'register_vb_scripts' ) );
+		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+	}
+
+	/**
+	 * Return whether the module API of Divi 5 is available.
+	 *
+	 * @return bool
+	 */
+	private function is_module_api_available(): bool {
+		return $this->is_active() && class_exists( '\ET\Builder\Packages\ModuleLibrary\ModuleRegistration' );
+	}
+
+	/**
+	 * Register our own modules in Divi 5.
+	 *
+	 * @return void
+	 */
+	public function register_modules(): void {
+		// bail if the module API of Divi 5 is not available.
+		if ( ! $this->is_module_api_available() ) {
+			return;
+		}
+
+		// register the language switcher module.
+		Divi5\Switcher_Module::get_instance()->register();
+	}
+
+	/**
+	 * Register the scripts for our modules in the visual builder of Divi 5.
+	 *
+	 * @return void
+	 */
+	public function register_vb_scripts(): void {
+		// bail if the module API of Divi 5 is not available.
+		if ( ! $this->is_module_api_available() || ! class_exists( '\ET\Builder\VisualBuilder\Assets\PackageBuildManager' ) ) {
+			return;
+		}
+
+		// register the script of the language switcher module.
+		Divi5\Switcher_Module::get_instance()->register_vb_script();
+	}
+
+	/**
+	 * Register the REST API routes for our modules (used for the preview in the visual builder).
+	 *
+	 * @return void
+	 */
+	public function register_rest_routes(): void {
+		// bail if the module API of Divi 5 is not available.
+		if ( ! $this->is_module_api_available() ) {
+			return;
+		}
+
+		// register the route of the language switcher module.
+		Divi5\Switcher_Module::get_instance()->register_rest_route();
 	}
 
 	/**

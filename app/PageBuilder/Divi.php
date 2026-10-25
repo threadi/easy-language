@@ -64,6 +64,25 @@ class Divi extends PageBuilder_Base {
 		add_filter( 'et_builder_page_settings_definitions', array( $this, 'add_fields' ) );
 		add_action( 'et_fb_enqueue_assets', array( $this, 'add_scripts_and_styles' ) );
 		add_filter( 'easy_language_js_top', array( $this, 'change_js_hierarchy' ) );
+		add_action( 'et_builder_ready', array( $this, 'register_modules' ) );
+	}
+
+	/**
+	 * Register our own modules in Divi 4.
+	 *
+	 * The module files extend classes of Divi, so they are only loaded if Divi is ready.
+	 * Each module file creates its own instance (like the modules of Divi itself).
+	 *
+	 * @return void
+	 */
+	public function register_modules(): void {
+		// bail if Divi 4 is not active or the base class of modules does not exist.
+		if ( ! $this->is_active() || ! class_exists( 'ET_Builder_Module' ) ) {
+			return;
+		}
+
+		// load the language switcher module.
+		require_once Helper::get_plugin_path() . 'legacy-classes/Divi/Switcher_Module.php';
 	}
 
 	/**

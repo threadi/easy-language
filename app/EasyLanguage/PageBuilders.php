@@ -212,11 +212,27 @@ class PageBuilders {
 	private function get_page_builder(): array {
 		// create the list.
 		$list = array(
+			'\easyLanguage\PageBuilder\Avada',
+			'\easyLanguage\PageBuilder\Avia',
+			'\easyLanguage\PageBuilder\BeaverBuilder',
 			'\easyLanguage\PageBuilder\BlockEditor',
+			'\easyLanguage\PageBuilder\BoldBuilder',
+			'\easyLanguage\PageBuilder\Breakdance',
 			'\easyLanguage\PageBuilder\Bricks',
+			'\easyLanguage\PageBuilder\Brizy',
+			'\easyLanguage\PageBuilder\Colibri',
 			'\easyLanguage\PageBuilder\Divi',
 			'\easyLanguage\PageBuilder\Divi5',
 			'\easyLanguage\PageBuilder\Elementor',
+			'\easyLanguage\PageBuilder\Fusion',
+			'\easyLanguage\PageBuilder\LiveComposer',
+			'\easyLanguage\PageBuilder\Nimble',
+			'\easyLanguage\PageBuilder\Oxygen',
+			'\easyLanguage\PageBuilder\SiteOrigin',
+			'\easyLanguage\PageBuilder\Themify',
+			'\easyLanguage\PageBuilder\VisualComposer',
+			'\easyLanguage\PageBuilder\WpBakery',
+			'\easyLanguage\PageBuilder\ZionBuilder',
 		);
 
 		/**

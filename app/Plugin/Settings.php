@@ -177,7 +177,6 @@ class Settings {
 		// the icon tab.
 		$icons_tab = $settings_page->add_tab( 'icons', 50 );
 		$icons_tab->set_title( __( 'Icons', 'easy-language' ) );
-		$icons_tab->set_hide_save( true );
 
 		// the log tab.
 		$logs_tab = $settings_page->add_tab( 'logs', 80 );
@@ -229,6 +228,11 @@ class Settings {
 		$icons_tab_main->set_callback( array( $this, 'render_icons' ) );
 		$icons_tab_main->set_setting( $settings_obj );
 
+		// the icons settings section.
+		$icons_tab_settings = $icons_tab->add_section( 'icons_settings', 20 );
+		$icons_tab_settings->set_title( __( 'Settings for icons', 'easy-language' ) );
+		$icons_tab_settings->set_setting( $settings_obj );
+
 		// the icons section.
 		$logs_tab_main = $logs_tab->add_section( 'logs_main', 10 );
 		$logs_tab_main->set_callback( array( $this, 'render_logs' ) );
@@ -279,6 +283,20 @@ class Settings {
 		$field->set_title( __( 'Select your API', 'easy-language' ) );
 		$field->set_options( $apis );
 		$field->set_sanitize_callback( array( self::get_instance(), 'sanitize_api' ) );
+		$setting->set_field( $field );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_switcher_icon_size' );
+		$setting->set_section( $icons_tab_settings );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 0 );
+		$field = new Number( $settings_obj );
+		$field->set_title( __( 'Default size of icons in language switchers', 'easy-language' ) );
+		$field->set_description( __( 'Size in pixels. Used by all language switchers which do not have an own icon size. Set to 0 to keep the size of the icons as before.', 'easy-language' ) );
+		$field->set_min( 0 );
+		$field->set_max( 512 );
+		$field->set_step( 1 );
 		$setting->set_field( $field );
 
 		// add setting.

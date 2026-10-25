@@ -105,6 +105,12 @@ Each release of this plugin will only be published if it fulfills the following 
 == Changelog ==
 
 = @@VersionNumber@@ =
+- Added toggle as new display for the language switcher (with adjustable colors, size and rounding)
+- Added visibility settings for each language switcher (chosen pages, posts and terms)
+- Added icon size for each language switcher and as default in the settings
+- Added all switcher settings to the classic menu
+- Added the language switcher as widget for Avada, Beaver Builder, Bold Page Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Enfold, Fusion, Live Composer, Nimble Builder, Oxygen 6, SiteOrigin, Themify Builder, Visual Composer, WPBakery (also Salient) and Zion Builder
+- Fixed several wrong links of the language switcher on blog homepage, archives and drafts
 - Added encryption of API keys, existing keys are migrated automatically
 - Now requires WordPress 6.6 or newer
 - Simplification requests now also check the permission for the respective object

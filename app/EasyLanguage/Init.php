@@ -1412,6 +1412,17 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_radio_as_string' ) );
 		$setting->set_field( $field );
 
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_switcher_compatibility' );
+		$setting->set_section( $frontend_section );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 0 );
+		$field = new Checkbox( $settings_obj );
+		$field->set_title( __( 'Compatibility mode for language switchers', 'easy-language' ) );
+		$field->set_description( __( 'If enabled, language switchers created before version 4.0.0 keep their previous output: shortcodes, Elementor widgets and blocks show links to not simplified pages, even if the link-mode hides them. Disable this to let all language switchers follow the link-mode. Newly added blocks always follow the link-mode.', 'easy-language' ) );
+		$setting->set_field( $field );
+
 		// get the advanced tab.
 		$advanced_tab = $settings_page->get_tab( 'advanced' );
 

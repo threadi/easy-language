@@ -7,9 +7,12 @@
 	"category": "widgets",
 	"icon": "list-view",
 	"description": "Provides a Block for Language Switcher in navigation.",
-	"keywords": [ "easy language", "switcher" ],
+	"keywords": [
+		"easy language",
+		"switcher"
+	],
 	"supports": {
-	  	"anchor": true,
+		"anchor": true,
 		"color": {
 			"gradients": true,
 			"link": true
@@ -24,21 +27,10 @@
 	"textdomain": "easy-language",
 	"editorScript": "file:build/index.js",
 	"editorStyle": "file:build/index.css",
-	"style": "file:build/style-index.css",
-	"attributes": {
-		"preview": {
-			"type": "boolean",
-			"default": false
-		},
-		"show_icons": {
-			"type": "boolean",
-			"default": false
-		},
-		"hide_actual_language": {
-			"type": "boolean",
-			"default": false
-		}
-	},
+	"style": [
+		"file:build/style-index.css",
+		"easy-language-switcher"
+	],
 	"example": {
 		"attributes": {
 			"preview": true
