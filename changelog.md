@@ -17,6 +17,11 @@
 - Settings of the classic menu switcher: display, hide actual language, icon size, toggle and visibility
 - Filters easy_language_switcher_settings, easy_language_switcher_entries, easy_language_switcher_toggle, easy_language_switcher_visible, easy_language_switcher_output and easy_language_switcher_objects_limit
 - Compatibility mode for language switchers created before 4.0.0, enabled automatically during the update
+- Support for the WordPress Abilities API (WordPress 6.9 or newer): AI clients can use Easy Language via an MCP plugin
+- Read-only abilities: get-configuration, get-object-simplifications, find-objects (missing, simplified or outdated simplifications) and list-texts
+- Abilities to change data: create-simplification, save-text-simplification (AI clients can save their own simplifications without using an API quota), set-text-state, set-automatic-prevention and run-simplification (via the active API in the background)
+- New settings tab "Abilities" to enable or disable the abilities, to allow only read-only or all abilities and to check whether the project can use them
+- Filters easy_language_abilities and easy_language_abilities_checks
 
 ### Changed
 
@@ -35,6 +40,10 @@
 
 ### Fixed
 
+- Quota with more spent characters than its limit is now handled as used up (before only a rest of exactly 0)
+- Simplification via API in the backend is canceled with a hint if the quota is used up, no request is sent
+- Dialog after adding a simplification no longer hangs if the quota is used up or not sufficient for all texts
+- Creating a simplification outside of wp-admin (e.g. via REST API) failed because of a missing function
 - API tokens were saved in the request log tables; existing entries are cleaned up during the update
 - Possible SQL injection via sort order in the log
 - Page builder data (Bricks, Brizy, Visual Composer, SeedProd, Beaver Builder, Breakdance, Divi 5, Themify) could be damaged when simplified texts were saved

@@ -650,7 +650,10 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 			// set marker to reset permalinks.
 			Rewrite::get_instance()->set_refresh();
 
-			// set lock on post to prevent automatic simplification.
+			// set lock on post to prevent automatic simplification (load the function if this is not a wp-admin request, e.g. via REST API or abilities).
+			if ( ! function_exists( 'wp_set_post_lock' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/post.php';
+			}
 			wp_set_post_lock( $copied_post_id );
 
 			// get the copy as "Post_Object".

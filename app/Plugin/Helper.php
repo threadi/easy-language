@@ -880,4 +880,34 @@ class Helper {
 		// return the requested filesystem object.
 		return $wp_filesystem;
 	}
+
+	/**
+	 * Return whether the quota of the given API is used up.
+	 *
+	 * The quota counts as used up if the API reports a limit and the spent characters reach or exceed it.
+	 * APIs without a known limit or with an unlimited quota are never used up.
+	 *
+	 * @param Api_Base $api_obj The API.
+	 *
+	 * @return bool
+	 */
+	public static function is_quota_used_up( Api_Base $api_obj ): bool {
+		$quota = $api_obj->get_quota();
+
+		// bail if the quota is unlimited.
+		if ( ! empty( $quota['unlimited'] ) ) {
+			return false;
+		}
+
+		// get the limit.
+		$limit = isset( $quota['character_limit'] ) ? absint( $quota['character_limit'] ) : 0;
+
+		// bail if no limit is known.
+		if ( 0 === $limit ) {
+			return false;
+		}
+
+		// return whether the spent characters reach the limit.
+		return ( isset( $quota['character_spent'] ) ? absint( $quota['character_spent'] ) : 0 ) >= $limit;
+	}
 }

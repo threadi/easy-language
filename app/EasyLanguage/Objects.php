@@ -768,6 +768,15 @@ abstract class Objects {
 	protected function process_simplification_trigger_on_end(): void {}
 
 	/**
+	 * Run the object-specific tasks after a simplification has been processed outside an API process.
+	 *
+	 * @return void
+	 */
+	public function run_simplification_end_trigger(): void {
+		$this->process_simplification_trigger_on_end();
+	}
+
+	/**
 	 * Set error marker for running simplification.
 	 *
 	 * @return void
@@ -838,8 +847,8 @@ abstract class Objects {
 			$return_array['status'] = 'above_limit';
 		}
 
-		// quota is exceeded.
-		if ( 0 === $return_array['quota_rest'] ) {
+		// quota is exceeded (also if more characters have been spent than the limit allows).
+		if ( $return_array['quota_rest'] <= 0 ) {
 			$return_array['status'] = 'exceeded';
 		}
 
