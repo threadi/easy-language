@@ -101,6 +101,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		$query  = array(
 			'post_type'                       => $this->get_type(),
 			'post_status'                     => 'any',
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- the simplified objects are linked to their originals via post meta, there is no other way to query them
 			'meta_query'                      => array(
 				'relation' => 'AND',
 				array(
@@ -145,6 +146,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		$query  = array(
 			'post_type'                       => $this->get_type(),
 			'post_status'                     => $post_status,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- the simplified objects are linked to their originals via post meta, there is no other way to query them
 			'meta_query'                      => array(
 				array(
 					'key'     => 'easy_language_simplification_original_id',

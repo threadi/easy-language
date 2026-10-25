@@ -76,6 +76,7 @@ class Installer {
 		global $wpdb;
 
 		// get blogs in this site-network.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- list of the sites in the network during (de)activation or uninstallation, the result must be up to date
 		return $wpdb->get_results(
 			"
             SELECT blog_id

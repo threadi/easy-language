@@ -64,6 +64,25 @@ class Divi extends PageBuilder_Base {
 		add_filter( 'et_builder_page_settings_definitions', array( $this, 'add_fields' ) );
 		add_action( 'et_fb_enqueue_assets', array( $this, 'add_scripts_and_styles' ) );
 		add_filter( 'easy_language_js_top', array( $this, 'change_js_hierarchy' ) );
+		add_action( 'et_builder_ready', array( $this, 'register_modules' ) );
+	}
+
+	/**
+	 * Register our own modules in Divi 4.
+	 *
+	 * The module files extend classes of Divi, so they are only loaded if Divi is ready.
+	 * Each module file creates its own instance (like the modules of Divi itself).
+	 *
+	 * @return void
+	 */
+	public function register_modules(): void {
+		// bail if Divi 4 is not active or the base class of modules does not exist.
+		if ( ! $this->is_active() || ! class_exists( 'ET_Builder_Module' ) ) {
+			return;
+		}
+
+		// load the language switcher module.
+		require_once Helper::get_plugin_path() . 'legacy-classes/Divi/Switcher_Module.php';
 	}
 
 	/**
@@ -88,6 +107,7 @@ class Divi extends PageBuilder_Base {
 	public function add_fields( array $fields ): array {
 		// add our custom fields where user can change language-settings.
 		$fields['easy-language-simplify-texts'] = array(
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- key of a Divi field definition, not a query argument
 			'meta_key'             => 'easy_language_divi_languages',
 			'type'                 => 'easy-language-language-options',
 			'show_in_bb'           => true,

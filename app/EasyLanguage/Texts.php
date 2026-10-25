@@ -1073,6 +1073,7 @@ class Texts {
 			$query              = array(
 				'taxonomy'     => $args['taxonomy'],
 				'hide_empty'   => false,
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- the simplified terms are linked to their originals via term meta, there is no other way to query them
 				'meta_key'     => 'easy_language_simplification_original_id',
 				'meta_compare' => 'EXISTS',
 				'fields'       => 'ids',
@@ -1090,6 +1091,7 @@ class Texts {
 		}
 
 		// add them to the actual query and keep existing excludes.
+		// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- simplified terms must be hidden in term lists and are only identifiable via term meta; the list is cached per request
 		$args['exclude'] = array_unique( array_merge( wp_parse_id_list( $args['exclude'] ?? array() ), $this->simplified_terms[ $cache_key ] ) );
 
 		// return resulting arguments.

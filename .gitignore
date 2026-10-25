@@ -12,6 +12,8 @@ languages/*.json
 /vendor/
 /blocks/*/build/
 /legacy-classes/Divi/build/
+/brizy/build/
+/divi5/build/
 /js/generated/metabox*
 /dist/
 smoke-result.txt

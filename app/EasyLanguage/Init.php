@@ -923,11 +923,12 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// get all simplified, draft and marked objects in any supported language to set them to publish.
 		foreach ( $this->get_supported_post_types() as $post_type => $enabled ) {
-			$query   = array(
+			$query = array(
 				'post_type'                       => $post_type,
 				'posts_per_page'                  => -1,
 				'post_status'                     => array( 'any', 'trash' ),
 				'fields'                          => 'ids',
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- the simplified objects are linked to their originals via post meta, there is no other way to query them
 				'meta_query'                      => array(
 					'relation' => 'AND',
 					array(
@@ -1029,11 +1030,12 @@ class Init extends Base implements ThirdPartySupport_Base {
 		if ( 'disabled' !== $new_state_setting ) {
 			// get all simplified objects in any supported language to set them to draft.
 			foreach ( $this->get_supported_post_types() as $post_type => $enabled ) {
-				$query   = array(
+				$query = array(
 					'post_type'                       => $post_type,
 					'posts_per_page'                  => -1,
 					'post_status'                     => array( 'any', 'trash' ),
 					'fields'                          => 'ids',
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- the simplified objects are linked to their originals via post meta, there is no other way to query them
 					'meta_query'                      => array(
 						array(
 							'key'     => 'easy_language_simplification_original_id',
@@ -1092,6 +1094,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// remove all 'easy_language_text_language'-marker.
 		$query   = array(
 			'post_status'    => 'any',
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- the simplified objects are linked to their originals via post meta, there is no other way to query them
 			'meta_query'     => array(
 				array(
 					'key'     => 'easy_language_text_language',
@@ -1142,7 +1145,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// delete the object-specific simplification markers.
 		global $wpdb;
 		foreach ( array( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS ) as $marker ) {
-			$wpdb->query( $wpdb->prepare( 'DELETE FROM ' . $wpdb->options . ' WHERE `option_name` LIKE %s', $wpdb->esc_like( $marker . '_' ) . '%' ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- deletes the object-specific markers of this plugin (option name prefix + object ID), no WP API available to delete options by prefix
+			$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `option_name` LIKE %s', $wpdb->options, $wpdb->esc_like( $marker . '_' ) . '%' ) );
 		}
 
 		// delete the cached simplification process counts.
@@ -1406,6 +1410,17 @@ class Init extends Base implements ThirdPartySupport_Base {
 			)
 		);
 		$field->set_sanitize_callback( array( \easyLanguage\Plugin\Settings::get_instance(), 'sanitize_radio_as_string' ) );
+		$setting->set_field( $field );
+
+		// add setting.
+		$setting = $settings_obj->add_setting( 'easy_language_switcher_compatibility' );
+		$setting->set_section( $frontend_section );
+		$setting->set_show_in_rest( true );
+		$setting->set_type( 'integer' );
+		$setting->set_default( 0 );
+		$field = new Checkbox( $settings_obj );
+		$field->set_title( __( 'Compatibility mode for language switchers', 'easy-language' ) );
+		$field->set_description( __( 'If enabled, language switchers created before version 4.0.0 keep their previous output: shortcodes, Elementor widgets and blocks show links to not simplified pages, even if the link-mode hides them. Disable this to let all language switchers follow the link-mode. Newly added blocks always follow the link-mode.', 'easy-language' ) );
 		$setting->set_field( $field );
 
 		// get the advanced tab.
@@ -2200,11 +2215,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 			// loop through the entries in batches and delete them.
 			foreach ( array_chunk( $entry_ids, 100 ) as $batch ) {
-				// extend the time limit for each batch, if possible.
-				if ( function_exists( 'set_time_limit' ) && false === strpos( (string) ini_get( 'disable_functions' ), 'set_time_limit' ) ) {
-					set_time_limit( 60 );
-				}
-
 				foreach ( $batch as $entry_id ) {
 					// delete the entry.
 					$entry = new Text( $entry_id );

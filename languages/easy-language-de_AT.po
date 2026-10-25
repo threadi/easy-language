@@ -2787,3 +2787,312 @@ msgstr "Bietet einen Block für die Sprachumschaltung."
 #~ msgstr ""
 #~ "Du kannst den SUMM AI API-Schlüssel vom Anbieter <a href=\"%1$s\" target="
 #~ "\"_blank\">hier</a> erhalten."
+
+#: app/EasyLanguage/Init.php:1422
+msgid "Compatibility mode for language switchers"
+msgstr "Kompatibilitätsmodus für Sprachwechsler"
+
+#: app/EasyLanguage/Init.php:1423
+msgid "If enabled, language switchers created before version 4.0.0 keep their previous output: shortcodes, Elementor widgets and blocks show links to not simplified pages, even if the link-mode hides them. Disable this to let all language switchers follow the link-mode. Newly added blocks always follow the link-mode."
+msgstr "Wenn aktiviert, behalten Sprachwechsler, die vor Version 4.0.0 angelegt wurden, ihre bisherige Ausgabe: Shortcodes, Elementor-Widgets und Blöcke zeigen auch Links zu nicht vereinfachten Seiten, obwohl der Link-Modus diese ausblendet. Deaktiviere dies, damit alle Sprachwechsler dem Link-Modus folgen. Neu eingefügte Blöcke folgen immer dem Link-Modus."
+
+#: app/EasyLanguage/Switcher.php:1147
+#, php-format
+msgid "This site is not available in %1$s."
+msgstr "Diese Seite ist nicht in %1$s verfügbar."
+
+#: app/EasyLanguage/Switcher.php:1156
+msgid "on"
+msgstr "an"
+
+#: app/EasyLanguage/Switcher.php:1156
+msgid "off"
+msgstr "aus"
+
+#: app/EasyLanguage/Switcher.php:1158
+msgid "not available"
+msgstr "nicht verfügbar"
+
+#: app/EasyLanguage/Switcher.php:1611
+#: app/PageBuilder/Elementor/Switcher_Widget.php:100
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Display"
+msgstr "Darstellung"
+
+#: app/EasyLanguage/Switcher.php:1631
+#: app/PageBuilder/Elementor/Switcher_Widget.php:258
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Icon size"
+msgstr "Icon-Größe"
+
+#: app/EasyLanguage/Switcher.php:1632
+msgid "e.g. 24px"
+msgstr "z. B. 24px"
+
+#: app/EasyLanguage/Switcher.php:1633
+#: app/PageBuilder/Elementor/Switcher_Widget.php:259
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Leave empty to use the default size from the plugin settings."
+msgstr "Leer lassen, um die Standardgröße aus den Plugin-Einstellungen zu verwenden."
+
+#: app/EasyLanguage/Switcher.php:1638
+#: app/PageBuilder/Elementor/Switcher_Widget.php:125
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Language of the toggle"
+msgstr "Sprache des Schalters"
+
+#: app/EasyLanguage/Switcher.php:1653
+#: app/PageBuilder/Elementor/Switcher_Widget.php:138
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Grey out if no simplification is available"
+msgstr "Ausgrauen, wenn keine Vereinfachung vorliegt"
+
+#: app/EasyLanguage/Switcher.php:1658
+#: app/PageBuilder/Elementor/Switcher_Widget.php:154
+#: app/PageBuilder/Elementor/Switcher_Widget.php:161
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Visibility"
+msgstr "Sichtbarkeit"
+
+#: app/EasyLanguage/Switcher.php:1671
+#: app/PageBuilder/Elementor/Switcher_Widget.php:171
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Pages and terms"
+msgstr "Seiten und Begriffe"
+
+#: app/EasyLanguage/Switcher.php:1680
+#: admin/menu-switcher.js:69
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+#, javascript-format
+msgid "Remove %1$s"
+msgstr "%1$s entfernen"
+
+#: app/EasyLanguage/Switcher.php:1686
+msgid "Search pages and terms …"
+msgstr "Seiten und Begriffe suchen …"
+
+#: app/EasyLanguage/Switcher.php:1686
+msgid "Search pages and terms"
+msgstr "Seiten und Begriffe suchen"
+
+#: app/EasyLanguage/Switcher.php:1693
+#: app/PageBuilder/Elementor/Switcher_Widget.php:186
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Include child pages and child terms"
+msgstr "Unterseiten und Unterbegriffe einschließen"
+
+#: app/EasyLanguage/Switcher.php:1699
+#: app/PageBuilder/Elementor/Switcher_Widget.php:199
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Include contents assigned to the chosen terms"
+msgstr "Auch auf Inhalten, die den gewählten Begriffen zugeordnet sind"
+
+#: app/EasyLanguage/Switcher.php:1704
+#: app/PageBuilder/Elementor/Switcher_Widget.php:212
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "On pages without own language versions"
+msgstr "Auf Seiten ohne eigene Sprachfassung"
+
+#: app/EasyLanguage/Switcher.php:1999
+#, php-format
+msgid "(no title, ID %1$d)"
+msgstr "(ohne Titel, ID %1$d)"
+
+#: app/EasyLanguage/Switcher.php:2014
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Text"
+msgstr "Text"
+
+#: app/EasyLanguage/Switcher.php:2016
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Toggle"
+msgstr "Schalter"
+
+#: app/EasyLanguage/Switcher.php:2027
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Show everywhere"
+msgstr "Überall anzeigen"
+
+#: app/EasyLanguage/Switcher.php:2028
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Show only on chosen pages and terms"
+msgstr "Nur auf gewählten Seiten und Begriffen anzeigen"
+
+#: app/EasyLanguage/Switcher.php:2029
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Show everywhere except on chosen pages and terms"
+msgstr "Überall außer auf gewählten Seiten und Begriffen anzeigen"
+
+#: app/EasyLanguage/Switcher.php:2042
+msgid "Hide (like until now)"
+msgstr "Ausblenden (wie bisher)"
+
+#: app/EasyLanguage/Switcher.php:2042
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Automatic (like until now)"
+msgstr "Automatisch (wie bisher)"
+
+#: app/EasyLanguage/Switcher.php:2043
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Link to the homepages"
+msgstr "Startseiten verlinken"
+
+#: app/EasyLanguage/Switcher.php:2055
+msgid "First active language"
+msgstr "Erste aktive Sprache"
+
+#: app/PageBuilder/Elementor/Switcher_Widget.php:139
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "If disabled, the toggle will be hidden on pages without simplification."
+msgstr "Wenn deaktiviert, wird der Schalter auf Seiten ohne Vereinfachung ausgeblendet."
+
+#: app/PageBuilder/Elementor/Switcher_Widget.php:213
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "For example archives, search results or the blog homepage."
+msgstr "Zum Beispiel Archive, Suchergebnisse oder die Blog-Startseite."
+
+#: app/Plugin/Settings.php:233
+msgid "Settings for icons"
+msgstr "Einstellungen für Icons"
+
+#: app/Plugin/Settings.php:295
+msgid "Default size of icons in language switchers"
+msgstr "Standardgröße der Icons in Sprachwechslern"
+
+#: app/Plugin/Settings.php:296
+msgid "Size in pixels. Used by all language switchers which do not have an own icon size. Set to 0 to keep the size of the icons as before."
+msgstr "Größe in Pixel. Gilt für alle Sprachwechsler ohne eigene Icon-Größe. Mit 0 bleibt die bisherige Größe der Icons erhalten."
+
+#: admin/menu-switcher.js:126
+msgid "Nothing found."
+msgstr "Nichts gefunden."
+
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Search for pages, posts or terms."
+msgstr "Nach Seiten, Beiträgen oder Begriffen suchen."
+
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "In the editor the language switcher is always visible."
+msgstr "Im Editor ist der Sprachwechsler immer sichtbar."
+
+#: app/EasyLanguage/Switcher.php
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Color of the toggle if on"
+msgstr "Farbe des Schalters, wenn an"
+
+#: app/EasyLanguage/Switcher.php
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Color of the toggle if off"
+msgstr "Farbe des Schalters, wenn aus"
+
+#: app/EasyLanguage/Switcher.php
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Color of the thumb"
+msgstr "Farbe des Schiebers"
+
+#: app/EasyLanguage/Switcher.php
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Size of the toggle"
+msgstr "Größe des Schalters"
+
+#: app/EasyLanguage/Switcher.php
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Rounding of the toggle"
+msgstr "Rundung des Schalters"
+
+#: app/EasyLanguage/Switcher.php
+msgid "e.g. 4px, 0 for squared"
+msgstr "z. B. 4px, 0 für eckig"
+
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Height of the toggle, the width is calculated. Leave empty for the default size."
+msgstr "Höhe des Schalters, die Breite wird daraus berechnet. Leer lassen für die Standardgröße."
+
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Leave empty for a round toggle, use 0 for a squared toggle."
+msgstr "Leer lassen für einen runden Schalter, 0 für einen eckigen Schalter."
+
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Colors of the toggle"
+msgstr "Farben des Schalters"
+
+#: app/PageBuilder/Elementor/Switcher_Widget.php
+msgid "Text or icons (setting below)"
+msgstr "Text oder Icons (Einstellung darunter)"
+
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Toggle on"
+msgstr "Schalter an"
+
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Toggle off"
+msgstr "Schalter aus"
+
+#: blocks/switcher/build/index.js:1
+#: blocks/navigation-switcher/build/index.js:1
+msgid "Thumb"
+msgstr "Schieber"
+
+msgid "Comma separated list of pages and terms, e.g. post:12,term:5."
+msgstr "Kommagetrennte Liste von Seiten und Begriffen, z. B. post:12,term:5."
+
+msgid "Desktop"
+msgstr "Desktop"
+
+msgid "Language Switchers"
+msgstr "Sprachumschalter"
+
+msgid "Loading …"
+msgstr "Lädt …"
+
+#, php-format
+msgid "Number with one of these units: %1$s"
+msgstr "Zahl mit einer dieser Einheiten: %1$s"
+
+#, php-format
+msgid "Only used if \"%1$s\" is set to \"%2$s\"."
+msgstr "Wird nur verwendet, wenn „%1$s“ auf „%2$s“ gesetzt ist."
+
+msgid "Phone"
+msgstr "Smartphone"
+
+msgid "Show On"
+msgstr "Anzeigen auf"
+
+msgid "Tablet"
+msgstr "Tablet"
+
+msgid "Show a switcher between the language versions of the actual page."
+msgstr "Zeigt einen Umschalter zwischen den Sprachfassungen der aktuellen Seite."

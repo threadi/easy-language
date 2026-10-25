@@ -81,10 +81,11 @@ class Switcher extends Tag {
 	 */
 	public function render(): void {
 		echo wp_kses_post(
-			\EasyLanguage\EasyLanguage\Switcher::get_instance()->get(
+			\easyLanguage\EasyLanguage\Switcher::get_instance()->get(
 				array(
 					'hide_actual_language' => false,
 					'show_icons'           => false,
+					'source'               => 'elementor-tag',
 				)
 			)
 		);

@@ -346,6 +346,7 @@ class Helper {
 			'posts_per_page' => 1,
 			'post_type'      => 'attachment',
 			'post_status'    => 'inherit',
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- the language icons are identified via attachment meta, there is no other way to query them
 			'meta_query'     => array(
 				array(
 					'key'     => 'easy_language_code',

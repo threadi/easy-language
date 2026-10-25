@@ -25,29 +25,33 @@ import './style.scss';
  * Internal dependencies
  */
 import edit from './edit';
-import save from "./save";
-import {easyLanguageIcon} from "../../components";
+import save from './save';
+import { easyLanguageIcon } from '../../components';
+import { getVariations } from '../../switcher-edit';
 
 /**
  * Every block starts by registering a new block type definition.
  *
+ * The attributes are defined in PHP: easyLanguage\EasyLanguage\Switcher::get_block_attributes().
+ *
  * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
  */
-registerBlockType(
-	'easy-language/switcher',
-	{
-		title: __( 'Language Switcher', 'easy-language' ),
-		description: __( 'Provides a Block for Language Switcher.', 'easy-language' ),
-		icon: easyLanguageIcon,
+registerBlockType( 'easy-language/switcher', {
+	title: __( 'Language Switcher', 'easy-language' ),
+	description: __(
+		'Provides a Block for Language Switcher.',
+		'easy-language'
+	),
+	icon: easyLanguageIcon,
+	variations: getVariations( __( 'Language Switcher', 'easy-language' ) ),
 
-		/**
-		 * @see ./edit.js
-		 */
-		edit: edit,
+	/**
+	 * @see ./edit.js
+	 */
+	edit,
 
-		/**
-		 * @see ./save.js
-		 */
-		save: save,
-	}
-);
+	/**
+	 * @see ./save.js
+	 */
+	save,
+} );

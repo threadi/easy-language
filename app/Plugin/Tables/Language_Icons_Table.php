@@ -109,4 +109,17 @@ class Language_Icons_Table extends WP_List_Table {
 	public function no_items(): void {
 		echo esc_html__( 'No icons found.', 'easy-language' );
 	}
+
+	/**
+	 * Do not output the table navigation.
+	 *
+	 * This table has no bulk actions and no pagination. The navigation would only add a nonce field, which
+	 * would replace the nonce of the settings form around this table.
+	 *
+	 * @param string $which The position ("top" or "bottom").
+	 *
+	 * @return void
+	 * @noinspection PhpUnusedParameterInspection
+	 */
+	protected function display_tablenav( $which ): void {}
 }

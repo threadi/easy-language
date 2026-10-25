@@ -323,6 +323,7 @@ class Request implements Api_Requests {
 			'quota'      => strlen( $this->get_text() ),
 			'blog_id'    => get_current_blog_id(),
 		);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- custom request table of this API, no WP API available; entries change with every request, so no object cache
 		$wpdb->insert( $this->table_requests, $query );
 
 		// log error.

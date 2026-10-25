@@ -5,11 +5,11 @@
   "author": "laOlaWeb GmbH",
   "license": "GPL-2.0-or-later",
   "scripts": {
-    "build": "concurrently --kill-others-on-fail \"npm run build:switcher\" \"npm run build:navigation-switcher\" \"npm run build:divi-language-field\" \"npm run build:sidebar\"",
+    "build": "concurrently --kill-others-on-fail \"npm run build:switcher\" \"npm run build:navigation-switcher\" \"npm run build:divi-language-field\" \"npm run build:sidebar\" \"npm run build:brizy\" \"npm run build:divi5\"",
     "format": "wp-scripts format",
     "lint:css": "wp-scripts lint-style",
     "lint:js": "wp-scripts lint-js",
-    "start": "concurrently --kill-others-on-fail \"npm run start:switcher\" \"npm run start:navigation-switcher\" \"npm run start:divi-language-field\" \"npm run start:sidebar\"",
+    "start": "concurrently --kill-others-on-fail \"npm run start:switcher\" \"npm run start:navigation-switcher\" \"npm run start:divi-language-field\" \"npm run start:sidebar\" \"npm run start:brizy\" \"npm run start:divi5\"",
     "packages-update": "wp-scripts packages-update",
     "start:switcher": "wp-scripts start blocks/switcher/src/index.js --output-path=blocks/switcher/build/",
     "build:switcher": "wp-scripts build blocks/switcher/src/index.js --output-path=blocks/switcher/build/",
@@ -19,7 +19,11 @@
     "build:navigation-switcher": "wp-scripts build blocks/navigation-switcher/src/index.js --output-path=blocks/navigation-switcher/build/",
     "start:sidebar": "wp-scripts start src/sidebar.js --output-path=js/generated/",
     "build:sidebar": "wp-scripts build src/sidebar.js --output-path=js/generated/",
-    "make-pot": "wp i18n make-pot . languages/easy-language.pot --exclude=blocks/switcher/src/,blocks/navigation-switcher/src/,svn/",
+    "start:brizy": "wp-scripts start brizy/src/index.js --output-path=brizy/build/",
+    "build:brizy": "wp-scripts build brizy/src/index.js --output-path=brizy/build/",
+    "start:divi5": "wp-scripts start divi5/src/index.js --output-path=divi5/build/ --config divi5/webpack.config.js",
+    "build:divi5": "wp-scripts build divi5/src/index.js --output-path=divi5/build/ --config divi5/webpack.config.js",
+    "make-pot": "wp i18n make-pot . languages/easy-language.pot --exclude=blocks/switcher/src/,blocks/navigation-switcher/src/,brizy/src/,divi5/src/,svn/",
     "make-json": "wp i18n make-json languages"
   },
   "devDependencies": {

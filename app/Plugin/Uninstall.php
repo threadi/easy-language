@@ -66,6 +66,7 @@ class Uninstall {
 		global $wpdb;
 
 		// get blogs in this site-network.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- list of the sites in the network during (de)activation or uninstallation, the result must be up to date
 		return $wpdb->get_results(
 			'
             SELECT blog_id
@@ -176,6 +177,7 @@ class Uninstall {
 			'posts_per_page' => -1,
 			'post_type'      => 'attachment',
 			'post_status'    => 'inherit',
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- the simplified objects are linked to their originals via post meta, there is no other way to query them
 			'meta_query'     => array(
 				array(
 					'key'     => 'easy_language_icon',
@@ -195,6 +197,7 @@ class Uninstall {
 			'posts_per_page' => -1,
 			'post_type'      => 'attachment',
 			'post_status'    => 'inherit',
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- the simplified objects are linked to their originals via post meta, there is no other way to query them
 			'meta_query'     => array(
 				array(
 					'key'     => 'easy_language_code',

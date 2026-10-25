@@ -69,6 +69,7 @@ class Elementor extends PageBuilder_Base {
 		add_action( 'elementor/element/wp-page/document_settings/after_section_end', array( $this, 'add_settings_controls_on_page' ) );
 		add_action( 'elementor/controls/register', array( $this, 'add_custom_control' ) );
 		add_action( 'elementor/editor/before_enqueue_styles', array( $this, 'add_styles' ) );
+		add_action( 'elementor/editor/after_enqueue_styles', array( $this, 'add_widget_icon_style' ) );
 		add_action( 'elementor/dynamic_tags/register_tags', array( $this, 'add_dynamic_tags' ) );
 	}
 
@@ -94,6 +95,15 @@ class Elementor extends PageBuilder_Base {
 	 */
 	public function register_widgets(): void {
 		Plugin::instance()->widgets_manager->register( new Switcher_Widget() );
+	}
+
+	/**
+	 * Add the style for the icon of our widget in the Elementor editor.
+	 *
+	 * @return void
+	 */
+	public function add_widget_icon_style(): void {
+		wp_enqueue_style( 'easy-language-builder-icon' );
 	}
 
 	/**

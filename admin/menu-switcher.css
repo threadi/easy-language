@@ -1,0 +1,49 @@
+/**
+ * Styles for the settings of the language switcher in classic menus.
+ */
+.easy-language-menu-switcher-settings {
+	clear: both;
+}
+
+.easy-language-menu-switcher-settings [hidden] {
+	display: none !important;
+}
+
+.easy-language-menu-switcher-settings .easy-language-object-picker {
+	margin: 4px 0 8px;
+}
+
+.easy-language-object-picker-selected,
+.easy-language-object-picker-results {
+	margin: 4px 0;
+	padding: 0;
+	list-style: none;
+}
+
+.easy-language-object-picker-selected li {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin: 0 0 4px;
+	padding: 2px 4px 2px 8px;
+	border: 1px solid #dcdcde;
+	border-radius: 2px;
+	background: #fff;
+}
+
+.easy-language-object-picker-results {
+	max-height: 200px;
+	overflow-y: auto;
+	border: 1px solid #dcdcde;
+	background: #fff;
+}
+
+.easy-language-object-picker-results:empty {
+	display: none;
+}
+
+.easy-language-object-picker-results li {
+	margin: 0;
+	padding: 4px 8px;
+}

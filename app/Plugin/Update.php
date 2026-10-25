@@ -151,6 +151,9 @@ class Update {
 		if ( version_compare( $db_plugin_version, '3.3.0', '<' ) ) {
 			$this->version330();
 		}
+		if ( version_compare( $db_plugin_version, '4.0.0', '<' ) ) {
+			$this->version400();
+		}
 
 		// log this event.
 		/* translators: %1$s and %2$s are replaced by the old and new version. */
@@ -454,7 +457,7 @@ class Update {
 			$last_id = 0;
 			do {
 				// @phpstan-ignore argument.type
-				$entries = $wpdb->get_results( $wpdb->prepare( 'SELECT `id`, `request` FROM `' . $table . '` WHERE `id` > %d AND `request` LIKE %s AND `request` NOT LIKE %s ORDER BY `id` ASC LIMIT %d', array( $last_id, $like, $like_anonymized, 500 ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.PreparedSQL.NotPrepared,WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$entries = $wpdb->get_results( $wpdb->prepare( 'SELECT `id`, `request` FROM %i WHERE `id` > %d AND `request` LIKE %s AND `request` NOT LIKE %s ORDER BY `id` ASC LIMIT %d', array( $table, $last_id, $like, $like_anonymized, 500 ) ), ARRAY_A ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 
 				// bail if no entries found.
 				if ( ! is_array( $entries ) || empty( $entries ) ) {
@@ -524,5 +527,18 @@ class Update {
 	 */
 	public function version302(): void {
 		Rewrite::get_instance()->set_refresh();
+	}
+
+	/**
+	 * To run on update to (exact) version 4.0.0.
+	 *
+	 * Existing installations keep the output of their existing language switchers (shortcodes, Elementor widgets
+	 * and blocks inserted before this version) via the compatibility mode.
+	 *
+	 * @return void
+	 */
+	public function version400(): void {
+		// enable the compatibility mode for the language switcher (this runs only once per site via the DB version).
+		update_option( 'easy_language_switcher_compatibility', 1, true );
 	}
 }

@@ -42,6 +42,10 @@ parameters:
   excludePaths:
   	- app/Dependencies/
   	- app/PageBuilder/Elementor/
+  	- app/PageBuilder/Bricks/
+  	- app/PageBuilder/Brizy/
+  	- app/PageBuilder/Divi5/
+  	- app/PageBuilder/ZionBuilder/
   	- app/ThirdPartySupport/TranslatePress/TranslatePress_Capito_Machine_Translator.php
   	- app/ThirdPartySupport/TranslatePress/TranslatePress_Summ_Ai_Machine_Translator.php
   scanFiles:

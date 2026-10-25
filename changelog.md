@@ -1,12 +1,22 @@
 # Changelog
 
-## [3.3.0] - 10.10.2026
+## [4.0.0] - unreleased
 
 ### Added
 
 - API keys are now saved encrypted (via Crypt for WordPress); existing keys are migrated automatically during the update
 - Smoke test of the release zip in WordPress Playground, SBOM and Plugin Check in the release workflow
 - Dependabot for GitHub Actions
+- New display "Toggle" for the language switcher (blocks, classic menu, shortcode, Elementor), optionally greyed out on pages without simplification
+- Design settings for the toggle: colors (on, off, thumb), size and rounding
+- Language switcher as native widget in Avada, Beaver Builder, Bold Page Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Enfold, Fusion, Live Composer, Nimble Builder, Oxygen 6, SiteOrigin, Themify Builder, Visual Composer, WPBakery (also Salient) and Zion Builder (with the same settings as the block)
+- Filter easy_language_switcher_widget_fields to change the settings of the page builder widgets
+- Visibility settings for each language switcher: show it only on (or hide it on) chosen pages, posts and terms, optionally with child pages/terms and contents assigned to the chosen terms
+- Setting for the behavior on pages without own language versions (archives, search results, blog homepage, 404)
+- Icon size for each language switcher and a default icon size in the plugin settings (Icons tab)
+- Settings of the classic menu switcher: display, hide actual language, icon size, toggle and visibility
+- Filters easy_language_switcher_settings, easy_language_switcher_entries, easy_language_switcher_toggle, easy_language_switcher_visible, easy_language_switcher_output and easy_language_switcher_objects_limit
+- Compatibility mode for language switchers created before 4.0.0, enabled automatically during the update
 
 ### Changed
 
@@ -18,6 +28,10 @@
 - Lists of texts are now paginated
 - GitHub Actions are pinned to commits and run with minimal permissions
 - Removed the Ant build
+- All outputs of the language switcher use one central function (Switcher::get() and Switcher::get_entries())
+- The attributes of both switcher blocks are defined only once
+- New blocks are wrapped in an element which uses the block settings (colors, typography, border, anchor); in navigations they are output as list item
+- Active language is marked with aria-current, icons get an accessible name
 
 ### Fixed
 
@@ -26,6 +40,15 @@
 - Page builder data (Bricks, Brizy, Visual Composer, SeedProd, Beaver Builder, Breakdance, Divi 5, Themify) could be damaged when simplified texts were saved
 - Automatic simplification was not scheduled after some updates due to an unknown cron interval
 - Missing gettext library in the release zip broke the export of translations
+- Language switcher on the blog homepage linked the versions of the first post in the list
+- Language switcher was not shown on archives of supported taxonomies
+- Classic menu showed the item "Language Switcher" with a useless link on pages without languages
+- Simplifications which are not published (e.g. drafts) were linked in the language switcher
+- Link-mode "do not link translated pages" generated relative links on pages without simplification
+- Simplified terms were not linked with the default link-mode
+- Active language was not detected on the language-specific homepage
+- Saving menus via code (e.g. WP-CLI or importer) stopped with "The link you followed has expired"
+- The icon option of the classic menu was shown on all menu items
 - Many smaller bugs, missing checks and PHP warnings
 
 ## [3.2.3] - 13.09.2026

@@ -1,0 +1,19 @@
+/**
+ * Icon of the language switcher widgets in the editors of page builders.
+ *
+ * Page builders which only support icon classes get the class "easy-language-builder-icon".
+ * The size follows the font-size of the icon element of the page builder.
+ */
+.easy-language-builder-icon {
+	display: inline-block !important;
+	width: 1em;
+	height: 1em;
+	background: url(../gfx/easy-language-icon.svg) center / contain no-repeat;
+	vertical-align: middle;
+}
+
+.easy-language-builder-icon::before,
+.easy-language-builder-icon::after {
+	content: none !important;
+	display: none !important;
+}

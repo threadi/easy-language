@@ -1,0 +1,19 @@
+/**
+ * Styles for the editor of the language switcher blocks.
+ */
+.easy-language-object-picker-selected {
+	margin: 8px 0 16px;
+	padding: 0;
+	list-style: none;
+
+	li {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		margin: 0 0 4px;
+		padding: 2px 4px 2px 8px;
+		border: 1px solid #ddd;
+		border-radius: 2px;
+	}
+}
