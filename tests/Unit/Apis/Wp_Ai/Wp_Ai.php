@@ -187,13 +187,16 @@ class Wp_Ai extends easyLanguageTests {
 		Ai_Provider::$configured = false;
 		$settings->refresh_api_options();
 		$field = $settings->get_settings_object()->get_setting( 'easy_language_api' )->get_field();
-		$this->assertStringContainsString( 'easy-language-api-unavailable', $field->get_options()['wp_ai'] );
+		$this->assertInstanceOf( \easySettingsForWordPress\Fields\Cards::class, $field );
+		$this->assertStringContainsString( 'easy-language-api-unavailable', $field->get_options()['wp_ai']['description'] );
+		$this->assertTrue( $field->get_options()['wp_ai']['disabled'] );
 
 		// connected later: the box must be available after the refresh.
 		Ai_Provider::$configured = true;
 		$settings->refresh_api_options();
-		$this->assertStringNotContainsString( 'easy-language-api-unavailable', $field->get_options()['wp_ai'] );
-		$this->assertStringContainsString( Ai_Provider::NAME, $field->get_options()['wp_ai'] );
+		$this->assertStringNotContainsString( 'easy-language-api-unavailable', $field->get_options()['wp_ai']['description'] );
+		$this->assertStringContainsString( Ai_Provider::NAME, $field->get_options()['wp_ai']['description'] );
+		$this->assertFalse( $field->get_options()['wp_ai']['disabled'] );
 	}
 
 	/**

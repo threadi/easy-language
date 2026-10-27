@@ -664,7 +664,6 @@ class Capito extends Base implements Api_Base {
 		$setting->set_section( $capito_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose source languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible source languages for capito-simplifications. This language has to be the language, which you use for any texts in your website.', 'easy-language' ) );
@@ -685,7 +684,6 @@ class Capito extends Base implements Api_Base {
 		$setting->set_section( $capito_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible target languages for capito-simplifications.', 'easy-language' ) );
@@ -725,7 +723,7 @@ class Capito extends Base implements Api_Base {
 		$setting->prevent_export( true );
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
+		$setting->set_show_in_rest( false );
 	}
 
 	/**

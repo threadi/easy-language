@@ -88,7 +88,7 @@ if ( str_contains( (string) $wpdb->get_var( $wpdb->prepare( 'SELECT `option_valu
 
 // use a known prompt, so the mock can separate it from the text.
 foreach ( array_keys( $easy_language_e2e_api->get_supported_target_languages() ) as $easy_language_e2e_language ) {
-	update_option( 'easy_language_chatgpt_target_languages_prompts_' . $easy_language_e2e_language, 'E2E-PROMPT: ' );
+	update_option( 'easy_language_chatgpt_target_languages_prompts_' . $easy_language_e2e_language, 'E2E-PROMPT:' );
 }
 
 // activate Leichte Sprache and Einfache Sprache, so the switcher has more than one language to offer.

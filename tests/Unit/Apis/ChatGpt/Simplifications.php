@@ -72,6 +72,45 @@ class Simplifications extends easyLanguageTests {
 	}
 
 	/**
+	 * The prompt and the text are separated by an empty line.
+	 *
+	 * @return void
+	 */
+	public function test_request_text_separates_prompt_and_text(): void {
+		// the prompt ends without space, like after saving the settings.
+		$this->assertSame( "Vereinfache bitte den Text.\n\nDas ist ein Text.", $this->object->get_request_text( 'Vereinfache bitte den Text.', 'Das ist ein Text.' ) );
+
+		// whitespace at the end of the prompt is not doubled.
+		$this->assertSame( "Vereinfache bitte den Text.\n\nDas ist ein Text.", $this->object->get_request_text( "Vereinfache bitte den Text. \n", 'Das ist ein Text.' ) );
+
+		// without prompt only the text is sent.
+		$this->assertSame( 'Das ist ein Text.', $this->object->get_request_text( '', 'Das ist ein Text.' ) );
+	}
+
+	/**
+	 * The request to the API contains the prompt and the text, separated by an empty line.
+	 *
+	 * @return void
+	 */
+	public function test_request_contains_separated_prompt(): void {
+		update_option( 'easy_language_chatgpt_target_languages_prompts_' . $this->test_target_language, 'Vereinfache bitte den Text.' );
+
+		// get the body of the request.
+		$body = '';
+		$catch = static function ( $response, $parsed_args ) use ( &$body ) {
+			$body = (string) ( $parsed_args['body'] ?? '' );
+			return $response;
+		};
+		add_filter( 'pre_http_request', $catch, 5, 2 );
+		$this->object->call_api( $this->test_text, $this->test_source_language, $this->test_target_language, false );
+		remove_filter( 'pre_http_request', $catch, 5 );
+
+		delete_option( 'easy_language_chatgpt_target_languages_prompts_' . $this->test_target_language );
+
+		$this->assertStringContainsString( wp_json_encode( "Vereinfache bitte den Text.\n\n" . $this->test_text ), $body );
+	}
+
+	/**
 	 * Filter any outgoing requests to simulate the responses.
 	 *
 	 * @param bool|array $false The return value.

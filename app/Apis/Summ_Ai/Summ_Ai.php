@@ -800,7 +800,6 @@ class Summ_Ai extends Base implements Api_Base {
 		$setting->set_section( $summ_ai_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose source languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible source languages for SUMM AI-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ) );
@@ -831,7 +830,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$setting->set_section( $summ_ai_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
+		$setting->set_show_in_rest( false );
 		$field = new FieldTable( $settings_obj );
 		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible target languages for SUMM AI-simplifications.', 'easy-language' ) );

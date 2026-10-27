@@ -536,7 +536,6 @@ class Wp_Ai extends Base implements Api_Base {
 		$setting->set_section( $section );
 		$setting->set_type( 'array' );
 		$setting->set_default( $defaults[ self::OPTION_SOURCE_LANGUAGES ] );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose source languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible source languages for simplifications via WordPress Connectors. This language has to be the language which you use for any texts in your website.', 'easy-language' ) );
@@ -550,7 +549,6 @@ class Wp_Ai extends Base implements Api_Base {
 		$setting->set_section( $section );
 		$setting->set_type( 'array' );
 		$setting->set_default( $defaults[ self::OPTION_TARGET_LANGUAGES ] );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible target languages for simplifications via WordPress Connectors.', 'easy-language' ) );

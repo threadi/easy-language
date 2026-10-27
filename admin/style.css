@@ -87,99 +87,124 @@ body .text-translations-table #source_language, body .text-translations-table #t
     padding: 2px 8px;
 }
 
-.easy_language_api {
+/**
+ * Choice of the API: field "Cards" of Easy Settings, which has the same markup in the classic view and the DataView.
+ */
+
+/* classic view: use the full width without the column for the title. */
+tr.easy_language_api {
 	display: block;
-    margin: 24px 0 0;
-	> th { display: none }
-	th, td {
-		line-height: 1;
-		padding: 0
+	margin: 24px 0 0;
+}
+
+tr.easy_language_api > th { display: none }
+
+tr.easy_language_api > td {
+	display: block;
+	margin-right: 12px;
+	padding: 0;
+}
+
+/* DataView: the title is already shown as title of the section. */
+.esfw-cards-easy_language_api > .esfw-cards__legend {
+	clip-path: inset(50%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	width: 1px;
+}
+
+.esfw-cards-easy_language_api {
+	padding-top: 12px;
+}
+
+/* all cards have the same height, if they are shown in columns. */
+@media only screen and (min-width: 783px) {
+	.esfw-cards-easy_language_api {
+		grid-auto-rows: 1fr;
 	}
+}
+
+.esfw-cards-easy_language_api .esfw-card {
+	background-color: #dcdcde;
+	border-color: #c3c4c7;
+	gap: 0;
+	padding: 18px 12px 8px;
+}
+
+.esfw-cards-easy_language_api .esfw-card:hover {
+	background-color: rgba(0,0,0,0.1);
+	border-color: #c3c4c7;
+}
+
+.esfw-cards-easy_language_api .esfw-card:has(.esfw-card__input:checked),
+.esfw-cards-easy_language_api .esfw-card:has(.esfw-card__input:checked):hover {
+	background-color: #fff;
+	border-color: #c3c4c7;
+	box-shadow: none;
+}
+
+.esfw-cards-easy_language_api .esfw-card.is-disabled:hover {
+	background-color: #dcdcde;
+}
+
+.esfw-cards-easy_language_api .esfw-card__header {
+	margin-bottom: 1em;
+}
+
+.esfw-cards-easy_language_api .esfw-card__label {
+	color: #1d2327;
+	font-size: 1.3em;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+.esfw-cards-easy_language_api .esfw-card__badge {
+	background-color: var(--lwel-hint-bg);
+	border-radius: 12px;
+	color: var(--lwel-hint-font);
+	padding: 8px 12px;
+}
+
+.esfw-cards-easy_language_api .esfw-card__description {
+	line-height: 1.5;
+
+	p {
+		margin: 4px 0 0;
+	}
+
 	table {
 		border-collapse: collapse;
 		margin-top: 4px;
 	}
-	.dashicons {
+
+	th, td {
 		line-height: 1.3;
+		padding: 0;
+		text-align: left;
 	}
+
+	th {
+		font-weight: 600;
+		width: 200px;
+	}
+
+	/* buttons with an icon (help, settings): center the icon in the button. */
 	.button {
+		align-items: center;
+		display: inline-flex;
+		justify-content: center;
 		margin-right: 1em;
+		vertical-align: middle;
+	}
+
+	.button .dashicons {
+		line-height: 1;
+		vertical-align: middle;
 	}
 }
 
-.easy_language_api td > div {
-	margin-bottom: 12px;
-}
-
-@media only screen and (min-width: 600px) {
-	.easy_language_api td {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		grid-gap: 12px;
-		grid-auto-rows: 1fr;
-		margin-right: 12px;
-	}
-	.easy_language_api td > div { margin: 12px 0; }
-}
-
-.easy_language_api h2 {
-    margin-top: 0;
-}
-
-.easy_language_api img {
-    float: right;
-    height: 32px;
-}
-
-.easy_language_api input[type='radio'] { display: none }
-
-.easy_language_api input[type='radio'] + label {
-    background-color: #dcdcde;
-    border: 1px solid #c3c4c7;
-    border-radius: 8px;
-    display: block;
-	height: 100%;
-    padding: 18px 12px 8px;
-    position: relative;
-    z-index: 1;
-}
-
-.easy_language_api input[type='radio'] + label > p:last-child { margin-bottom: 0 }
-
-.easy_language_api input[type='radio'] + label:before {
-    background-color: var( --lwel-hint-bg);
-    border-radius: 8px;
-    color: var(--lwel-hint-font);
-    content: attr(data-active-title);
-    display: none;
-    padding: 4px 12px;
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
-}
-
-.easy_language_api input[type='radio'] + label:hover {
-	background-color: rgba(0,0,0,0.1);
-}
-
-.easy_language_api input[type='radio']:checked + label, .easy_language_api input[type='radio']:checked + label:hover {
-    background-color: #fff;
-}
-
-/* APIs which could not be used (e.g. no connector for the API via WordPress Connectors) could not be chosen. */
-.easy_language_api input[type='radio']:not(:checked) + label:has(.easy-language-api-unavailable) {
-	cursor: not-allowed;
-	opacity: .7;
-	pointer-events: none;
-}
-
-.easy_language_api input[type='radio'] + label:has(.easy-language-api-unavailable) a {
-	pointer-events: auto;
-}
-
-.easy_language_api .easy-language-api-unavailable {
+.esfw-cards-easy_language_api .easy-language-api-unavailable {
 	border-left: 4px solid #dba617;
 	background-color: #fcf9e8;
 	padding: 6px 8px;
@@ -362,18 +387,6 @@ body.settings_page_easy_language_settings #state { width: 48px }
 body.settings_page_easy_language_settings #date { width: 124px }
 body.settings_page_easy_language_settings #api { width: 80px }
 body.settings_page_easy_language_settings #response { min-width: 200px;width: auto }
-
-#easy-language-active-api {
-	background-color: var(--lwel-hint-bg);
-	border-radius: 12px;
-	color: #fff;
-	padding: 8px 12px;
-	position: absolute;
-	top: -8px;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	z-index: 10;
-}
 
 .easy_language_summ_ai_api_key td, .easy_language_capito_api_key td, .easy_language_chatgpt_api_key td {
 	background-color: var(--lwel-hint-bg);

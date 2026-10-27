@@ -15,7 +15,7 @@ defined( 'ABSPATH' ) || exit;
  * The plugin sends the prompt followed by the text to simplify. The mock removes the prompt and returns the text
  * with this marker in front of it, so the tests can recognize simplified texts.
  */
-const EASY_LANGUAGE_E2E_PROMPT = 'E2E-PROMPT: ';
+const EASY_LANGUAGE_E2E_PROMPT = 'E2E-PROMPT:';
 
 /**
  * The marker for simplified texts.
@@ -57,9 +57,9 @@ function easy_language_e2e_response( int $code, string $body ): array {
  * @return string
  */
 function easy_language_e2e_simplify( string $text ): string {
-	// remove the prompt.
+	// remove the prompt and the whitespace after it (saving the settings trims the prompt, so it may end without space).
 	if ( str_starts_with( $text, EASY_LANGUAGE_E2E_PROMPT ) ) {
-		$text = substr( $text, strlen( EASY_LANGUAGE_E2E_PROMPT ) );
+		$text = ltrim( substr( $text, strlen( EASY_LANGUAGE_E2E_PROMPT ) ) );
 	}
 
 	// add the marker in the first HTML tag, so the HTML stays valid.

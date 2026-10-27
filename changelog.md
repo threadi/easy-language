@@ -26,9 +26,11 @@
 - New API "WordPress Connectors" to simplify texts in Einfache and Leichte Sprache with the AI connectors of WordPress (WordPress 7.0 or newer); it could only be activated if a connector for text generation is connected
 - Settings for the API "WordPress Connectors": choice of the connector and of the source and target languages
 - Filters easy_language_wp_ai_instruction, easy_language_wp_ai_request_object, easy_language_wp_ai_source_languages, easy_language_wp_ai_target_languages and easy_language_wp_ai_mapping_languages
+- New setting "View of the settings" in the advanced settings: modern view (DataView, default) or classic view
 
 ### Changed
 
+- The choice of the API uses the new field "Cards" of Easy Settings: it looks the same in the classic view and in the DataView; APIs which could not be used could not be chosen
 - Updated dependencies
 - Now requires WordPress 6.6 or newer
 - API keys are no longer readable via REST API and are shown masked in the settings
@@ -44,6 +46,8 @@
 
 ### Fixed
 
+- ChatGPT: the prompt and the text to simplify are now separated by an empty line (before, the last sentence of the prompt and the first one of the text merged)
+- Checkboxes with array values (e.g. supported post types, languages) were empty in the DataView and could be removed by saving there
 - Progress of the simplifications in the admin bar was shown up to one minute after all texts had been simplified
 - Quota with more spent characters than its limit is now handled as used up (before only a rest of exactly 0)
 - Simplification via API in the backend is canceled with a hint if the quota is used up, no request is sent

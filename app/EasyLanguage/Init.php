@@ -1232,7 +1232,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 				'post' => '1',
 			)
 		);
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose supported post-types', 'easy-language' ) );
 		$field->set_options( $post_types );
@@ -1272,7 +1271,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $general_main_section );
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose supported taxonomies', 'easy-language' ) );
 		$field->set_options( $taxonomies );
@@ -1296,7 +1294,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $general_main_section );
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose languages', 'easy-language' ) );
 		/* translators: %1$s will be replaced by the settings-URL for the active API */

@@ -63,7 +63,7 @@
 		"threadi/crypt-for-wordpress": "^4.0",
 		"threadi/easy-dialog-for-wordpress": "^2.0.4",
 		"threadi/easy-setup-for-wordpress": "^1.5.1",
-		"threadi/easy-settings-for-wordpress": "^3.7.0",
+		"threadi/easy-settings-for-wordpress": "^3.9.0",
 		"threadi/easy-transients-for-wordpress": "^1.4.9",
 		"threadi/react-dialog": "^1.1.0"
 	},

@@ -71,10 +71,6 @@ class Quota_Ajax extends WP_Ajax_UnitTestCase {
 	 * @return void
 	 */
 	public function test_used_up_quota_cancels_simplification(): void {
-		// known issue: array settings of the plugin (e.g. easy_language_post_types) are registered for REST without "items" schema.
-		// WP_Ajax_UnitTestCase runs "admin_init", where these settings are registered, which triggers this notice.
-		$this->setExpectedIncorrectUsage( 'register_setting' );
-
 		// create an original and its simplified object.
 		$post_id = self::factory()->post->create(
 			array(

@@ -59,6 +59,30 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 	}
 
 	/**
+	 * Return the text for the request: the prompt and the text to simplify, separated by an empty line.
+	 *
+	 * Without a separator, the last sentence of the prompt and the first one of the text would merge, e.g. as
+	 * WordPress removes spaces at the end of the prompt when saving the settings.
+	 *
+	 * @param string $prompt            The prompt for the target language.
+	 * @param string $text_to_translate The text to simplify.
+	 *
+	 * @return string
+	 */
+	public function get_request_text( string $prompt, string $text_to_translate ): string {
+		// remove whitespace around the prompt.
+		$prompt = trim( $prompt );
+
+		// without prompt, only the text is sent.
+		if ( '' === $prompt ) {
+			return $text_to_translate;
+		}
+
+		// return the prompt and the text, separated by an empty line.
+		return $prompt . "\n\n" . $text_to_translate;
+	}
+
+	/**
 	 * Call API to simplify a single text.
 	 *
 	 * @param string $text_to_translate The text to translate.
@@ -75,7 +99,7 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 		$request_obj = $this->get_api()->get_request_object();
 		$request_obj->set_token( $this->get_api()->get_token() );
 		$request_obj->set_url( $this->get_api()->get_api_url() );
-		$request_obj->set_text( $request_text . $text_to_translate );
+		$request_obj->set_text( $this->get_request_text( $request_text, $text_to_translate ) );
 		$request_obj->set_source_language( $source_language );
 		$request_obj->set_target_language( $target_language );
 		/**
