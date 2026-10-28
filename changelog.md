@@ -46,6 +46,11 @@
 
 ### Fixed
 
+- Bricks (and all other page builders): widgets marked as "no HTML" were handled as HTML
+- Divi 5: texts of headings, buttons and icon list items are now read from and written to the block attributes, where Divi 5 saves them
+- SeedProd: simplifications without the capability "unfiltered_html" (e.g. via cron) no longer remove closing HTML tags from the page data
+- Deleting a simplification permanently (without trash) now also removes its language from the original
+- Requesting a term by ID no longer returns a post with the same ID
 - ChatGPT: the prompt and the text to simplify are now separated by an empty line (before, the last sentence of the prompt and the first one of the text merged)
 - Checkboxes with array values (e.g. supported post types, languages) were empty in the DataView and could be removed by saving there
 - Progress of the simplifications in the admin bar was shown up to one minute after all texts had been simplified

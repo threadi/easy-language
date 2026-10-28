@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f1757983d7b1809ea216cbb6218ab41c",
+    "content-hash": "5ec87594d09efda2e371dbbb79c3741d",
     "packages": [
         {
             "name": "gettext/gettext",
@@ -205,16 +205,16 @@
         },
         {
             "name": "threadi/easy-dialog-for-wordpress",
-            "version": "2.0.4",
+            "version": "2.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/threadi/easy-dialog-for-wordpress.git",
-                "reference": "27a7db4b4816d3e928bf93736081538ad5464cbf"
+                "reference": "e2f8ffddb8cbafc9977d4c23dccd4a154b79c595"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/threadi/easy-dialog-for-wordpress/zipball/27a7db4b4816d3e928bf93736081538ad5464cbf",
-                "reference": "27a7db4b4816d3e928bf93736081538ad5464cbf",
+                "url": "https://api.github.com/repos/threadi/easy-dialog-for-wordpress/zipball/e2f8ffddb8cbafc9977d4c23dccd4a154b79c595",
+                "reference": "e2f8ffddb8cbafc9977d4c23dccd4a154b79c595",
                 "shasum": ""
             },
             "type": "library",
@@ -231,27 +231,27 @@
             "description": "Provides a simple react-driven dialog-modal for the WordPress-backend.",
             "support": {
                 "issues": "https://github.com/threadi/easy-dialog-for-wordpress/issues",
-                "source": "https://github.com/threadi/easy-dialog-for-wordpress/tree/2.0.4"
+                "source": "https://github.com/threadi/easy-dialog-for-wordpress/tree/2.0.5"
             },
-            "time": "2026-10-04T14:34:54+00:00"
+            "time": "2026-10-18T13:02:22+00:00"
         },
         {
             "name": "threadi/easy-settings-for-wordpress",
-            "version": "3.7.0",
+            "version": "3.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/threadi/easy-settings-for-wordpress.git",
-                "reference": "0b49dac0d80c5767f3877bb78032964c14ecc617"
+                "reference": "d1f965c39f10e1ea0f1e9aba10f1ca44ac5d5c80"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/threadi/easy-settings-for-wordpress/zipball/0b49dac0d80c5767f3877bb78032964c14ecc617",
-                "reference": "0b49dac0d80c5767f3877bb78032964c14ecc617",
+                "url": "https://api.github.com/repos/threadi/easy-settings-for-wordpress/zipball/d1f965c39f10e1ea0f1e9aba10f1ca44ac5d5c80",
+                "reference": "d1f965c39f10e1ea0f1e9aba10f1ca44ac5d5c80",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.2",
-                "threadi/easy-dialog-for-wordpress": "*"
+                "threadi/easy-dialog-for-wordpress": "^2.0"
             },
             "require-dev": {
                 "automattic/vipwpcs": "^3.1",
@@ -288,9 +288,9 @@
             "description": "Provides a settings wrapper for WordPress plugins and themes.",
             "support": {
                 "issues": "https://github.com/threadi/easy-settings-for-wordpress/issues",
-                "source": "https://github.com/threadi/easy-settings-for-wordpress/tree/3.7.0"
+                "source": "https://github.com/threadi/easy-settings-for-wordpress/tree/3.9.0"
             },
-            "time": "2026-10-07T10:57:30+00:00"
+            "time": "2026-10-27T21:52:06+00:00"
         },
         {
             "name": "threadi/easy-setup-for-wordpress",
@@ -1990,16 +1990,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "2.3.6",
+            "version": "2.3.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "1427af4647235b4a73b13940b1f1258d3584f36e"
+                "reference": "2c122d2f890ae4b9e6ede898a9ac36b2c07e2a17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/1427af4647235b4a73b13940b1f1258d3584f36e",
-                "reference": "1427af4647235b4a73b13940b1f1258d3584f36e",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/2c122d2f890ae4b9e6ede898a9ac36b2c07e2a17",
+                "reference": "2c122d2f890ae4b9e6ede898a9ac36b2c07e2a17",
                 "shasum": ""
             },
             "require": {
@@ -2031,17 +2031,17 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.3.6"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/2.3.9"
             },
-            "time": "2026-09-27T20:07:45+00:00"
+            "time": "2026-10-27T22:32:31+00:00"
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.3.1",
+            "version": "2.3.3",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/6155239b488e95d26d1ebd95c6b4bb294d7f09db",
-                "reference": "6155239b488e95d26d1ebd95c6b4bb294d7f09db",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/4b57dc8ca7456b635d1661845f44bc060b02c6b0",
+                "reference": "4b57dc8ca7456b635d1661845f44bc060b02c6b0",
                 "shasum": ""
             },
             "require": {
@@ -2097,7 +2097,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-10-08T21:09:11+00:00"
+            "time": "2026-10-27T14:06:26+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -3838,16 +3838,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v6.4.47",
+            "version": "v6.4.48",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "0f758dfab4608cac6a342b7e7f80cb84c9cc98ca"
+                "reference": "c9c4cf6745e8b25db27466f59cf126ac8d3db3a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/0f758dfab4608cac6a342b7e7f80cb84c9cc98ca",
-                "reference": "0f758dfab4608cac6a342b7e7f80cb84c9cc98ca",
+                "url": "https://api.github.com/repos/symfony/console/zipball/c9c4cf6745e8b25db27466f59cf126ac8d3db3a4",
+                "reference": "c9c4cf6745e8b25db27466f59cf126ac8d3db3a4",
                 "shasum": ""
             },
             "require": {
@@ -3912,7 +3912,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v6.4.47"
+                "source": "https://github.com/symfony/console/tree/v6.4.48"
             },
             "funding": [
                 {
@@ -3932,7 +3932,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-18T10:23:48+00:00"
+            "time": "2026-10-07T08:10:34+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -4007,16 +4007,16 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v6.4.45",
+            "version": "v6.4.48",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "6dabf41c21957a2060f101bd7bf7e322989866bd"
+                "reference": "e3ff48b19ac71ee79f89021122211710b892ae0b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/6dabf41c21957a2060f101bd7bf7e322989866bd",
-                "reference": "6dabf41c21957a2060f101bd7bf7e322989866bd",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/e3ff48b19ac71ee79f89021122211710b892ae0b",
+                "reference": "e3ff48b19ac71ee79f89021122211710b892ae0b",
                 "shasum": ""
             },
             "require": {
@@ -4053,7 +4053,7 @@
             "description": "Provides basic utilities for the filesystem",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/filesystem/tree/v6.4.45"
+                "source": "https://github.com/symfony/filesystem/tree/v6.4.48"
             },
             "funding": [
                 {
@@ -4073,7 +4073,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-08-23T07:59:31+00:00"
+            "time": "2026-10-06T17:30:58+00:00"
         },
         {
             "name": "symfony/finder",
@@ -4651,16 +4651,16 @@
         },
         {
             "name": "symfony/string",
-            "version": "v6.4.46",
+            "version": "v6.4.48",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "4513ab2b0ad2d7845a2f920e2f30b61633c9e606"
+                "reference": "9459a27a00b1f0fec1954e9eb362d00aedcfe048"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/4513ab2b0ad2d7845a2f920e2f30b61633c9e606",
-                "reference": "4513ab2b0ad2d7845a2f920e2f30b61633c9e606",
+                "url": "https://api.github.com/repos/symfony/string/zipball/9459a27a00b1f0fec1954e9eb362d00aedcfe048",
+                "reference": "9459a27a00b1f0fec1954e9eb362d00aedcfe048",
                 "shasum": ""
             },
             "require": {
@@ -4716,7 +4716,7 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/symfony/string/tree/v6.4.46"
+                "source": "https://github.com/symfony/string/tree/v6.4.48"
             },
             "funding": [
                 {
@@ -4736,7 +4736,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-11T09:03:57+00:00"
+            "time": "2026-10-03T14:51:46+00:00"
         },
         {
             "name": "szepeviktor/phpstan-wordpress",
@@ -4977,7 +4977,7 @@
         },
         {
             "name": "wp-phpunit/wp-phpunit",
-            "version": "6.9.8",
+            "version": "6.9.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-phpunit/wp-phpunit.git",

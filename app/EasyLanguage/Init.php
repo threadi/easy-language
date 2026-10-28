@@ -161,7 +161,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		add_action( 'admin_bar_menu', array( $this, 'add_simplification_button_in_admin_bar' ), 500 );
 		add_action( 'admin_bar_menu', array( $this, 'show_simplification_process' ), 400 );
 		add_filter( 'site_status_tests', array( $this, 'add_site_status_test' ) );
-		add_filter( 'easy_language_get_object', array( $this, 'get_post_object' ), 20, 2 );
+		add_filter( 'easy_language_get_object', array( $this, 'get_post_object' ), 20, 3 );
 		add_filter( 'easy_language_get_object', array( $this, 'get_term_object' ), 10, 3 );
 		add_filter( 'easy_language_first_simplify_dialog', array( $this, 'change_first_simplify_dialog' ), 10, 3 );
 		add_filter( 'easy_language_get_object_by_wp_object', array( $this, 'get_term_object_by_wp_object' ), 10, 3 );
@@ -2810,12 +2810,18 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 *
 	 * @param Objects|false $the_object The object we will return.
 	 * @param int           $object_id The object-ID.
+	 * @param string        $object_type The requested object type (optional).
 	 * @return Objects|false
 	 */
-	public function get_post_object( Objects|false $the_object, int $object_id ): Objects|false {
+	public function get_post_object( Objects|false $the_object, int $object_id, string $object_type = '' ): Objects|false {
 		// bail if the object is already found.
 		if ( false !== $the_object ) {
 			return $the_object;
+		}
+
+		// bail if a term is requested: a post with the same ID is not the requested object.
+		if ( '' !== $object_type && taxonomy_exists( $object_type ) ) {
+			return false;
 		}
 
 		// we assume it is a post-object and check for it.

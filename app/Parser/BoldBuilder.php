@@ -101,7 +101,7 @@ class BoldBuilder extends Parser_Base implements Parser {
 		 */
 		$html_widgets = apply_filters( 'easy_language_boldbuilder_html_widgets', $html_support_widgets );
 
-		return isset( $html_widgets[ $widget_name ] );
+		return ! empty( $html_widgets[ $widget_name ] );
 	}
 
 	/**

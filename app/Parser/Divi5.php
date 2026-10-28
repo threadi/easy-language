@@ -69,13 +69,24 @@ class Divi5 extends Parser_Base implements Parser {
 				},
 			),
 			'divi/heading'        => array(
-				'html' => true,
+				'html'  => true,
+				'paths' => array(
+					'title.innerContent.desktop.value',
+				),
 			),
 			'divi/button'         => array(
-				'html' => true,
+				'html'  => true,
+				'paths' => array(
+					'button.innerContent.desktop.value.text',
+					'content.module.text.desktop.value',
+				),
 			),
 			'divi/icon-list-item' => array(
-				'html' => true,
+				'html'  => true,
+				'paths' => array(
+					'title.innerContent.desktop.value',
+					'content.innerContent.desktop.value',
+				),
 			),
 		);
 
@@ -120,12 +131,17 @@ class Divi5 extends Parser_Base implements Parser {
 
 		// get content if it is a valid flow-text-block.
 		if ( isset( $flow_blocks[ $block['blockName'] ] ) ) {
-			$add_to_result = $flow_blocks[ $block['blockName'] ];
+			$add_to_result  = $flow_blocks[ $block['blockName'] ];
+			$attribute_path = $this->get_text_attribute_path( $block, $flow_blocks[ $block['blockName'] ] );
 			if ( ! empty( $flow_blocks[ $block['blockName'] ]['callback'] ) && is_callable( $flow_blocks[ $block['blockName'] ]['callback'] ) ) {
 				$add_to_result['text'] = call_user_func( $flow_blocks[ $block['blockName'] ]['callback'], $block );
+			} elseif ( '' !== $attribute_path ) {
+				// Divi 5 saves the text of its modules in the attributes of the block.
+				$add_to_result['text'] = trim( (string) $this->get_attribute_by_path( $block['attrs'], $attribute_path ) );
 			} else {
 				$add_to_result['text'] = trim( $block['innerHTML'] );
 			}
+			unset( $add_to_result['paths'] );
 			$resulting_texts[] = $add_to_result;
 		}
 
@@ -186,6 +202,13 @@ class Divi5 extends Parser_Base implements Parser {
 					// set the simplified text.
 					$block['attrs']['content']['innerContent']['desktop']['value'] = str_replace( $this->get_text(), $simplified_part, $text );
 				}
+			} elseif ( '' !== $this->get_text_attribute_path( $block, $flow_blocks[ $block['blockName'] ] ) ) {
+				// replace the text in the attribute of the block, where Divi 5 saves the text of its modules.
+				$attribute_path = $this->get_text_attribute_path( $block, $flow_blocks[ $block['blockName'] ] );
+				$text           = (string) $this->get_attribute_by_path( $block['attrs'], $attribute_path );
+				if ( str_contains( $text, $this->get_text() ) ) {
+					$block['attrs'] = $this->set_attribute_by_path( $block['attrs'], $attribute_path, str_replace( $this->get_text(), $simplified_part, $text ) );
+				}
 			} else {
 				// replace the text in the inner content, which is used by serialize_blocks().
 				if ( isset( $block['innerContent'] ) && is_array( $block['innerContent'] ) ) {
@@ -218,6 +241,74 @@ class Divi5 extends Parser_Base implements Parser {
 
 		// return the resulting block.
 		return $block;
+	}
+
+	/**
+	 * Return the path of the attribute which contains the text of the given block. Empty string if there is none.
+	 *
+	 * @param array<string,mixed> $block      The block.
+	 * @param array<string,mixed> $definition The definition of the block (see get_flow_text_blocks()).
+	 *
+	 * @return string
+	 */
+	private function get_text_attribute_path( array $block, array $definition ): string {
+		// bail if the block has no attributes or no paths are defined.
+		if ( empty( $block['attrs'] ) || ! is_array( $block['attrs'] ) || empty( $definition['paths'] ) || ! is_array( $definition['paths'] ) ) {
+			return '';
+		}
+
+		// return the first path which contains a text.
+		foreach ( $definition['paths'] as $path ) {
+			if ( is_string( $this->get_attribute_by_path( $block['attrs'], (string) $path ) ) ) {
+				return (string) $path;
+			}
+		}
+
+		// return empty string if no path contains a text.
+		return '';
+	}
+
+	/**
+	 * Return the value of a nested attribute by its path (keys separated by a dot).
+	 *
+	 * @param array<string,mixed> $attributes The attributes.
+	 * @param string              $path       The path, e.g. "title.innerContent.desktop.value".
+	 *
+	 * @return mixed
+	 */
+	private function get_attribute_by_path( array $attributes, string $path ): mixed {
+		$value = $attributes;
+		foreach ( explode( '.', $path ) as $key ) {
+			if ( ! is_array( $value ) || ! array_key_exists( $key, $value ) ) {
+				return null;
+			}
+			$value = $value[ $key ];
+		}
+		return $value;
+	}
+
+	/**
+	 * Set the value of a nested attribute by its path (keys separated by a dot).
+	 *
+	 * @param array<string,mixed> $attributes The attributes.
+	 * @param string              $path       The path, e.g. "title.innerContent.desktop.value".
+	 * @param string              $value      The new value.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function set_attribute_by_path( array $attributes, string $path, string $value ): array {
+		$keys = explode( '.', $path );
+		$key  = (string) array_shift( $keys );
+
+		// set the value on the last key.
+		if ( empty( $keys ) ) {
+			$attributes[ $key ] = $value;
+			return $attributes;
+		}
+
+		// go deeper.
+		$attributes[ $key ] = $this->set_attribute_by_path( isset( $attributes[ $key ] ) && is_array( $attributes[ $key ] ) ? $attributes[ $key ] : array(), implode( '.', $keys ), $value );
+		return $attributes;
 	}
 
 	/**

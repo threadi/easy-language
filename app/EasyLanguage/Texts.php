@@ -271,6 +271,14 @@ class Texts {
 			// get original post.
 			$original_post = new Post_Object( $post_obj->get_original_object_as_int() );
 
+			// remove the language from the list of simplified languages on the original post (it is also deleted
+			// without the trash before, e.g. via wp_delete_post( $post_id, true )).
+			$language_code = array_key_first( $post_obj->get_language() );
+			if ( ! empty( $language_code ) ) {
+				$original_post->remove_language( $language_code );
+				$original_post->remove_changed_marker( $language_code );
+			}
+
 			// clean up the language marker on the original post if it does not have any simplification.
 			if ( false === $original_post->has_simplifications() ) {
 				delete_post_meta( $original_post->get_id(), 'easy_language_text_language' );
