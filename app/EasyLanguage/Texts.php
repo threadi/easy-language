@@ -11,6 +11,8 @@ namespace easyLanguage\EasyLanguage;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
+use easyLanguage\Plugin\Api_Base;
 use easyLanguage\Plugin\Apis;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Languages;
@@ -247,13 +249,13 @@ class Texts {
 	 * @return void
 	 */
 	public function delete_post_object( int $post_id ): void {
-		// get the object.
-		$post_obj = new Post_Object( $post_id );
-
-		// bail if the post-type is not supported.
-		if ( ! Init::get_instance()->is_post_type_supported( $post_obj->get_type() ) ) {
+		// bail if this is a revision, as they are never simplified or simplifiable objects.
+		if ( wp_is_post_revision( $post_id ) ) {
 			return;
 		}
+
+		// get the object.
+		$post_obj = new Post_Object( $post_id );
 
 		// secure the title.
 		$post_title = $post_obj->get_title();
@@ -286,7 +288,7 @@ class Texts {
 
 			// delete the text-entries of the deleted object.
 			foreach ( $post_obj->get_entries() as $entry ) {
-				$entry->delete( $post_id );
+				$entry->delete( $post_id, $post_obj->get_type() );
 			}
 
 			// Log event.
@@ -321,6 +323,17 @@ class Texts {
 				$original_post->remove_language( $language_code );
 				$original_post->remove_changed_marker( $language_code );
 			}
+
+			// remove the object from the simplification-marker arrays.
+			$term_object->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING );
+			$term_object->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX );
+			$term_object->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT );
+			$term_object->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS );
+		} else {
+			// get all simplified terms for this original and delete them too.
+			foreach ( $term_object->get_simplifications() as $simplified_term_id ) {
+				wp_delete_term( $simplified_term_id, $taxonomy );
+			}
 		}
 	}
 
@@ -343,9 +356,9 @@ class Texts {
 			)
 		);
 
-		// delete them.
+		// delete only their connection to this term (the texts could also be used by other objects).
 		foreach ( $entries as $entry ) {
-			$entry->delete();
+			$entry->delete( $term_id, $taxonomy );
 		}
 	}
 
@@ -383,6 +396,12 @@ class Texts {
 					'back_link' => true,
 				)
 			);
+		}
+
+		// bail if the API is not configured or its quota is used up.
+		if ( ! $this->is_api_usable_for_simplification( $api_obj ) ) {
+			wp_safe_redirect( wp_get_referer() );
+			exit;
 		}
 
 		if ( $object_id > 0 ) {
@@ -440,6 +459,12 @@ class Texts {
 			exit;
 		}
 
+		// bail if the API is not configured or its quota is used up.
+		if ( ! $this->is_api_usable_for_simplification( $api_obj ) ) {
+			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+			exit;
+		}
+
 		if ( $object_id > 0 && ! empty( $taxonomy ) ) {
 			// run simplification of this object.
 			$term_obj = new Term_Object( $object_id, $taxonomy );
@@ -482,6 +507,12 @@ class Texts {
 		// bail if capability is not granted.
 		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
 			// redirect user.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
+		// bail if the API is not configured or its quota is used up.
+		if ( ! $this->is_api_usable_for_simplification( $api_obj ) ) {
 			wp_safe_redirect( wp_get_referer() );
 			exit;
 		}
@@ -547,14 +578,32 @@ class Texts {
 			exit;
 		}
 
+		// bail if a simplification of this object is already running (e.g. via JS), do not touch its marker.
+		if ( $object->is_simplification_running() ) {
+			// Log event.
+			/* translators: %1$s will be replaced by a title. */
+			Log::get_instance()->add_log( sprintf( __( 'Simplification of a text of %1$s canceled as a simplification of this object is already running.', 'easy-language' ), '<i>' . esc_html( $object->get_title() ) . '</i>' ), 'error' );
+
+			// show hint.
+			/* translators: %1$s will be replaced by the object-title */
+			$this->add_simplification_error_hint( sprintf( __( 'Simplification for <i>%1$s</i> is already running.', 'easy-language' ), esc_html( $object->get_title() ) ) );
+
+			// redirect user back.
+			wp_safe_redirect( wp_get_referer() );
+			exit;
+		}
+
 		// mark simplification for this object as running.
 		$object->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, time() );
 
 		// call simplification for each text on this object.
-		$object->process_simplification( $api_obj->get_simplifications_obj(), $api_obj->get_mapping_languages(), $entry );
+		$object->process_simplification( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping(), $entry );
 
 		// remove running marker to mark end of process.
 		$object->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
+
+		// run the object-specific tasks after the simplification (e.g. update of the object).
+		$object->run_simplification_end_trigger();
 
 		// redirect user back to the editor.
 		wp_safe_redirect( wp_get_referer() );
@@ -704,6 +753,11 @@ class Texts {
 						continue;
 					}
 
+					// do nothing if this text is not part of the parsed content (e.g. texts of ACF- or SCF-fields).
+					if ( $this->is_text_to_keep_on_object_update( $entry, $post_obj ) ) {
+						continue;
+					}
+
 					// get the simplification.
 					$simplification = trim( $entry->get_simplification( $target_language ) );
 
@@ -712,9 +766,9 @@ class Texts {
 						&& false === in_array( $simplification, $parsed_text_list, true )
 						&& false === in_array( trim( $entry->get_original() ), $parsed_text_list, true )
 					) {
-						$entry->delete( $post_id );
+						$entry->delete( $post_id, $post_obj->get_type() );
 					} elseif ( $simplification !== $title && false !== $entry->is_field( 'title' ) ) {
-						$entry->delete( $post_id );
+						$entry->delete( $post_id, $post_obj->get_type() );
 					}
 				}
 			}
@@ -760,6 +814,12 @@ class Texts {
 
 					// set the object.
 					$original_text_obj->set_object( $post_type, $post_obj->get_id(), $index, $pagebuilder_obj->get_name() );
+				} elseif ( $original_text_obj instanceof Text && ! $this->is_text_linked_to_object( $original_text_obj, $post_id, $post_type ) && false === $this->db->get_entry_by_simplification( trim( $text['text'] ), $target_language ) ) {
+					// the text is already known from another object: link it to this object and mark it to simplify.
+					$original_text_obj->set_object( $post_type, $post_id, $index, $pagebuilder_obj->get_name() );
+					if ( 'ignore' !== $original_text_obj->get_state() ) {
+						$original_text_obj->set_state( 'to_simplify' );
+					}
 				}
 			}
 
@@ -777,6 +837,12 @@ class Texts {
 
 				// set the object.
 				$original_title_obj->set_object( $post_type, $post_id, 0, $pagebuilder_obj->get_name() );
+			} elseif ( $original_title_obj instanceof Text && ! $this->is_text_linked_to_object( $original_title_obj, $post_id, $post_type ) && false === $this->db->get_entry_by_simplification( trim( $title ), $target_language ) ) {
+				// the title is already known from another object: link it to this object and mark it to simplify.
+				$original_title_obj->set_object( $post_type, $post_id, 0, $pagebuilder_obj->get_name() );
+				if ( 'ignore' !== $original_title_obj->get_state() ) {
+					$original_title_obj->set_state( 'to_simplify' );
+				}
 			}
 
 			// remove changed-marker on an original object for each language.
@@ -826,9 +892,10 @@ class Texts {
 			/* translators: %1$s will be replaced by a title. */
 			Log::get_instance()->add_log( sprintf( __( '%1$s has been moved to trash and cleaned up.', 'easy-language' ), '<i>' . $post_obj->get_title() . '</i>' ), 'success' );
 		} else {
-			// get all simplified objects for this original and move them also to trash.
+			// get all simplified objects for this original and move them also to trash
+			// (wp_delete_post() without force would delete objects of custom post types permanently).
 			foreach ( $post_obj->get_simplifications() as $simplified_post_id ) {
-				wp_delete_post( $simplified_post_id );
+				wp_trash_post( $simplified_post_id );
 			}
 		}
 	}
@@ -870,6 +937,116 @@ class Texts {
 				wp_untrash_post( $simplified_post_id );
 			}
 		}
+	}
+
+	/**
+	 * Return whether the given API could be used for a simplification requested without JS.
+	 *
+	 * Shows a hint for the user if not.
+	 *
+	 * @param Api_Base $api_obj The API to use.
+	 *
+	 * @return bool
+	 */
+	private function is_api_usable_for_simplification( Api_Base $api_obj ): bool {
+		// bail if the API is not configured.
+		if ( false === $api_obj->is_configured() ) {
+			/* translators: %1$s will be replaced by the API title. */
+			$message = sprintf( __( 'The API %1$s is not configured. Nothing has been simplified.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
+
+			// Log event.
+			Log::get_instance()->add_log( $message, 'error' );
+
+			// show hint.
+			$this->add_simplification_error_hint( $message );
+
+			// return false as the API could not be used.
+			return false;
+		}
+
+		// bail if the quota of the API is used up.
+		if ( Helper::is_quota_used_up( $api_obj ) ) {
+			/* translators: %1$s will be replaced by the API title. */
+			$message = sprintf( __( '<strong>The quota of %1$s is used up.</strong><br>Nothing has been simplified.', 'easy-language' ), esc_html( $api_obj->get_title() ) );
+
+			// Log event.
+			Log::get_instance()->add_log( $message, 'error' );
+
+			// show hint.
+			$this->add_simplification_error_hint( $message );
+
+			// return false as the API could not be used.
+			return false;
+		}
+
+		// return true as the API could be used.
+		return true;
+	}
+
+	/**
+	 * Show an error hint for the user regarding a simplification requested without JS.
+	 *
+	 * @param string $message The message (could contain HTML).
+	 *
+	 * @return void
+	 */
+	private function add_simplification_error_hint( string $message ): void {
+		$transient_obj = Transients::get_instance()->add();
+		$transient_obj->set_name( 'easy_language_simplification_not_possible' );
+		$transient_obj->set_message( $message );
+		$transient_obj->set_type( 'error' );
+		$transient_obj->save();
+	}
+
+	/**
+	 * Return whether the given text is linked to the given object.
+	 *
+	 * @param Text   $entry The text-object.
+	 * @param int    $object_id The object-ID.
+	 * @param string $object_type The object-type.
+	 *
+	 * @return bool
+	 */
+	private function is_text_linked_to_object( Text $entry, int $object_id, string $object_type ): bool {
+		foreach ( $entry->get_objects() as $object ) {
+			if ( absint( $object['object_id'] ) === $object_id && $object_type === $object['object_type'] ) {
+				return true;
+			}
+		}
+
+		// return false if the text is not linked to this object.
+		return false;
+	}
+
+	/**
+	 * Return whether the given text should be kept on a simplified object during its update, even if it is not part
+	 * of the parsed texts of the object (e.g. texts of ACF- or SCF-fields).
+	 *
+	 * @param Text        $entry The text-object.
+	 * @param Post_Object $post_obj The simplified object.
+	 *
+	 * @return bool
+	 */
+	private function is_text_to_keep_on_object_update( Text $entry, Post_Object $post_obj ): bool {
+		// texts of ACF- and SCF-fields are not part of the parsed content.
+		$keep = false;
+		foreach ( $entry->get_objects() as $object ) {
+			if ( str_starts_with( (string) $object['field'], 'acf_meta_' ) || str_starts_with( (string) $object['field'], 'scf_meta_' ) ) {
+				$keep = true;
+				break;
+			}
+		}
+
+		/**
+		 * Filter whether a text should be kept on a simplified object during its update, even if it is not part of
+		 * the parsed texts of this object (e.g. texts from custom fields).
+		 *
+		 * @since 3.3.0 Available since 3.3.0.
+		 * @param bool $keep True if the text should be kept.
+		 * @param Text $entry The text-object.
+		 * @param Post_Object $post_obj The simplified object.
+		 */
+		return (bool) apply_filters( 'easy_language_keep_text_on_object_update', $keep, $entry, $post_obj );
 	}
 
 	/**

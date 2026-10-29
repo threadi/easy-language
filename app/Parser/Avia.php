@@ -137,10 +137,15 @@ class Avia extends Parser_Base implements Parser {
 					// get the attributes of this shortcode.
 					$shortcode_attributes = shortcode_parse_atts( $matches[3][ $key ] );
 
+					// bail if the shortcode has no attributes.
+					if ( ! is_array( $shortcode_attributes ) ) {
+						continue;
+					}
+
 					foreach ( $shortcode_attributes as $attribute => $attribute_value ) {
 						if ( in_array( $attribute, $attributes, true ) && ! empty( $attribute_value ) ) {
 							$resulting_texts[] = array(
-								'text' => $attribute_value,
+								'text' => is_string( $attribute_value ) ? $this->unmask_shortcode_attribute_value( $attribute_value ) : $attribute_value,
 								'html' => $this->is_flow_text_widget_html( $shortcode ),
 							);
 						}

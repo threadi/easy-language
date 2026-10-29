@@ -107,7 +107,7 @@ class Request implements Api_Requests {
 	 *
 	 * @var string
 	 */
-	private string $token;
+	private string $token = '';
 
 	/**
 	 * Constructor.
@@ -163,6 +163,13 @@ class Request implements Api_Requests {
 
 		// get chatgpt-object.
 		$chatgpt_obj = ChatGpt::get_instance();
+
+		// bail if no token is given.
+		if ( empty( $this->token ) ) {
+			// Log event.
+			Log::get_instance()->add_log( __( 'ChatGpt: no API token given for request.', 'easy-language' ), 'error' );
+			return;
+		}
 
 		// merge header-array.
 		$headers = array_merge(
@@ -233,7 +240,13 @@ class Request implements Api_Requests {
 		if ( ! $args_json ) {
 			$args_json = '';
 		}
-		Log_Api::get_instance()->add_log( $chatgpt_obj->get_name(), $this->http_status, $args_json, 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
+
+		// add the error message if the request failed (e.g., timeout).
+		$error_message = '';
+		if ( is_wp_error( $result ) ) {
+			$error_message = 'Error: ' . esc_html( $result->get_error_message() ) . '<br>';
+		}
+		Log_Api::get_instance()->add_log( $chatgpt_obj->get_name(), $this->http_status, $args_json, $error_message . 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
 
 		// save request and result in the database.
 		$this->save_in_db();

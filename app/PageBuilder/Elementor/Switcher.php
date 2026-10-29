@@ -54,6 +54,11 @@ class Switcher extends Tag {
 	 * @return array Dynamic tag groups.
 	 */
 	public function get_group(): array {
+		// use the default site group if Elementor Pro is not loaded.
+		if ( ! class_exists( '\ElementorPro\Modules\DynamicTags\Module' ) ) {
+			return array( 'site' );
+		}
+
 		return array( \ElementorPro\Modules\DynamicTags\Module::SITE_GROUP );
 	}
 

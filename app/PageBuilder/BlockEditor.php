@@ -119,6 +119,11 @@ class BlockEditor extends PageBuilder_Base {
 			return;
 		}
 
+		// bail if the user could not use simplifications (the sidebar uses an endpoint which requires this capability).
+		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
+			return;
+		}
+
 		// get the screen.
 		$screen = get_current_screen();
 

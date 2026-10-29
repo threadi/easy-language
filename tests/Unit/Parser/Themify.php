@@ -248,6 +248,8 @@ class Themify extends easyLanguageTests {
 	 * @return void
 	 */
 	public function test_is_object_using_pagebuilder(): void {
+		$this->activate();
+
 		$this->assertTrue( $this->parser->is_object_using_pagebuilder( new Post_Object( $this->post_id ) ) );
 
 		$other_id = self::factory()->post->create();

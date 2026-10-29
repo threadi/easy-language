@@ -271,7 +271,20 @@ class Crypt {
 	 * @return string
 	 */
 	public function get_masked_value( string $option ): string {
-		return '' === $this->get_raw_value( $option ) ? '' : self::MASK;
+		// get the value as saved in the database.
+		$value = $this->get_raw_value( $option );
+
+		// bail if no value is saved.
+		if ( '' === $value ) {
+			return '';
+		}
+
+		// bail if the encrypted value could not be decrypted (e.g. after a change of the key), so the user sees that it is missing.
+		if ( $this->is_encrypted( $value ) && '' === $this->decrypt( $value, $option ) ) {
+			return '';
+		}
+
+		return self::MASK;
 	}
 
 	/**

@@ -53,9 +53,31 @@ class Simplifications extends easyLanguageTests {
 		// prevent external requests from Personio APIs.
 		add_filter( 'pre_http_request', array( self::class, 'filter_requests' ), 10, 3 );
 
+		// use an example token, as requests without token are not sent.
+		add_filter( 'pre_option_easy_language_chatgpt_api_key', array( self::class, 'get_example_token' ) );
+
 		// get the simplification object.
 		$this->object = \easyLanguage\Apis\ChatGpt\Simplifications::get_instance();
 		$this->object->set_api( $this->get_api_obj() );
+	}
+
+	/**
+	 * Clean up after each test.
+	 *
+	 * @return void
+	 */
+	public function tear_down(): void {
+		remove_filter( 'pre_option_easy_language_chatgpt_api_key', array( self::class, 'get_example_token' ) );
+		parent::tear_down();
+	}
+
+	/**
+	 * Return an example token for the requests.
+	 *
+	 * @return string
+	 */
+	public static function get_example_token(): string {
+		return 'example-token';
 	}
 
 	/**

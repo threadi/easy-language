@@ -34,12 +34,20 @@ class Log_Table extends WP_List_Table {
 	}
 
 	/**
+	 * Count of entries to show per page.
+	 */
+	private const PER_PAGE = 50;
+
+	/**
 	 * Get the table data
+	 *
+	 * @param int $limit  Max count of entries to return.
+	 * @param int $offset Count of entries to skip.
 	 *
 	 * @return array<string,mixed>
 	 */
-	private function table_data(): array {
-		return Log::get_instance()->get_entries();
+	private function table_data( int $limit = self::PER_PAGE, int $offset = 0 ): array {
+		return Log::get_instance()->get_entries( $limit, $offset );
 	}
 
 	/**
@@ -52,8 +60,16 @@ class Log_Table extends WP_List_Table {
 		$hidden   = $this->get_hidden_columns();
 		$sortable = $this->get_sortable_columns();
 
+		// set the pagination.
+		$this->set_pagination_args(
+			array(
+				'total_items' => Log::get_instance()->count_entries(),
+				'per_page'    => self::PER_PAGE,
+			)
+		);
+
 		$this->_column_headers = array( $columns, $hidden, $sortable );
-		$this->items           = $this->table_data();
+		$this->items           = $this->table_data( self::PER_PAGE, ( $this->get_pagenum() - 1 ) * self::PER_PAGE );
 	}
 
 	/**

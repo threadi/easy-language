@@ -68,6 +68,15 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 		// get the emboldened setting for target language.
 		$enable_embolden_negative = absint( get_option( 'easy_language_summ_ai_target_languages_' . $target_language . '_embolden_negative' ) );
 
+		// get the API object.
+		$api_obj = $this->get_api();
+
+		// check if this request uses the free quota of the plugin (only in free mode).
+		$is_free_request = $api_obj instanceof Summ_Ai && $api_obj->is_free_mode();
+
+		// check if this is a test request.
+		$is_test_request = $is_test || $api_obj->is_test_mode_active();
+
 		// build request.
 		$request_obj = $this->get_api()->get_request_object();
 		$request_obj->set_url( $this->get_api()->get_api_url() );
@@ -78,7 +87,7 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 		$request_obj->set_new_lines( $enable_new_lines );
 		$request_obj->set_embolden_negative( $enable_embolden_negative );
 		$request_obj->set_method( 'POST' );
-		$request_obj->set_is_test( $is_test ? true : $this->get_api()->is_test_mode_active() );
+		$request_obj->set_is_test( $is_test_request );
 		$request_obj->set_source_language( $source_language );
 		$request_obj->set_target_language( $target_language );
 		/**
@@ -130,8 +139,8 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 				$this->get_api()->disable_free_requests();
 			}
 
-			// save character-count to quota if the answer does not contain "no_count".
-			if ( empty( $response_array['no_count'] ) ) {
+			// save character-count to the free quota if the free mode is used, this is not a test and the answer does not contain "no_count".
+			if ( $is_free_request && ! $is_test_request && empty( $response_array['no_count'] ) ) {
 				update_option( 'easy_language_summ_ai_quota', absint( get_option( 'easy_language_summ_ai_quota', 0 ) ) + strlen( $text_to_translate ) );
 			}
 

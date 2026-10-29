@@ -17,6 +17,8 @@ class Cli {
 	/**
 	 * Reset simplifications.
 	 *
+	 * Hint: on multisite this resets the simplifications of all blogs, as they are saved in tables used by all blogs.
+	 *
 	 * @return void
 	 * @noinspection PhpUnused
 	 */

@@ -143,8 +143,8 @@ class Themify extends Parser_Base implements Parser {
 			}
 		}
 
-		// return resulting list.
-		return $resulting_texts;
+		// return resulting list (as list, as the callers use its index as order).
+		return array_values( $resulting_texts );
 	}
 
 	/**

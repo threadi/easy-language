@@ -63,29 +63,27 @@ class Installer {
 	}
 
 	/**
-	 * Get list of blogs in a multisite-installation.
+	 * Get list of blog IDs in a multisite-installation.
 	 *
-	 * @return array<string,mixed>
+	 * Includes archived, spammed or deleted sites, so they are also prepared if they are activated again.
+	 *
+	 * @return array<int>
 	 */
 	private function get_blogs(): array {
 		if ( false === is_multisite() ) {
 			return array();
 		}
 
-		// Get DB-connection.
-		global $wpdb;
-
-		// get blogs in this site-network.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- list of the sites in the network during (de)activation or uninstallation, the result must be up to date
-		return $wpdb->get_results(
-			"
-            SELECT blog_id
-            FROM {$wpdb->blogs}
-            WHERE site_id = '{$wpdb->siteid}'
-            AND spam = '0'
-            AND deleted = '0'
-            AND archived = '0'
-        "
+		// get all sites in this network.
+		return array_map(
+			'absint',
+			get_sites(
+				array(
+					'fields'     => 'ids',
+					'number'     => 0,
+					'network_id' => get_current_network_id(),
+				)
+			)
 		);
 	}
 
@@ -101,7 +99,7 @@ class Installer {
 			// loop through the blogs.
 			foreach ( $this->get_blogs() as $blog_id ) {
 				// switch to the blog.
-				switch_to_blog( $blog_id->blog_id );
+				switch_to_blog( $blog_id );
 
 				// run tasks for activation in this single blog.
 				$this->activation_tasks();
@@ -229,7 +227,7 @@ class Installer {
 			// loop through the blogs.
 			foreach ( $this->get_blogs() as $blog_id ) {
 				// switch to the blog.
-				switch_to_blog( $blog_id->blog_id );
+				switch_to_blog( $blog_id );
 
 				// run tasks for deactivation in this single blog.
 				$this->deactivation_tasks();

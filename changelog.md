@@ -27,6 +27,9 @@
 - Settings for the API "WordPress Connectors": choice of the connector and of the source and target languages
 - Filters easy_language_wp_ai_instruction, easy_language_wp_ai_request_object, easy_language_wp_ai_source_languages, easy_language_wp_ai_target_languages and easy_language_wp_ai_mapping_languages
 - New setting "View of the settings" in the advanced settings: modern view (DataView, default) or classic view
+- Filter easy_language_keep_text_on_object_update to keep texts of other plugins (e.g. ACF fields) linked when a simplified object is saved
+- Log and API log are saved per site in multisite; existing entries are assigned to the main site during the update
+- More than 100 additional unit tests, also run in multisite
 
 ### Changed
 
@@ -35,7 +38,6 @@
 - Now requires WordPress 6.6 or newer
 - API keys are no longer readable via REST API and are shown masked in the settings
 - Simplification requests now also check the permission for the respective object
-- Reset of the plugin only affects the actual site in multisite
 - Lists of texts are now paginated
 - GitHub Actions are pinned to commits and run with minimal permissions
 - Removed the Ant build
@@ -43,6 +45,17 @@
 - The attributes of both switcher blocks are defined only once
 - New blocks are wrapped in an element which uses the block settings (colors, typography, border, anchor); in navigations they are output as list item
 - Active language is marked with aria-current, icons get an accessible name
+- Simplified texts are replaced in all simplified objects which use them, not only in the object which is simplified (except trashed, locked objects and objects with prevented automatic mode)
+- Texts which could not be simplified (e.g. language not supported by the active API) stay "to simplify" instead of being marked as simplified
+- Automatic simplification skips texts which could not be simplified for one day, so they no longer block the following texts
+- Automatic simplification no longer runs on objects which are simplified at the same time via the dialog
+- A simplification in the dialog stops on an API error instead of sending the same text again
+- A changed API key is only removed if the API rejects it (401/403), on other errors the previous key is kept
+- SUMM AI: paid keys for which the API returns no character limit are no longer blocked after 1,000,000 characters
+- SUMM AI: without API key and with disabled free requests the API counts as not configured
+- ChatGPT: incomplete responses (cut off at the token limit) are no longer saved as simplification
+- Block editor sidebar is only shown to users who are allowed to simplify
+- Request logs of the APIs can save long texts
 
 ### Fixed
 
@@ -73,6 +86,34 @@
 - Saving menus via code (e.g. WP-CLI or importer) stopped with "The link you followed has expired"
 - The icon option of the classic menu was shown on all menu items
 - Many smaller bugs, missing checks and PHP warnings
+- Themify: simplification of a page stopped with a fatal error
+- Reactivating the plugin switched the active API to SUMM AI
+- Quota of capito and SUMM AI was requested even if the API was not active or no key was set
+- Multisite: texts of other sites were shown in the lists and used by the automatic simplification
+- Texts used in several simplified objects (e.g. the same paragraph on two pages) were only replaced in one of them
+- Moving an original of a custom post type to trash deleted its simplifications permanently
+- Deleting a term removed the texts of other objects with the same text (e.g. a post with the same title)
+- Simplified terms: already known texts were not simplified, a second language could not be added, simplifications were not deleted with the original
+- Titles of private or protected posts were saved with the prefix "Private:" or "Protected:" and with HTML entities
+- Texts added to a simplified page were not simplified if they were already known from another page
+- ACF/SCF: fields were read formatted and their texts were removed when the simplified object was saved
+- TranslatePress: SUMM AI and capito returned no translations, SUMM AI was not detected as translation engine
+- capito: a rest quota of 0 was not handled as used up; team accounts without team used a wrong URL
+- SUMM AI: the free quota was also counted in paid mode
+- Dialog to add a simplification did not open for administrators if the API was not configured
+- Errors while adding a simplification or deleting all data were not shown
+- Language front page redirected to the homepage, simplified posts had wrong links with plain permalinks
+- Changing the site language saved the previous language as source language for SUMM AI
+- Polylang: source language was "en_US" in backend and cron
+- Interval "every 20 minutes" ran every 15 minutes
+- Page builders activated network-wide in multisite were not detected
+- Elementor: dynamic tag caused a fatal error if Elementor Pro was not loaded; simplified texts were not shown with element caching
+- Beaver Builder: the draft kept the original texts and overwrote the simplification on next publish
+- Shortcode attributes with quotes or brackets were simplified again after every save
+- Language icons: a failed import marked another post as icon; own media files with the same name could be deleted on uninstall
+- Uninstall left simplified terms, simplified posts of no longer supported post types and some options
+- Export of the API log contained entries which were already cleared
+- Site Health reported the automatic simplification as not running if it was only a few seconds late
 
 ## [3.2.3] - 13.09.2026
 

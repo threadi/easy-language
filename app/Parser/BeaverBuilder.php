@@ -151,9 +151,16 @@ class BeaverBuilder extends Parser_Base implements Parser {
 			return $original_complete;
 		}
 
-		// get editor contents and loop through its array.
-		$data = get_post_meta( $this->get_object_id(), '_fl_builder_data', true );
-		if ( is_array( $data ) && ! empty( $data ) ) {
+		// replace the texts in the published data and in the draft (which is used by the BeaverBuilder editor).
+		foreach ( array( '_fl_builder_data', '_fl_builder_draft' ) as $meta_key ) {
+			// get editor contents and loop through its array.
+			$data = get_post_meta( $this->get_object_id(), $meta_key, true );
+
+			// bail if no data are given.
+			if ( ! is_array( $data ) || empty( $data ) ) {
+				continue;
+			}
+
 			// get the data before the replacement to detect changes.
 			$data_before = serialize( $data ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
 
@@ -163,7 +170,7 @@ class BeaverBuilder extends Parser_Base implements Parser {
 			// save the data for BeaverBuilder, if they have been changed.
 			if ( serialize( $data ) !== $data_before ) { // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize
 				// slash the data deep (incl. objects) as update_post_meta() unslashes them.
-				update_post_meta( $this->get_object_id(), '_fl_builder_data', map_deep( $data, 'wp_slash' ) );
+				update_post_meta( $this->get_object_id(), $meta_key, map_deep( $data, 'wp_slash' ) );
 			}
 		}
 
@@ -223,22 +230,27 @@ class BeaverBuilder extends Parser_Base implements Parser {
 				continue;
 			}
 
+			// bail if the section has no settings with a type.
+			if ( ! isset( $section->type, $section->settings ) || ! $section->settings instanceof stdClass || ! isset( $section->settings->type ) ) {
+				continue;
+			}
+
 			// if section is of element type "module", get its contents.
 			if ( 'module' === $section->type ) {
 				foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-					if ( $flow_text_name !== $section->settings->type ) {
+					if ( $flow_text_name !== $section->settings->type || ! is_array( $flow_text_settings ) ) {
 						continue;
 					}
 					foreach ( $flow_text_settings as $entry_name ) {
-						if ( empty( $section->settings->{$entry_name} ) ) {
+						if ( ! is_string( $entry_name ) || empty( $section->settings->{$entry_name} ) ) {
 							continue;
 						}
 
 						// get the content.
 						$content = $section->settings->{$entry_name};
 
-						// bail if trimmed content is empty.
-						if ( empty( trim( $content ) ) ) {
+						// bail if the content is not a string or its trimmed content is empty.
+						if ( ! is_string( $content ) || empty( trim( $content ) ) ) {
 							continue;
 						}
 
@@ -270,22 +282,27 @@ class BeaverBuilder extends Parser_Base implements Parser {
 				continue;
 			}
 
+			// bail if the section has no settings with a type.
+			if ( ! isset( $section->type, $section->settings ) || ! $section->settings instanceof stdClass || ! isset( $section->settings->type ) ) {
+				continue;
+			}
+
 			// if section is of element type "module", get its contents.
 			if ( 'module' === $section->type ) {
 				foreach ( $this->get_flow_text_widgets() as $flow_text_name => $flow_text_settings ) {
-					if ( $flow_text_name !== $section->settings->type ) {
+					if ( $flow_text_name !== $section->settings->type || ! is_array( $flow_text_settings ) ) {
 						continue;
 					}
 					foreach ( $flow_text_settings as $entry_name ) {
-						if ( empty( $section->settings->{$entry_name} ) ) {
+						if ( ! is_string( $entry_name ) || empty( $section->settings->{$entry_name} ) ) {
 							continue;
 						}
 
 						// get the content.
 						$content = $section->settings->{$entry_name};
 
-						// bail if trimmed content is empty.
-						if ( empty( trim( $content ) ) ) {
+						// bail if the content is not a string or its trimmed content is empty.
+						if ( ! is_string( $content ) || empty( trim( $content ) ) ) {
 							continue;
 						}
 

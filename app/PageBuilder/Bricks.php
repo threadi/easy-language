@@ -131,8 +131,8 @@ class Bricks extends PageBuilder_Base {
 		}
 
 		// add the labels of the chosen objects.
-		$include = isset( $_GET['include'] ) ? array_map( 'sanitize_text_field', (array) wp_unslash( $_GET['include'] ) ) : array();
-		foreach ( $switcher->get_object_labels( array_values( $include ) ) as $object ) {
+		$include = isset( $_GET['include'] ) ? $switcher->sanitize_objects( wp_unslash( $_GET['include'] ) ) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		foreach ( $switcher->get_object_labels( $include ) as $object ) {
 			$options[ $object['value'] ] = $object['label'];
 		}
 

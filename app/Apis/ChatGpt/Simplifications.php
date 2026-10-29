@@ -121,8 +121,8 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 			// transform it to array.
 			$request_array = json_decode( $response, true );
 
-			// get the text only if it has returned from API.
-			if ( ! empty( $request_array['choices'][0]['message']['content'] ) ) {
+			// get the text only if it has returned from API as string and is complete (not cut off because of the token limit).
+			if ( is_array( $request_array ) && ! empty( $request_array['choices'][0]['message']['content'] ) && is_string( $request_array['choices'][0]['message']['content'] ) && ( ! isset( $request_array['choices'][0]['finish_reason'] ) || 'length' !== $request_array['choices'][0]['finish_reason'] ) ) {
 				// get the simplified text.
 				$simplified_text = $request_array['choices'][0]['message']['content'];
 

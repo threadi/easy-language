@@ -58,7 +58,8 @@
 		},
 		"exclude-from-classmap": [
 			"tests/Fakes/Parser/Elementor/",
-			"tests/Fakes/Parser/Themify/"
+			"tests/Fakes/Parser/Themify/",
+			"tests/Fakes/Stability/F/"
 		]
 	},
 	"require": {

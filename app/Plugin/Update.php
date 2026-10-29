@@ -10,6 +10,7 @@ namespace easyLanguage\Plugin;
 // prevent direct access.
 defined( 'ABSPATH' ) || exit;
 
+use easyLanguage\Apis\Capito\Capito;
 use easyLanguage\Apis\Summ_Ai\Summ_Ai;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Db;
@@ -95,6 +96,18 @@ class Update {
 				return;
 			}
 
+			// get the db-version again, as another process could have run the update before we got the lock.
+			wp_cache_delete( 'easyLanguageVersion', 'options' );
+			wp_cache_delete( 'alloptions', 'options' );
+			wp_cache_delete( 'notoptions', 'options' );
+			$db_plugin_version = get_option( 'easyLanguageVersion', '1.0.0' );
+
+			// bail if the update has already been run by another process.
+			if ( ! version_compare( $installed_plugin_version, (string) $db_plugin_version, '>' ) ) {
+				$this->release_lock();
+				return;
+			}
+
 			try {
 				$this->run_updates( $installed_plugin_version, (string) $db_plugin_version );
 			} finally {
@@ -123,9 +136,11 @@ class Update {
 		// encrypt the saved API keys, which are not encrypted yet.
 		Crypt::get_instance()->migrate();
 
-		if ( version_compare( $installed_plugin_version, '2.1.0', '>=' ) ) {
-			$this->version210();
-		}
+		// check the schedule of the automatic simplification on every update.
+		$this->check_automatic_simplification_schedule();
+
+		// set the setup to complete if the plugin is already in use, on every update.
+		$this->check_setup_completion();
 
 		if ( version_compare( $db_plugin_version, '2.1.0', '<' ) ) {
 			$this->version210();
@@ -165,11 +180,13 @@ class Update {
 	}
 
 	/**
-	 * Run on every update for 2.1.0 or newer.
+	 * Check the schedule of the automatic simplification, runs on every update.
+	 *
+	 * Adds the schedule if it is missing and moves it from old, not registered intervals to a registered interval.
 	 *
 	 * @return void
 	 */
-	private function version210(): void {
+	private function check_automatic_simplification_schedule(): void {
 		// get the interval to use for the automatic simplification.
 		$interval = $this->get_automatic_simplification_interval();
 
@@ -184,7 +201,14 @@ class Update {
 				$this->schedule_automatic_simplification( $interval );
 			}
 		}
+	}
 
+	/**
+	 * Set the setup to complete if an API key is set or texts are simplified, runs on every update.
+	 *
+	 * @return void
+	 */
+	private function check_setup_completion(): void {
 		// set setup to complete if an API key is set or texts are simplified.
 		$setup_obj = Setup::get_instance();
 		if ( ! $setup_obj->is_completed() ) {
@@ -210,7 +234,14 @@ class Update {
 				$setup_obj->set_completed( $setup_obj->get_setup_name() );
 			}
 		}
+	}
 
+	/**
+	 * On update to version 2.1.0 or newer.
+	 *
+	 * @return void
+	 */
+	private function version210(): void {
 		// remote now unused transients.
 		Transients::get_instance()->delete_transient( Transients::get_instance()->get_transient_by_name( 'easy_language_intro_step_1' ) );
 	}
@@ -227,6 +258,7 @@ class Update {
 		}
 
 		// remove our schedules.
+		wp_unschedule_hook( 'easy_language_capito_quota_interval' ); // old name of the schedule before 2.3.0.
 		wp_unschedule_hook( 'easy_language_capito_request_quota' );
 		wp_unschedule_hook( 'easy_language_summ_ai_request_quota' );
 
@@ -334,10 +366,24 @@ class Update {
 		delete_option( 'easy_language_summ_ai_target_languages_new_lines' );
 		delete_option( 'easy_language_summ_ai_target_languages_embolden_negative' );
 
-		// migrate the interval settings for our schedules.
-		$this->migrate_interval_setting( 'easy_language_capito_quota_interval' );
-		$this->migrate_interval_setting( 'easy_language_summ_ai_quota_interval' );
-		$this->migrate_interval_setting( 'easy_language_automatic_simplification' );
+		// migrate the interval settings for our schedules and reschedule the events with the migrated intervals.
+		// The save callbacks of the settings are not registered at this point, so this is done explicitly.
+		// The quota requests are only scheduled if the API is active and has a (paid) API key.
+		if ( $this->migrate_interval_setting( 'easy_language_capito_quota_interval' ) ) {
+			Capito::get_instance()->set_quota_interval( (string) get_option( 'easy_language_capito_quota_interval', '' ) );
+		}
+		if ( $this->migrate_interval_setting( 'easy_language_summ_ai_quota_interval' ) ) {
+			Summ_Ai::get_instance()->set_quota_interval( (string) get_option( 'easy_language_summ_ai_quota_interval', '' ) );
+		}
+		if ( $this->migrate_interval_setting( 'easy_language_automatic_simplification' ) ) {
+			// reschedule the automatic simplification only if it is scheduled with another interval (a missing schedule is added on every update).
+			$interval        = $this->get_automatic_simplification_interval();
+			$scheduled_event = wp_get_scheduled_event( 'easy_language_automatic_simplification' );
+			if ( $scheduled_event && $interval !== $scheduled_event->schedule ) {
+				wp_clear_scheduled_hook( 'easy_language_automatic_simplification' );
+				$this->schedule_automatic_simplification( $interval );
+			}
+		}
 	}
 
 	/**
@@ -347,15 +393,15 @@ class Update {
 	 *
 	 * @param string $option The option name.
 	 *
-	 * @return void
+	 * @return bool True if the value has been changed.
 	 */
-	private function migrate_interval_setting( string $option ): void {
+	private function migrate_interval_setting( string $option ): bool {
 		// get the actual value.
 		$value = get_option( $option, '' );
 
 		// bail if value is not a string or empty.
 		if ( ! is_string( $value ) || '' === $value ) {
-			return;
+			return false;
 		}
 
 		// get the prefix of our intervals.
@@ -363,16 +409,16 @@ class Update {
 
 		// bail if the value has already the prefix.
 		if ( str_starts_with( $value, $prefix ) ) {
-			return;
+			return false;
 		}
 
 		// bail if the prefixed value is not a registered interval.
 		if ( ! array_key_exists( $prefix . $value, Intervals::get_instance()->get_intervals_for_settings() ) ) {
-			return;
+			return false;
 		}
 
 		// save the prefixed value.
-		update_option( $option, $prefix . $value );
+		return update_option( $option, $prefix . $value );
 	}
 
 	/**
@@ -540,5 +586,13 @@ class Update {
 	public function version400(): void {
 		// enable the compatibility mode for the language switcher (this runs only once per site via the DB version).
 		update_option( 'easy_language_switcher_compatibility', 1, true );
+
+		// add the column for the site to the log tables (they are shared by all sites of a multisite).
+		Log::get_instance()->create_table();
+		Log_Api::get_instance()->create_table();
+
+		// assign the existing log entries to the main site.
+		Log::get_instance()->migrate_entries_without_site();
+		Log_Api::get_instance()->migrate_entries_without_site();
 	}
 }

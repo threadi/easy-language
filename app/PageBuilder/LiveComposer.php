@@ -212,6 +212,12 @@ class LiveComposer extends PageBuilder_Base {
 			// get the value.
 			$value = $options[ self::PREFIX . $name ] ?? null;
 
+			// unchecked switches are saved as false (otherwise a default of true could not be disabled).
+			if ( false === $value && 'switch' === $field['type'] ) {
+				$values[ $name ] = false;
+				continue;
+			}
+
 			// bail if no value is set.
 			if ( is_null( $value ) || false === $value ) {
 				continue;
@@ -238,8 +244,8 @@ class LiveComposer extends PageBuilder_Base {
 	 * @return bool
 	 */
 	private function is_preview( array $options ): bool {
-		// modules rendered via AJAX are always editor previews.
-		if ( wp_doing_ajax() && ! isset( $options['module_render_nonajax'] ) ) {
+		// modules rendered via AJAX are editor previews (only for users which could edit contents).
+		if ( wp_doing_ajax() && ! isset( $options['module_render_nonajax'] ) && current_user_can( 'edit_posts' ) ) {
 			return true;
 		}
 

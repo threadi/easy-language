@@ -119,6 +119,8 @@ class Avia extends easyLanguageTests {
 	 * @return void
 	 */
 	public function test_object_using_pagebuilder(): void {
+		Theme_Switcher::activate( 'enfold' );
+
 		$post_id = self::factory()->post->create( array( 'post_content' => $this->content ) );
 		$this->assertFalse( \easyLanguage\Parser\Avia::get_instance()->is_object_using_pagebuilder( new Post_Object( $post_id ) ) );
 

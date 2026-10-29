@@ -316,9 +316,18 @@ class Db {
 		// define the statement.
 		$sql = 'SELECT `id`, `original`, `lang`' . $query_parts['select'] . ' FROM %i AS o' . $query_parts['join'] . $query_parts['where'] . $query_parts['order'] . $sql_limit;
 
+		// get the table names for the statement.
+		$tables = array( $this->get_table_name_originals() );
+
+		// use a sub-query for joined tables, if the object columns are not needed, to get each text only once (the joins could return multiple rows for one text).
+		if ( ! empty( $query_parts['join'] ) && empty( $filter['not_locked'] ) && empty( $filter['object_state'] ) ) {
+			$sql      = 'SELECT o.`id`, o.`original`, o.`lang` FROM %i AS o WHERE o.`id` IN ( SELECT o.`id` FROM %i AS o' . $query_parts['join'] . $query_parts['where'] . ' )' . $query_parts['order'] . $sql_limit;
+			$tables[] = $this->get_table_name_originals();
+		}
+
 		// get entries.
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts(), ORDER BY from a whitelist), all values are passed as prepare() arguments.; custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
-		$results = $wpdb->get_results( $wpdb->prepare( $sql, $this->get_table_name_originals(), ...$vars ), ARRAY_A );
+		$results = $wpdb->get_results( $wpdb->prepare( $sql, ...$tables, ...$vars ), ARRAY_A );
 
 		// bail if results are empty.
 		if ( empty( $results ) ) {
@@ -328,8 +337,16 @@ class Db {
 		// initialize the return array.
 		$return = array();
 
+		// list of added text IDs to add each text only once.
+		$added_ids = array();
+
 		// loop through results and add them to the list.
 		foreach ( $results as $result ) {
+			// bail if this text has already been added (e.g. as it is used by multiple objects).
+			if ( isset( $added_ids[ absint( $result['id'] ) ] ) ) {
+				continue;
+			}
+
 			// only add post-type-objects if not_locked is set and if they are not locked.
 			$add = true;
 			if ( ! empty( $filter['not_locked'] ) ) {
@@ -354,6 +371,9 @@ class Db {
 
 				// add the Text-object to the list.
 				$return[] = $obj;
+
+				// mark the text as added.
+				$added_ids[ absint( $result['id'] ) ] = true;
 			}
 		}
 
@@ -385,7 +405,8 @@ class Db {
 		$query_parts = $this->get_query_parts( $filter, array() );
 
 		// define the statement.
-		$sql = 'SELECT COUNT(*) FROM %i AS o' . $query_parts['join'] . $query_parts['where'];
+		// count each text only once, as the joins could return multiple rows for one text.
+		$sql = 'SELECT COUNT(DISTINCT o.`id`) FROM %i AS o' . $query_parts['join'] . $query_parts['where'];
 
 		// get the count.
 		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- $sql consists only of fixed SQL fragments with placeholders (see get_query_parts()), all values are passed as prepare() arguments.; custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
@@ -524,9 +545,7 @@ class Db {
 				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN %i oo ON oo.oid = o.id';
 				$sql_select .= ', oo.object_id';
 				$sql_where  .= ' AND oo.object_id = %d';
-				$sql_where  .= ' AND oo.blog_id = %d';
 				$vars[]      = absint( $filter['object_id'] );
-				$vars[]      = absint( get_current_blog_id() );
 				if ( ! empty( $filter['object_state'] ) ) {
 					$sql_where .= ' AND oo.state = %s';
 					$vars[]     = $filter['object_state'];
@@ -536,9 +555,7 @@ class Db {
 				$sql_join[ $this->get_table_name_originals_objects() ] = ' INNER JOIN %i oo ON oo.oid = o.id';
 				$sql_select .= ', oo.object_type';
 				$sql_where  .= ' AND oo.object_type = %s';
-				$sql_where  .= ' AND oo.blog_id = %d';
 				$vars[]      = $filter['object_type'];
-				$vars[]      = absint( get_current_blog_id() );
 			}
 			if ( ! empty( $filter['simplification_hash'] ) && ! empty( $filter['simplification_lang'] ) ) {
 				$sql_join[ $this->get_table_name_simplifications() ] = ' INNER JOIN %i s ON s.oid = o.id';
@@ -579,6 +596,12 @@ class Db {
 			if ( ! empty( $filter['has_simplification'] ) ) {
 				$sql_join[ $this->get_table_name_simplifications() ] = ' INNER JOIN %i s ON s.oid = o.id';
 			}
+
+			// use only the objects of the actual blog if the objects are joined (they are saved for all blogs in one table).
+			if ( isset( $sql_join[ $this->get_table_name_originals_objects() ] ) ) {
+				$sql_where .= ' AND oo.blog_id = %d';
+				$vars[]     = absint( get_current_blog_id() );
+			}
 		}
 
 		// return the parts.
@@ -595,11 +618,21 @@ class Db {
 	/**
 	 * Reset all simplifications.
 	 *
+	 * The texts which have been simplified are marked to simplify them again.
+	 *
+	 * Hint: on multisite the tables are used by all blogs and the simplifications are not saved per blog,
+	 * so this resets the simplifications of all blogs.
+	 *
 	 * @return void
 	 */
 	public function reset_simplifications(): void {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- custom table of this plugin, no WP API available
 		$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %i', $this->get_table_name_simplifications() ) );
+
+		// mark the simplified texts to simplify them again, as they have no simplification anymore.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
+		$wpdb->query( $wpdb->prepare( 'UPDATE %i SET `state` = %s WHERE `state` IN ( %s, %s )', $this->get_table_name_originals(), 'to_simplify', 'in_use', 'processing' ) );
 
 		// the counts of simplified texts have been changed.
 		$this->clear_process_counts();

@@ -110,7 +110,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @noinspection PhpFullyQualifiedNameUsageInspection
 	 */
 	public function cli(): void {
-		\WP_CLI::add_command( 'easy-language', 'easyLanguage\ThirdPartySupport\TranslatePress\Cli' );
+		// register as subcommand to not replace the main command of this plugin.
+		\WP_CLI::add_command( 'easy-language trp_reset_simplifications', array( new Cli(), 'trp_reset_simplifications' ) );
 	}
 
 	/**
@@ -299,10 +300,14 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add them to the list.
 		foreach ( $languages as $language_code => $language ) {
 			// check if the table of our own language exist.
-			if ( ! empty( $wpdb->get_results( $wpdb->prepare( 'SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = %s', array( $trp_query->get_table_name( strtolower( $language_code ) ) ) ) ) ) ) {
-				// truncate the tables of our own language.
-				$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $trp_query->get_table_name( strtolower( $language_code ) ) ) ) ); // @phpstan-ignore argument.type
-				$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $trp_query->get_gettext_table_name( strtolower( $language_code ) ) ) ) ); // @phpstan-ignore argument.type
+			foreach ( array( $trp_query->get_table_name( strtolower( $language_code ) ), $trp_query->get_gettext_table_name( strtolower( $language_code ) ) ) as $table_name ) {
+				// bail if the table does not exist in the database of this WordPress.
+				if ( empty( $wpdb->get_results( $wpdb->prepare( 'SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s', array( $table_name ) ) ) ) ) {
+					continue;
+				}
+
+				// truncate the table of our own language.
+				$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $table_name ) ) ); // @phpstan-ignore argument.type
 			}
 		}
 	}
@@ -321,7 +326,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// get the used translation engine.
 		$translation_engine = $settings['trp_machine_translation_settings']['translation-engine'] ?? '';
 
-		if ( in_array( $translation_engine, array( 'summ-ai', 'capito' ), true ) ) {
+		if ( in_array( $translation_engine, array( 'summ_ai', 'capito' ), true ) ) {
 			// remove our own filter to prevent a loop.
 			remove_filter( 'trp_mt_available_supported_languages', array( $this, 'get_supported_languages_for_trp' ) );
 

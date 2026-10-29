@@ -74,7 +74,9 @@ class Log {
             `log` longtext DEFAULT '' NOT NULL,
             `user_id` int(11) DEFAULT 0 NOT NULL,
             `state` varchar(40) DEFAULT '' NOT NULL,
-            UNIQUE KEY id (id)
+            `blog_id` bigint(20) DEFAULT 0 NOT NULL,
+            UNIQUE KEY id (id),
+            KEY blog_id (blog_id)
         ) $charset_collate;";
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -130,6 +132,7 @@ class Log {
 				'log'     => $entry,
 				'state'   => $state,
 				'user_id' => $user_id,
+				'blog_id' => get_current_blog_id(),
 			)
 		);
 
@@ -147,15 +150,51 @@ class Log {
 	private function clean_log(): void {
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
-		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE 1 = %d AND `time` < DATE_SUB(NOW(), INTERVAL %d DAY)', array( $this->get_table_name(), 1, absint( get_option( 'easy_language_log_max_age', 50 ) ) ) ) );
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `blog_id` = %d AND `time` < DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)', array( $this->get_table_name(), get_current_blog_id(), max( 1, absint( get_option( 'easy_language_log_max_age', 50 ) ) ) ) ) );
 	}
 
 	/**
-	 * Return the entries for this log object.
+	 * Delete all entries of the actual site (e.g. for a reset of the plugin in a multisite).
+	 *
+	 * @return void
+	 */
+	public function delete_entries_of_site(): void {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `blog_id` = %d', array( $this->get_table_name(), get_current_blog_id() ) ) );
+	}
+
+	/**
+	 * Assign the entries without site (from versions before 4.0.0) to the main site.
+	 *
+	 * @return void
+	 */
+	public function migrate_entries_without_site(): void {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
+		$wpdb->query( $wpdb->prepare( 'UPDATE %i SET `blog_id` = %d WHERE `blog_id` = %d', array( $this->get_table_name(), get_main_site_id(), 0 ) ) );
+	}
+
+	/**
+	 * Return the count of entries of the actual site.
+	 *
+	 * @return int
+	 */
+	public function count_entries(): int {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
+		return absint( $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE `blog_id` = %d', array( $this->get_table_name(), get_current_blog_id() ) ) ) );
+	}
+
+	/**
+	 * Return the entries of the actual site for this log object.
+	 *
+	 * @param int $limit  Max count of entries to return (0 for all).
+	 * @param int $offset Count of entries to skip (only used with a limit).
 	 *
 	 * @return array<string,mixed>
 	 */
-	public function get_entries(): array {
+	public function get_entries( int $limit = 0, int $offset = 0 ): array {
 		global $wpdb;
 
 		// define the allowed columns to order the table (request value => DB column).
@@ -175,14 +214,23 @@ class Log {
 			$order = 'DESC';
 		}
 
+		// get the limit (all entries if no limit is given).
+		$limit_sql = '';
+		$vars      = array( $this->get_table_name(), get_current_blog_id(), $order_by );
+		if ( $limit > 0 ) {
+			$limit_sql = ' LIMIT %d OFFSET %d';
+			$vars[]    = $limit;
+			$vars[]    = max( 0, $offset );
+		}
+
 		// get results in ascending order and return them.
 		if ( 'ASC' === $order ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
-			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM %i WHERE 1 = %d ORDER BY %i ASC, `id` DESC', array( $this->get_table_name(), 1, $order_by ) ), ARRAY_A );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache; the limit is a fixed string with placeholders
+			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM %i WHERE `blog_id` = %d ORDER BY %i ASC, `id` DESC' . $limit_sql, $vars ), ARRAY_A );
 		}
 
 		// get results in descending order and return them.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
-		return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM %i WHERE 1 = %d ORDER BY %i DESC, `id` DESC', array( $this->get_table_name(), 1, $order_by ) ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache; the limit is a fixed string with placeholders
+		return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM %i WHERE `blog_id` = %d ORDER BY %i DESC, `id` DESC' . $limit_sql, $vars ), ARRAY_A );
 	}
 }

@@ -379,8 +379,8 @@ class Summ_Ai extends Base implements Api_Base {
 	public function install(): void {
 		global $wpdb;
 
-		// set summ ai api as default API.
-		update_option( 'easy_language_api', $this->get_name() );
+		// set summ ai api as default API, if no API has been chosen yet (do not overwrite the choice of the user on reactivation).
+		add_option( 'easy_language_api', $this->get_name() );
 
 		$charset_collate = $wpdb->get_charset_collate();
 
@@ -388,8 +388,8 @@ class Summ_Ai extends Base implements Api_Base {
 		$sql = "CREATE TABLE $this->table_requests (
             `id` mediumint(9) NOT NULL AUTO_INCREMENT,
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-            `request` text DEFAULT '' NOT NULL,
-            `response` text DEFAULT '' NOT NULL,
+            `request` longtext DEFAULT '' NOT NULL,
+            `response` longtext DEFAULT '' NOT NULL,
             `duration` int(11) DEFAULT 0 NOT NULL,
             `httpstatus` int(11) DEFAULT 0 NOT NULL,
             `quota` int(11) DEFAULT 0 NOT NULL,
@@ -424,11 +424,50 @@ class Summ_Ai extends Base implements Api_Base {
 		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
 
 		/**
+		 * Remove settings.
+		 */
+		foreach ( $this->get_options() as $option_name ) {
+			delete_option( $option_name );
+		}
+
+		/**
 		 * Delete our table.
 		 */
 		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
-		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->table_requests ) );
+		// the table is shared by all sites in multisite: drop it only if the shared tables are removed.
+		if ( \easyLanguage\Plugin\Uninstall::get_instance()->is_dropping_shared_tables() ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
+			$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->table_requests ) );
+		} else {
+			// remove only the entries of the actual site.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available
+			$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `blog_id` = %d', array( $this->table_requests, get_current_blog_id() ) ) );
+		}
+	}
+
+	/**
+	 * Return a list of options this API is using, e.g., for clean uninstallation.
+	 *
+	 * The counter for the free quota ('easy_language_summ_ai_quota') and the marker for disabled free requests
+	 * ('easy_language_summ_ai_disable_free_requests') are kept intentionally: like the installation hash
+	 * (EASY_LANGUAGE_HASH), which is never removed, they belong to the free usage of this installation
+	 * and must not be reset by a reinstallation.
+	 *
+	 * @return array<string>
+	 */
+	private function get_options(): array {
+		return array(
+			'easy_language_summ_ai_api_key',
+			'easy_language_summ_ai_paid_quota',
+			'easy_language_summ_ai_mode',
+			'easy_language_summ_ai_email_mode',
+			'easy_language_summ_api_email',
+			'easy_language_summ_ai_source_languages',
+			'easy_language_summ_ai_target_languages',
+			'easy_language_summ_ai_html_mode',
+			'easy_language_summ_ai_quota_interval',
+			'easy_language_summ_ai_test',
+		);
 	}
 
 	/**
@@ -589,9 +628,16 @@ class Summ_Ai extends Base implements Api_Base {
 	/**
 	 * Return true as this API is preconfigured.
 	 *
+	 * Exception: in free mode, if the free requests have been disabled by the API, an own API key is necessary.
+	 *
 	 * @return bool
 	 */
 	public function is_configured(): bool {
+		// bail if free mode is used, but free requests are disabled.
+		if ( $this->is_free_mode() && ! $this->is_free_requests_enabled() ) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -627,7 +673,7 @@ class Summ_Ai extends Base implements Api_Base {
 	public function get_log_entries(): array {
 		$wpdb = $this->wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom request table of this API, no WP API available; entries change with every request, so no object cache
-		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `time`, `request`, `response` FROM %i WHERE 1 = %d', array( $this->table_requests, 1 ) ) ); // @phpstan-ignore argument.type
+		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `time`, `request`, `response` FROM %i WHERE `blog_id` = %d', array( $this->table_requests, get_current_blog_id() ) ) ); // @phpstan-ignore argument.type
 		if ( is_null( $results ) ) {
 			return array();
 		}
@@ -974,10 +1020,11 @@ class Summ_Ai extends Base implements Api_Base {
 	 * Validate the SUMM API Token.
 	 *
 	 * @param ?string $value The key to validate.
+	 * @param mixed   $old_value The actual saved key (optional, given by the "pre_update_option"-filter).
 	 *
 	 * @return ?string
 	 */
-	public function validate_api_key( ?string $value ): ?string {
+	public function validate_api_key( ?string $value, mixed $old_value = null ): ?string {
 		// bail if the key has not been changed (the form returns the mask, the saved key will be kept).
 		if ( Crypt::MASK === $value || Crypt::get_instance()->is_encrypted( $value ) ) {
 			return $value;
@@ -1011,7 +1058,7 @@ class Summ_Ai extends Base implements Api_Base {
 		} elseif ( 0 !== strcmp( $value, get_option( 'easy_language_summ_ai_api_key', '' ) ) ) {
 			// if the token has been changed, run tests with it.
 			// switch mode to paid for test.
-			$mode = $this->mode;
+			$mode = $this->get_mode();
 			$this->set_mode( 'paid' );
 			$request = $this->get_test_request_response( $value );
 			if ( 200 !== $request->get_http_status() ) {
@@ -1022,8 +1069,13 @@ class Summ_Ai extends Base implements Api_Base {
 				// log the event.
 				Log::get_instance()->add_log( sprintf( 'Token for SUMM AI has been changed, but we get an error from API by validation of the key. Please <a href="%1$s">check API log</a>.', esc_url( Helper::get_api_logs_page_url() ) ), 'error' );
 
-				// remove key.
-				$value = '';
+				if ( in_array( $request->get_http_status(), array( 401, 403 ), true ) ) {
+					// remove key as it has been rejected by the API.
+					$value = '';
+				} else {
+					// keep the actual saved key as the new one could not be verified (e.g., timeout or server error).
+					$value = is_string( $old_value ) ? $old_value : (string) get_option( 'easy_language_summ_ai_api_key', '' );
+				}
 
 				// revert mode.
 				$this->set_mode( $mode );
@@ -1097,9 +1149,12 @@ class Summ_Ai extends Base implements Api_Base {
 			 */
 			$min_percent = apply_filters( 'easy_language_quota_percent', $min_percent );
 
-			// show hint it limit has been reached.
-			$percent = absint( ! empty( $quota['character_spent'] ) ? $quota['character_spent'] : 0 ) / absint( $quota['character_limit'] );
-			if ( 1 === $percent ) {
+			// show hint it limit has been reached (only if a limit is known).
+			$percent = 0;
+			if ( empty( $quota['unlimited'] ) && ! empty( $quota['character_limit'] ) && absint( $quota['character_limit'] ) > 0 ) {
+				$percent = absint( ! empty( $quota['character_spent'] ) ? $quota['character_spent'] : 0 ) / absint( $quota['character_limit'] );
+			}
+			if ( $percent >= 1 ) {
 				// get the transients-object to add the new one.
 				$transient_obj = $transients_obj->add();
 				$transient_obj->set_dismissible_days( 2 );
@@ -1117,6 +1172,9 @@ class Summ_Ai extends Base implements Api_Base {
 				$transient_obj->set_message( sprintf( __( '<strong>More than 80 percent of your quota for the SUMM AI API has already been used.</strong> Please contact the <a href="%1$s" target="_blank">SUMM AI support (open new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 				$transient_obj->set_type( 'error' );
 				$transient_obj->save();
+			} else {
+				// remove an outdated hint.
+				$transients_obj->get_transient_by_name( 'easy_language_summ_ai_quota' )->delete();
 			}
 		} else {
 			// delete quota-array in db.
@@ -1141,7 +1199,7 @@ class Summ_Ai extends Base implements Api_Base {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -1152,7 +1210,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$this->set_mode( $mode );
 
 		// redirect user.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -1182,8 +1240,10 @@ class Summ_Ai extends Base implements Api_Base {
 		// transform it to an array and return it.
 		$results = json_decode( $response, true );
 		if ( is_array( $results ) ) {
+			// mark the quota as unlimited if the API does not return any limit.
 			if ( empty( $results['character_limit'] ) ) {
-				$results['character_limit'] = 1000000;
+				$results['character_limit'] = 0;
+				$results['unlimited']       = true;
 			}
 			return $results;
 		}
@@ -1291,12 +1351,12 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function run_token_test(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-summ-ai-test-token', 'nonce' );
+		check_admin_referer( 'easy-language-summ-ai-test-token', 'nonce' );
 
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -1329,7 +1389,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$transient_obj->save();
 
 		// redirect user.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -1358,12 +1418,12 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function remove_token(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-summ-ai-remove-token', 'nonce' );
+		check_admin_referer( 'easy-language-summ-ai-remove-token', 'nonce' );
 
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -1383,7 +1443,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$this->set_mode( 'free' );
 
 		// redirect user.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -1507,6 +1567,8 @@ class Summ_Ai extends Base implements Api_Base {
 			$api_quota = $this->get_quota();
 			if ( empty( $api_quota ) || ! isset( $api_quota['character_spent'], $api_quota['character_limit'] ) ) {
 				$quota_text = esc_html__( 'No quota consumed so far', 'easy-language' );
+			} elseif ( ! empty( $api_quota['unlimited'] ) ) {
+				$quota_text = esc_html__( 'Unlimited.', 'easy-language' );
 			} else {
 				$quota_text = $api_quota['character_spent'] . ' / ' . $api_quota['character_limit'];
 			}

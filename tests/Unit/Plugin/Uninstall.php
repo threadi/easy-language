@@ -279,7 +279,8 @@ class Uninstall extends easyLanguageTests {
 		global $wpdb;
 		$this->create_data();
 
-		\easyLanguage\Plugin\Uninstall::get_instance()->run();
+		// in a multisite the shared tables are only removed during the network-wide uninstallation.
+		\easyLanguage\Plugin\Uninstall::get_instance()->run( is_multisite() );
 		wp_cache_flush();
 
 		// no table of this plugin remains.

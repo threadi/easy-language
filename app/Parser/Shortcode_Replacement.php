@@ -142,8 +142,8 @@ trait Shortcode_Replacement {
 			return $attribute[0];
 		}
 
-		// bail if the value is not the original text.
-		if ( stripcslashes( $value ) !== $original_text ) {
+		// bail if the value is not the original text (masked or unmasked).
+		if ( stripcslashes( $value ) !== $original_text && $this->unmask_shortcode_attribute_value( stripcslashes( $value ) ) !== $original_text ) {
 			return $attribute[0];
 		}
 
@@ -162,5 +162,18 @@ trait Shortcode_Replacement {
 
 		// return the attribute with the simplified value.
 		return $name . '=' . $quote . $masked . $quote . $suffix;
+	}
+
+	/**
+	 * Return the attribute value without the masking we use when saving a simplification in an attribute.
+	 *
+	 * This way the parsed texts are the same as the saved simplifications.
+	 *
+	 * @param string $value The attribute value.
+	 *
+	 * @return string
+	 */
+	private function unmask_shortcode_attribute_value( string $value ): string {
+		return str_replace( array( '&#91;', '&#93;', '&quot;', '&#039;' ), array( '[', ']', '"', "'" ), $value );
 	}
 }

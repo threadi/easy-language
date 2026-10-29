@@ -180,12 +180,22 @@ class Breakdance extends Parser_Base implements Parser {
 		$flow_text_widgets = $this->get_flow_text_widgets();
 
 		// get the contents of this widget, if it is allowed.
-		if ( ! empty( $widget['data']['type'] ) && ! empty( $flow_text_widgets[ $widget['data']['type'] ] ) && isset( $widget['data']['properties']['content']['content']['text'] ) && is_string( $widget['data']['properties']['content']['content']['text'] ) ) {
-			// add this widget with its content to the list.
-			$resulting_texts[] = array(
-				'text' => $widget['data']['properties']['content']['content']['text'],
-				'html' => $this->is_flow_text_widget_html( $widget['data']['type'] ),
-			);
+		if ( ! empty( $widget['data']['type'] ) && is_string( $widget['data']['type'] ) && ! empty( $flow_text_widgets[ $widget['data']['type'] ] ) && is_array( $flow_text_widgets[ $widget['data']['type'] ] ) && isset( $widget['data']['properties'] ) && is_array( $widget['data']['properties'] ) ) {
+			foreach ( $this->get_property_paths( $flow_text_widgets[ $widget['data']['type'] ] ) as $path ) {
+				// get the value of this property.
+				$value = $this->get_property_by_path( $widget['data']['properties'], $path );
+
+				// bail if the value is not a string.
+				if ( ! is_string( $value ) ) {
+					continue;
+				}
+
+				// add this widget with its content to the list.
+				$resulting_texts[] = array(
+					'text' => $value,
+					'html' => $this->is_flow_text_widget_html( $widget['data']['type'] ),
+				);
+			}
 		}
 
 		// loop through inner-widgets.
@@ -205,6 +215,82 @@ class Breakdance extends Parser_Base implements Parser {
 	}
 
 	/**
+	 * Return the list of property paths of a widget configuration (see get_flow_text_widgets()).
+	 *
+	 * E.g. "properties" => array( "content" => array( "content" => array( "text" ) ) ) results in
+	 * the path array( "content", "content", "text" ).
+	 *
+	 * @param array<int|string,mixed> $configuration The configuration of the widget or a part of it.
+	 * @param array<int,string>       $prefix The keys of the actual level.
+	 * @return array<int,array<int,string>>
+	 */
+	private function get_property_paths( array $configuration, array $prefix = array() ): array {
+		// on first level use the properties.
+		if ( empty( $prefix ) ) {
+			// use the default path for texts if no properties are configured (as before 4.0.0).
+			if ( empty( $configuration['properties'] ) || ! is_array( $configuration['properties'] ) ) {
+				return array( array( 'content', 'content', 'text' ) );
+			}
+			$configuration = $configuration['properties'];
+		}
+
+		// collect the paths.
+		$paths = array();
+		foreach ( $configuration as $key => $value ) {
+			if ( is_array( $value ) ) {
+				$paths = array_merge( $paths, $this->get_property_paths( $value, array_merge( $prefix, array( (string) $key ) ) ) );
+			} elseif ( is_string( $value ) ) {
+				$paths[] = array_merge( $prefix, array( $value ) );
+			}
+		}
+
+		// return the resulting paths.
+		return $paths;
+	}
+
+	/**
+	 * Return the value of a property by its path.
+	 *
+	 * @param array<string,mixed> $properties The properties of a widget.
+	 * @param array<int,string>   $path The path.
+	 * @return mixed
+	 */
+	private function get_property_by_path( array $properties, array $path ): mixed {
+		$value = $properties;
+		foreach ( $path as $key ) {
+			if ( ! is_array( $value ) || ! array_key_exists( $key, $value ) ) {
+				return null;
+			}
+			$value = $value[ $key ];
+		}
+		return $value;
+	}
+
+	/**
+	 * Set the value of an existing property by its path.
+	 *
+	 * @param array<string,mixed> $properties The properties of a widget.
+	 * @param array<int,string>   $path The path.
+	 * @param string              $value The new value.
+	 * @return array<string,mixed>
+	 */
+	private function set_property_by_path( array $properties, array $path, string $value ): array {
+		$key = (string) array_shift( $path );
+
+		// set the value on the last key.
+		if ( empty( $path ) ) {
+			$properties[ $key ] = $value;
+			return $properties;
+		}
+
+		// go deeper.
+		if ( isset( $properties[ $key ] ) && is_array( $properties[ $key ] ) ) {
+			$properties[ $key ] = $this->set_property_by_path( $properties[ $key ], $path, $value );
+		}
+		return $properties;
+	}
+
+	/**
 	 * Replace the original text with its simplification in the widget and its inner widgets.
 	 *
 	 * Uses the same structure as get_widgets().
@@ -219,11 +305,19 @@ class Breakdance extends Parser_Base implements Parser {
 		$flow_text_widgets = $this->get_flow_text_widgets();
 
 		// replace the content of this widget, if it is allowed and matches the original text.
-		if ( ! empty( $widget['data']['type'] ) && ! empty( $flow_text_widgets[ $widget['data']['type'] ] ) && isset( $widget['data']['properties']['content']['content']['text'] ) && $this->get_text() === $widget['data']['properties']['content']['content']['text'] ) {
-			$widget['data']['properties']['content']['content']['text'] = $simplified_part;
+		if ( ! empty( $widget['data']['type'] ) && is_string( $widget['data']['type'] ) && ! empty( $flow_text_widgets[ $widget['data']['type'] ] ) && is_array( $flow_text_widgets[ $widget['data']['type'] ] ) && isset( $widget['data']['properties'] ) && is_array( $widget['data']['properties'] ) ) {
+			foreach ( $this->get_property_paths( $flow_text_widgets[ $widget['data']['type'] ] ) as $path ) {
+				// bail if the value is not the original text.
+				if ( $this->get_text() !== $this->get_property_by_path( $widget['data']['properties'], $path ) ) {
+					continue;
+				}
 
-			// mark the change.
-			$changed = true;
+				// set the simplified text.
+				$widget['data']['properties'] = $this->set_property_by_path( $widget['data']['properties'], $path, $simplified_part );
+
+				// mark the change.
+				$changed = true;
+			}
 		}
 
 		// loop through inner-widgets.

@@ -301,8 +301,8 @@ class Nimble extends PageBuilder_Base {
 	 * @return bool
 	 */
 	private function is_preview(): bool {
-		// modules are rendered via AJAX in the editor.
-		if ( wp_doing_ajax() ) {
+		// modules are rendered via AJAX in the editor (only for users which could edit contents).
+		if ( wp_doing_ajax() && current_user_can( 'edit_posts' ) ) {
 			return true;
 		}
 

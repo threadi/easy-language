@@ -64,6 +64,11 @@ class Abilities {
 	private const MAX_PER_PAGE = 100;
 
 	/**
+	 * Max count of texts which are scanned for visibility if list-texts is used without an object.
+	 */
+	private const MAX_SCAN_TEXTS = 1000;
+
+	/**
 	 * Instance of this object.
 	 *
 	 * @var ?Abilities
@@ -496,8 +501,8 @@ class Abilities {
 				'label'               => __( 'Get Easy Language configuration', 'easy-language' ),
 				'description'         => __( 'Returns the configuration of the plugin Easy Language: the active API for automatic simplifications incl. its quota, the source and target languages (e.g. de_LS for Leichte Sprache, de_EL for Einfache Sprache), the supported post types and taxonomies and the settings for automatic simplifications. Use this first to learn which language codes and post types can be used with the other abilities.', 'easy-language' ),
 				'input_schema'        => array(
+					// no "properties" here: an empty PHP array would be serialized as JSON list "[]" instead of an object.
 					'type'                 => 'object',
-					'properties'           => array(),
 					'additionalProperties' => false,
 					'default'              => array(),
 				),
@@ -627,6 +632,10 @@ class Abilities {
 						'total_pages' => array( 'type' => 'integer' ),
 						'page'        => array( 'type' => 'integer' ),
 						'items'       => array( 'type' => 'array' ),
+						'truncated'   => array(
+							'type'        => 'boolean',
+							'description' => __( 'True if not all texts have been checked (only without object_id). Filter by object_id to get all texts of an object.', 'easy-language' ),
+						),
 					),
 				),
 				'execute_callback'    => array( $this, 'execute_list_texts' ),
@@ -1261,13 +1270,47 @@ class Abilities {
 		if ( ! empty( $input['search'] ) ) {
 			$query['s'] = sanitize_text_field( (string) $input['search'] );
 		}
+
+		// check if the user could edit the posts of others in all requested post types.
+		$can_edit_others = true;
+		foreach ( $post_types as $post_type ) {
+			$post_type_obj = get_post_type_object( $post_type );
+			if ( ! $post_type_obj instanceof WP_Post_Type || ! current_user_can( $post_type_obj->cap->edit_others_posts ) ) {
+				$can_edit_others = false;
+				break;
+			}
+		}
+
+		// if not, load all IDs and filter the editable posts before the pagination, so the totals match the visible items.
+		// (no author restriction, as users could have edit rights on posts of others via other capabilities).
+		if ( ! $can_edit_others ) {
+			$query['posts_per_page'] = -1;
+			$query['paged']          = 1;
+		}
+
 		$results = new WP_Query( $query );
+
+		// get the IDs of the editable posts of the requested page and the totals.
+		$total       = absint( $results->found_posts );
+		$total_pages = absint( $results->max_num_pages );
+		$post_ids    = array_map( 'absint', $results->get_posts() );
+		if ( ! $can_edit_others ) {
+			$post_ids    = array_values(
+				array_filter(
+					$post_ids,
+					function ( int $post_id ): bool {
+						return current_user_can( 'edit_post', $post_id );
+					}
+				)
+			);
+			$total       = count( $post_ids );
+			$total_pages = (int) ceil( $total / $per_page );
+			$post_ids    = array_slice( $post_ids, ( $page - 1 ) * $per_page, $per_page );
+		}
 
 		// collect the items.
 		$items = array();
-		foreach ( $results->get_posts() as $post_id ) {
-			$post_id = absint( $post_id );
-
+		foreach ( $post_ids as $post_id ) {
 			// bail if the user is not allowed to edit this post.
 			if ( ! current_user_can( 'edit_post', $post_id ) ) {
 				continue;
@@ -1295,8 +1338,8 @@ class Abilities {
 
 		// return the result.
 		return array(
-			'total'       => absint( $results->found_posts ),
-			'total_pages' => absint( $results->max_num_pages ),
+			'total'       => $total,
+			'total_pages' => $total_pages,
 			'page'        => $page,
 			'items'       => $items,
 		);
@@ -1331,7 +1374,8 @@ class Abilities {
 		$languages = $this->get_active_language_codes();
 
 		// get the entries.
-		$db = Db::get_instance();
+		$db        = Db::get_instance();
+		$truncated = false;
 		if ( ! empty( $filter['object_id'] ) ) {
 			// the user may edit the requested object (see permission check), so all its texts are visible: paginate via DB.
 			$total   = $db->count_entries( $filter );
@@ -1344,8 +1388,14 @@ class Abilities {
 			}
 		} else {
 			// only texts used by at least one object the user may edit are visible, so the total must be counted on these.
+			// limit the scan to protect the server: each text needs further queries for its objects.
+			$entries = $db->get_entries( $filter, array(), self::MAX_SCAN_TEXTS + 1 );
+			if ( count( $entries ) > self::MAX_SCAN_TEXTS ) {
+				$entries   = array_slice( $entries, 0, self::MAX_SCAN_TEXTS );
+				$truncated = true;
+			}
 			$all_visible = array();
-			foreach ( $db->get_entries( $filter ) as $entry ) {
+			foreach ( $entries as $entry ) {
 				$objects = $this->get_editable_objects_of_text( $entry );
 				if ( empty( $objects ) ) {
 					continue;
@@ -1391,6 +1441,7 @@ class Abilities {
 			'total_pages' => (int) ceil( $total / $per_page ),
 			'page'        => $page,
 			'items'       => $items,
+			'truncated'   => $truncated,
 		);
 	}
 
@@ -1502,7 +1553,7 @@ class Abilities {
 			return new WP_Error( 'easy_language_not_simplified', __( 'This object is not a simplification. Use the ID of the simplified object (see get-object-simplifications).', 'easy-language' ) );
 		}
 
-		// get its language.
+		// get its language (get_language() returns only active target languages for simplified objects).
 		$language = (string) array_key_first( $object->get_language() );
 
 		// bail if the language is not active.
@@ -1542,8 +1593,52 @@ class Abilities {
 			return new WP_Error( 'easy_language_text_not_found', __( 'The text is not used by this object.', 'easy-language' ) );
 		}
 
+		// bail if the text is also used by objects the user could not edit, as its state and simplification are shared.
+		if ( ! $this->current_user_can_edit_all_objects_of_text( $entries[0] ) ) {
+			return new WP_Error( 'easy_language_text_shared', __( 'The text is also used by other objects you are not allowed to edit.', 'easy-language' ) );
+		}
+
 		// return the text.
 		return $entries[0];
+	}
+
+	/**
+	 * Return whether the actual user could edit all existing objects which are using the given text.
+	 *
+	 * @param Text $entry The text.
+	 *
+	 * @return bool
+	 */
+	private function current_user_can_edit_all_objects_of_text( Text $entry ): bool {
+		foreach ( $entry->get_objects() as $object_array ) {
+			$object_id   = absint( $object_array['object_id'] );
+			$object_type = (string) $object_array['object_type'];
+
+			// check terms.
+			if ( taxonomy_exists( $object_type ) ) {
+				// ignore terms which do not exist anymore.
+				if ( ! get_term( $object_id, $object_type ) instanceof \WP_Term ) {
+					continue;
+				}
+				if ( ! current_user_can( 'edit_term', $object_id ) ) {
+					return false;
+				}
+				continue;
+			}
+
+			// ignore posts which do not exist anymore.
+			if ( ! get_post( $object_id ) instanceof WP_Post ) {
+				continue;
+			}
+
+			// bail if the user could not edit this post.
+			if ( ! current_user_can( 'edit_post', $object_id ) ) {
+				return false;
+			}
+		}
+
+		// return true as the user could edit all objects.
+		return true;
 	}
 
 	/**
@@ -1758,12 +1853,20 @@ class Abilities {
 			return new WP_Error( 'easy_language_quota_exceeded', sprintf( __( 'The quota of %1$s is used up. Nothing has been simplified.', 'easy-language' ), $api_obj->get_title() ), array( 'quota_state' => $quota_state ) );
 		}
 
-		// save the requesting user for the background process.
+		// bail if the object could not be simplified completely with this API (too many texts, a text too long or not enough quota).
+		if ( in_array( $quota_state['status'], array( 'above_entry_limit', 'above_text_limit', 'above_limit' ), true ) ) {
+			/* translators: %1$s will be replaced by the API title, %2$s by a status. */
+			return new WP_Error( 'easy_language_quota_state', sprintf( __( 'This object could not be simplified with %1$s (state: %2$s). Nothing has been scheduled.', 'easy-language' ), $api_obj->get_title(), $quota_state['status'] ), array( 'quota_state' => $quota_state ) );
+		}
+
+		// save the requesting user for the background process (before scheduling, as the cron could run immediately).
 		update_option( $object->get_marker_option_name( self::MARKER_USER ), get_current_user_id(), false );
 
 		// schedule the simplification.
 		$scheduled = wp_schedule_single_event( time(), self::CRON_HOOK, $args, true );
 		if ( $scheduled instanceof WP_Error ) {
+			// remove the saved user as nothing has been scheduled.
+			delete_option( $object->get_marker_option_name( self::MARKER_USER ) );
 			return $scheduled;
 		}
 
@@ -1819,8 +1922,10 @@ class Abilities {
 		// get the active API.
 		$api_obj = Apis::get_instance()->get_active_api();
 
-		// bail if no API is active.
-		if ( ! $api_obj instanceof Api_Base ) {
+		// bail if no API for automatic simplifications is active or it is not configured (anymore).
+		if ( ! $api_obj instanceof Api_Base || 'no_api' === $api_obj->get_name() || ! $api_obj->is_configured() ) {
+			/* translators: %1$s will be replaced by a title. */
+			Log::get_instance()->add_log( sprintf( __( 'Simplification of %1$s requested via ability was canceled as no configured API for automatic simplifications is active.', 'easy-language' ), '<i>' . esc_html( $object->get_title() ) . '</i>' ), 'error' );
 			wp_set_current_user( $previous_user_id );
 			return;
 		}
@@ -1847,6 +1952,9 @@ class Abilities {
 			if ( 0 === $to_simplify_after ) {
 				// let the plugin finish the process (no API request is sent as nothing is left to simplify).
 				$object->process_simplifications( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping(), 0, false );
+
+				// run the tasks after the end of a simplification, as the plugin does not run them if no text was left.
+				$object->run_simplification_end_trigger();
 			} else {
 				// do not retry failed texts to protect the quota, just end the process.
 				$object->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );

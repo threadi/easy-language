@@ -207,6 +207,8 @@ class Brizy extends easyLanguageTests {
 	 * @return void
 	 */
 	public function test_object_using_pagebuilder(): void {
+		$this->activate();
+
 		$post_id = self::factory()->post->create();
 		$this->assertFalse( \easyLanguage\Parser\Brizy::get_instance()->is_object_using_pagebuilder( new Post_Object( $post_id ) ) );
 

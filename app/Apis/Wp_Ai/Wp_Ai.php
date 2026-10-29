@@ -147,25 +147,27 @@ class Wp_Ai extends Base implements Api_Base {
 
 		// check each configured provider for its support of text generation.
 		$providers = array();
+		$failed    = false;
 		foreach ( $configured as $provider_id => $provider_name ) {
 			try {
 				$supported = wp_ai_client_prompt( 'Test' )->using_provider( $provider_id )->using_system_instruction( 'Test' )->is_supported_for_text_generation();
 			} catch ( Throwable $e ) {
 				$supported = false;
+				$failed    = true;
 			}
 			if ( true === $supported ) {
 				$providers[ $provider_id ] = $provider_name;
 			}
 		}
 
-		// cache the result.
+		// cache the result (only for a short time if the list is empty or the check of any provider failed, e.g., because of a temporary error).
 		set_transient(
 			self::TRANSIENT_PROVIDERS,
 			array(
 				'key'       => $cache_key,
 				'providers' => $providers,
 			),
-			12 * HOUR_IN_SECONDS
+			( $failed || empty( $providers ) ) ? 5 * MINUTE_IN_SECONDS : 12 * HOUR_IN_SECONDS
 		);
 
 		// return the list.

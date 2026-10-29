@@ -136,6 +136,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// initialize the list to return.
 		$languages = array();
 
+		// bail if WPML object is not available.
+		if ( ! is_object( $sitepress ) || ! method_exists( $sitepress, 'get_active_languages' ) ) {
+			return $languages;
+		}
+
 		// loop through the languages activated in WPML.
 		foreach ( $sitepress->get_active_languages() as $language ) {
 			$languages[ $language['code'] ] = '1';
@@ -189,6 +194,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// marker that something has been changed in WPML.
 		$wpml_changed = false;
+
+		// marker that something failed.
+		$wpml_failed = false;
 
 		// get actual active languages.
 		$old_active_languages = $sitepress->get_active_languages();
@@ -254,10 +262,16 @@ class Init extends Base implements ThirdPartySupport_Base {
 				'encode_url'     => 0,
 				'tag'            => $language_code,
 				'translations'   => $simplifications,
-				'flag'           => $language_code . '.png',
+				'flag'           => $language['img'],
 				'flag_upload'    => true,
 			);
-			$icl_edit_languages->insert_one( $data );
+			$result = $icl_edit_languages->insert_one( $data );
+
+			// bail if the language could not be added.
+			if ( false === $result ) {
+				$wpml_failed = true;
+				continue;
+			}
 
 			// add this language to active languages.
 			$active_languages[] = $language_code;
@@ -280,6 +294,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 			if ( function_exists( 'icl_cache_clear' ) ) {
 				icl_cache_clear();
 			}
+		}
+
+		// bail if something failed to run this routine again.
+		if ( $wpml_failed ) {
+			return;
 		}
 
 		// save the marker to run this routine only once for this version and active languages.

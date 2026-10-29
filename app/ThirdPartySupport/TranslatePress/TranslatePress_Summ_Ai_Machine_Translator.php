@@ -47,8 +47,8 @@ class TranslatePress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 			return new WP_Error( 'error', __( 'No active SUMM AI API!', 'easy-language' ) );
 		}
 
-		// return request result.
-		return Simplifications::get_instance()->call_api( (string) $string_to_translate, (string) $source_language, (string) $language_code, false, $this->is_test );
+		// return request result (array with "translated_text" or empty array on error).
+		return $api_object->get_simplifications_obj()->call_api( (string) $string_to_translate, (string) $source_language, (string) $language_code, false, $this->is_test );
 	}
 
 	/**
@@ -67,8 +67,13 @@ class TranslatePress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 			return array();
 		}
 
-		$source_language = $this->machine_translation_codes[ $source_language_code ];
-		$target_language = $this->machine_translation_codes[ $target_language_code ];
+		// get the language codes of this plugin (e.g. "de_DE" and "de_LS") for the languages of TranslatePress.
+		$api_object = Apis::get_instance()->get_active_api();
+		if ( false === $api_object || 'summ_ai' !== $api_object->get_name() ) {
+			return array();
+		}
+		$source_language = $this->get_plugin_language_code( $source_language_code, $api_object->get_supported_source_languages() );
+		$target_language = $this->get_plugin_language_code( $target_language_code, $api_object->get_supported_target_languages() );
 
 		$translated_strings = array();
 		foreach ( $new_strings as $key => $string_to_translate ) {
@@ -88,41 +93,52 @@ class TranslatePress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 				)
 			);
 
-			/**
-			 * Analyse the response.
-			 *
-			 * HTTP-Code:
-			 * - 200 => ok, its translated.
-			 * - 429 => to many requests => break.
-			 * - 467 => quota exceeded => break.
-			 */
-			if ( is_array( $response ) && ! is_wp_error( $response ) && isset( $response['response'] ) && isset( $response['response']['code'] ) ) {
-				if ( 200 === $response['response']['code'] ) {
+			// bail if the response does not contain a simplified text.
+			if ( ! is_array( $response ) || empty( $response['translated_text'] ) || ! is_string( $response['translated_text'] ) ) {
+				continue;
+			}
 
-					// update simplification count.
-					$this->machine_translator_logger->count_towards_quota( $string_to_translate );
+			// update simplification count.
+			$this->machine_translator_logger->count_towards_quota( $string_to_translate );
 
-					$translation_response = json_decode( $response['body'] );
-					if ( ! empty( $translation_response->translated_text ) ) {
-						// update the simplification string.
-						$translated_strings[ $key ] = wp_kses_post( nl2br( (string) $translation_response->translated_text ) );
-					}
+			// update the simplification string.
+			$translated_strings[ $key ] = wp_kses_post( nl2br( $response['translated_text'] ) );
 
-					// break if configured quota is exceeded.
-					if ( $this->machine_translator_logger->quota_exceeded() ) {
-						break;
-					}
-				}
-
-				// break loop if to many requests or quota exceeded.
-				if ( in_array( $response['response']['code'], array( 429, 467 ), true ) ) {
-					break;
-				}
+			// break if configured quota is exceeded.
+			if ( $this->machine_translator_logger->quota_exceeded() ) {
+				break;
 			}
 		}
 
 		// will have the same indexes as $new_strings, or it will be an empty array if something went wrong.
 		return $translated_strings;
+	}
+
+	/**
+	 * Return the language code of this plugin for the given language code of TranslatePress.
+	 *
+	 * TranslatePress uses the codes of its language list, which could differ in case (e.g. "de_ls" for "de_LS").
+	 *
+	 * @param string              $trp_language_code The language code from TranslatePress.
+	 * @param array<string,mixed> $supported_languages List of supported languages of the API.
+	 *
+	 * @return string
+	 */
+	private function get_plugin_language_code( string $trp_language_code, array $supported_languages ): string {
+		// use the code if it is supported as it is.
+		if ( isset( $supported_languages[ $trp_language_code ] ) ) {
+			return $trp_language_code;
+		}
+
+		// search the code case-insensitive in the codes and URLs of the supported languages.
+		foreach ( $supported_languages as $language_code => $settings ) {
+			if ( strtolower( (string) $language_code ) === strtolower( $trp_language_code ) || ( is_array( $settings ) && isset( $settings['url'] ) && strtolower( (string) $settings['url'] ) === strtolower( $trp_language_code ) ) ) {
+				return (string) $language_code;
+			}
+		}
+
+		// use the code TranslatePress has mapped for this language as fallback.
+		return (string) ( $this->machine_translation_codes[ $trp_language_code ] ?? $trp_language_code );
 	}
 
 	/**
@@ -132,7 +148,7 @@ class TranslatePress_Summ_Ai_Machine_Translator extends TRP_Machine_Translator {
 	 */
 	public function test_request(): WP_Error|array {
 		$this->is_test = true;
-		return $this->send_request( 'de_DE', 'de_ls', 'about' );
+		return $this->send_request( 'de_DE', 'de_LS', 'about' );
 	}
 
 	/**

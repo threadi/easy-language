@@ -15,6 +15,7 @@ use easyLanguage\Plugin\Helper;
 use easyLanguage\EasyLanguage\Parser;
 use easyLanguage\EasyLanguage\Parser_Base;
 use easyLanguage\EasyLanguage\Post_Object;
+use WP_Post;
 
 /**
  * Handler for parsing Salients WP Bakery-content.
@@ -155,10 +156,15 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 					// get the attributes of this shortcode.
 					$shortcode_attributes = shortcode_parse_atts( $matches[3][ $key ] );
 
+					// bail if the shortcode has no attributes.
+					if ( ! is_array( $shortcode_attributes ) ) {
+						continue;
+					}
+
 					foreach ( $shortcode_attributes as $attribute => $attribute_value ) {
 						if ( ! empty( $attribute_value ) && in_array( $attribute, $attributes, true ) ) {
 							$resulting_texts[] = array(
-								'text' => $attribute_value,
+								'text' => is_string( $attribute_value ) ? $this->unmask_shortcode_attribute_value( $attribute_value ) : $attribute_value,
 								'html' => $this->is_flow_text_widget_html( $shortcode ),
 							);
 						}
@@ -260,7 +266,16 @@ class Salients_WpBakery extends Parser_Base implements Parser {
 	 * @return void
 	 */
 	public function update_object( Objects $post_object ): void {
+		// get the post.
+		$post = get_post( $post_object->get_id() );
+
+		// bail if the post could not be loaded.
+		if ( ! $post instanceof WP_Post ) {
+			return;
+		}
+
+		// trigger the save_post-hook for this post.
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Intentionally triggers the WordPress core hook save_post.
-		do_action( 'save_post', $post_object->get_id(), $post_object->get_object_as_object(), true );
+		do_action( 'save_post', $post->ID, $post, true );
 	}
 }

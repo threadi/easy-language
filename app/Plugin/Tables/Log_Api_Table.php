@@ -34,11 +34,19 @@ class Log_Api_Table extends WP_List_Table {
 	}
 
 	/**
+	 * Count of entries to show per page.
+	 */
+	private const PER_PAGE = 50;
+
+	/**
 	 * Get the table data
+	 *
+	 * @param int $limit  Max count of entries to return.
+	 * @param int $offset Count of entries to skip.
 	 *
 	 * @return array<string,mixed>
 	 */
-	private function table_data(): array {
+	private function table_data( int $limit = self::PER_PAGE, int $offset = 0 ): array {
 		// check nonce (headers are already sent at this point, so show a hint instead of a redirect).
 		if ( isset( $_REQUEST['nonce'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['nonce'] ) ), 'easy-language-table-log-api' ) ) {
 			?>
@@ -69,19 +77,44 @@ class Log_Api_Table extends WP_List_Table {
 		if ( ! empty( $api ) ) {
 			if ( 'asc' === $order ) {
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
-				return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d AND `api` = %s ORDER BY %i ASC, `id` DESC', array( $table_name, 1, $api, $order_by ) ), ARRAY_A );
+				return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE `blog_id` = %d AND `api` = %s ORDER BY %i ASC, `id` DESC LIMIT %d OFFSET %d', array( $table_name, get_current_blog_id(), $api, $order_by, $limit, $offset ) ), ARRAY_A );
 			}
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
-			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d AND `api` = %s ORDER BY %i DESC, `id` DESC', array( $table_name, 1, $api, $order_by ) ), ARRAY_A );
+			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE `blog_id` = %d AND `api` = %s ORDER BY %i DESC, `id` DESC LIMIT %d OFFSET %d', array( $table_name, get_current_blog_id(), $api, $order_by, $limit, $offset ) ), ARRAY_A );
 		}
 
 		// get all results and return them.
 		if ( 'asc' === $order ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
-			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d ORDER BY %i ASC, `id` DESC', array( $table_name, 1, $order_by ) ), ARRAY_A );
+			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE `blog_id` = %d ORDER BY %i ASC, `id` DESC LIMIT %d OFFSET %d', array( $table_name, get_current_blog_id(), $order_by, $limit, $offset ) ), ARRAY_A );
 		}
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
-		return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d ORDER BY %i DESC, `id` DESC', array( $table_name, 1, $order_by ) ), ARRAY_A );
+		return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE `blog_id` = %d ORDER BY %i DESC, `id` DESC LIMIT %d OFFSET %d', array( $table_name, get_current_blog_id(), $order_by, $limit, $offset ) ), ARRAY_A );
+	}
+
+	/**
+	 * Return the count of entries for the actual filter.
+	 *
+	 * @return int
+	 */
+	private function count_table_data(): int {
+		global $wpdb;
+
+		// get the table name.
+		$table_name = Log_Api::get_instance()->get_table_name();
+
+		// get filter.
+		$api = $this->get_api_filter();
+
+		// count the entries filtered by API.
+		if ( ! empty( $api ) ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
+			return absint( $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE `blog_id` = %d AND `api` = %s', array( $table_name, get_current_blog_id(), $api ) ) ) );
+		}
+
+		// count all entries.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
+		return absint( $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE `blog_id` = %d', array( $table_name, get_current_blog_id() ) ) ) );
 	}
 
 	/**
@@ -94,8 +127,16 @@ class Log_Api_Table extends WP_List_Table {
 		$hidden   = $this->get_hidden_columns();
 		$sortable = $this->get_sortable_columns();
 
+		// set the pagination.
+		$this->set_pagination_args(
+			array(
+				'total_items' => $this->count_table_data(),
+				'per_page'    => self::PER_PAGE,
+			)
+		);
+
 		$this->_column_headers = array( $columns, $hidden, $sortable );
-		$this->items           = $this->table_data();
+		$this->items           = $this->table_data( self::PER_PAGE, ( $this->get_pagenum() - 1 ) * self::PER_PAGE );
 	}
 
 	/**
@@ -164,13 +205,14 @@ class Log_Api_Table extends WP_List_Table {
 
 		// get all apis from entries and add them to the list.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
-		$entries    = $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `request`, `response`, `api` FROM %i WHERE 1 = %d', array( Log_Api::get_instance()->get_table_name(), 1 ) ), ARRAY_A );
+		$entries    = $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT `api` FROM %i WHERE `blog_id` = %d', array( Log_Api::get_instance()->get_table_name(), get_current_blog_id() ) ) );
 		$apis_array = array();
-		foreach ( $entries as $item ) {
-			if ( empty( $apis_array[ $item['api'] ] ) ) {
-				$api_object = \easyLanguage\Plugin\Apis::get_instance()->get_api_by_name( $item['api'] );
+		foreach ( $entries as $api_name ) {
+			$api_name = (string) $api_name;
+			if ( empty( $apis_array[ $api_name ] ) ) {
+				$api_object = \easyLanguage\Plugin\Apis::get_instance()->get_api_by_name( $api_name );
 				if ( false !== $api_object ) {
-					$apis_array[ $item['api'] ] = $api_object;
+					$apis_array[ $api_name ] = $api_object;
 				}
 			}
 		}

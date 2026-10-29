@@ -53,31 +53,47 @@ class Uninstall {
 	}
 
 	/**
-	 * Return the list of blogs in a multisite-installation.
+	 * Marker whether the tables, which are shared by all sites of a multisite, should be removed.
 	 *
-	 * @return array<array<string>>
+	 * @var bool
+	 */
+	private bool $drop_shared_tables = true;
+
+	/**
+	 * Return the list of blog IDs in a multisite-installation.
+	 *
+	 * Includes archived, spammed or deleted sites, as they also contain data of this plugin.
+	 *
+	 * @return array<int>
 	 */
 	private function get_blogs(): array {
 		if ( false === is_multisite() ) {
 			return array();
 		}
 
-		// Get DB-connection.
-		global $wpdb;
-
-		// get blogs in this site-network.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- list of the sites in the network during (de)activation or uninstallation, the result must be up to date
-		return $wpdb->get_results(
-			'
-            SELECT blog_id
-            FROM ' . $wpdb->blogs . "
-            WHERE site_id = '" . $wpdb->siteid . "'
-            AND spam = '0'
-            AND deleted = '0'
-            AND archived = '0'
-            ",
-			ARRAY_A
+		// get all sites in this network.
+		return array_map(
+			'absint',
+			get_sites(
+				array(
+					'fields'     => 'ids',
+					'number'     => 0,
+					'network_id' => get_current_network_id(),
+				)
+			)
 		);
+	}
+
+	/**
+	 * Return whether the tables, which are shared by all sites of a multisite, will be removed by the actual run.
+	 *
+	 * This is false during the reset of a single site in a multisite: the shared tables are kept, only the data
+	 * of the actual site is removed.
+	 *
+	 * @return bool
+	 */
+	public function is_dropping_shared_tables(): bool {
+		return $this->drop_shared_tables;
 	}
 
 	/**
@@ -90,11 +106,14 @@ class Uninstall {
 	 * @return void
 	 */
 	public function run( bool $network_wide = false ): void {
+		// remove the shared tables only on single-site-install or during the uninstallation in the complete network.
+		$this->drop_shared_tables = ! is_multisite() || $network_wide;
+
 		if ( $network_wide && is_multisite() ) {
 			// loop through the blogs.
 			foreach ( $this->get_blogs() as $blog_id ) {
 				// switch to the blog.
-				switch_to_blog( absint( $blog_id['blog_id'] ) );
+				switch_to_blog( $blog_id );
 
 				// run tasks for uninstalling in this blog.
 				$this->deactivation_tasks();
@@ -106,6 +125,9 @@ class Uninstall {
 			// simply run the tasks on single-site-install or in the actual site.
 			$this->deactivation_tasks();
 		}
+
+		// reset the marker.
+		$this->drop_shared_tables = true;
 	}
 
 	/**
@@ -119,7 +141,7 @@ class Uninstall {
 	public function remove_encryption_keys(): void {
 		if ( is_multisite() ) {
 			foreach ( $this->get_blogs() as $blog_id ) {
-				switch_to_blog( absint( $blog_id['blog_id'] ) );
+				switch_to_blog( $blog_id );
 				Crypt::get_instance()->uninstall();
 				restore_current_blog();
 			}
@@ -169,8 +191,8 @@ class Uninstall {
 		// initialize the necessary components of the plugin.
 		$this->init_plugin();
 
-		// enable the settings.
-		Settings::get_instance()->get_settings_object()->activation();
+		// get the IDs of the texts used in this site, before their connections are removed (only needed if the shared tables are kept).
+		$text_ids = $this->drop_shared_tables ? array() : $this->get_text_ids_of_site();
 
 		// get all images which have assigned 'easy_language_icon' post-meta and delete them.
 		$query                            = array(
@@ -247,11 +269,15 @@ class Uninstall {
 		}
 
 		/**
-		 * Delete DB-tables.
+		 * Delete DB-tables or, if they are used by other sites of a multisite, only the data of the actual site.
 		 */
-		Log::get_instance()->delete_table();
-		Log_Api::get_instance()->delete_table();
-		Db::get_instance()->delete_tables();
+		if ( $this->drop_shared_tables ) {
+			Log::get_instance()->delete_table();
+			Log_Api::get_instance()->delete_table();
+			Db::get_instance()->delete_tables();
+		} else {
+			$this->delete_data_of_site( $text_ids );
+		}
 
 		// remove setup-options.
 		Setup::get_instance()->uninstall();
@@ -297,6 +323,70 @@ class Uninstall {
 	}
 
 	/**
+	 * Return the IDs of the texts used in the actual site.
+	 *
+	 * @return array<int>
+	 */
+	private function get_text_ids_of_site(): array {
+		global $wpdb;
+
+		// bail if the tables for texts do not exist.
+		$db_obj = Db::get_instance();
+		if ( ! $db_obj->tables_exist() ) {
+			return array();
+		}
+
+		// get the IDs of the texts used in this site.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; the result must be up to date during the reset
+		return array_map( 'absint', (array) $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT `oid` FROM %i WHERE `blog_id` = %d', array( $db_obj->get_table_name_originals_objects(), get_current_blog_id() ) ) ) );
+	}
+
+	/**
+	 * Delete the data of the actual site from the tables, which are shared by all sites of a multisite.
+	 *
+	 * Texts and simplifications are only removed if they are not used by another site.
+	 *
+	 * @param array<int> $text_ids The IDs of the texts which have been used by this site.
+	 *
+	 * @return void
+	 */
+	private function delete_data_of_site( array $text_ids ): void {
+		global $wpdb;
+
+		// delete the log entries of this site.
+		Log::get_instance()->delete_entries_of_site();
+		Log_Api::get_instance()->delete_entries_of_site();
+
+		// bail if the tables for texts do not exist.
+		$db_obj = Db::get_instance();
+		if ( ! $db_obj->tables_exist() ) {
+			return;
+		}
+
+		// delete the connections between texts and objects of this site.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `blog_id` = %d', array( $db_obj->get_table_name_originals_objects(), get_current_blog_id() ) ) );
+
+		// delete the texts and their simplifications, which are not used by any other site.
+		foreach ( $text_ids as $text_id ) {
+			// bail if this text is used by another site.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; the result must be up to date during the reset
+			if ( absint( $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE `oid` = %d', array( $db_obj->get_table_name_originals_objects(), $text_id ) ) ) ) > 0 ) {
+				continue;
+			}
+
+			// delete the text and its simplifications.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available
+			$wpdb->delete( $db_obj->get_table_name_originals(), array( 'id' => $text_id ) );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available
+			$wpdb->delete( $db_obj->get_table_name_simplifications(), array( 'oid' => $text_id ) );
+		}
+
+		// the counts of texts have been changed.
+		$db_obj->clear_process_counts();
+	}
+
+	/**
 	 * Return list of options this plugin is using.
 	 *
 	 * @return array<string>
@@ -307,6 +397,8 @@ class Uninstall {
 			'easy_language_update_lock',
 			'easy_language_wpml_languages_marker',
 			'easy_language_sublanguage_languages_marker',
+			\easyLanguage\EasyLanguage\Abilities::OPTION_ENABLED,
+			\easyLanguage\EasyLanguage\Abilities::OPTION_MODE,
 		);
 	}
 }

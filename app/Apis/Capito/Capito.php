@@ -335,8 +335,8 @@ class Capito extends Base implements Api_Base {
 		$sql = "CREATE TABLE $this->table_requests (
             `id` mediumint(9) NOT NULL AUTO_INCREMENT,
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-            `request` text DEFAULT '' NOT NULL,
-            `response` text DEFAULT '' NOT NULL,
+            `request` longtext DEFAULT '' NOT NULL,
+            `response` longtext DEFAULT '' NOT NULL,
             `duration` int(11) DEFAULT 0 NOT NULL,
             `httpstatus` int(11) DEFAULT 0 NOT NULL,
             `quota` int(11) DEFAULT 0 NOT NULL,
@@ -381,8 +381,15 @@ class Capito extends Base implements Api_Base {
 		 * Delete our table.
 		 */
 		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
-		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->table_requests ) );
+		// the table is shared by all sites in multisite: drop it only if the shared tables are removed.
+		if ( \easyLanguage\Plugin\Uninstall::get_instance()->is_dropping_shared_tables() ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
+			$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->table_requests ) );
+		} else {
+			// remove only the entries of the actual site.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available
+			$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `blog_id` = %d', array( $this->table_requests, get_current_blog_id() ) ) );
+		}
 	}
 
 	/**
@@ -409,6 +416,7 @@ class Capito extends Base implements Api_Base {
 	private function get_transients(): array {
 		return array(
 			'easy_language_capito_test_token',
+			'easy_language_capito_quota',
 		);
 	}
 
@@ -733,6 +741,15 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function get_quota(): array {
 		$quota = get_option( 'easy_language_capito_quota', array() );
+
+		// if no quota is remaining, return a used-up quota (spent equals the limit), so no further requests are sent.
+		if ( isset( $quota['assistance']['subscription']['remaining'] ) && is_numeric( $quota['assistance']['subscription']['remaining'] ) && (int) $quota['assistance']['subscription']['remaining'] <= 0 ) {
+			return array(
+				'character_spent' => 1,
+				'character_limit' => 1,
+			);
+		}
+
 		if ( ! empty( $quota['assistance']['subscription']['remaining'] ) ) {
 			return array(
 				'character_spent' => $quota['assistance']['subscription']['remaining'],
@@ -756,7 +773,12 @@ class Capito extends Base implements Api_Base {
 	public function get_api_url(): string {
 		$url = EASY_LANGUAGE_CAPITO_API_URL;
 		if ( $this->is_team_account() ) {
-			return $url . get_option( 'easy_language_capito_team', '' );
+			$team = (string) get_option( 'easy_language_capito_team', '' );
+
+			// use the team only if one is chosen, otherwise use the own account.
+			if ( ! empty( $team ) ) {
+				return $url . rawurlencode( $team );
+			}
 		}
 		return $url . 'me';
 	}
@@ -801,10 +823,11 @@ class Capito extends Base implements Api_Base {
 	 * Validate the API token.
 	 *
 	 * @param ?string $value The API-key.
+	 * @param mixed   $old_value The actual saved API-key (optional, given by the "pre_update_option"-filter).
 	 * @return ?string
 	 * @noinspection PhpUnused
 	 */
-	public function validate_api_key( ?string $value ): ?string {
+	public function validate_api_key( ?string $value, mixed $old_value = null ): ?string {
 		// bail if the key has not been changed (the form returns the mask, the saved key will be kept).
 		if ( Crypt::MASK === $value || Crypt::get_instance()->is_encrypted( $value ) ) {
 			return $value;
@@ -842,8 +865,13 @@ class Capito extends Base implements Api_Base {
 				// Log event.
 				Log::get_instance()->add_log( sprintf( 'Token for capito has been changed, but we get an error from API by validation of the key. Please <a href="%1$s">check API log</a>.', esc_url( Helper::get_api_logs_page_url() ) ), 'error' );
 
-				// remove token.
-				$value = '';
+				if ( in_array( $request->get_http_status(), array( 401, 403 ), true ) ) {
+					// remove token as it has been rejected by the API.
+					$value = '';
+				} else {
+					// keep the actual saved token as the new one could not be verified (e.g., timeout or server error).
+					$value = is_string( $old_value ) ? $old_value : (string) get_option( 'easy_language_capito_api_key', '' );
+				}
 			} else {
 				// get initial quota.
 				$this->get_quota_from_api( $value );
@@ -996,17 +1024,11 @@ class Capito extends Base implements Api_Base {
 			update_option( 'easy_language_capito_quota', $quota );
 
 			// check if key is limited.
-			if ( ! empty( $quota['assistance']['subscription']['remaining'] ) ) {
-				if ( absint( $quota['assistance']['subscription']['remaining'] ) > 0 && absint( $quota['assistance']['subscription']['remaining'] ) < 1000 ) {
-					// get the transients-object to add the new one.
-					$transient_obj = $transients_obj->add();
-					$transient_obj->set_dismissible_days( 2 );
-					$transient_obj->set_name( 'easy_language_capito_quota' );
-					/* translators: %1$s will be replaced by the URL for capito support. */
-					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the capito API is nearly depleted.</strong> You will soon not be able to use any simplifications from capito. Please contact the <a href="%1$s" target="_blank">Capito support (open new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
-					$transient_obj->set_type( 'error' );
-					$transient_obj->save();
-				} elseif ( 0 === absint( $quota['assistance']['subscription']['remaining'] ) ) {
+			if ( isset( $quota['assistance']['subscription']['remaining'] ) && is_numeric( $quota['assistance']['subscription']['remaining'] ) ) {
+				// get the remaining quota (negative values count as depleted).
+				$remaining = max( 0, (int) $quota['assistance']['subscription']['remaining'] );
+
+				if ( 0 === $remaining ) {
 					// get the transients-object to add the new one.
 					$transient_obj = $transients_obj->add();
 					$transient_obj->set_dismissible_days( 2 );
@@ -1015,6 +1037,18 @@ class Capito extends Base implements Api_Base {
 					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the capito API is completely depleted.</strong> You will not be able to use any simplifications from capito. Please contact the <a href="%1$s" target="_blank">Capito support (open new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 					$transient_obj->set_type( 'error' );
 					$transient_obj->save();
+				} elseif ( $remaining < 1000 ) {
+					// get the transients-object to add the new one.
+					$transient_obj = $transients_obj->add();
+					$transient_obj->set_dismissible_days( 2 );
+					$transient_obj->set_name( 'easy_language_capito_quota' );
+					/* translators: %1$s will be replaced by the URL for capito support. */
+					$transient_obj->set_message( sprintf( __( '<strong>Your quota for the capito API is nearly depleted.</strong> You will soon not be able to use any simplifications from capito. Please contact the <a href="%1$s" target="_blank">Capito support (open new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
+					$transient_obj->set_type( 'error' );
+					$transient_obj->save();
+				} else {
+					// remove an outdated hint.
+					$transients_obj->get_transient_by_name( 'easy_language_capito_quota' )->delete();
 				}
 			}
 		} else {
@@ -1039,7 +1073,7 @@ class Capito extends Base implements Api_Base {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -1061,7 +1095,7 @@ class Capito extends Base implements Api_Base {
 		wp_clear_scheduled_hook( 'easy_language_capito_request_quota' );
 
 		// redirect user.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -1078,7 +1112,7 @@ class Capito extends Base implements Api_Base {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -1086,7 +1120,7 @@ class Capito extends Base implements Api_Base {
 		$this->get_quota_from_api();
 
 		// redirect user.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -1131,7 +1165,7 @@ class Capito extends Base implements Api_Base {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -1165,7 +1199,7 @@ class Capito extends Base implements Api_Base {
 		$transient_obj->save();
 
 		// redirect user.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -1195,7 +1229,7 @@ class Capito extends Base implements Api_Base {
 	public function get_log_entries(): array {
 		$wpdb = $this->wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom request table of this API, no WP API available; entries change with every request, so no object cache
-		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `time`, `request`, `response` FROM %i WHERE 1 = %d', array( $this->table_requests, 1 ) ) ); // @phpstan-ignore argument.type
+		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `time`, `request`, `response` FROM %i WHERE `blog_id` = %d', array( $this->table_requests, get_current_blog_id() ) ) ); // @phpstan-ignore argument.type
 		if ( is_null( $results ) ) {
 			return array();
 		}

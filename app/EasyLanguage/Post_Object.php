@@ -116,13 +116,21 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 				),
 			),
 			'fields'                          => 'ids',
+			'orderby'                         => array(
+				'date' => 'DESC',
+				'ID'   => 'DESC',
+			),
 			'do_not_use_easy_language_filter' => '1',
 		);
 		$result = new WP_Query( $query );
-		if ( 1 === $result->post_count ) {
-			return absint( $result->posts[0] );
+
+		// bail if no simplification could be found.
+		if ( 0 === $result->post_count ) {
+			return 0;
 		}
-		return 0;
+
+		// return the newest not trashed simplification (e.g. if a trashed copy has been restored after a new one has been created).
+		return absint( $result->posts[0] );
 	}
 
 	/**
@@ -215,7 +223,16 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 	 * @return string
 	 */
 	public function get_title(): string {
-		return get_the_title( $this->get_id() );
+		// get the raw title (without texturize, entities or "Private:"/"Protected:" prefixes, as it is saved as text and written back).
+		$title = get_post_field( 'post_title', $this->get_id(), 'raw' );
+
+		// bail if the title is not a string.
+		if ( ! is_string( $title ) ) {
+			return '';
+		}
+
+		// return the title.
+		return $title;
 	}
 
 	/**
@@ -681,7 +698,7 @@ class Post_Object extends Objects implements Easy_Language_Interface {
 		// remove the connections of texts to the copy.
 		$copy_obj = new Post_Object( $copied_post_id );
 		foreach ( $copy_obj->get_entries() as $entry ) {
-			$entry->delete( $copied_post_id );
+			$entry->delete( $copied_post_id, $copy_obj->get_type() );
 		}
 
 		// delete the copy itself.

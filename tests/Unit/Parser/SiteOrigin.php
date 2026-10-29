@@ -199,6 +199,8 @@ class SiteOrigin extends easyLanguageTests {
 	 * @return void
 	 */
 	public function test_is_object_using_pagebuilder(): void {
+		$this->activate();
+
 		$post_object = new Post_Object( $this->post_id );
 		$this->assertFalse( $this->parser->is_object_using_pagebuilder( $post_object ) );
 

@@ -287,6 +287,8 @@ class Settings {
 		$field = new Number( $settings_obj );
 		$field->set_title( __( 'Set max age for log entries', 'easy-language' ) );
 		$field->set_description( __( 'Older log-entries will be deleted automatically.', 'easy-language' ) );
+		$field->set_min( 1 );
+		$field->set_step( 1 );
 		$setting->set_field( $field );
 
 		// add setting.

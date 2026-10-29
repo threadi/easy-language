@@ -518,8 +518,8 @@ class ChatGpt extends Base implements Api_Base {
 		$sql = "CREATE TABLE $this->table_requests (
             `id` mediumint(9) NOT NULL AUTO_INCREMENT,
             `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-            `request` text DEFAULT '' NOT NULL,
-            `response` text DEFAULT '' NOT NULL,
+            `request` longtext DEFAULT '' NOT NULL,
+            `response` longtext DEFAULT '' NOT NULL,
             `duration` int(11) DEFAULT 0 NOT NULL,
             `httpstatus` int(11) DEFAULT 0 NOT NULL,
             `quota` int(11) DEFAULT 0 NOT NULL,
@@ -553,8 +553,15 @@ class ChatGpt extends Base implements Api_Base {
 		 * Delete our table.
 		 */
 		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
-		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->table_requests ) );
+		// the table is shared by all sites in multisite: drop it only if the shared tables are removed.
+		if ( \easyLanguage\Plugin\Uninstall::get_instance()->is_dropping_shared_tables() ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
+			$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->table_requests ) );
+		} else {
+			// remove only the entries of the actual site.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available
+			$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `blog_id` = %d', array( $this->table_requests, get_current_blog_id() ) ) );
+		}
 	}
 
 	/**
@@ -702,7 +709,7 @@ class ChatGpt extends Base implements Api_Base {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -715,7 +722,7 @@ class ChatGpt extends Base implements Api_Base {
 		}
 
 		// redirect user.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -811,7 +818,7 @@ class ChatGpt extends Base implements Api_Base {
 	public function get_log_entries(): array {
 		$wpdb = $this->wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom request table of this API, no WP API available; entries change with every request, so no object cache
-		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `time`, `request`, `response` FROM %i WHERE 1 = %d', array( $this->table_requests, 1 ) ) ); // @phpstan-ignore argument.type
+		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `time`, `request`, `response` FROM %i WHERE `blog_id` = %d', array( $this->table_requests, get_current_blog_id() ) ) ); // @phpstan-ignore argument.type
 		if ( is_null( $results ) ) {
 			return array();
 		}

@@ -136,6 +136,8 @@ class Kubio extends easyLanguageTests {
 	 * @return void
 	 */
 	public function test_is_object_using_pagebuilder(): void {
+		add_filter( 'pre_option_active_plugins', array( $this, 'get_active_plugins' ) );
+
 		$post_id     = self::factory()->post->create( array( 'post_content' => self::CONTENT ) );
 		$post_object = new Post_Object( $post_id );
 		$this->assertFalse( $this->parser->is_object_using_pagebuilder( $post_object ) );

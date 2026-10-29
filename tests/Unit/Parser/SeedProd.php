@@ -95,6 +95,8 @@ class SeedProd extends easyLanguageTests {
 		// as administrator, like a simplification in the backend.
 		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 
+		// save the test data unfiltered, like SeedProd does (in multisite, administrators have no unfiltered_html).
+		kses_remove_filters();
 		$this->post_id = self::factory()->post->create(
 			array(
 				'post_type'             => 'page',
@@ -102,6 +104,7 @@ class SeedProd extends easyLanguageTests {
 				'post_content_filtered' => wp_slash( (string) wp_json_encode( $this->get_data() ) ),
 			)
 		);
+		kses_init();
 
 		$this->parser = \easyLanguage\Parser\SeedProd::get_instance();
 		$this->parser->set_object_id( $this->post_id );
@@ -238,6 +241,8 @@ class SeedProd extends easyLanguageTests {
 	 * @return void
 	 */
 	public function test_is_object_using_pagebuilder(): void {
+		$this->activate();
+
 		$this->assertTrue( $this->parser->is_object_using_pagebuilder( new Post_Object( $this->post_id ) ) );
 
 		$other_id = self::factory()->post->create();

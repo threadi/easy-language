@@ -338,7 +338,7 @@ class Elementor extends Parser_Base implements Parser {
 	 * @return bool
 	 */
 	public function is_object_using_pagebuilder( Post_Object $post_object ): bool {
-		return get_post_meta( $post_object->get_id(), '_elementor_data', true );
+		return ! empty( get_post_meta( $post_object->get_id(), '_elementor_data', true ) );
 	}
 
 	/**
@@ -398,6 +398,9 @@ class Elementor extends Parser_Base implements Parser {
 	 * @return void
 	 */
 	public function update_object( Objects $post_object ): void {
+		// remove the element cache of Elementor so the changed texts are used in the frontend.
+		delete_post_meta( $post_object->get_id(), '_elementor_element_cache' );
+
 		// bail if the Elementor CSS class is not available.
 		if ( ! class_exists( Post_CSS::class ) ) {
 			return;

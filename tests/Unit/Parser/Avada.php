@@ -139,6 +139,8 @@ class Avada extends easyLanguageTests {
 	 * @return void
 	 */
 	public function test_object_using_pagebuilder(): void {
+		Theme_Switcher::activate( 'avada' );
+
 		$post_id = self::factory()->post->create( array( 'post_content' => $this->content ) );
 		$this->assertFalse( \easyLanguage\Parser\Avada::get_instance()->is_object_using_pagebuilder( new Post_Object( $post_id ) ) );
 

@@ -192,15 +192,24 @@ class Divi5 extends Parser_Base implements Parser {
 				// get the text via callback.
 				$text = call_user_func( $flow_blocks[ $block['blockName'] ]['callback'], $block );
 
+				// get the path where the text of this block is saved: the configured one or the one of "divi/text" (default before 4.0.0).
+				$attribute_path = $this->get_text_attribute_path( $block, $flow_blocks[ $block['blockName'] ] );
+				if ( '' === $attribute_path ) {
+					$attribute_path = 'content.innerContent.desktop.value';
+				}
+
 				// replace the text only if the callback returned a string which contains the original text.
-				if ( is_string( $text ) && str_contains( $text, $this->get_text() ) ) {
+				if ( '' !== $attribute_path && is_string( $text ) && str_contains( $text, $this->get_text() ) ) {
 					// make sure the attributes are an array.
 					if ( ! isset( $block['attrs'] ) || ! is_array( $block['attrs'] ) ) {
 						$block['attrs'] = array();
 					}
 
 					// set the simplified text.
-					$block['attrs']['content']['innerContent']['desktop']['value'] = str_replace( $this->get_text(), $simplified_part, $text );
+					$block['attrs'] = $this->set_attribute_by_path( $block['attrs'], $attribute_path, str_replace( $this->get_text(), $simplified_part, $text ) );
+				} elseif ( '' === $attribute_path ) {
+					// replace the text in the inner content as we do not know any attribute for this block.
+					$block = $this->replace_text_in_inner_content( $block, $simplified_part );
 				}
 			} elseif ( '' !== $this->get_text_attribute_path( $block, $flow_blocks[ $block['blockName'] ] ) ) {
 				// replace the text in the attribute of the block, where Divi 5 saves the text of its modules.
@@ -210,22 +219,7 @@ class Divi5 extends Parser_Base implements Parser {
 					$block['attrs'] = $this->set_attribute_by_path( $block['attrs'], $attribute_path, str_replace( $this->get_text(), $simplified_part, $text ) );
 				}
 			} else {
-				// replace the text in the inner content, which is used by serialize_blocks().
-				if ( isset( $block['innerContent'] ) && is_array( $block['innerContent'] ) ) {
-					foreach ( $block['innerContent'] as $content_index => $inner_content ) {
-						// bail if this is not a string (e.g. a placeholder for an inner block).
-						if ( ! is_string( $inner_content ) ) {
-							continue;
-						}
-
-						$block['innerContent'][ $content_index ] = str_replace( $this->get_text(), $simplified_part, $inner_content );
-					}
-				}
-
-				// replace the text also in the inner HTML.
-				if ( isset( $block['innerHTML'] ) && is_string( $block['innerHTML'] ) ) {
-					$block['innerHTML'] = str_replace( $this->get_text(), $simplified_part, $block['innerHTML'] );
-				}
+				$block = $this->replace_text_in_inner_content( $block, $simplified_part );
 			}
 		}
 
@@ -237,6 +231,35 @@ class Divi5 extends Parser_Base implements Parser {
 		// loop through inner-blocks.
 		foreach ( $block['innerBlocks'] as $index => $inner_block ) {
 			$block['innerBlocks'][ $index ] = $this->get_text_with_simplifications_deep( $original_complete, $simplified_part, $inner_block, $flow_blocks );
+		}
+
+		// return the resulting block.
+		return $block;
+	}
+
+	/**
+	 * Replace the original text in the inner content and inner HTML of the given block.
+	 *
+	 * @param array<string,mixed> $block The block.
+	 * @param string              $simplified_part The translated content.
+	 * @return array<string,mixed>
+	 */
+	private function replace_text_in_inner_content( array $block, string $simplified_part ): array {
+		// replace the text in the inner content, which is used by serialize_blocks().
+		if ( isset( $block['innerContent'] ) && is_array( $block['innerContent'] ) ) {
+			foreach ( $block['innerContent'] as $content_index => $inner_content ) {
+				// bail if this is not a string (e.g. a placeholder for an inner block).
+				if ( ! is_string( $inner_content ) ) {
+					continue;
+				}
+
+				$block['innerContent'][ $content_index ] = str_replace( $this->get_text(), $simplified_part, $inner_content );
+			}
+		}
+
+		// replace the text also in the inner HTML.
+		if ( isset( $block['innerHTML'] ) && is_string( $block['innerHTML'] ) ) {
+			$block['innerHTML'] = str_replace( $this->get_text(), $simplified_part, $block['innerHTML'] );
 		}
 
 		// return the resulting block.

@@ -325,7 +325,12 @@ class Switcher {
 			'post_status'  => 'publish',
 			'post_type'    => EASY_LANGUAGE_CPT_SWITCHER,
 		);
-		wp_insert_post( $query );
+		$post_id = wp_insert_post( $query );
+
+		// bail if the entry could not be created (try it again on the next request).
+		if ( ! is_int( $post_id ) || $post_id <= 0 ) {
+			return;
+		}
 
 		// mark that we have done the work.
 		update_option( 'easy_language_switcher_default', 1, true );
@@ -1743,7 +1748,7 @@ class Switcher {
 	 */
 	public function add_menu_options( int $item_id, WP_Post|null $menu_item = null ): void {
 		// bail if this is not a language switcher.
-		if ( $menu_item instanceof WP_Post && EASY_LANGUAGE_CPT_SWITCHER !== get_post_meta( $item_id, '_menu_item_object', true ) ) {
+		if ( EASY_LANGUAGE_CPT_SWITCHER !== get_post_meta( $item_id, '_menu_item_object', true ) ) {
 			return;
 		}
 
@@ -2145,10 +2150,10 @@ class Switcher {
 		list( $type, $id ) = array_pad( explode( ':', $value ), 2, '0' );
 		$id                = absint( $id );
 
-		// get the label for terms (only of supported taxonomies).
+		// get the label for terms (only of supported taxonomies and only if the taxonomy is public or the user could assign it).
 		if ( 'term' === $type ) {
 			$term = get_term( $id );
-			if ( ! $term instanceof WP_Term || ! $this->init->is_taxonomy_supported( $term->taxonomy ) ) {
+			if ( ! $term instanceof WP_Term || ! $this->init->is_taxonomy_supported( $term->taxonomy ) || ( ! is_taxonomy_viewable( $term->taxonomy ) && ! current_user_can( 'assign_term', $term->term_id ) ) ) {
 				return array();
 			}
 			$taxonomy = get_taxonomy( $term->taxonomy );

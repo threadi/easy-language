@@ -133,9 +133,9 @@ class WpBakery extends easyLanguageTests {
 
 		$this->assertStringContainsString( '[vc_btn title="Mehr &quot;lesen&quot;" link="url:%2Fkontakt%2F"]', $result );
 
-		// the parser finds the simplified (masked) text in the result.
+		// the parser finds the simplified (unmasked) text in the result.
 		$this->parser->set_text( $result );
-		$this->assertContains( 'Mehr &quot;lesen&quot;', array_column( $this->parser->get_parsed_texts(), 'text' ) );
+		$this->assertContains( 'Mehr "lesen"', array_column( $this->parser->get_parsed_texts(), 'text' ) );
 		$this->assertCount( 5, $this->parser->get_parsed_texts() );
 	}
 

@@ -257,6 +257,11 @@ class Elementor extends PageBuilder_Base {
 			return;
 		}
 
+		// bail if the dynamic tags module of Elementor Pro is not loaded.
+		if ( ! class_exists( '\ElementorPro\Modules\DynamicTags\Module' ) ) {
+			return;
+		}
+
 		// register our own switcher.
 		$dynamic_tags->register( new Switcher() );
 	}

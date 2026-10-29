@@ -114,7 +114,7 @@ class Request implements Api_Requests {
 	 *
 	 * @var string
 	 */
-	private string $token;
+	private string $token = '';
 
 	/**
 	 * Constructor.
@@ -173,6 +173,13 @@ class Request implements Api_Requests {
 
 		// get capito-object.
 		$capito_obj = Capito::get_instance();
+
+		// bail if no token is given.
+		if ( empty( $this->token ) ) {
+			// Log event.
+			Log::get_instance()->add_log( __( 'capito: no API token given for request.', 'easy-language' ), 'error' );
+			return;
+		}
 
 		// merge header-array.
 		$headers = array_merge(
@@ -240,7 +247,13 @@ class Request implements Api_Requests {
 		if ( ! $args ) {
 			$args = '';
 		}
-		Log_Api::get_instance()->add_log( $capito_obj->get_name(), $this->http_status, $args, 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
+
+		// add the error message if the request failed (e.g., timeout).
+		$error_message = '';
+		if ( is_wp_error( $result ) ) {
+			$error_message = 'Error: ' . esc_html( $result->get_error_message() ) . '<br>';
+		}
+		Log_Api::get_instance()->add_log( $capito_obj->get_name(), $this->http_status, $args, $error_message . 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
 
 		// save the request and result in db.
 		$this->save_in_db();

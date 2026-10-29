@@ -305,6 +305,14 @@ class Request implements Api_Requests {
 		// log error if something happened.
 		if ( is_wp_error( $this->get_result() ) ) {
 			Log::get_instance()->add_log( sprintf( 'Error during request on API %1$s via %2$s: %3$s', esc_html( $summ_ai_obj->get_title() ), esc_html( $this->url ), esc_html( $this->get_result()->get_error_message() ) ), 'error' );
+
+			// log the request (with an anonymized token) with the error message in the API log.
+			$args['headers']['Authorization'] = 'anonymized';
+			$args_json                        = wp_json_encode( $args );
+			if ( ! $args_json ) {
+				$args_json = '';
+			}
+			Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, $args_json, 'Error: ' . esc_html( $this->get_result()->get_error_message() ) );
 		} else {
 			// secure response.
 			$this->response = wp_remote_retrieve_body( $this->get_result() );

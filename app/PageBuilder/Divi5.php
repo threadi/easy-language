@@ -60,7 +60,8 @@ class Divi5 extends PageBuilder_Base {
 		}
 
 		// use hooks.
-		add_filter( 'wp_insert_post_data', array( $this, 'fix_product_duplication_slashing' ), 1 );
+		add_action( 'woocommerce_product_duplicate_before_save', array( $this, 'enable_product_duplication_slashing' ) );
+		add_action( 'woocommerce_product_duplicate', array( $this, 'disable_product_duplication_slashing' ) );
 		add_action( 'init', array( $this, 'register_modules' ) );
 		add_action( 'divi_visual_builder_assets_before_enqueue_scripts', array( $this, 'register_vb_scripts' ) );
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
@@ -163,6 +164,27 @@ class Divi5 extends PageBuilder_Base {
 		// otherwise return false.
 		$is_active = false;
 		return $is_active;
+	}
+
+	/**
+	 * Enable the slashing fix for D5 content during the duplication of a WooCommerce product.
+	 *
+	 * WooCommerce saves the duplicated product without slashing its content. Our own copies are already slashed,
+	 * so the fix must not run for every insert or update.
+	 *
+	 * @return void
+	 */
+	public function enable_product_duplication_slashing(): void {
+		add_filter( 'wp_insert_post_data', array( $this, 'fix_product_duplication_slashing' ), 1 );
+	}
+
+	/**
+	 * Disable the slashing fix for D5 content after the duplication of a WooCommerce product.
+	 *
+	 * @return void
+	 */
+	public function disable_product_duplication_slashing(): void {
+		remove_filter( 'wp_insert_post_data', array( $this, 'fix_product_duplication_slashing' ), 1 );
 	}
 
 	/**

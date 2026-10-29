@@ -24,7 +24,10 @@ const EasyLanguagePanel = () => {
 	 * Get the data for this object from the server.
 	 */
 	useEffect(() => {
-		if (!postId) return;
+		if (!postId) {
+			setIsLoading(false);
+			return;
+		}
 
 		setIsLoading(true);
 		apiFetch({

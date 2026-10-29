@@ -444,27 +444,33 @@ class Text {
 	/**
 	 * Delete this entry with all of its simplifications.
 	 *
-	 * @param int $object_id The object-ID which connection should be deleted primarily.
+	 * @param int    $object_id The object-ID which connection should be deleted primarily.
+	 * @param string $object_type The object-type (e.g. post-type or taxonomy) of the object (optional, all types if empty).
 	 *
 	 * @return void
 	 */
-	public function delete( int $object_id = 0 ): void {
+	public function delete( int $object_id = 0, string $object_type = '' ): void {
 		global $wpdb;
 
-		// get object count before we do anything.
-		$object_count = count( $this->get_objects() );
+		// get object count in all blogs before we do anything (the texts are shared between the blogs in multisite).
+		$object_count = $this->get_object_count_in_all_blogs();
 
 		// delete the connection between text and given object_id.
 		if ( $object_id > 0 ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
-			$wpdb->delete(
-				Db::get_instance()->get_table_name_originals_objects(),
-				array(
-					'oid'       => $this->get_id(),
-					'blog_id'   => get_current_blog_id(),
-					'object_id' => $object_id,
-				)
+			// define the connection to delete.
+			$where = array(
+				'oid'       => $this->get_id(),
+				'blog_id'   => get_current_blog_id(),
+				'object_id' => $object_id,
 			);
+
+			// limit it to the given object type (e.g. to not touch a term with the same ID as a post).
+			if ( ! empty( $object_type ) ) {
+				$where['object_type'] = $object_type;
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
+			$wpdb->delete( Db::get_instance()->get_table_name_originals_objects(), $where );
 		} else {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 			$wpdb->delete(
@@ -476,8 +482,8 @@ class Text {
 			);
 		}
 
-		// if this text is used only from 1 object, delete it complete, including its simplifications.
-		if ( 1 === $object_count && 1 === absint( get_option( 'easy_language_delete_unused_simplifications', 0 ) ) ) {
+		// if this text was used only from 1 object, which has been removed now, delete it complete, including its simplifications.
+		if ( 1 === $object_count && 0 === $this->get_object_count_in_all_blogs() && 1 === absint( get_option( 'easy_language_delete_unused_simplifications', 0 ) ) ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
 			$wpdb->delete( Db::get_instance()->get_table_name_originals(), array( 'id' => $this->get_id() ) );
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
@@ -486,6 +492,18 @@ class Text {
 
 		// the counts of texts have been changed.
 		Db::get_instance()->clear_process_counts();
+	}
+
+	/**
+	 * Return the count of objects in all blogs which are using this text.
+	 *
+	 * @return int
+	 */
+	private function get_object_count_in_all_blogs(): int {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available; content changes with every simplification, so no object cache
+		return absint( $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i WHERE `oid` = %d', array( Db::get_instance()->get_table_name_originals_objects(), $this->get_id() ) ) ) );
 	}
 
 	/**

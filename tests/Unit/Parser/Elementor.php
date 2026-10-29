@@ -224,6 +224,8 @@ class Elementor extends easyLanguageTests {
 	 * @return void
 	 */
 	public function test_object_using_pagebuilder(): void {
+		$this->activate();
+
 		$this->assertFalse( (bool) \easyLanguage\Parser\Elementor::get_instance()->is_object_using_pagebuilder( new Post_Object( self::factory()->post->create() ) ) );
 
 		$parser = $this->get_parser( '' );

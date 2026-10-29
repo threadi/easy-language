@@ -39,7 +39,18 @@ class Helper {
 	 * @return bool
 	 */
 	public static function is_plugin_active( string $plugin ): bool {
-		return in_array( $plugin, (array) get_option( 'active_plugins', array() ), true );
+		// check the plugins which are active in the actual site.
+		if ( in_array( $plugin, (array) get_option( 'active_plugins', array() ), true ) ) {
+			return true;
+		}
+
+		// bail if this is not a multisite.
+		if ( ! is_multisite() ) {
+			return false;
+		}
+
+		// check the plugins which are active network-wide (they are saved as keys).
+		return isset( ( (array) get_site_option( 'active_sitewide_plugins', array() ) )[ $plugin ] );
 	}
 
 	/**
@@ -143,7 +154,16 @@ class Helper {
 		 * Consider the main language set in Polylang for the web page.
 		 */
 		if ( function_exists( 'pll_default_language' ) && self::is_plugin_active( 'polylang/polylang.php' ) ) {
-			$wp_language = pll_current_language( 'locale' );
+			// use the current language (e.g. in frontend), otherwise (e.g. in backend or cron) the default language of Polylang.
+			$pll_language = function_exists( 'pll_current_language' ) ? pll_current_language( 'locale' ) : false;
+			if ( empty( $pll_language ) ) {
+				$pll_language = pll_default_language( 'locale' );
+			}
+
+			// use the Polylang language only if it is set.
+			if ( is_string( $pll_language ) && ! empty( $pll_language ) ) {
+				$wp_language = $pll_language;
+			}
 		}
 
 		/**

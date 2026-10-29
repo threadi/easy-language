@@ -374,17 +374,16 @@ abstract class Objects {
 				return 0;
 			}
 
-			// define a filter for entry-loading to check max count of entries for this object.
+			// define a filter for entry-loading to check max count of entries for this object which should be simplified.
+			// already simplified texts are not processed (again), so they must not be counted.
 			$filter = array(
 				'object_id'   => $this->get_id(),
 				'object_type' => $this->get_type(),
+				'state'       => 'to_simplify',
 			);
 
-			// get entries.
-			$max_entries = Db::get_instance()->get_entries( $filter );
-
 			// get entry-count.
-			$max_entry_count = count( $max_entries );
+			$max_entry_count = Db::get_instance()->count_entries( $filter );
 
 			// get the active API.
 			$api_obj = Apis::get_instance()->get_active_api();
@@ -533,6 +532,11 @@ abstract class Objects {
 
 		// loop through simplifications of this object.
 		foreach ( $entries as $entry ) {
+			// refresh the running marker, so a long-running process is not treated as orphaned.
+			if ( absint( $this->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING ) ) > 0 ) {
+				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, time() );
+			}
+
 			$c += $this->process_simplification( $simplification_obj, $language_mappings, $entry );
 
 			// update counter for simplification of texts.
@@ -543,6 +547,21 @@ abstract class Objects {
 
 			// show progress on CLI.
 			$progress ? $progress->tick() : false;
+
+			// stop a batched run if this text could not be simplified, as it would be the first one again in the next batch.
+			if ( $limit > 0 && 'to_simplify' === $entry->get_state() ) {
+				// end progress on CLI.
+				$progress ? $progress->finish() : false;
+
+				// remove running marker to mark the end of the process (the result has been set by process_simplification()).
+				$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
+
+				// run the end trigger as previous batches could have changed the object.
+				$this->process_simplification_trigger_on_end();
+
+				// return simplification-count.
+				return $c;
+			}
 		}
 
 		// end progress on CLI.
@@ -629,11 +648,17 @@ abstract class Objects {
 		// marker if API-errors happened.
 		$api_errors = false;
 
+		// marker if any request has been sent to the API.
+		$api_requested = false;
+
 		// send the request for each active mapping between source-language and target-languages.
 		foreach ( $language_mappings as $source_language => $target_languages ) {
 			foreach ( $target_languages as $target_language ) {
 				// only if this text is not already simplified in source-language matching the target-language.
 				if ( ! empty( $object_language[ $target_language ] ) && false === $entry->has_simplification_in_language( $target_language ) && $source_language === $entry->get_source_language() ) {
+					// mark that we requested the API.
+					$api_requested = true;
+
 					// call API to get simplification of the given entry.
 					$results = $simplification_obj->call_api( $entry->get_original(), $source_language, $target_language, $entry->is_html() );
 
@@ -673,11 +698,25 @@ abstract class Objects {
 
 		// loop through the mapping languages to replace the texts in this object with the simplifications.
 		$replaced_count = 0;
+
+		// marker if any simplification is available for this text.
+		$simplification_available = false;
 		foreach ( $language_mappings as $source_language => $target_languages ) {
 			foreach ( $target_languages as $target_language ) {
-				if ( false !== $entry->has_simplification_in_language( $target_language ) && $source_language === $entry->get_source_language() && $entry->replace_original_with_simplification( $this->get_id(), $target_language, $this->get_type() ) ) {
+				// bail if no simplification is available for this language.
+				if ( false === $entry->has_simplification_in_language( $target_language ) || $source_language !== $entry->get_source_language() ) {
+					continue;
+				}
+
+				// mark that a simplification is available.
+				$simplification_available = true;
+
+				if ( $entry->replace_original_with_simplification( $this->get_id(), $target_language, $this->get_type() ) ) {
 					++$replaced_count;
 				}
+
+				// replace the text also in all other objects in this language which are using it, as the text is marked as simplified for all of them.
+				$this->replace_simplification_in_other_objects( $entry, $target_language );
 			}
 		}
 
@@ -693,6 +732,35 @@ abstract class Objects {
 		// reset the state to "to_simplify" if the API returned errors and nothing has been simplified or replaced.
 		if ( false !== $api_errors && 0 === $c && 0 === $replaced_count ) {
 			$entry->set_state( 'to_simplify' );
+
+			// return 0 as nothing has been simplified.
+			return 0;
+		}
+
+		// reset the state to "to_simplify" if no API request has been sent and nothing has been replaced (e.g. no matching language mapping).
+		if ( false === $api_requested && 0 === $replaced_count ) {
+			$entry->set_state( 'to_simplify' );
+
+			// create a dialog depending on the reason.
+			$dialog = array(
+				'className' => 'wp-dialog-error',
+				'title'     => __( 'Simplification canceled', 'easy-language' ),
+				'texts'     => array(
+					/* translators: %1$s will be replaced by the object-title (like post or page) */
+					'<p>' . sprintf( __( 'The texts in this %1$s could not be simplified, as the active API does not support the language of the texts or of this %1$s.', 'easy-language' ), esc_html( $this->get_type_name() ) ) . '</p>',
+				),
+				'buttons'   => array(
+					array(
+						'action'  => 'location.reload();',
+						'variant' => 'primary',
+						'text'    => __( 'OK', 'easy-language' ),
+					),
+				),
+			);
+			if ( $simplification_available ) {
+				$dialog['texts'][0] = '<p>' . __( 'We got simplified texts from API but does not replace any texts. This might be an error with the pagebuilder-support of the Easy Language plugin.', 'easy-language' ) . '</p>';
+			}
+			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
 			// return 0 as nothing has been simplified.
 			return 0;
@@ -749,6 +817,9 @@ abstract class Objects {
 			);
 			$this->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, $dialog );
 
+			// reset the state, so the text is not left in "processing" (the simplification is saved and will be used locally on the next run).
+			$entry->set_state( 'to_simplify' );
+
 			// return 0.
 			return 0;
 		}
@@ -758,6 +829,66 @@ abstract class Objects {
 
 		// return simplification-count.
 		return $c;
+	}
+
+	/**
+	 * Replace the original text with its simplification in all other objects using this text in the given language.
+	 *
+	 * The state of a text is saved only once for all objects using it. If it is marked as simplified, it will
+	 * not be processed for the other objects anymore, so we have to replace it in them, too.
+	 *
+	 * @param Text   $entry The text-object.
+	 * @param string $target_language The target language.
+	 *
+	 * @return void
+	 */
+	private function replace_simplification_in_other_objects( Text $entry, string $target_language ): void {
+		// collect the objects to prevent multiple replacements in the same object.
+		$done = array();
+
+		// loop through the objects using this text.
+		foreach ( $entry->get_objects() as $object_array ) {
+			$object_id   = absint( $object_array['object_id'] );
+			$object_type = (string) $object_array['object_type'];
+
+			// bail if this is the actual object.
+			if ( $object_id === $this->get_id() && $object_type === $this->get_type() ) {
+				continue;
+			}
+
+			// bail if this object has already been handled.
+			if ( isset( $done[ $object_type . '_' . $object_id ] ) ) {
+				continue;
+			}
+			$done[ $object_type . '_' . $object_id ] = true;
+
+			// get the object.
+			$object = Helper::get_object( $object_id, $object_type );
+
+			// bail if it is not an Objects object.
+			if ( ! $object instanceof Objects ) {
+				continue;
+			}
+
+			// bail if the object is trashed.
+			if ( 'trash' === $object->get_status() ) {
+				continue;
+			}
+
+			// bail if the object does not use the target language.
+			$object_language = $object->get_language();
+			if ( empty( $object_language[ $target_language ] ) ) {
+				continue;
+			}
+
+			// bail if the object should not be changed automatically, is edited by a user or is simplified in another process.
+			if ( $object->is_automatic_mode_prevented() || $object->is_locked() || $object->is_simplification_running() ) {
+				continue;
+			}
+
+			// replace the text in this object.
+			$entry->replace_original_with_simplification( $object_id, $target_language, $object_type );
+		}
 	}
 
 	/**
