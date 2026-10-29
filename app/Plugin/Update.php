@@ -227,7 +227,7 @@ class Update {
 		}
 
 		// remove our schedules.
-		wp_unschedule_hook( 'easy_language_capito_quota_interval' );
+		wp_unschedule_hook( 'easy_language_capito_request_quota' );
 		wp_unschedule_hook( 'easy_language_summ_ai_request_quota' );
 
 		// re-initialize the active API for clean usage.

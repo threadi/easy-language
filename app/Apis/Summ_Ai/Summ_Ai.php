@@ -410,7 +410,8 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function deactivate(): void {
-		// nothing to do.
+		// remove our own schedule.
+		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
 	}
 
 	/**
@@ -491,6 +492,9 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function disable(): void {
+		// remove our own schedule.
+		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
+
 		$transients_obj = Transients::get_instance();
 		foreach ( $this->get_transients() as $transient_name ) {
 			$transient_obj = $transients_obj->get_transient_by_name( $transient_name );
@@ -607,6 +611,11 @@ class Summ_Ai extends Base implements Api_Base {
 		// set SUMM AI API mode to free, if not already set.
 		if ( ! get_option( 'easy_language_summ_ai_mode' ) ) {
 			update_option( 'easy_language_summ_ai_mode', 'free' );
+		}
+
+		// schedule the quota request only if a paid API key is set.
+		if ( $this->is_summ_api_token_set() ) {
+			$this->schedule_quota_request();
 		}
 	}
 
@@ -1025,6 +1034,11 @@ class Summ_Ai extends Base implements Api_Base {
 				// set API mode to 'paid'.
 				$this->set_mode( 'paid' );
 
+				// schedule the quota request if this API is active.
+				if ( $this->is_active() ) {
+					$this->schedule_quota_request();
+				}
+
 				// log the event.
 				Log::get_instance()->add_log( __( 'Token for SUMM AI has been changed.', 'easy-language' ), 'success' );
 			}
@@ -1056,6 +1070,13 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function get_quota_from_api( string $token = '' ): void {
+		// without an explicit token (e.g., via schedule): bail if this API is not active or no paid API key is set.
+		if ( empty( $token ) && ( ! $this->is_active() || ! $this->is_summ_api_token_set() ) ) {
+			// remove the schedule as it should not run in this case.
+			wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
+			return;
+		}
+
 		// get quota from api.
 		$quota = $this->request_quota( $token );
 
@@ -1150,6 +1171,11 @@ class Summ_Ai extends Base implements Api_Base {
 		$request->set_method( 'GET' );
 		$request->send();
 
+		// bail if the request was not successful (e.g., invalid token).
+		if ( 200 !== $request->get_http_status() ) {
+			return array();
+		}
+
 		// get the response.
 		$response = $request->get_response();
 
@@ -1220,13 +1246,42 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function set_quota_interval( ?string $value ): ?string {
 		$value = Helper::settings_validate_select_field( $value );
-		if ( ! empty( $value ) ) {
-			wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
-			wp_schedule_event( time(), $value, 'easy_language_summ_ai_request_quota' );
+
+		// remove any existing schedule.
+		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
+
+		// schedule the quota request only if this API is active and a paid API key is set.
+		if ( ! empty( $value ) && $this->is_active() && $this->is_summ_api_token_set() ) {
+			$this->schedule_quota_request( $value );
 		}
 
 		// return setting.
 		return $value;
+	}
+
+	/**
+	 * Schedule the quota request with the given interval or the saved interval setting.
+	 *
+	 * The caller is responsible for checking whether this API is active and a paid API key is set.
+	 *
+	 * @param string $interval The interval to use (optional).
+	 *
+	 * @return void
+	 */
+	private function schedule_quota_request( string $interval = '' ): void {
+		// get the interval from the setting if none is given.
+		if ( empty( $interval ) ) {
+			$interval = (string) get_option( 'easy_language_summ_ai_quota_interval', 'easy_language_daily' );
+		}
+
+		// bail if the interval is not registered.
+		if ( ! array_key_exists( $interval, wp_get_schedules() ) ) {
+			return;
+		}
+
+		// replace any existing schedule.
+		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
+		wp_schedule_event( time(), $interval, 'easy_language_summ_ai_request_quota' );
 	}
 
 	/**
@@ -1348,6 +1403,13 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function get_mode(): string {
 		$mode = get_option( 'easy_language_summ_ai_mode' );
+
+		// use the free mode if the paid mode is saved, but no API key is available (e.g., removed or not decryptable).
+		// Exception: the paid mode has been set explicitly in this request (e.g., during validation of a new key).
+		if ( 'paid' === $mode && 'paid' !== $this->mode && empty( get_option( 'easy_language_summ_ai_api_key', '' ) ) ) {
+			return 'free';
+		}
+
 		if ( in_array( $mode, array( 'paid', 'free' ), true ) ) {
 			return $mode;
 		}

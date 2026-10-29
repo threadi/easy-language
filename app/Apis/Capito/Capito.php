@@ -848,6 +848,11 @@ class Capito extends Base implements Api_Base {
 				// get initial quota.
 				$this->get_quota_from_api( $value );
 
+				// schedule the quota request if this API is active.
+				if ( $this->is_active() ) {
+					$this->schedule_quota_request();
+				}
+
 				// Log event.
 				Log::get_instance()->add_log( __( 'Token for capito has been changed.', 'easy-language' ), 'success' );
 			}
@@ -869,13 +874,42 @@ class Capito extends Base implements Api_Base {
 	 */
 	public function set_quota_interval( ?string $value ): ?string {
 		$value = Helper::settings_validate_select_field( $value );
-		if ( ! empty( $value ) ) {
-			wp_clear_scheduled_hook( 'easy_language_capito_request_quota' );
-			wp_schedule_event( time(), $value, 'easy_language_capito_request_quota' );
+
+		// remove any existing schedule.
+		wp_clear_scheduled_hook( 'easy_language_capito_request_quota' );
+
+		// schedule the quota request only if this API is active and a token is set.
+		if ( ! empty( $value ) && $this->is_active() && $this->is_capito_token_set() ) {
+			$this->schedule_quota_request( $value );
 		}
 
 		// return setting.
 		return $value;
+	}
+
+	/**
+	 * Schedule the quota request with the given interval or the saved interval setting.
+	 *
+	 * The caller is responsible for checking whether this API is active and a token is set.
+	 *
+	 * @param string $interval The interval to use (optional).
+	 *
+	 * @return void
+	 */
+	private function schedule_quota_request( string $interval = '' ): void {
+		// get the interval from the setting if none is given.
+		if ( empty( $interval ) ) {
+			$interval = (string) get_option( 'easy_language_capito_quota_interval', 'easy_language_daily' );
+		}
+
+		// bail if the interval is not registered.
+		if ( ! array_key_exists( $interval, wp_get_schedules() ) ) {
+			return;
+		}
+
+		// replace any existing schedule.
+		wp_clear_scheduled_hook( 'easy_language_capito_request_quota' );
+		wp_schedule_event( time(), $interval, 'easy_language_capito_request_quota' );
 	}
 
 	/**
@@ -918,6 +952,11 @@ class Capito extends Base implements Api_Base {
 		$request->set_method( 'GET' );
 		$request->send();
 
+		// bail if the request was not successful (e.g., invalid token).
+		if ( 200 !== $request->get_http_status() ) {
+			return array();
+		}
+
 		// get the response.
 		$response = $request->get_response();
 
@@ -939,6 +978,13 @@ class Capito extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function get_quota_from_api( string $token = '' ): void {
+		// without an explicit token (e.g., via schedule): bail if this API is not active or no token is set.
+		if ( empty( $token ) && ( ! $this->is_active() || ! $this->is_capito_token_set() ) ) {
+			// remove the schedule as it should not run in this case.
+			wp_clear_scheduled_hook( 'easy_language_capito_request_quota' );
+			return;
+		}
+
 		// get quota from api.
 		$quota = $this->request_quota( $token );
 
@@ -1064,6 +1110,11 @@ class Capito extends Base implements Api_Base {
 			$icon_obj = new Language_Icon();
 			$icon_obj->set_file( $settings['img'] );
 			$icon_obj->save( $language_code );
+		}
+
+		// schedule the quota request only if a token is set.
+		if ( $this->is_capito_token_set() ) {
+			$this->schedule_quota_request();
 		}
 	}
 

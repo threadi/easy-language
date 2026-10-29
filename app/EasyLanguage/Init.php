@@ -2426,6 +2426,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return;
 		}
 
+		// bail if the quota of the active API is used up (no request could be successful).
+		if ( Helper::is_quota_used_up( $api_obj ) ) {
+			return;
+		}
+
 		// get limit from settings.
 		$limit = get_option( 'easy_language_automatic_item_count', 6 );
 
@@ -2610,6 +2615,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// bail if used API has no configuration set.
 		if ( false === $api_obj->is_configured() ) {
+			return;
+		}
+
+		// bail if the quota of the active API is used up, as no simplification could run in background.
+		if ( Helper::is_quota_used_up( $api_obj ) ) {
 			return;
 		}
 
