@@ -27,6 +27,10 @@
 	<exclude-pattern>*/js/*</exclude-pattern>
 	<exclude-pattern>*/src/*</exclude-pattern>
 	<exclude-pattern>*TranslatePress</exclude-pattern>
+	<!-- the E2E tests: cache of WordPress Playground (contains a complete WordPress) and the results of Playwright. -->
+	<exclude-pattern type="relative">^tmp/*</exclude-pattern>
+	<exclude-pattern type="relative">^test-results/*</exclude-pattern>
+	<exclude-pattern type="relative">^playwright-report/*</exclude-pattern>
 
 	<!--
 		Require WordPress 6.2.

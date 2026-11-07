@@ -111,7 +111,7 @@ class Themify extends Parser_Base implements Parser {
 		 */
 		$html_widgets = apply_filters( 'easy_language_themify_html_widgets', $html_support_widgets );
 
-		return isset( $html_widgets[ $widget_name ] );
+		return ! empty( $html_widgets[ $widget_name ] );
 	}
 
 	/**
@@ -119,7 +119,7 @@ class Themify extends Parser_Base implements Parser {
 	 *
 	 * Get the themify-content and parse its widgets to get the content of flow-text-widgets.
 	 *
-	 * @return array<string,mixed>
+	 * @return array<int,mixed>
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if themify is not active.
@@ -143,8 +143,8 @@ class Themify extends Parser_Base implements Parser {
 			}
 		}
 
-		// return resulting list.
-		return $resulting_texts;
+		// return resulting list (as list, as the callers use its index as order).
+		return array_values( $resulting_texts );
 	}
 
 	/**

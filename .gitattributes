@@ -29,3 +29,5 @@
 /.editorconfig export-ignore
 /.gitignore export-ignore
 /.gitattributes export-ignore
+/playwright.config.ts export-ignore
+/tmp/ export-ignore

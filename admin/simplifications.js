@@ -16,8 +16,77 @@ jQuery( document ).ready(
 		$('input.easy-language-automatic-simplification-prevention').on( 'change', function() {
 			easy_language_prevent_automatic_simplification( $(this).data('id'), $(this).data('object-type'), $(this).is(':checked'), null );
 		});
+
+		// show debug information about an object.
+		$('a.easy-language-debug-object').on( 'click', function(e) {
+			e.preventDefault();
+			easy_language_get_debug_info( $(this).data('debug-config') );
+		});
 	}
 );
+
+/**
+ * Load the debug information for an object via AJAX and show them in a dialog.
+ *
+ * @param config The debug config of the object (with id and type).
+ */
+function easy_language_get_debug_info( config ) {
+	// get internationalization tools of WordPress.
+	let { __ } = wp.i18n;
+
+	jQuery.ajax(
+		{
+			type: "POST",
+			url: easyLanguageSimplificationJsVars.ajax_url,
+			data: {
+				'action': 'easy_language_get_debug_info',
+				'config': config,
+				'nonce': easyLanguageSimplificationJsVars.debug_info_nonce
+			},
+			error: function() {
+				easy_language_simplification_show_error( __( 'Error loading the debug information.', 'easy-language' ) );
+			},
+			success: function( dialog_config ) {
+				// bail if the response is not a dialog.
+				if( ! dialog_config || ! dialog_config.detail ) {
+					easy_language_simplification_show_error( __( 'Error loading the debug information.', 'easy-language' ) );
+					return;
+				}
+
+				// show the debug information.
+				easy_language_create_dialog( dialog_config );
+			}
+		}
+	);
+}
+
+/**
+ * Show an error dialog with the given message.
+ *
+ * @param message The message (as plain text).
+ */
+function easy_language_simplification_show_error( message ) {
+	// get internationalization tools of WordPress.
+	let { __ } = wp.i18n;
+
+	let dialog_config = {
+		detail: {
+			className: 'wp-dialog-error',
+			title: __( 'Error', 'easy-language' ),
+			texts: [
+				'<p><strong>' + easy_language_simplification_escape_html( message ) + '</strong></p>'
+			],
+			buttons: [
+				{
+					'action': 'location.reload();',
+					'variant': 'primary',
+					'text': __( 'OK', 'easy-language' )
+				}
+			]
+		}
+	}
+	easy_language_create_dialog( dialog_config );
+}
 
 /**
  * Send request to reset the simplification process of given object.
@@ -91,7 +160,28 @@ function easy_language_add_simplification_object( object_id, type, language, sim
 				'language': language,
 				'nonce': easyLanguageSimplificationJsVars.add_simplification_nonce
 			},
+			error: function(e) {
+				// get the message from the response (e.g. from wp_send_json_error()).
+				let message = __( 'The simplified object could not be created.', 'easy-language' );
+				if( e.responseJSON && e.responseJSON.data && e.responseJSON.data.message ) {
+					message = e.responseJSON.data.message;
+				}
+				easy_language_simplification_show_error( message );
+			},
 			success: function(data) {
+				// show error if the response is not ok.
+				if( ! data || 'ok' !== data.status ) {
+					let message = __( 'The simplified object could not be created.', 'easy-language' );
+					if( data && data.data && data.data.message ) {
+						message = data.data.message;
+					}
+					else if( data && data.message ) {
+						message = data.message;
+					}
+					easy_language_simplification_show_error( message );
+					return;
+				}
+
 				if( 'ok' === data.status && "auto" === simplification_mode && "ok" === data.quota_state.status ) {
 					easy_language_get_simplification( data.object_id, data.object_type, false );
 				}

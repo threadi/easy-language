@@ -1,6 +1,6 @@
 {
 	"name": "threadi/easy-language",
-	"version": "3.3.0",
+	"version": "4.0.0",
 	"license": "GPL-2.0-or-later",
 	"description": "This plugin adds support for easy language in WordPress.",
 	"authors": [
@@ -55,15 +55,20 @@
 	"autoload-dev": {
 		"psr-4": {
 			"easyLanguage\\Tests\\": "tests/"
-		}
+		},
+		"exclude-from-classmap": [
+			"tests/Fakes/Parser/Elementor/",
+			"tests/Fakes/Parser/Themify/",
+			"tests/Fakes/Stability/F/"
+		]
 	},
 	"require": {
 		"php": "^8.2",
 		"gettext/gettext": "^5.7",
 		"threadi/crypt-for-wordpress": "^4.0",
-		"threadi/easy-dialog-for-wordpress": "^2.0.4",
+		"threadi/easy-dialog-for-wordpress": "^2.0.5",
 		"threadi/easy-setup-for-wordpress": "^1.5.1",
-		"threadi/easy-settings-for-wordpress": "^3.7.0",
+		"threadi/easy-settings-for-wordpress": "^3.9.2",
 		"threadi/easy-transients-for-wordpress": "^1.4.9",
 		"threadi/react-dialog": "^1.1.0"
 	},

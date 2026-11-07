@@ -199,8 +199,11 @@ class Rest_Api {
 			return $result;
 		}
 
-		// if scheduled event exist, check if next run is in the past.
-		if ( $scheduled_event->timestamp < time() ) {
+		// get a grace period for the next run, as WP-Cron runs only on requests (at least 1 hour or 2 intervals).
+		$grace_period = max( HOUR_IN_SECONDS, 2 * absint( $scheduled_event->interval ?? 0 ) );
+
+		// if scheduled event exist, check if next run is in the past (longer than the grace period).
+		if ( $scheduled_event->timestamp + $grace_period < time() ) {
 			$result['status'] = 'recommended';
 			/* translators: %1$s will be replaced by the date of the planned next schedule run (which is in the past) */
 			$result['description'] = sprintf( __( 'Cronjob to simplify texts should have been run at %1$s, but was not executed!<br><strong>Please check the cron-system of your WordPress-installation.</strong>', 'easy-language' ), Helper::get_format_date_time( gmdate( 'Y-m-d H:i:s', $scheduled_event->timestamp ) ) );

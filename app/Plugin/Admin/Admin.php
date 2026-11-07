@@ -168,6 +168,8 @@ class Admin {
 				'run_delete_data_nonce'       => wp_create_nonce( 'easy-language-delete-data-nonce' ),
 				'get_delete_data_nonce'       => wp_create_nonce( 'easy-language-get-delete-data-nonce' ),
 				'set_icon_for_language_nonce' => wp_create_nonce( 'easy-language-set-icon-for-language' ),
+				'token_action_running'        => __( 'Please wait while the request is running.', 'easy-language' ),
+				'token_action_error'          => __( 'The request could not be completed. Please reload the page and try again.', 'easy-language' ),
 				'review_url'                  => 'https://wordpress.org/plugins/easy-language/#reviews',
 				'title_rate_us'               => __( 'Add your review for this plugin', 'easy-language' ),
 				'dismiss_intro_nonce'         => wp_create_nonce( 'easy-language-dismiss-intro-step-2' ),

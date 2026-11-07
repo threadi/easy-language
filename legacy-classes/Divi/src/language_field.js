@@ -13,17 +13,23 @@ import $ from 'jquery';
 
 /**
  * Init scripts for easy-language-handling.
+ *
+ * @param {number} tries Number of tries already made to find the button.
  */
-function init_scripts() {
-	if( top.document.querySelector('.easy-language-language-options-wrap .easy-dialog-for-wordpress') ) {
-		top.document.querySelector('.easy-language-language-options-wrap .easy-dialog-for-wordpress').addEventListener('click', function(e) {
+function init_scripts( tries = 0 ) {
+	let button = top.document.querySelector('.easy-language-language-options-wrap .easy-dialog-for-wordpress:not([data-easy-language-initialized])');
+	if( button ) {
+		// mark the button to prevent duplicate listeners.
+		button.dataset.easyLanguageInitialized = '1';
+		button.addEventListener('click', function(e) {
 			e.preventDefault();
 			document.body.dispatchEvent(new CustomEvent("react-dialog", { detail: JSON.parse(this.dataset.dialog) }));
 		});
 	}
-	else {
+	else if( tries < 100 ) {
+		// try again later, but not endless.
 		setTimeout(function() {
-			init_scripts();
+			init_scripts( tries + 1 );
 		}, 200)
 	}
 }

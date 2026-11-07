@@ -312,6 +312,13 @@ class BoldBuilder extends PageBuilder_Base {
 		// collect the values of our fields (Bold Page Builder encodes some characters in attributes).
 		$values = array();
 		foreach ( $switcher->get_widget_fields() as $name => $field ) {
+			// unchecked switches are saved as empty value (otherwise a default of true could not be disabled).
+			if ( isset( $atts[ $name ] ) && '' === $atts[ $name ] && 'switch' === $field['type'] ) {
+				$values[ $name ] = false;
+				continue;
+			}
+
+			// bail if no value is set.
 			if ( ! isset( $atts[ $name ] ) || '' === $atts[ $name ] ) {
 				continue;
 			}

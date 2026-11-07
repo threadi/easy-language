@@ -127,6 +127,12 @@ class Your_Api extends Base implements Api_Base {
 				'description' => __( 'The Leichte Sprache used in Germany, Suisse and Austria.', 'easy-language'),
 				'url' => 'de_ls',
 			),
+			'de_EL' => array(
+				'label' => __( 'Einfache Sprache', 'easy-language'),
+				'enabled' => true,
+				'description' => __( 'The Einfache Sprache used in Germany, Suisse and Austria.', 'easy-language'),
+				'url' => 'de_el',
+			),
 			'en_EL' => array(
 				'label' => __( 'easy-to-read', 'easy-language'),
 				'enabled' => true,
@@ -137,7 +143,7 @@ class Your_Api extends Base implements Api_Base {
 				'label' => __( 'FALC', 'easy-language'),
 				'enabled' => true,
 				'description' => __( 'The FALC used in french-based countries.', 'easy-language'),
-				'url' => 'fr_fr',
+				'url' => 'fr_fa',
 			),
 		);
 	}
@@ -165,6 +171,18 @@ class Your_Api extends Base implements Api_Base {
 	 */
 	public function is_active(): bool {
 		return $this->get_name() === get_option( 'easy_language_api' );
+	}
+
+	/**
+	 * Return whether this API is configured and could be used for simplifications.
+	 *
+	 * This example API needs no configuration (e.g., no API key), so it is always configured.
+	 * Without this method the API would only be configured if it has settings (see Base::is_configured()).
+	 *
+	 * @return bool
+	 */
+	public function is_configured(): bool {
+		return true;
 	}
 
 	/**

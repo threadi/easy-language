@@ -53,9 +53,31 @@ class Simplifications extends easyLanguageTests {
 		// prevent external requests from Personio APIs.
 		add_filter( 'pre_http_request', array( self::class, 'filter_requests' ), 10, 3 );
 
+		// use an example token, as requests without token are not sent.
+		add_filter( 'pre_option_easy_language_chatgpt_api_key', array( self::class, 'get_example_token' ) );
+
 		// get the simplification object.
 		$this->object = \easyLanguage\Apis\ChatGpt\Simplifications::get_instance();
 		$this->object->set_api( $this->get_api_obj() );
+	}
+
+	/**
+	 * Clean up after each test.
+	 *
+	 * @return void
+	 */
+	public function tear_down(): void {
+		remove_filter( 'pre_option_easy_language_chatgpt_api_key', array( self::class, 'get_example_token' ) );
+		parent::tear_down();
+	}
+
+	/**
+	 * Return an example token for the requests.
+	 *
+	 * @return string
+	 */
+	public static function get_example_token(): string {
+		return 'example-token';
 	}
 
 	/**
@@ -69,6 +91,45 @@ class Simplifications extends easyLanguageTests {
 		$this->assertNotEmpty( $result );
 		$this->assertArrayHasKey( 'translated_text', $result );
 		$this->assertArrayHasKey( 'jobid', $result );
+	}
+
+	/**
+	 * The prompt and the text are separated by an empty line.
+	 *
+	 * @return void
+	 */
+	public function test_request_text_separates_prompt_and_text(): void {
+		// the prompt ends without space, like after saving the settings.
+		$this->assertSame( "Vereinfache bitte den Text.\n\nDas ist ein Text.", $this->object->get_request_text( 'Vereinfache bitte den Text.', 'Das ist ein Text.' ) );
+
+		// whitespace at the end of the prompt is not doubled.
+		$this->assertSame( "Vereinfache bitte den Text.\n\nDas ist ein Text.", $this->object->get_request_text( "Vereinfache bitte den Text. \n", 'Das ist ein Text.' ) );
+
+		// without prompt only the text is sent.
+		$this->assertSame( 'Das ist ein Text.', $this->object->get_request_text( '', 'Das ist ein Text.' ) );
+	}
+
+	/**
+	 * The request to the API contains the prompt and the text, separated by an empty line.
+	 *
+	 * @return void
+	 */
+	public function test_request_contains_separated_prompt(): void {
+		update_option( 'easy_language_chatgpt_target_languages_prompts_' . $this->test_target_language, 'Vereinfache bitte den Text.' );
+
+		// get the body of the request.
+		$body = '';
+		$catch = static function ( $response, $parsed_args ) use ( &$body ) {
+			$body = (string) ( $parsed_args['body'] ?? '' );
+			return $response;
+		};
+		add_filter( 'pre_http_request', $catch, 5, 2 );
+		$this->object->call_api( $this->test_text, $this->test_source_language, $this->test_target_language, false );
+		remove_filter( 'pre_http_request', $catch, 5 );
+
+		delete_option( 'easy_language_chatgpt_target_languages_prompts_' . $this->test_target_language );
+
+		$this->assertStringContainsString( wp_json_encode( "Vereinfache bitte den Text.\n\n" . $this->test_text ), $body );
 	}
 
 	/**

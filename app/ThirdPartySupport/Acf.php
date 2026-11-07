@@ -153,8 +153,8 @@ class Acf extends Base implements ThirdPartySupport_Base {
 			return;
 		}
 
-		// get all ACF fields on this object.
-		$fields = get_fields( $post_object->get_id() );
+		// get all ACF fields on this object (unformatted, as we save them as original texts and write them back).
+		$fields = get_fields( $post_object->get_id(), false );
 
 		// bail if no fields are configured.
 		if ( empty( $fields ) ) {

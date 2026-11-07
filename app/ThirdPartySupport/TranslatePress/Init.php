@@ -110,7 +110,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 * @noinspection PhpFullyQualifiedNameUsageInspection
 	 */
 	public function cli(): void {
-		\WP_CLI::add_command( 'easy-language', 'easyLanguage\ThirdPartySupport\TranslatePress\Cli' );
+		// register as subcommand to not replace the main command of this plugin.
+		\WP_CLI::add_command( 'easy-language trp_reset_simplifications', array( new Cli(), 'trp_reset_simplifications' ) );
 	}
 
 	/**
@@ -299,10 +300,15 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// add them to the list.
 		foreach ( $languages as $language_code => $language ) {
 			// check if the table of our own language exist.
-			if ( ! empty( $wpdb->get_results( $wpdb->prepare( 'SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = %s', array( $trp_query->get_table_name( strtolower( $language_code ) ) ) ) ) ) ) {
-				// truncate the tables of our own language.
-				$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $trp_query->get_table_name( strtolower( $language_code ) ) ) ) ); // @phpstan-ignore argument.type
-				$wpdb->query( sprintf( 'TRUNCATE TABLE %s', esc_sql( $trp_query->get_gettext_table_name( strtolower( $language_code ) ) ) ) ); // @phpstan-ignore argument.type
+			foreach ( array( $trp_query->get_table_name( strtolower( $language_code ) ), $trp_query->get_gettext_table_name( strtolower( $language_code ) ) ) as $table_name ) {
+				// bail if the table does not exist in the database of this WordPress.
+				if ( empty( $wpdb->get_results( $wpdb->prepare( 'SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s', array( $table_name ) ) ) ) ) {
+					continue;
+				}
+
+				// truncate the table of our own language (the table name is escaped as identifier).
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the simplifications in the tables of TranslatePress, no WP API available
+				$wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %i', $table_name ) ); // @phpstan-ignore argument.type
 			}
 		}
 	}
@@ -321,7 +327,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// get the used translation engine.
 		$translation_engine = $settings['trp_machine_translation_settings']['translation-engine'] ?? '';
 
-		if ( in_array( $translation_engine, array( 'summ-ai', 'capito' ), true ) ) {
+		if ( in_array( $translation_engine, array( 'summ_ai', 'capito' ), true ) ) {
 			// remove our own filter to prevent a loop.
 			remove_filter( 'trp_mt_available_supported_languages', array( $this, 'get_supported_languages_for_trp' ) );
 
@@ -464,22 +470,36 @@ class Init extends Base implements ThirdPartySupport_Base {
 	}
 
 	/**
-	 * Check our individual settings.
+	 * Check our individual settings in the machine translation settings of TranslatePress.
 	 *
-	 * @param array<string,string> $settings List of settings.
-	 * @return array<string,string>
+	 * The API key of SUMM AI is managed only in the settings of Easy Language (saved encrypted there). An API key
+	 * in the settings of TranslatePress (saved by versions before 4.0.0 unencrypted) is removed.
+	 *
+	 * @param array<string,mixed> $settings List of settings.
+	 * @return array<string,mixed>
 	 */
 	public function sanitize_settings( array $settings ): array {
-		// check for nonce.
-		if ( isset( $_POST['easy-language-verify'] ) && ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['easy-language-verify'] ) ), 'submit-application' ) ) {
-			return $settings;
-		}
-
-		if ( ! empty( $_POST['trp_machine_translation_settings']['summ-ai-key'] ) ) {
-			$settings['summ-ai-key'] = sanitize_text_field( wp_unslash( $_POST['trp_machine_translation_settings']['summ-ai-key'] ) );
-		}
-
+		unset( $settings['summ-ai-key'] );
 		return $settings;
+	}
+
+	/**
+	 * Remove the API key of SUMM AI from the saved settings of TranslatePress (saved by versions before 4.0.0).
+	 *
+	 * @return void
+	 */
+	public function remove_legacy_api_key(): void {
+		// get the settings of TranslatePress.
+		$settings = get_option( 'trp_machine_translation_settings' );
+
+		// bail if no key is saved.
+		if ( ! is_array( $settings ) || ! array_key_exists( 'summ-ai-key', $settings ) ) {
+			return;
+		}
+
+		// remove the key and save the settings.
+		unset( $settings['summ-ai-key'] );
+		update_option( 'trp_machine_translation_settings', $settings );
 	}
 
 	/**

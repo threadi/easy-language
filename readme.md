@@ -22,30 +22,38 @@ After checkout go through the following steps:
 
 ## Release
 
+All ways to create a release use the same script _bin/build-release.sh_. So they all create a zip with the same content.
+The script needs bash, composer, npm, rsync and zip. Its steps (see the comment at the beginning of the script):
+
+1. `init` - install the PHP packages and build blocks, sidebar, page builder fields and react-dialog
+2. `prepare` - remove the dev packages and generate the release autoloader
+3. `collect <version>` - copy the files of the release to _dist/easy-language/_ and set the version number
+4. `zip <file>` - create the zip
+5. `smoke <file>` - optional: test the zip in WordPress Playground (needs Node 24 and internet access)
+6. `restore` - install the dev packages again
+
 ### from local environment with ant (fallback for GitHub)
 
-Runs the same steps as the GitHub action and creates a zip with the same content.
 Not available locally: the Plugin Check (PCP), the SBOM and the GitHub release itself.
 
 1. set the version number in _build/build.properties_.
 2. optional: set _npx.path_ there to run the smoke test in WordPress Playground (needs Node 24).
-3. execute the following command in _build/_: `ant build`
-4. after that you will find the zip in _releases/<version>/easy-language.zip_.
+3. execute the following command in _build/_: `ant build` (or `ant release-zip` to skip checks and tests)
+4. after that you will find the zip in _releases/easy-language_<version>.zip_, e.g. _releases/easy-language_4.0.0.zip_.
 
 ### from local environment with Taskfile
 
-Runs the same steps as the GitHub action and creates a zip with the same content (needs composer, npm, php, rsync and zip).
 Not available locally: the Plugin Check (PCP), the SBOM and the GitHub release itself.
 
-1. execute the following command in main directory: `task release -- 3.3.0` - adjust the version number.
+1. execute the following command in main directory: `task release -- 4.0.0` - adjust the version number.
 2. optional: prefix it with `SKIP_CHECKS=true` to skip PHPStan and PHPCS, or with `SMOKE=true` to run the smoke test in WordPress Playground (needs Node 24).
-3. after that you will find the zip in _releases/<version>/easy-language.zip_.
+3. after that you will find the zip in _releases/easy-language_<version>.zip_, e.g. _releases/easy-language_4.0.0.zip_.
 
 ### on GitHub
 
 1. Add a section for the new version to _changelog.md_ (e.g. `## [3.3.0] - 01.11.2026`).
 2. Create a new tag with the new version number (e.g. `3.3.0`).
-3. The GitHub action builds the zip, checks it (Plugin Check, smoke test in WordPress Playground) and attaches it together with an SBOM to the release.
+3. The GitHub action builds the zip, checks it (Plugin Check, smoke test in WordPress Playground, E2E tests) and attaches it together with an SBOM to the release. The release is only published if the E2E tests have run successfully.
 4. A manual run of the action with a version number creates a test build without a release.
 
 ## Translations
@@ -128,6 +136,12 @@ Hint: this check runs against the VIP-GO-platform which is not our target for th
 
 `wp plugin check --error-severity=7 --warning-severity=6 --include-low-severity-errors --categories=plugin_repo --format=json --slug=easy-language .`
 
+## Development mode
+
+If the development mode of WordPress is set to `plugin` or `all` (constant `WP_DEVELOPMENT_MODE`), the update routines of this plugin
+are **not** run: new database columns, tables and migrated settings of a new version are missing then. After switching to a new version
+in development mode, disable the development mode once (or reactivate the plugin) to run the update routines.
+
 ## Unit tests
 
 ### Preparation
@@ -137,3 +151,28 @@ Be sure to have run `composer install` or `composer update` before.
 ### Run
 
 `composer test`
+
+## E2E tests
+
+The E2E tests run with [Playwright](https://playwright.dev/) against WordPress Playground, which is started by Playwright itself.
+They check the settings, the simplification of pages in the backend (list of pages and block editor), the language switcher
+and the simplified pages in the frontend, the blocks and the permissions.
+
+The ChatGPT API is replaced by a mock (_tests/e2e/mu-plugins/_), which adds "Leicht gesagt: " in front of every text.
+No account at OpenAI and no network access for the API is needed. The test data (API, users and pages) is created by _tests/e2e/setup.php_.
+
+### Preparation
+
+1. `composer install`
+2. `npm ci` and `npm run build`
+3. build react-dialog in _vendor/threadi/react-dialog/_ with `npm install` and `npm run build`
+4. `npx playwright install chromium`
+
+Or use `task prepare` for steps 1 to 3.
+
+### Run
+
+`npm run test:e2e`
+
+Optional environment variables are described in _playwright.config.ts_, e.g. to use a local copy of WordPress instead of downloading it.
+The tests also run in the GitHub action "Build release zip", the report of Playwright is attached to its run.

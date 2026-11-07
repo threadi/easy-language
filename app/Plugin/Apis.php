@@ -99,6 +99,7 @@ class Apis {
 			'easyLanguage\Apis\Capito\Capito',
 			'easyLanguage\Apis\Summ_Ai\Summ_Ai',
 			'easyLanguage\Apis\ChatGpt\ChatGpt',
+			'easyLanguage\Apis\Wp_Ai\Wp_Ai',
 			'easyLanguage\Apis\No_Api\No_Api',
 		);
 
@@ -194,11 +195,11 @@ class Apis {
 				__( 'Response', 'easy-language' ),
 			),
 		);
-		foreach ( $api_object->get_log_entries() as $entry ) {
+		foreach ( $this->get_api_log_entries_for_export( $api_object->get_name() ) as $entry ) {
 			$entries[] = array(
-				$entry->time,
-				$entry->request,
-				$entry->response,
+				$entry['time'],
+				$entry['request'],
+				$entry['response'],
 			);
 		}
 
@@ -210,9 +211,33 @@ class Apis {
 			exit;
 		}
 		foreach ( $entries as $row ) {
-			fputcsv( $fp, array_map( array( $this, 'get_csv_safe_value' ), $row ) );
+			fputcsv( $fp, array_map( array( $this, 'get_csv_safe_value' ), $row ), ',', '"', '' );
 		}
 		exit;
+	}
+
+	/**
+	 * Return the API log entries of the given API for the export.
+	 *
+	 * Uses the same source as the API log table and its "clear log" action.
+	 *
+	 * @param string $api_name The name of the API.
+	 *
+	 * @return array<int,array<string,mixed>>
+	 */
+	private function get_api_log_entries_for_export( string $api_name ): array {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
+		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `time`, `request`, `response` FROM %i WHERE `api` = %s AND `blog_id` = %d ORDER BY `time` ASC, `id` ASC', array( Log_Api::get_instance()->get_table_name(), $api_name, get_current_blog_id() ) ), ARRAY_A );
+
+		// bail if no entries could be loaded.
+		if ( ! is_array( $results ) ) {
+			return array();
+		}
+
+		// return the entries.
+		return $results;
 	}
 
 	/**
@@ -222,17 +247,28 @@ class Apis {
 	 *
 	 * @return string
 	 */
-	private function get_csv_safe_value( mixed $value ): string {
+	public function get_csv_safe_value( mixed $value ): string {
 		// convert the value to string.
 		$value = is_scalar( $value ) ? (string) $value : '';
 
-		// bail if value does not start with a character which could start a formula.
-		if ( '' === $value || ! in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+		// bail if value is empty.
+		if ( '' === $value ) {
 			return $value;
 		}
 
-		// prefix the value to prevent its interpretation as formula.
-		return "'" . $value;
+		// values starting with a control character could be interpreted as formula by spreadsheet applications.
+		if ( in_array( $value[0], array( "\t", "\r", "\n" ), true ) ) {
+			return "'" . $value;
+		}
+
+		// check the first character after leading whitespace (spreadsheet applications ignore it), but keep the value itself.
+		$trimmed = ltrim( $value, " \t\r\n\0\x0B" );
+		if ( '' !== $trimmed && in_array( $trimmed[0], array( '=', '+', '-', '@' ), true ) ) {
+			return "'" . $value;
+		}
+
+		// return the value unchanged.
+		return $value;
 	}
 
 	/**
@@ -277,7 +313,7 @@ class Apis {
 
 		// delete the entries.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
-		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `api` = %s', array( Log_Api::get_instance()->get_table_name(), $api_object->get_name() ) ) );
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `api` = %s AND `blog_id` = %d', array( Log_Api::get_instance()->get_table_name(), $api_object->get_name(), get_current_blog_id() ) ) );
 
 		// redirect user back.
 		wp_safe_redirect( Helper::get_referer_url() );

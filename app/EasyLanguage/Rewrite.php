@@ -167,7 +167,18 @@ class Rewrite {
 		// get the slugs for each actual enabled language.
 		$slugs = array();
 		foreach ( Languages::get_instance()->get_active_languages() as $language ) {
-			$slugs[] = $language['url'];
+			// bail if no URL-part is set for this language.
+			if ( empty( $language['url'] ) ) {
+				continue;
+			}
+
+			// add the slug to the list.
+			$slugs[] = preg_quote( $language['url'], '/' );
+		}
+
+		// bail if no slugs are available.
+		if ( empty( $slugs ) ) {
+			return $rules;
 		}
 
 		// define the slug for rules.
@@ -212,8 +223,14 @@ class Rewrite {
 	 * @return string
 	 */
 	public function prevent_redirect_for_front_page( string $redirect_url, string $requested_url ): string {
-		foreach ( Languages::get_instance()->get_active_languages() as $language_code => $settings ) {
-			if ( str_contains( $requested_url, '/' . $language_code . '/' ) ) {
+		foreach ( Languages::get_instance()->get_active_languages() as $settings ) {
+			// bail if no URL-part is set for this language.
+			if ( empty( $settings['url'] ) ) {
+				continue;
+			}
+
+			// do not redirect if the URL-part of this language is used in the requested URL.
+			if ( str_contains( $requested_url, '/' . $settings['url'] . '/' ) ) {
 				return '';
 			}
 		}
@@ -239,6 +256,11 @@ class Rewrite {
 		 * @noinspection PhpConditionAlreadyCheckedInspection
 		 */
 		if ( apply_filters( 'easy_language_prevent_simple_permalinks', $false ) ) {
+			return $url;
+		}
+
+		// bail if no URL is given or plain permalinks are used (WordPress uses query parameters then).
+		if ( '' === $url || empty( get_option( 'permalink_structure' ) ) ) {
 			return $url;
 		}
 

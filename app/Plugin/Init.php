@@ -396,12 +396,8 @@ class Init {
 			exit;
 		}
 
-		// get db object.
-		global $wpdb;
-
-		// clear the log.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
-		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE 1 = %d', array( Log::get_instance()->get_table_name(), 1 ) ) );
+		// clear the log of the actual site.
+		Log::get_instance()->delete_entries_of_site();
 
 		// redirect user back.
 		wp_safe_redirect( Helper::get_referer_url() );

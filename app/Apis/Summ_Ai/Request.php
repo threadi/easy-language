@@ -14,6 +14,7 @@ defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Log;
+use easyLanguage\Plugin\Api_Request_Table;
 use easyLanguage\Plugin\Log_Api;
 use easyLanguage\EasyLanguage\Db;
 use WP_Error;
@@ -250,7 +251,7 @@ class Request implements Api_Requests {
 			'headers'     => $headers,
 			'httpversion' => '1.1',
 			'timeout'     => get_option( 'easy_language_api_timeout', 60 ),
-			'redirection' => 10,
+			'redirection' => 0, // never follow redirects, as the request contains the API key.
 		);
 
 		// set request data.
@@ -305,6 +306,14 @@ class Request implements Api_Requests {
 		// log error if something happened.
 		if ( is_wp_error( $this->get_result() ) ) {
 			Log::get_instance()->add_log( sprintf( 'Error during request on API %1$s via %2$s: %3$s', esc_html( $summ_ai_obj->get_title() ), esc_html( $this->url ), esc_html( $this->get_result()->get_error_message() ) ), 'error' );
+
+			// log the request (with an anonymized token) with the error message in the API log.
+			$args['headers']['Authorization'] = 'anonymized';
+			$args_json                        = wp_json_encode( $args );
+			if ( ! $args_json ) {
+				$args_json = '';
+			}
+			Log_Api::get_instance()->add_log( $summ_ai_obj->get_name(), $this->http_status, $args_json, 'Error: ' . esc_html( $this->get_result()->get_error_message() ) );
 		} else {
 			// secure response.
 			$this->response = wp_remote_retrieve_body( $this->get_result() );
@@ -464,7 +473,7 @@ class Request implements Api_Requests {
 			'time'       => gmdate( 'Y-m-d H:i:s' ),
 			'request'    => wp_json_encode( $this->get_request() ),
 			'response'   => $this->get_response(),
-			'duration'   => $this->duration,
+			'duration'   => round( $this->duration, 3 ),
 			'httpstatus' => $this->get_http_status(),
 			'quota'      => strlen( $this->get_text() ),
 			'blog_id'    => get_current_blog_id(),
@@ -477,6 +486,9 @@ class Request implements Api_Requests {
 			/* translators: %1$s will be replaced by the error code. */
 			Log::get_instance()->add_log( sprintf( __( 'Error during adding API log entry: %1$s', 'easy-language' ), '<code>' . $wpdb->last_error . '</code>' ), 'error' );
 		}
+
+		// remove old entries, so the table does not grow without limit.
+		Api_Request_Table::cleanup( $this->table_requests );
 	}
 
 	/**

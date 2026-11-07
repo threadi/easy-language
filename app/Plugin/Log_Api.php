@@ -75,7 +75,9 @@ class Log_Api {
             `request` longtext DEFAULT '' NOT NULL,
             `response` longtext DEFAULT '' NOT NULL,
             `state` varchar(40) DEFAULT '' NOT NULL,
-            UNIQUE KEY id (id)
+            `blog_id` bigint(20) DEFAULT 0 NOT NULL,
+            UNIQUE KEY id (id),
+            KEY blog_id (blog_id)
         ) $charset_collate;";
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -131,6 +133,7 @@ class Log_Api {
 				'request'    => $request,
 				'response'   => $response,
 				'state'      => $state,
+				'blog_id'    => get_current_blog_id(),
 			)
 		);
 
@@ -154,6 +157,28 @@ class Log_Api {
 	private function clean_log(): void {
 		global $wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
-		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE 1 = %d AND `time` < DATE_SUB(NOW(), INTERVAL %d DAY)', array( $this->get_table_name(), 1, absint( get_option( 'easy_language_log_max_age', 50 ) ) ) ) );
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `blog_id` = %d AND `time` < DATE_SUB(UTC_TIMESTAMP(), INTERVAL %d DAY)', array( $this->get_table_name(), get_current_blog_id(), max( 1, absint( get_option( 'easy_language_log_max_age', 50 ) ) ) ) ) );
+	}
+
+	/**
+	 * Delete all entries of the actual site (e.g. for a reset of the plugin in a multisite).
+	 *
+	 * @return void
+	 */
+	public function delete_entries_of_site(): void {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
+		$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `blog_id` = %d', array( $this->get_table_name(), get_current_blog_id() ) ) );
+	}
+
+	/**
+	 * Assign the entries without site (from versions before 4.0.0) to the main site.
+	 *
+	 * @return void
+	 */
+	public function migrate_entries_without_site(): void {
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
+		$wpdb->query( $wpdb->prepare( 'UPDATE %i SET `blog_id` = %d WHERE `blog_id` = %d', array( $this->get_table_name(), get_main_site_id(), 0 ) ) );
 	}
 }

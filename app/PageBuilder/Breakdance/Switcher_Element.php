@@ -376,7 +376,7 @@ class Switcher_Element {
 				if ( ! empty( $field['description'] ) ) {
 					$options['placeholder'] = (string) $field['description'];
 				}
-				foreach ( Switcher::get_instance()->get_widget_object_options() as $value => $label ) {
+				foreach ( $this->get_object_options() as $value => $label ) {
 					$options['items'][] = array(
 						'value' => (string) $value,
 						'text'  => $label,
@@ -433,6 +433,34 @@ class Switcher_Element {
 			'children'           => $children,
 			'keywords'           => array(),
 		);
+	}
+
+	/**
+	 * Return the options for the selection of pages and terms.
+	 *
+	 * The builder of Breakdance runs in the frontend, so we load the options there also.
+	 *
+	 * @return array<string,string>
+	 */
+	private function get_object_options(): array {
+		$switcher = Switcher::get_instance();
+
+		// get the options for the backend.
+		$options = $switcher->get_widget_object_options();
+		if ( ! empty( $options ) || ! current_user_can( 'edit_posts' ) ) {
+			return $options;
+		}
+
+		// bail if this is not the builder of Breakdance.
+		if ( ! isset( $_GET['breakdance'] ) || 'builder' !== sanitize_key( wp_unslash( $_GET['breakdance'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return $options;
+		}
+
+		// get the options for the builder.
+		foreach ( $switcher->search_objects( '', 500 ) as $object ) {
+			$options[ $object['value'] ] = $object['label'];
+		}
+		return $options;
 	}
 
 	/**

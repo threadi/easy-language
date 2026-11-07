@@ -1,16 +1,18 @@
 # Changelog
 
-## [4.0.0] - unreleased
+## [4.0.0] - 07.11.2026
 
 ### Added
 
 - API keys are now saved encrypted (via Crypt for WordPress); existing keys are migrated automatically during the update
 - Smoke test of the release zip in WordPress Playground, SBOM and Plugin Check in the release workflow
 - Dependabot for GitHub Actions
+- E2E tests with Playwright in WordPress Playground (settings, simplification in the list of pages and in the block editor, language switcher, simplified pages, blocks, permissions); the release is only published if they succeed
 - New display "Toggle" for the language switcher (blocks, classic menu, shortcode, Elementor), optionally greyed out on pages without simplification
 - Design settings for the toggle: colors (on, off, thumb), size and rounding
 - Language switcher as native widget in Avada, Beaver Builder, Bold Page Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Enfold, Fusion, Live Composer, Nimble Builder, Oxygen 6, SiteOrigin, Themify Builder, Visual Composer, WPBakery (also Salient) and Zion Builder (with the same settings as the block)
 - Filter easy_language_switcher_widget_fields to change the settings of the page builder widgets
+- Classic widget for the language switcher in all widget areas (also as legacy widget in the block-based widget editor), independent of any page builder
 - Visibility settings for each language switcher: show it only on (or hide it on) chosen pages, posts and terms, optionally with child pages/terms and contents assigned to the chosen terms
 - Setting for the behavior on pages without own language versions (archives, search results, blog homepage, 404)
 - Icon size for each language switcher and a default icon size in the plugin settings (Icons tab)
@@ -22,14 +24,29 @@
 - Abilities to change data: create-simplification, save-text-simplification (AI clients can save their own simplifications without using an API quota), set-text-state, set-automatic-prevention and run-simplification (via the active API in the background)
 - New settings tab "Abilities" to enable or disable the abilities, to allow only read-only or all abilities and to check whether the project can use them
 - Filters easy_language_abilities and easy_language_abilities_checks
+- New API "WordPress Connectors" to simplify texts in Einfache and Leichte Sprache with the AI connectors of WordPress (WordPress 7.0 or newer); it could only be activated if a connector for text generation is connected
+- Settings for the API "WordPress Connectors": choice of the connector and of the source and target languages
+- Filters easy_language_wp_ai_instruction, easy_language_wp_ai_request_object, easy_language_wp_ai_source_languages, easy_language_wp_ai_target_languages and easy_language_wp_ai_mapping_languages
+- New setting "View of the settings" in the advanced settings: modern view (DataView, default) or classic view
+- Filter easy_language_keep_text_on_object_update to keep texts of other plugins (e.g. ACF fields) linked when a simplified object is saved
+- Log and API log are saved per site in multisite; existing entries are assigned to the main site during the update
+- More than 100 additional unit tests, also run in multisite
+- Dependabot also for Composer and npm packages
+- Section "External services" in readme.txt with the data sent to SUMM AI (incl. the free proxy of laOlaWeb), capito, OpenAI and the WordPress connectors
+- Filter easy_language_api_requests_max_age for the max age of the entries in the request tables of the APIs
+- Confirmation (or --yes) for the WP CLI commands reset_simplifications and trp_reset_simplifications
+- Unit tests for the lifecycle of the plugin (hooks, their order, multiple runs of init), the output of the language switcher in all page builders, the URLs of simplified objects, the settings callbacks, the tables in the backend, errors of the APIs, the encryption, the block editor parser and the support of Polylang, Sublanguage, WPML, SCF and TranslatePress
 
 ### Changed
 
+- Buttons to test and remove the token of SUMM AI, capito and ChatGPT run via AJAX and show their result in a dialog instead of reloading the page; removing a token has to be confirmed
+- New logo of SUMM AI (as SVG) in the choice of the API
+- The button to update the quota of SUMM AI and capito runs via AJAX and shows its result in a dialog; the page is reloaded after closing it to show the actual quota
+- The choice of the API uses the new field "Cards" of Easy Settings: it looks the same in the classic view and in the DataView; APIs which could not be used could not be chosen
 - Updated dependencies
 - Now requires WordPress 6.6 or newer
 - API keys are no longer readable via REST API and are shown masked in the settings
 - Simplification requests now also check the permission for the respective object
-- Reset of the plugin only affects the actual site in multisite
 - Lists of texts are now paginated
 - GitHub Actions are pinned to commits and run with minimal permissions
 - Removed the Ant build
@@ -37,9 +54,36 @@
 - The attributes of both switcher blocks are defined only once
 - New blocks are wrapped in an element which uses the block settings (colors, typography, border, anchor); in navigations they are output as list item
 - Active language is marked with aria-current, icons get an accessible name
+- Simplified texts are replaced in all simplified objects which use them, not only in the object which is simplified (except trashed, locked objects and objects with prevented automatic mode)
+- Texts which could not be simplified (e.g. language not supported by the active API) stay "to simplify" instead of being marked as simplified
+- Automatic simplification skips texts which could not be simplified for one day, so they no longer block the following texts
+- Automatic simplification no longer runs on objects which are simplified at the same time via the dialog
+- A simplification in the dialog stops on an API error instead of sending the same text again
+- A changed API key is only removed if the API rejects it (401/403), on other errors the previous key is kept
+- SUMM AI: paid keys for which the API returns no character limit are no longer blocked after 1,000,000 characters
+- SUMM AI: without API key and with disabled free requests the API counts as not configured
+- ChatGPT: incomplete responses (cut off at the token limit) are no longer saved as simplification
+- Block editor sidebar is only shown to users who are allowed to simplify
+- Request logs of the APIs can save long texts
+- Texts without HTML (e.g. titles and text fields of page builders) returned by SUMM AI, capito and ChatGPT are saved without any HTML (like for WordPress Connectors)
+- Requests to the APIs do not follow redirects anymore, as they contain the API key; capito and ChatGPT use wp_safe_remote_post()
+- The request tables of SUMM AI, capito and ChatGPT are cleaned up like the logs (default: entries older than 50 days); the duration of requests is saved with milliseconds
+- The automatic simplification runs only once at the same time (lock against overlapping WP-Cron requests)
+- Redirects back to the previous page accept only URLs of the own website
+- The API key of SUMM AI is not saved in the settings of TranslatePress anymore; an existing key there is removed during the update
+- TranslatePress: tables are emptied with an escaped identifier
+- The release zip is created by one script (bin/build-release.sh) for the GitHub workflow, Ant and Taskfile; local builds are saved as releases/easy-language_<version>.zip
 
 ### Fixed
 
+- Bricks (and all other page builders): widgets marked as "no HTML" were handled as HTML
+- Divi 5: texts of headings, buttons and icon list items are now read from and written to the block attributes, where Divi 5 saves them
+- SeedProd: simplifications without the capability "unfiltered_html" (e.g. via cron) no longer remove closing HTML tags from the page data
+- Deleting a simplification permanently (without trash) now also removes its language from the original
+- Requesting a term by ID no longer returns a post with the same ID
+- ChatGPT: the prompt and the text to simplify are now separated by an empty line (before, the last sentence of the prompt and the first one of the text merged)
+- Checkboxes with array values (e.g. supported post types, languages) were empty in the DataView and could be removed by saving there
+- Progress of the simplifications in the admin bar was shown up to one minute after all texts had been simplified
 - Quota with more spent characters than its limit is now handled as used up (before only a rest of exactly 0)
 - Simplification via API in the backend is canceled with a hint if the quota is used up, no request is sent
 - Dialog after adding a simplification no longer hangs if the quota is used up or not sufficient for all texts
@@ -59,6 +103,40 @@
 - Saving menus via code (e.g. WP-CLI or importer) stopped with "The link you followed has expired"
 - The icon option of the classic menu was shown on all menu items
 - Many smaller bugs, missing checks and PHP warnings
+- Themify: simplification of a page stopped with a fatal error
+- Reactivating the plugin switched the active API to SUMM AI
+- Quota of capito and SUMM AI was requested even if the API was not active or no key was set
+- Multisite: texts of other sites were shown in the lists and used by the automatic simplification
+- Texts used in several simplified objects (e.g. the same paragraph on two pages) were only replaced in one of them
+- Moving an original of a custom post type to trash deleted its simplifications permanently
+- Deleting a term removed the texts of other objects with the same text (e.g. a post with the same title)
+- Simplified terms: already known texts were not simplified, a second language could not be added, simplifications were not deleted with the original
+- Titles of private or protected posts were saved with the prefix "Private:" or "Protected:" and with HTML entities
+- Texts added to a simplified page were not simplified if they were already known from another page
+- ACF/SCF: fields were read formatted and their texts were removed when the simplified object was saved
+- TranslatePress: SUMM AI and capito returned no translations, SUMM AI was not detected as translation engine
+- capito: a rest quota of 0 was not handled as used up; team accounts without team used a wrong URL
+- SUMM AI: the free quota was also counted in paid mode
+- Dialog to add a simplification did not open for administrators if the API was not configured
+- Errors while adding a simplification or deleting all data were not shown
+- Language front page redirected to the homepage, simplified posts had wrong links with plain permalinks
+- Changing the site language saved the previous language as source language for SUMM AI
+- Polylang: source language was "en_US" in backend and cron
+- Interval "every 20 minutes" ran every 15 minutes
+- Page builders activated network-wide in multisite were not detected
+- Elementor: dynamic tag caused a fatal error if Elementor Pro was not loaded; simplified texts were not shown with element caching
+- Beaver Builder: the draft kept the original texts and overwrote the simplification on next publish
+- Shortcode attributes with quotes or brackets were simplified again after every save
+- Language icons: a failed import marked another post as icon; own media files with the same name could be deleted on uninstall
+- Uninstall left simplified terms, simplified posts of no longer supported post types and some options
+- Export of the API log contained entries which were already cleared
+- Site Health reported the automatic simplification as not running if it was only a few seconds late
+- Export of the API log as CSV: values with leading whitespace or line breaks before a formula character were not protected against formula injection
+- Export of simplifications as po-file had a faulty Content-Disposition header
+- Uninstall: the meta query for language icons used an invalid compare value
+- SUMM AI: an invalid contact email was saved although an error was shown; the former email is kept now
+- Block editor, Kubio and Divi 5: the parts between blocks (without block name) are skipped before they are used as array key (null as array key is deprecated in PHP 8.5)
+- Tables of simplified texts and API log: PHP 8.5 deprecation notice if the table is not sorted by the user
 
 ## [3.2.3] - 13.09.2026
 

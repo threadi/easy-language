@@ -16,6 +16,7 @@ use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Intervals;
 use easyLanguage\Plugin\Languages;
+use easyLanguage\Plugin\Lock;
 use easyLanguage\Plugin\Log;
 use easyLanguage\Plugin\Settings;
 use easyLanguage\Plugin\Setup;
@@ -43,6 +44,12 @@ use WP_User;
  * Initializer for this plugin.
  */
 class Init extends Base implements ThirdPartySupport_Base {
+
+	/**
+	 * Name of the option used as lock during the automatic simplification.
+	 */
+	public const AUTOMATIC_SIMPLIFICATION_LOCK = 'easy_language_automatic_simplification_lock';
+
 	/**
 	 * Marker for a foreign plugin (plugins, which are supported by this plugin but not maintained).
 	 *
@@ -161,7 +168,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		add_action( 'admin_bar_menu', array( $this, 'add_simplification_button_in_admin_bar' ), 500 );
 		add_action( 'admin_bar_menu', array( $this, 'show_simplification_process' ), 400 );
 		add_filter( 'site_status_tests', array( $this, 'add_site_status_test' ) );
-		add_filter( 'easy_language_get_object', array( $this, 'get_post_object' ), 20, 2 );
+		add_filter( 'easy_language_get_object', array( $this, 'get_post_object' ), 20, 3 );
 		add_filter( 'easy_language_get_object', array( $this, 'get_term_object' ), 10, 3 );
 		add_filter( 'easy_language_first_simplify_dialog', array( $this, 'change_first_simplify_dialog' ), 10, 3 );
 		add_filter( 'easy_language_get_object_by_wp_object', array( $this, 'get_term_object_by_wp_object' ), 10, 3 );
@@ -594,8 +601,8 @@ class Init extends Base implements ThirdPartySupport_Base {
 			// get language from request.
 			$language = filter_input( INPUT_GET, 'lang', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 
-			// check if the requested language is supported by our plugin.
-			$languages = $api->get_active_target_languages();
+			// check if the requested language is supported by our plugin (same list as used for the views).
+			$languages = Languages::get_instance()->get_active_languages();
 
 			// change the request for post to show only them who are simplified in the given language.
 			if ( ! is_null( $language ) && ! empty( $languages[ $language ] ) ) {
@@ -673,7 +680,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		update_option( 'easy_language_source_languages', $languages );
 
 		// update SUMM AI setting.
-		$languages = array( Helper::get_wp_lang() => '1' );
+		$languages = array( $new_value => '1' );
 		update_option( 'easy_language_summ_ai_source_languages', $languages );
 
 		// Log event.
@@ -1029,6 +1036,17 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// remove scheduled simplifications requested via abilities.
 		wp_unschedule_hook( Abilities::CRON_HOOK );
 
+		// remove the markers of the requesting users of these scheduled simplifications.
+		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- gets the object-specific markers of this plugin (option name prefix + object ID), no WP API available to get options by prefix
+		$option_names = $wpdb->get_col( $wpdb->prepare( 'SELECT `option_name` FROM %i WHERE `option_name` LIKE %s', $wpdb->options, $wpdb->esc_like( 'easy_language_ability_user_' ) . '%' ) );
+		foreach ( $option_names as $option_name ) {
+			delete_option( $option_name );
+		}
+
+		// remove the automatic simplification (it will be scheduled again on activation).
+		wp_clear_scheduled_hook( 'easy_language_automatic_simplification' );
+
 		// get new state setting.
 		$new_state_setting = get_option( 'easy_language_state_on_deactivation', 'draft' );
 
@@ -1088,6 +1106,43 @@ class Init extends Base implements ThirdPartySupport_Base {
 			}
 		}
 
+		// get the database-object.
+		global $wpdb;
+
+		// remove all other simplified posts (e.g. of post types which are not supported anymore or not registered).
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- the simplified objects are linked to their originals via post meta, the post types of them might not be registered anymore
+		$post_ids = $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT `post_id` FROM %i WHERE `meta_key` = %s', $wpdb->postmeta, 'easy_language_simplification_original_id' ) );
+		foreach ( $post_ids as $post_id ) {
+			wp_delete_post( absint( $post_id ), true );
+		}
+
+		// remove all simplified terms (also of taxonomies which are not supported anymore or not registered).
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- the simplified terms are linked to their originals via term meta, the taxonomies of them might not be registered anymore
+		$terms = $wpdb->get_results( $wpdb->prepare( 'SELECT DISTINCT tt.`term_id`, tt.`taxonomy` FROM %i tm INNER JOIN %i tt ON tt.`term_id` = tm.`term_id` WHERE tm.`meta_key` = %s', $wpdb->termmeta, $wpdb->term_taxonomy, 'easy_language_simplification_original_id' ), ARRAY_A );
+		foreach ( $terms as $term ) {
+			// register a not registered taxonomy temporarily, as WordPress could not delete terms of it otherwise.
+			$temporary_taxonomy = ! taxonomy_exists( $term['taxonomy'] );
+			if ( $temporary_taxonomy ) {
+				register_taxonomy( $term['taxonomy'], array(), array( 'public' => false ) );
+			}
+
+			// delete the term.
+			wp_delete_term( absint( $term['term_id'] ), $term['taxonomy'] );
+
+			// remove the temporary taxonomy.
+			if ( $temporary_taxonomy ) {
+				unregister_taxonomy( $term['taxonomy'] );
+			}
+		}
+
+		// delete the term meta of this plugin.
+		$term_meta_keys = array( 'easy_language_simplified_in', 'easy_language_text_language', 'easy_language_simplification_original_id', 'easy_language_source_language', 'easy_language_simplification_language', 'easy_language_api' );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- get the language-specific change-markers of this plugin, no WP API available to get meta keys by pattern
+		$changed_keys = $wpdb->get_col( $wpdb->prepare( 'SELECT DISTINCT `meta_key` FROM %i WHERE `meta_key` LIKE %s', $wpdb->termmeta, $wpdb->esc_like( 'easy_language_' ) . '%' . $wpdb->esc_like( '_changed' ) ) );
+		foreach ( array_merge( $term_meta_keys, $changed_keys ) as $meta_key ) {
+			delete_metadata( 'term', 0, $meta_key, '', true );
+		}
+
 		// delete meta keys on parent objects.
 		delete_post_meta_by_key( 'easy_language_simplified_in' );
 		delete_post_meta_by_key( 'easy_language_text_language' );
@@ -1117,6 +1172,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 
 		// remove custom transients which are not set via Transient-object.
 		delete_transient( 'easy_language_refresh_rewrite_rules' );
+
+		// remove the list of texts skipped by the automatic simplification.
+		delete_option( 'easy_language_automatic_simplification_skipped' );
 
 		// delete switcher for classic menu.
 		$query    = array(
@@ -1149,14 +1207,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// delete the object-specific simplification markers.
-		global $wpdb;
-		foreach ( array( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS ) as $marker ) {
+		foreach ( array( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, EASY_LANGUAGE_OPTION_SIMPLIFICATION_COUNT, EASY_LANGUAGE_OPTION_SIMPLIFICATION_MAX, EASY_LANGUAGE_OPTION_SIMPLIFICATION_RESULTS, 'easy_language_ability_user' ) as $marker ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- deletes the object-specific markers of this plugin (option name prefix + object ID), no WP API available to delete options by prefix
 			$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `option_name` LIKE %s', $wpdb->options, $wpdb->esc_like( $marker . '_' ) . '%' ) );
 		}
 
 		// delete the cached simplification process counts.
-		delete_transient( 'easy_language_simplification_process_counts' );
+		delete_transient( Db::TRANSIENT_PROCESS_COUNTS );
 
 		// schedule deaktivieren.
 		wp_clear_scheduled_hook( 'easy_language_automatic_simplification' );
@@ -1232,7 +1289,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 				'post' => '1',
 			)
 		);
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose supported post-types', 'easy-language' ) );
 		$field->set_options( $post_types );
@@ -1272,7 +1328,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $general_main_section );
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose supported taxonomies', 'easy-language' ) );
 		$field->set_options( $taxonomies );
@@ -1296,7 +1351,6 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$setting->set_section( $general_main_section );
 		$setting->set_type( 'array' );
 		$setting->set_default( array() );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose languages', 'easy-language' ) );
 		/* translators: %1$s will be replaced by the settings-URL for the active API */
@@ -2154,7 +2208,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 */
 	public function add_body_class( string $classes ): string {
 		if ( 1 === absint( get_option( 'easy_language_intro_step_2', 0 ) ) ) {
-			$classes .= 'easy-language-intro-step-2';
+			$classes .= ' easy-language-intro-step-2';
 		}
 		return $classes;
 	}
@@ -2429,6 +2483,11 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return;
 		}
 
+		// bail if the quota of the active API is used up (no request could be successful).
+		if ( Helper::is_quota_used_up( $api_obj ) ) {
+			return;
+		}
+
 		// get limit from settings.
 		$limit = get_option( 'easy_language_automatic_item_count', 6 );
 
@@ -2437,18 +2496,70 @@ class Init extends Base implements ThirdPartySupport_Base {
 			$limit = 0;
 		}
 
-		// get one text of a not locked, not prevented and actual not trashed object which should be simplified.
-		$query               = $this->get_filter_for_entries_to_simplify();
-		$query['not_locked'] = true;
-		$entries             = Db::get_instance()->get_entries( $query, array(), $limit );
-
-		// bail if no text could be found.
-		if ( empty( $entries ) ) {
+		// bail if another run of the automatic simplification is still running (e.g. overlapping WP-Cron requests).
+		// A lock is treated as orphaned after the max. time this run could need for all of its requests.
+		$lock_timeout = $limit > 0 ? max( 10 * MINUTE_IN_SECONDS, ( absint( $limit ) + 1 ) * max( 1, absint( get_option( 'easy_language_api_timeout', 60 ) ) ) ) : HOUR_IN_SECONDS;
+		if ( ! Lock::acquire( self::AUTOMATIC_SIMPLIFICATION_LOCK, $lock_timeout ) ) {
 			return;
 		}
 
+		try {
+			$this->run_automatic_simplification_entries( $api_obj, absint( $limit ) );
+		} finally {
+			// release the lock in every case.
+			Lock::release( self::AUTOMATIC_SIMPLIFICATION_LOCK );
+		}
+	}
+
+	/**
+	 * Simplify the texts of the automatic simplification (the lock is set by run_automatic_simplification()).
+	 *
+	 * @param Api_Base $api_obj The active API.
+	 * @param int      $limit Max count of texts to simplify, 0 for no limit.
+	 *
+	 * @return void
+	 */
+	private function run_automatic_simplification_entries( Api_Base $api_obj, int $limit ): void {
+		// get the texts which could not be simplified in the last runs (e.g. language not supported by the API), to skip them for a day.
+		$skipped_texts = get_option( 'easy_language_automatic_simplification_skipped', array() );
+		if ( ! is_array( $skipped_texts ) ) {
+			$skipped_texts = array();
+		}
+		$skipped_texts = array_filter(
+			$skipped_texts,
+			static function ( $timestamp ): bool {
+				return absint( $timestamp ) > ( time() - DAY_IN_SECONDS );
+			}
+		);
+
+		// get one text of a not locked, not prevented and actual not trashed object which should be simplified.
+		// load as many additional texts as are skipped, so the skipped texts do not block the following texts.
+		$query               = $this->get_filter_for_entries_to_simplify();
+		$query['not_locked'] = true;
+		$entries             = Db::get_instance()->get_entries( $query, array(), $limit > 0 ? absint( $limit ) + count( $skipped_texts ) : 0 );
+
+		// bail if no text could be found.
+		if ( empty( $entries ) ) {
+			// save the cleaned list of skipped texts.
+			update_option( 'easy_language_automatic_simplification_skipped', $skipped_texts, false );
+			return;
+		}
+
+		// count the processed texts.
+		$processed = 0;
+
 		// loop through the results.
 		foreach ( $entries as $entry ) {
+			// bail if the limit of texts for this run is reached.
+			if ( $limit > 0 && $processed >= absint( $limit ) ) {
+				break;
+			}
+
+			// bail if this text could not be simplified in the last runs.
+			if ( isset( $skipped_texts[ $entry->get_id() ] ) ) {
+				continue;
+			}
+
 			// get the simplification objects where this text is been used.
 			$simplification_objects = $entry->get_objects();
 
@@ -2457,23 +2568,72 @@ class Init extends Base implements ThirdPartySupport_Base {
 				continue;
 			}
 
-			// get object of the first one as we simplify this text only one time.
-			$object = Helper::get_object( absint( $simplification_objects[0]['object_id'] ), $simplification_objects[0]['object_type'] );
+			// get the first suitable object as we simplify this text only one time.
+			$object = false;
+			foreach ( $simplification_objects as $simplification_object ) {
+				// get the object.
+				$candidate = Helper::get_object( absint( $simplification_object['object_id'] ), $simplification_object['object_type'] );
 
-			// bail if object could be loaded for this text.
+				// bail if object could not be loaded.
+				if ( ! $candidate instanceof Objects ) {
+					continue;
+				}
+
+				// bail if this is not a simplified object.
+				if ( ! $candidate->is_simplified() ) {
+					continue;
+				}
+
+				// bail if this object is in trash.
+				if ( 'trash' === $candidate->get_status() ) {
+					continue;
+				}
+
+				// bail if automatic simplification is prevented for this object.
+				if ( $candidate->is_automatic_mode_prevented() ) {
+					continue;
+				}
+
+				// bail if a simplification of this object is running in another process (e.g. via AJAX) - it simplifies this text.
+				if ( $candidate->is_simplification_running() ) {
+					continue 2;
+				}
+
+				// use this object.
+				$object = $candidate;
+				break;
+			}
+
+			// bail if no suitable object could be found for this text.
 			if ( ! $object instanceof Objects ) {
 				continue;
 			}
+
+			// get the actual running marker to restore it after the simplification.
+			$running_marker = $object->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING );
 
 			// mark simplification for this object as running.
 			$object->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, time() );
 
 			// call translation for the text on the object.
-			$object->process_simplification( $api_obj->get_simplifications_obj(), $api_obj->get_mapping_languages(), $entry );
+			$object->process_simplification( $api_obj->get_simplifications_obj(), $api_obj->get_active_language_mapping(), $entry );
+			++$processed;
 
-			// remove running marker to mark end of process.
-			$object->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, 0 );
+			// skip this text in the next runs if it is still to simplify (e.g. API error or language not supported).
+			if ( 'to_simplify' === $entry->get_state() ) {
+				$skipped_texts[ $entry->get_id() ] = time();
+			}
+
+			// restore the previous running marker to mark end of process.
+			if ( ! is_string( $running_marker ) && ! is_int( $running_marker ) ) {
+				$object->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING );
+			} else {
+				$object->set_array_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING, $running_marker );
+			}
 		}
+
+		// save the list of skipped texts.
+		update_option( 'easy_language_automatic_simplification_skipped', $skipped_texts, false );
 	}
 
 	/**
@@ -2616,8 +2776,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return;
 		}
 
+		// bail if the quota of the active API is used up, as no simplification could run in background.
+		if ( Helper::is_quota_used_up( $api_obj ) ) {
+			return;
+		}
+
 		// get the counts from cache.
-		$counts = get_transient( 'easy_language_simplification_process_counts' );
+		$counts = get_transient( Db::TRANSIENT_PROCESS_COUNTS );
 
 		// get the counts via DB if they are not cached.
 		if ( ! is_array( $counts ) ) {
@@ -2629,7 +2794,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			);
 
 			// cache them for a short time.
-			set_transient( 'easy_language_simplification_process_counts', $counts, MINUTE_IN_SECONDS );
+			set_transient( Db::TRANSIENT_PROCESS_COUNTS, $counts, MINUTE_IN_SECONDS );
 		}
 
 		// get _all_ items.
@@ -2738,9 +2903,13 @@ class Init extends Base implements ThirdPartySupport_Base {
 			return '';
 		}
 
+		// reschedule the event only if the interval is registered and differs from the actual one (or no event exists).
 		if ( ! empty( $value ) ) {
-			wp_clear_scheduled_hook( 'easy_language_automatic_simplification' );
-			wp_schedule_event( time(), $value, 'easy_language_automatic_simplification' );
+			$schedules = wp_get_schedules();
+			if ( isset( $schedules[ $value ] ) && wp_get_schedule( 'easy_language_automatic_simplification' ) !== $value ) {
+				wp_clear_scheduled_hook( 'easy_language_automatic_simplification' );
+				wp_schedule_event( time(), $value, 'easy_language_automatic_simplification' );
+			}
 		}
 
 		// return setting.
@@ -2793,7 +2962,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -2804,7 +2973,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// redirect user back to previous page.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -2813,12 +2982,18 @@ class Init extends Base implements ThirdPartySupport_Base {
 	 *
 	 * @param Objects|false $the_object The object we will return.
 	 * @param int           $object_id The object-ID.
+	 * @param string        $object_type The requested object type (optional).
 	 * @return Objects|false
 	 */
-	public function get_post_object( Objects|false $the_object, int $object_id ): Objects|false {
+	public function get_post_object( Objects|false $the_object, int $object_id, string $object_type = '' ): Objects|false {
 		// bail if the object is already found.
 		if ( false !== $the_object ) {
 			return $the_object;
+		}
+
+		// bail if a term is requested: a post with the same ID is not the requested object.
+		if ( '' !== $object_type && taxonomy_exists( $object_type ) ) {
+			return false;
 		}
 
 		// we assume it is a post-object and check for it.
@@ -2900,6 +3075,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 			$dialog['buttons'][0]['variant'] = 'primary';
 			$dialog['buttons'][1]            = $dialog['buttons'][2];
 			unset( $dialog['buttons'][2] );
+
+			// re-index the buttons, so they are a list in JSON (e.g. with an additional settings button).
+			$dialog['buttons'] = array_values( $dialog['buttons'] );
 		}
 
 		// return resulting dialog.
@@ -2919,7 +3097,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if capability is missing.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user back to list.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -2929,7 +3107,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if capability is not granted.
 		if ( 0 === $text_id || ! current_user_can( 'edit_el_simplifier' ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -2948,7 +3126,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$transient_obj->save();
 
 		// redirect user back to list.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -2965,7 +3143,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -2989,7 +3167,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		Log::get_instance()->add_log( __( 'All to simplify texts has been deleted', 'easy-language' ), 'success' );
 
 		// redirect user back to list.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -3200,6 +3378,9 @@ class Init extends Base implements ThirdPartySupport_Base {
 						$dialog['buttons'][0]['variant'] = 'primary';
 						$dialog['buttons'][1]            = $dialog['buttons'][2];
 						unset( $dialog['buttons'][2] );
+
+						// re-index the buttons, so they are a list in JSON.
+						$dialog['buttons'] = array_values( $dialog['buttons'] );
 					}
 
 					// show link to add simplification for this language.
@@ -3254,7 +3435,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if capability is missing.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user back to list.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -3264,7 +3445,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if capability is not granted.
 		if ( 0 === $text_id || ! current_user_can( 'edit_el_simplifier' ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -3283,7 +3464,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$transient_obj->save();
 
 		// redirect user back to the list.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 

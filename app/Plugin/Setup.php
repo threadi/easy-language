@@ -321,7 +321,7 @@ class Setup {
 	 * @return void
 	 */
 	public function update_step( int $count ): void {
-		update_option( 'esfw_steps', absint( get_option( 'esfw_steps' ) ) + $count );
+		update_option( 'esfw_step', absint( get_option( 'esfw_step' ) ) + $count );
 	}
 
 	/**
@@ -354,7 +354,7 @@ class Setup {
 		$this->update_process_step( 1 );
 
 		// set steps to max steps to end the process.
-		update_option( 'esfw_steps', $max_steps );
+		update_option( 'esfw_step', $max_steps );
 	}
 
 	/**
@@ -492,6 +492,6 @@ class Setup {
 	 * @return void
 	 */
 	public function update_process_step( int $step = 1 ): void {
-		update_option( 'esfw_step', absint( get_option( 'esfw_step' ) + $step ) );
+		update_option( 'esfw_step', absint( get_option( 'esfw_step' ) ) + $step );
 	}
 }

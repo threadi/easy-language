@@ -110,7 +110,8 @@ class Kubio extends Parser_Base implements Parser {
 		$flow_blocks = $this->get_flow_text_blocks();
 
 		// get content if it is a valid flow-text-block.
-		if ( isset( $flow_blocks[ $block['blockName'] ] ) ) {
+		// freeform HTML between blocks has no block name (null as array key is deprecated since PHP 8.5).
+		if ( isset( $block['blockName'] ) && is_string( $block['blockName'] ) && isset( $flow_blocks[ $block['blockName'] ] ) ) {
 			$add_to_result = $flow_blocks[ $block['blockName'] ];
 			if ( ! empty( $flow_blocks[ $block['blockName'] ]['callback'] ) && is_callable( $flow_blocks[ $block['blockName'] ]['callback'] ) ) {
 				// the block name is the first parameter for backwards compatibility, the complete block is the second.

@@ -52,6 +52,48 @@ jQuery( document ).ready(
 		});
 
 		/**
+		 * Token actions of the APIs (e.g. test or remove the token): run them via AJAX and show the result in a dialog.
+		 *
+		 * The buttons are part of the field descriptions, which are rendered later in the DataView. So the event is
+		 * delegated to the document.
+		 */
+		$( document ).on( 'click', 'a.easy-language-token-action', function( e ) {
+			e.preventDefault();
+
+			let action = String( $( this ).data( 'action' ) );
+			let nonce = String( $( this ).data( 'nonce' ) );
+			let title = $( this ).data( 'dialog-title' ) ? String( $( this ).data( 'dialog-title' ) ) : $( this ).text();
+			let confirm_dialog = $( this ).data( 'confirm-dialog' );
+
+			// run the action directly if no confirmation is necessary.
+			if ( ! confirm_dialog ) {
+				easy_language_run_token_action( action, nonce, title );
+				return;
+			}
+
+			// ask for confirmation before running the action.
+			let dialog_config = {
+				detail: {
+					title: confirm_dialog.title,
+					texts: confirm_dialog.texts,
+					buttons: [
+						{
+							'action': 'easy_language_run_token_action(' + JSON.stringify( action ) + ', ' + JSON.stringify( nonce ) + ', ' + JSON.stringify( title ) + ');',
+							'variant': 'primary',
+							'text': confirm_dialog.yes
+						},
+						{
+							'action': 'closeDialog();',
+							'variant': 'secondary',
+							'text': confirm_dialog.no
+						}
+					]
+				}
+			}
+			easy_language_create_dialog( dialog_config );
+		});
+
+		/**
 		 * Image handling: choose new icon vor language.
 		 */
 		$('body.settings_page_easy_language_settings a.replace-icon').on( 'click',function(e){
@@ -203,6 +245,9 @@ function easy_language_start_data_deletion() {
 	}
 	easy_language_create_dialog( dialog_config );
 
+	// state of the deletion request: 'running', 'done' or 'error'.
+	let deletion_state = { request: 'running' };
+
 	// start deletion.
 	jQuery.ajax(
 		{
@@ -212,19 +257,67 @@ function easy_language_start_data_deletion() {
 				'action': 'easy_language_run_data_deletion',
 				'nonce': easyLanguageJsVars.run_delete_data_nonce
 			},
-			success: function( data ) {
-				easy_language_get_data_deletion_info();
+			error: function( e ) {
+				deletion_state.request = 'error';
+				easy_language_show_data_deletion_error( e.statusText );
+			},
+			success: function() {
+				deletion_state.request = 'done';
 			}
 		}
+	);
+
+	// start polling for the progress while the deletion is running.
+	setTimeout(
+		function () {
+			easy_language_get_data_deletion_info( deletion_state ) },
+		500
 	);
 }
 
 /**
- * Get import info until deletion is done.
+ * Show an error during deletion of simplified texts.
+ *
+ * @param error The error message.
  */
-function easy_language_get_data_deletion_info() {
+function easy_language_show_data_deletion_error( error ) {
 	// get internationalization tools of WordPress.
 	let { __ } = wp.i18n;
+
+	// create dialog.
+	let dialog_config = {
+		detail: {
+			className: 'wp-dialog-error',
+			title: __( 'Deletion of simplified texts', 'easy-language' ),
+			texts: [
+				/* translators: [error] will be replaced by the http-error-message (e.g. "Gateway timed out") */
+				__( '<p><strong>The following error occurred during deletion of simplified texts: [error]</strong></p>', 'easy-language' ).replace( '[error]', easy_language_escape_html( error ) )
+			],
+			buttons: [
+				{
+					'action': 'location.reload();',
+					'variant': 'primary',
+					'text': 'OK',
+				}
+			]
+		}
+	}
+	easy_language_create_dialog( dialog_config );
+}
+
+/**
+ * Get import info until deletion is done.
+ *
+ * @param deletion_state Optional state of the deletion request.
+ */
+function easy_language_get_data_deletion_info( deletion_state ) {
+	// get internationalization tools of WordPress.
+	let { __ } = wp.i18n;
+
+	// bail if the deletion request failed (its error is already shown).
+	if ( deletion_state && 'error' === deletion_state.request ) {
+		return;
+	}
 
 	// run info check.
 	jQuery.ajax(
@@ -235,7 +328,19 @@ function easy_language_get_data_deletion_info() {
 				'action': 'easy_language_get_info_delete_data',
 				'nonce': easyLanguageJsVars.get_delete_data_nonce
 			},
+			error: function( e ) {
+				// bail if the deletion request failed (its error is already shown).
+				if ( deletion_state && 'error' === deletion_state.request ) {
+					return;
+				}
+				easy_language_show_data_deletion_error( e.statusText );
+			},
 			success: function (data) {
+				// bail if the deletion request failed (its error is already shown).
+				if ( deletion_state && 'error' === deletion_state.request ) {
+					return;
+				}
+
 				let stepData = data.split( ";" );
 				let count    = parseInt( stepData[0] );
 				let max      = parseInt( stepData[1] );
@@ -244,11 +349,11 @@ function easy_language_get_data_deletion_info() {
 				// update progressbar.
 				jQuery("#progress_delete_simplifications").attr('value', (count / max) * 100);
 
-				// get next info until running is not 1.
-				if ( running >= 1 ) {
+				// get next info until running is not 1 and the deletion request has been finished.
+				if ( running >= 1 || ( deletion_state && 'running' === deletion_state.request ) ) {
 					setTimeout(
 						function () {
-							easy_language_get_data_deletion_info() },
+							easy_language_get_data_deletion_info( deletion_state ) },
 						500
 					);
 				} else {
@@ -275,6 +380,80 @@ function easy_language_get_data_deletion_info() {
 	)
 }
 
+
+/**
+ * Run a token action of an API (e.g. test or remove the token) via AJAX and show the result in a dialog.
+ *
+ * @param action The name of the AJAX-action.
+ * @param nonce The nonce for this action.
+ * @param title The title for the dialogs.
+ */
+function easy_language_run_token_action( action, nonce, title ) {
+	// show a dialog while the request is running.
+	easy_language_create_dialog( {
+		detail: {
+			title: title,
+			texts: [
+				'<p>' + easy_language_escape_html( easyLanguageJsVars.token_action_running ) + '</p>'
+			],
+			progressbar: {
+				// without "progress" the progressbar is shown as indeterminate.
+				active: true,
+				id: 'progress_token_action'
+			}
+		}
+	} );
+
+	// send the request.
+	jQuery.ajax(
+		{
+			type: "POST",
+			url: easyLanguageJsVars.ajax_url,
+			data: {
+				'action': action,
+				'nonce': nonce
+			},
+			success: function( dialog_config ) {
+				// bail if the response does not contain a dialog.
+				if ( ! dialog_config || ! dialog_config.detail ) {
+					easy_language_show_token_action_error( title, '' );
+					return;
+				}
+
+				// show the result.
+				easy_language_create_dialog( dialog_config );
+			},
+			error: function( e ) {
+				easy_language_show_token_action_error( title, e.statusText );
+			}
+		}
+	);
+}
+
+/**
+ * Show an error for a token action.
+ *
+ * @param title The title of the dialog.
+ * @param error The error message.
+ */
+function easy_language_show_token_action_error( title, error ) {
+	easy_language_create_dialog( {
+		detail: {
+			className: 'wp-dialog-error',
+			title: title,
+			texts: [
+				'<p><strong>' + easy_language_escape_html( easyLanguageJsVars.token_action_error ) + '</strong>' + ( error ? ' ' + easy_language_escape_html( error ) : '' ) + '</p>'
+			],
+			buttons: [
+				{
+					'action': 'closeDialog();',
+					'variant': 'primary',
+					'text': 'OK'
+				}
+			]
+		}
+	} );
+}
 
 /**
  * Helper to create a new dialog with given config.

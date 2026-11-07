@@ -124,7 +124,7 @@ class Switcher {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		add_filter( 'wp_get_nav_menu_items', array( $this, 'set_menu_items' ) );
 		add_filter( 'nav_menu_link_attributes', array( $this, 'set_menu_link_attributes' ), 10, 2 );
-		add_action( 'wp_nav_menu_item_custom_fields', array( $this, 'add_menu_options' ), 10, 2 );
+		add_action( 'wp_nav_menu_item_custom_fields', array( $this, 'add_menu_options' ) );
 		add_action( 'wp_update_nav_menu_item', array( $this, 'save_menu_options' ), 10, 2 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_menu_scripts' ) );
 		add_shortcode( 'easy-language-switcher', array( $this, 'use_shortcode' ) );
@@ -319,13 +319,18 @@ class Switcher {
 		}
 
 		// add the single entry for language-switcher to use in classic menus.
-		$query = array(
+		$query   = array(
 			'post_title'   => __( 'Language Switcher', 'easy-language' ),
 			'post_content' => '',
 			'post_status'  => 'publish',
 			'post_type'    => EASY_LANGUAGE_CPT_SWITCHER,
 		);
-		wp_insert_post( $query );
+		$post_id = wp_insert_post( $query );
+
+		// bail if the entry could not be created (try it again on the next request).
+		if ( 0 === $post_id ) {
+			return;
+		}
 
 		// mark that we have done the work.
 		update_option( 'easy_language_switcher_default', 1, true );
@@ -1736,14 +1741,13 @@ class Switcher {
 	/**
 	 * Add options for language-switcher in classic menu.
 	 *
-	 * @param int          $item_id The ID of the item.
-	 * @param WP_Post|null $menu_item The menu item.
+	 * @param int $item_id The ID of the item.
 	 *
 	 * @return void
 	 */
-	public function add_menu_options( int $item_id, WP_Post|null $menu_item = null ): void {
+	public function add_menu_options( int $item_id ): void {
 		// bail if this is not a language switcher.
-		if ( $menu_item instanceof WP_Post && EASY_LANGUAGE_CPT_SWITCHER !== get_post_meta( $item_id, '_menu_item_object', true ) ) {
+		if ( EASY_LANGUAGE_CPT_SWITCHER !== get_post_meta( $item_id, '_menu_item_object', true ) ) {
 			return;
 		}
 
@@ -2145,10 +2149,10 @@ class Switcher {
 		list( $type, $id ) = array_pad( explode( ':', $value ), 2, '0' );
 		$id                = absint( $id );
 
-		// get the label for terms (only of supported taxonomies).
+		// get the label for terms (only of supported taxonomies and only if the taxonomy is public or the user could assign it).
 		if ( 'term' === $type ) {
 			$term = get_term( $id );
-			if ( ! $term instanceof WP_Term || ! $this->init->is_taxonomy_supported( $term->taxonomy ) ) {
+			if ( ! $term instanceof WP_Term || ! $this->init->is_taxonomy_supported( $term->taxonomy ) || ( ! is_taxonomy_viewable( $term->taxonomy ) && ! current_user_can( 'assign_term', $term->term_id ) ) ) {
 				return array();
 			}
 			$taxonomy = get_taxonomy( $term->taxonomy );

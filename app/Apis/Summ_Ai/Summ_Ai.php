@@ -24,6 +24,7 @@ use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Crypt;
 use easyLanguage\Plugin\Api_Base;
+use easyLanguage\Plugin\Api_Request_Table;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Intervals;
 use easyLanguage\Plugin\Language_Icon;
@@ -143,8 +144,15 @@ class Summ_Ai extends Base implements Api_Base {
 		// add hook to remove token.
 		add_action( 'admin_action_easy_language_summ_ai_remove_token', array( $this, 'remove_token' ) );
 
+		// add AJAX-hooks to test and remove the token without reloading the page.
+		add_action( 'wp_ajax_easy_language_summ_ai_test_token', array( $this, 'run_token_test_via_ajax' ) );
+		add_action( 'wp_ajax_easy_language_summ_ai_remove_token', array( $this, 'remove_token_via_ajax' ) );
+
 		// add hook to get actual quota via link.
 		add_action( 'admin_action_easy_language_summ_ai_get_quota', array( $this, 'get_quota_from_api_via_link' ) );
+
+		// add AJAX-hook to get actual quota without reloading the page.
+		add_action( 'wp_ajax_easy_language_summ_ai_get_quota', array( $this, 'get_quota_from_api_via_ajax' ) );
 	}
 
 	/**
@@ -220,7 +228,7 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_logo_url(): string {
-		return Helper::get_plugin_url() . 'app/Apis/Summ_Ai/gfx/logo.jpg';
+		return Helper::get_plugin_url() . 'app/Apis/Summ_Ai/gfx/logo.svg';
 	}
 
 	/**
@@ -377,31 +385,23 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function install(): void {
-		global $wpdb;
+		// set summ ai api as default API, if no API has been chosen yet (do not overwrite the choice of the user on reactivation).
+		add_option( 'easy_language_api', $this->get_name() );
 
-		// set summ ai api as default API.
-		update_option( 'easy_language_api', $this->get_name() );
-
-		$charset_collate = $wpdb->get_charset_collate();
-
-		// table for original-texts to translate.
-		$sql = "CREATE TABLE $this->table_requests (
-            `id` mediumint(9) NOT NULL AUTO_INCREMENT,
-            `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-            `request` text DEFAULT '' NOT NULL,
-            `response` text DEFAULT '' NOT NULL,
-            `duration` int(11) DEFAULT 0 NOT NULL,
-            `httpstatus` int(11) DEFAULT 0 NOT NULL,
-            `quota` int(11) DEFAULT 0 NOT NULL,
-            `blog_id` int(11) DEFAULT 0 NOT NULL,
-            UNIQUE KEY id (id)
-        ) $charset_collate;";
-
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		dbDelta( $sql );
+		// table for the requests and responses of this API.
+		Api_Request_Table::create( $this->table_requests );
 
 		// add the settings.
 		$this->add_settings();
+	}
+
+	/**
+	 * Return the name of the table for the requests and responses of this API.
+	 *
+	 * @return string
+	 */
+	public function get_request_table(): string {
+		return $this->table_requests;
 	}
 
 	/**
@@ -410,7 +410,8 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function deactivate(): void {
-		// nothing to do.
+		// remove our own schedule.
+		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
 	}
 
 	/**
@@ -423,11 +424,50 @@ class Summ_Ai extends Base implements Api_Base {
 		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
 
 		/**
+		 * Remove settings.
+		 */
+		foreach ( $this->get_options() as $option_name ) {
+			delete_option( $option_name );
+		}
+
+		/**
 		 * Delete our table.
 		 */
 		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
-		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->table_requests ) );
+		// the table is shared by all sites in multisite: drop it only if the shared tables are removed.
+		if ( \easyLanguage\Plugin\Uninstall::get_instance()->is_dropping_shared_tables() ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- removes the custom table of this plugin during uninstallation, no WP API available for custom tables
+			$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $this->table_requests ) );
+		} else {
+			// remove only the entries of the actual site.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom table of this plugin, no WP API available
+			$wpdb->query( $wpdb->prepare( 'DELETE FROM %i WHERE `blog_id` = %d', array( $this->table_requests, get_current_blog_id() ) ) );
+		}
+	}
+
+	/**
+	 * Return a list of options this API is using, e.g., for clean uninstallation.
+	 *
+	 * The counter for the free quota ('easy_language_summ_ai_quota') and the marker for disabled free requests
+	 * ('easy_language_summ_ai_disable_free_requests') are kept intentionally: like the installation hash
+	 * (EASY_LANGUAGE_HASH), which is never removed, they belong to the free usage of this installation
+	 * and must not be reset by a reinstallation.
+	 *
+	 * @return array<string>
+	 */
+	private function get_options(): array {
+		return array(
+			'easy_language_summ_ai_api_key',
+			'easy_language_summ_ai_paid_quota',
+			'easy_language_summ_ai_mode',
+			'easy_language_summ_ai_email_mode',
+			'easy_language_summ_api_email',
+			'easy_language_summ_ai_source_languages',
+			'easy_language_summ_ai_target_languages',
+			'easy_language_summ_ai_html_mode',
+			'easy_language_summ_ai_quota_interval',
+			'easy_language_summ_ai_test',
+		);
 	}
 
 	/**
@@ -491,6 +531,9 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function disable(): void {
+		// remove our own schedule.
+		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
+
 		$transients_obj = Transients::get_instance();
 		foreach ( $this->get_transients() as $transient_name ) {
 			$transient_obj = $transients_obj->get_transient_by_name( $transient_name );
@@ -585,9 +628,16 @@ class Summ_Ai extends Base implements Api_Base {
 	/**
 	 * Return true as this API is preconfigured.
 	 *
+	 * Exception: in free mode, if the free requests have been disabled by the API, an own API key is necessary.
+	 *
 	 * @return bool
 	 */
 	public function is_configured(): bool {
+		// bail if free mode is used, but free requests are disabled.
+		if ( $this->is_free_mode() && ! $this->is_free_requests_enabled() ) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -608,6 +658,11 @@ class Summ_Ai extends Base implements Api_Base {
 		if ( ! get_option( 'easy_language_summ_ai_mode' ) ) {
 			update_option( 'easy_language_summ_ai_mode', 'free' );
 		}
+
+		// schedule the quota request only if a paid API key is set.
+		if ( $this->is_summ_api_token_set() ) {
+			$this->schedule_quota_request();
+		}
 	}
 
 	/**
@@ -618,7 +673,7 @@ class Summ_Ai extends Base implements Api_Base {
 	public function get_log_entries(): array {
 		$wpdb = $this->wpdb;
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom request table of this API, no WP API available; entries change with every request, so no object cache
-		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `time`, `request`, `response` FROM %i WHERE 1 = %d', array( $this->table_requests, 1 ) ) ); // @phpstan-ignore argument.type
+		$results = $wpdb->get_results( $wpdb->prepare( 'SELECT `time`, `request`, `response` FROM %i WHERE `blog_id` = %d', array( $this->table_requests, get_current_blog_id() ) ) ); // @phpstan-ignore argument.type
 		if ( is_null( $results ) ) {
 			return array();
 		}
@@ -683,28 +738,11 @@ class Summ_Ai extends Base implements Api_Base {
 		/* translators: %1$s will be replaced by the SUMM AI URL */
 		$description .= sprintf( __( '<strong>If you want more <a href="%1$s" target="_blank">get your SUMM AI API key now (open new window)</a></strong>.<br>If you have any questions about the key provided by SUMM AI, please contact their support: <a href="%1$s" target="_blank">%1$s (open new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_summ_api_token_set() ) {
-			// set the link to test the entered token.
-			$url = add_query_arg(
-				array(
-					'action' => 'easy_language_summ_ai_test_token',
-					'nonce'  => wp_create_nonce( 'easy-language-summ-ai-test-token' ),
-				),
-				get_admin_url() . 'admin.php'
-			);
-
-			// set the link to remove the token.
-			$remove_token_url = add_query_arg(
-				array(
-					'action' => 'easy_language_summ_ai_remove_token',
-					'nonce'  => wp_create_nonce( 'easy-language-summ-ai-remove-token' ),
-				),
-				get_admin_url() . 'admin.php'
-			);
-
 			// Show other description if token is set.
 			/* translators: %1$s will be replaced by the SUMM AI URL */
 			$description  = sprintf( __( 'If you have any questions about the key provided by SUMM AI, please contact their support: <a href="%1$s" target="_blank">%1$s (open new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
-			$description .= '<br><a href="' . esc_url( $url ) . '" class="button button-primary easy-language-settings-button">' . __( 'Test token', 'easy-language' ) . '</a><a href="' . esc_url( $remove_token_url ) . '" class="button button-primary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
+			$description .= '<br>' . Helper::get_token_action_button( __( 'Test token', 'easy-language' ), 'easy_language_summ_ai_test_token', 'easy-language-summ-ai-test-token' );
+			$description .= Helper::get_token_action_button( __( 'Remove token', 'easy-language' ), 'easy_language_summ_ai_remove_token', 'easy-language-summ-ai-remove-token', Helper::get_remove_token_confirm_dialog() );
 		}
 
 		// if the foreign translation-plugin with the API support is used, hide the language-settings.
@@ -718,17 +756,16 @@ class Summ_Ai extends Base implements Api_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_summ_ai_api_key' );
 		$setting->set_section( $summ_ai_tab_main );
-		$setting->set_show_in_rest( false );
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
 		$setting->prevent_export( true );
 		$field = new Password( $settings_obj );
 		$field->set_title( __( 'SUMM AI API Key', 'easy-language' ) );
-		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
 		$field->set_value( Crypt::get_instance()->get_masked_value( 'easy_language_summ_ai_api_key' ) );
 		$field->set_description( $description );
 		$setting->set_field( $field );
+		$setting->set_reload_on_save( true );
 
 		// define url for general wp-settings.
 		$wp_settings_url = add_query_arg(
@@ -800,7 +837,6 @@ class Summ_Ai extends Base implements Api_Base {
 		$setting->set_section( $summ_ai_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
 		$field = new Checkboxes( $settings_obj );
 		$field->set_title( __( 'Choose source languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible source languages for SUMM AI-simplifications. This language has to be the language which you use for any texts in your website.', 'easy-language' ) );
@@ -831,7 +867,7 @@ class Summ_Ai extends Base implements Api_Base {
 		$setting->set_section( $summ_ai_tab_main );
 		$setting->set_type( 'array' );
 		$setting->set_default( $languages );
-		$setting->set_show_in_rest( array( 'schema' => array( 'type' => 'string' ) ) );
+		$setting->set_show_in_rest( false );
 		$field = new FieldTable( $settings_obj );
 		$field->set_title( __( 'Choose target languages', 'easy-language' ) );
 		$field->set_description( __( 'These are the possible target languages for SUMM AI-simplifications.', 'easy-language' ) );
@@ -966,10 +1002,16 @@ class Summ_Ai extends Base implements Api_Base {
 	 * Validate the SUMM API Token.
 	 *
 	 * @param ?string $value The key to validate.
+	 * @param mixed   $old_value The actual saved key (optional, given by the "pre_update_option"-filter).
 	 *
 	 * @return ?string
 	 */
-	public function validate_api_key( ?string $value ): ?string {
+	public function validate_api_key( ?string $value, mixed $old_value = null ): ?string {
+		// bail if this API is not active: keep the given value without validation (null would delete the stored key).
+		if ( ! $this->is_active() ) {
+			return $value;
+		}
+
 		// bail if the key has not been changed (the form returns the mask, the saved key will be kept).
 		if ( Crypt::MASK === $value || Crypt::get_instance()->is_encrypted( $value ) ) {
 			return $value;
@@ -1003,7 +1045,7 @@ class Summ_Ai extends Base implements Api_Base {
 		} elseif ( 0 !== strcmp( $value, get_option( 'easy_language_summ_ai_api_key', '' ) ) ) {
 			// if the token has been changed, run tests with it.
 			// switch mode to paid for test.
-			$mode = $this->mode;
+			$mode = $this->get_mode();
 			$this->set_mode( 'paid' );
 			$request = $this->get_test_request_response( $value );
 			if ( 200 !== $request->get_http_status() ) {
@@ -1014,8 +1056,13 @@ class Summ_Ai extends Base implements Api_Base {
 				// log the event.
 				Log::get_instance()->add_log( sprintf( 'Token for SUMM AI has been changed, but we get an error from API by validation of the key. Please <a href="%1$s">check API log</a>.', esc_url( Helper::get_api_logs_page_url() ) ), 'error' );
 
-				// remove key.
-				$value = '';
+				if ( in_array( $request->get_http_status(), array( 401, 403 ), true ) ) {
+					// remove key as it has been rejected by the API.
+					$value = '';
+				} else {
+					// keep the actual saved key as the new one could not be verified (e.g., timeout or server error).
+					$value = is_string( $old_value ) ? $old_value : (string) get_option( 'easy_language_summ_ai_api_key', '' );
+				}
 
 				// revert mode.
 				$this->set_mode( $mode );
@@ -1025,6 +1072,11 @@ class Summ_Ai extends Base implements Api_Base {
 
 				// set API mode to 'paid'.
 				$this->set_mode( 'paid' );
+
+				// schedule the quota request if this API is active.
+				if ( $this->is_active() ) {
+					$this->schedule_quota_request();
+				}
 
 				// log the event.
 				Log::get_instance()->add_log( __( 'Token for SUMM AI has been changed.', 'easy-language' ), 'success' );
@@ -1043,8 +1095,12 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return ?string
 	 */
 	public function validate_api_email( ?string $value ): ?string {
+		// keep the saved email if the given one is not valid (it is sent to SUMM AI with each request).
 		if ( ! empty( $value ) && false === is_email( $value ) ) {
-			add_settings_error( 'easy_language_summ_api_email', 'easy_language_summ_api_email', __( 'The given email is not a valid email-address.', 'easy-language' ) );
+			if ( function_exists( 'add_settings_error' ) ) {
+				add_settings_error( 'easy_language_summ_api_email', 'easy_language_summ_api_email', __( 'The given email is not a valid email-address.', 'easy-language' ) );
+			}
+			return (string) get_option( 'easy_language_summ_api_email', '' );
 		}
 		return $value;
 	}
@@ -1057,6 +1113,13 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function get_quota_from_api( string $token = '' ): void {
+		// without an explicit token (e.g., via schedule): bail if this API is not active or no paid API key is set.
+		if ( empty( $token ) && ( ! $this->is_active() || ! $this->is_summ_api_token_set() ) ) {
+			// remove the schedule as it should not run in this case.
+			wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
+			return;
+		}
+
 		// get quota from api.
 		$quota = $this->request_quota( $token );
 
@@ -1077,9 +1140,12 @@ class Summ_Ai extends Base implements Api_Base {
 			 */
 			$min_percent = apply_filters( 'easy_language_quota_percent', $min_percent );
 
-			// show hint it limit has been reached.
-			$percent = absint( ! empty( $quota['character_spent'] ) ? $quota['character_spent'] : 0 ) / absint( $quota['character_limit'] );
-			if ( 1 === $percent ) {
+			// show hint it limit has been reached (only if a limit is known).
+			$percent = 0;
+			if ( empty( $quota['unlimited'] ) && ! empty( $quota['character_limit'] ) && absint( $quota['character_limit'] ) > 0 ) {
+				$percent = absint( ! empty( $quota['character_spent'] ) ? $quota['character_spent'] : 0 ) / absint( $quota['character_limit'] );
+			}
+			if ( $percent >= 1 ) {
 				// get the transients-object to add the new one.
 				$transient_obj = $transients_obj->add();
 				$transient_obj->set_dismissible_days( 2 );
@@ -1097,6 +1163,9 @@ class Summ_Ai extends Base implements Api_Base {
 				$transient_obj->set_message( sprintf( __( '<strong>More than 80 percent of your quota for the SUMM AI API has already been used.</strong> Please contact the <a href="%1$s" target="_blank">SUMM AI support (open new window)</a> about extending the quota.', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) ) );
 				$transient_obj->set_type( 'error' );
 				$transient_obj->save();
+			} else {
+				// remove an outdated hint.
+				$transients_obj->get_transient_by_name( 'easy_language_summ_ai_quota' )->delete();
 			}
 		} else {
 			// delete quota-array in db.
@@ -1121,19 +1190,79 @@ class Summ_Ai extends Base implements Api_Base {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
 		// get quota in paid mode.
-		$mode = $this->get_mode();
-		$this->set_mode( 'paid' );
-		$this->get_quota_from_api();
-		$this->set_mode( $mode );
+		$this->update_paid_quota();
 
 		// redirect user.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
+	}
+
+	/**
+	 * Get quota via AJAX and return the result as dialog.
+	 *
+	 * The page is reloaded after closing the dialog to show the actual quota.
+	 *
+	 * @return void
+	 */
+	public function get_quota_from_api_via_ajax(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-summ-ai-get-quota', 'nonce' );
+
+		// get the title for the dialog.
+		$title = __( 'Update quota', 'easy-language' );
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			wp_send_json( Helper::get_token_action_result_dialog( $title, __( 'You are not allowed to update the quota.', 'easy-language' ), false ) );
+		}
+
+		// get quota in paid mode.
+		$quota = $this->update_paid_quota();
+
+		// bail if no quota could be retrieved.
+		if ( empty( $quota ) || ! isset( $quota['character_spent'], $quota['character_limit'] ) ) {
+			/* translators: %1$s is replaced by the URL for the API-log */
+			wp_send_json( Helper::get_token_action_result_dialog( $title, sprintf( __( '<strong>The quota could not be retrieved.</strong> Please take a look <a href="%1$s">in the log</a> to check the reason.', 'easy-language' ), esc_url( Helper::get_api_logs_page_url() ) ), false, true ) );
+		}
+
+		// create the text for the quota.
+		if ( ! empty( $quota['unlimited'] ) ) {
+			$quota_text = __( 'Unlimited.', 'easy-language' );
+		} else {
+			$quota_text = absint( $quota['character_spent'] ) . ' / ' . absint( $quota['character_limit'] );
+		}
+
+		// return the result as dialog.
+		/* translators: %1$s will be replaced by the quota (e.g. "100 / 1000") */
+		wp_send_json( Helper::get_token_action_result_dialog( $title, sprintf( __( '<strong>The quota has been updated.</strong> Actual quota: %1$s', 'easy-language' ), esc_html( $quota_text ) ), true, true ) );
+	}
+
+	/**
+	 * Request the quota of the paid API key and return it.
+	 *
+	 * @return array<string,mixed>
+	 */
+	private function update_paid_quota(): array {
+		// use the paid mode for the request.
+		$mode = $this->get_mode();
+		$this->set_mode( 'paid' );
+
+		// request the quota.
+		$this->get_quota_from_api();
+
+		// get the resulting quota.
+		$quota = $this->get_quota();
+
+		// revert the mode.
+		$this->set_mode( $mode );
+
+		// return the quota.
+		return $quota;
 	}
 
 	/**
@@ -1151,14 +1280,21 @@ class Summ_Ai extends Base implements Api_Base {
 		$request->set_method( 'GET' );
 		$request->send();
 
+		// bail if the request was not successful (e.g., invalid token).
+		if ( 200 !== $request->get_http_status() ) {
+			return array();
+		}
+
 		// get the response.
 		$response = $request->get_response();
 
 		// transform it to an array and return it.
 		$results = json_decode( $response, true );
 		if ( is_array( $results ) ) {
+			// mark the quota as unlimited if the API does not return any limit.
 			if ( empty( $results['character_limit'] ) ) {
-				$results['character_limit'] = 1000000;
+				$results['character_limit'] = 0;
+				$results['unlimited']       = true;
 			}
 			return $results;
 		}
@@ -1221,9 +1357,13 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function set_quota_interval( ?string $value ): ?string {
 		$value = Helper::settings_validate_select_field( $value );
-		if ( ! empty( $value ) ) {
-			wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
-			wp_schedule_event( time(), $value, 'easy_language_summ_ai_request_quota' );
+
+		// remove any existing schedule.
+		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
+
+		// schedule the quota request only if this API is active and a paid API key is set.
+		if ( ! empty( $value ) && $this->is_active() && $this->is_summ_api_token_set() ) {
+			$this->schedule_quota_request( $value );
 		}
 
 		// return setting.
@@ -1231,52 +1371,112 @@ class Summ_Ai extends Base implements Api_Base {
 	}
 
 	/**
+	 * Schedule the quota request with the given interval or the saved interval setting.
+	 *
+	 * The caller is responsible for checking whether this API is active and a paid API key is set.
+	 *
+	 * @param string $interval The interval to use (optional).
+	 *
+	 * @return void
+	 */
+	private function schedule_quota_request( string $interval = '' ): void {
+		// get the interval from the setting if none is given.
+		if ( empty( $interval ) ) {
+			$interval = (string) get_option( 'easy_language_summ_ai_quota_interval', 'easy_language_daily' );
+		}
+
+		// bail if the interval is not registered.
+		if ( ! array_key_exists( $interval, wp_get_schedules() ) ) {
+			return;
+		}
+
+		// replace any existing schedule.
+		wp_clear_scheduled_hook( 'easy_language_summ_ai_request_quota' );
+		wp_schedule_event( time(), $interval, 'easy_language_summ_ai_request_quota' );
+	}
+
+	/**
 	 * Run a token test via request.
+	 *
+	 * This is the fallback without JavaScript. The result is shown as transient after reloading the page.
 	 *
 	 * @return void
 	 */
 	public function run_token_test(): void {
 		// check nonce.
-		check_ajax_referer( 'easy-language-summ-ai-test-token', 'nonce' );
+		check_admin_referer( 'easy-language-summ-ai-test-token', 'nonce' );
 
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
-		// get global transients-object.
-		$transients_obj = Transients::get_instance();
+		// run the test.
+		$result = $this->test_token();
 
-		// run test only is necessary values are set.
-		if ( $this->is_summ_api_token_set() && $this->is_email_set() ) {
-			// send request.
-			$request = $this->get_test_request_response();
-
-			// add new transient for response to user.
-			$transient_obj = $transients_obj->add();
-			$transient_obj->set_name( 'easy_language_summ_ai_test_token' );
-			if ( 200 === $request->get_http_status() ) {
-				// show ok-message.
-				$transient_obj->set_message( __( 'Token could be successfully verified.', 'easy-language' ) );
-				$transient_obj->set_type( 'success' );
-			} else {
-				// show error.
-				$transient_obj->set_message( __( 'Token could not be verified. Please take a look in the log to check the reason.', 'easy-language' ) );
-				$transient_obj->set_type( 'error' );
-			}
-		} else {
-			// show error via new transients object.
-			$transient_obj = $transients_obj->add();
-			$transient_obj->set_message( __( 'Token or contact email missing.', 'easy-language' ) );
-			$transient_obj->set_type( 'error' );
-		}
+		// add new transient for response to user.
+		$transient_obj = Transients::get_instance()->add();
+		$transient_obj->set_name( 'easy_language_summ_ai_test_token' );
+		$transient_obj->set_message( $result['message'] );
+		$transient_obj->set_type( $result['success'] ? 'success' : 'error' );
 		$transient_obj->save();
 
 		// redirect user.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
+	}
+
+	/**
+	 * Run a token test via AJAX and return the result as dialog.
+	 *
+	 * @return void
+	 */
+	public function run_token_test_via_ajax(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-summ-ai-test-token', 'nonce' );
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			wp_send_json( Helper::get_token_action_result_dialog( __( 'Test token', 'easy-language' ), __( 'You are not allowed to test the token.', 'easy-language' ), false ) );
+		}
+
+		// run the test.
+		$result = $this->test_token();
+
+		// return the result as dialog.
+		wp_send_json( Helper::get_token_action_result_dialog( __( 'Test token', 'easy-language' ), $result['message'], $result['success'] ) );
+	}
+
+	/**
+	 * Test the stored token against the API and return the result.
+	 *
+	 * @return array{success: bool, message: string}
+	 */
+	private function test_token(): array {
+		// bail if necessary values are not set.
+		if ( ! $this->is_summ_api_token_set() || ! $this->is_email_set() ) {
+			return array(
+				'success' => false,
+				'message' => __( 'Token or contact email missing.', 'easy-language' ),
+			);
+		}
+
+		// send request.
+		$request = $this->get_test_request_response();
+
+		// return the result.
+		if ( 200 === $request->get_http_status() ) {
+			return array(
+				'success' => true,
+				'message' => __( 'Token could be successfully verified.', 'easy-language' ),
+			);
+		}
+		return array(
+			'success' => false,
+			'message' => __( 'Token could not be verified. Please take a look in the log to check the reason.', 'easy-language' ),
+		);
 	}
 
 	/**
@@ -1300,19 +1500,56 @@ class Summ_Ai extends Base implements Api_Base {
 	/**
 	 * Remove token via request.
 	 *
+	 * This is the fallback without JavaScript.
+	 *
 	 * @return void
 	 */
 	public function remove_token(): void {
+		// check nonce.
+		check_admin_referer( 'easy-language-summ-ai-remove-token', 'nonce' );
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			// redirect user.
+			wp_safe_redirect( Helper::get_referer_url() );
+			exit;
+		}
+
+		// remove the token.
+		$this->delete_token();
+
+		// redirect user.
+		wp_safe_redirect( Helper::get_referer_url() );
+		exit;
+	}
+
+	/**
+	 * Remove token via AJAX and return the result as dialog.
+	 *
+	 * @return void
+	 */
+	public function remove_token_via_ajax(): void {
 		// check nonce.
 		check_ajax_referer( 'easy-language-summ-ai-remove-token', 'nonce' );
 
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
-			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
-			exit;
+			wp_send_json( Helper::get_token_action_result_dialog( __( 'Remove token', 'easy-language' ), __( 'You are not allowed to remove the token.', 'easy-language' ), false ) );
 		}
 
+		// remove the token.
+		$this->delete_token();
+
+		// return the result as dialog: the page is reloaded after closing it to show the changed settings.
+		wp_send_json( Helper::get_token_action_result_dialog( __( 'Remove token', 'easy-language' ), __( 'The token has been removed.', 'easy-language' ), true, true ) );
+	}
+
+	/**
+	 * Delete the token and all data depending on it.
+	 *
+	 * @return void
+	 */
+	private function delete_token(): void {
 		// delete settings.
 		delete_option( 'easy_language_summ_ai_api_key' );
 		delete_option( 'easy_language_summ_ai_paid_quota' );
@@ -1327,10 +1564,6 @@ class Summ_Ai extends Base implements Api_Base {
 
 		// revert to free mode.
 		$this->set_mode( 'free' );
-
-		// redirect user.
-		wp_safe_redirect( wp_get_referer() );
-		exit;
 	}
 
 	/**
@@ -1349,6 +1582,13 @@ class Summ_Ai extends Base implements Api_Base {
 	 */
 	public function get_mode(): string {
 		$mode = get_option( 'easy_language_summ_ai_mode' );
+
+		// use the free mode if the paid mode is saved, but no API key is available (e.g., removed or not decryptable).
+		// Exception: the paid mode has been set explicitly in this request (e.g., during validation of a new key).
+		if ( 'paid' === $mode && 'paid' !== $this->mode && empty( get_option( 'easy_language_summ_ai_api_key', '' ) ) ) {
+			return 'free';
+		}
+
 		if ( in_array( $mode, array( 'paid', 'free' ), true ) ) {
 			return $mode;
 		}
@@ -1446,24 +1686,17 @@ class Summ_Ai extends Base implements Api_Base {
 			$api_quota = $this->get_quota();
 			if ( empty( $api_quota ) || ! isset( $api_quota['character_spent'], $api_quota['character_limit'] ) ) {
 				$quota_text = esc_html__( 'No quota consumed so far', 'easy-language' );
+			} elseif ( ! empty( $api_quota['unlimited'] ) ) {
+				$quota_text = esc_html__( 'Unlimited.', 'easy-language' );
 			} else {
 				$quota_text = $api_quota['character_spent'] . ' / ' . $api_quota['character_limit'];
 			}
-
-			// get the update quota link.
-			$update_quota_url = add_query_arg(
-				array(
-					'action' => 'easy_language_summ_ai_get_quota',
-					'nonce'  => wp_create_nonce( 'easy-language-summ-ai-get-quota' ),
-				),
-				get_admin_url() . 'admin.php'
-			);
 
 			// output.
 			?>
 			<p>
 				<strong><?php echo esc_html__( 'Quota', 'easy-language' ); ?>:</strong> <?php echo wp_kses_post( $quota_text ); ?>
-				<a href="<?php echo esc_url( $update_quota_url ); ?>#statistics" class="button button-secondary"><?php echo esc_html__( 'Update now', 'easy-language' ); ?></a>
+				<?php echo wp_kses_post( Helper::get_token_action_button( __( 'Update now', 'easy-language' ), 'easy_language_summ_ai_get_quota', 'easy-language-summ-ai-get-quota', array(), 'button button-secondary', __( 'Update quota', 'easy-language' ) ) ); ?>
 			</p>
 			<?php
 		} else {

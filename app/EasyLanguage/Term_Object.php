@@ -152,6 +152,30 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 	}
 
 	/**
+	 * Return the term_ids of the simplifications of this object in any languages.
+	 *
+	 * @return array<int,int>
+	 */
+	public function get_simplifications(): array {
+		global $wpdb;
+
+		// get them directly from the term meta, as the simplified terms are hidden in term queries in the backend.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- the simplified terms are hidden via get_terms_args in backend term queries, so we have to query the term meta directly; used only during deletion
+		$results = $wpdb->get_col(
+			$wpdb->prepare(
+				'SELECT tm.`term_id`
+					FROM %i tm
+					JOIN %i tt ON (tt.`term_id` = tm.`term_id`)
+					WHERE tm.`meta_key` = %s AND tm.`meta_value` = %s AND tt.`taxonomy` = %s',
+				array( $wpdb->termmeta, $wpdb->term_taxonomy, 'easy_language_simplification_original_id', (string) $this->get_id(), $this->get_type() )
+			)
+		);
+
+		// return the list.
+		return array_map( 'absint', $results );
+	}
+
+	/**
 	 * Return the object-title.
 	 *
 	 * @return string
@@ -451,8 +475,12 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 		// remove unnecessary fields.
 		unset( $term['term_id'], $term['name'], $term['taxonomy'] );
 
-		// save the copy.
-		$result = wp_insert_term( $this->get_name() . '-2', $this->get_type(), $term ); // @phpstan-ignore argument.type
+		// save the copy with a unique name (a second target language would otherwise fail with "term_exists").
+		$suffix = 2;
+		do {
+			$result = wp_insert_term( $this->get_name() . '-' . $suffix, $this->get_type(), $term ); // @phpstan-ignore argument.type
+			++$suffix;
+		} while ( is_wp_error( $result ) && 'term_exists' === $result->get_error_code() && $suffix < 100 );
 
 		// bail on error.
 		if ( is_wp_error( $result ) ) {
@@ -494,6 +522,7 @@ class Term_Object extends Objects implements Easy_Language_Interface {
 			}
 			if ( $original_text_obj instanceof Text ) {
 				$original_text_obj->set_object( $this->get_type(), $copied_term_id, 0, '' );
+				$original_text_obj->set_state( 'to_simplify' );
 			}
 		}
 

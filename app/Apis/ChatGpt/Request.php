@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Log;
+use easyLanguage\Plugin\Api_Request_Table;
 use easyLanguage\Plugin\Log_Api;
 use easyLanguage\EasyLanguage\Db;
 use WP_Error;
@@ -107,7 +108,7 @@ class Request implements Api_Requests {
 	 *
 	 * @var string
 	 */
-	private string $token;
+	private string $token = '';
 
 	/**
 	 * Constructor.
@@ -164,6 +165,13 @@ class Request implements Api_Requests {
 		// get chatgpt-object.
 		$chatgpt_obj = ChatGpt::get_instance();
 
+		// bail if no token is given.
+		if ( empty( $this->token ) ) {
+			// Log event.
+			Log::get_instance()->add_log( __( 'ChatGpt: no API token given for request.', 'easy-language' ), 'error' );
+			return;
+		}
+
 		// merge header-array.
 		$headers = array_merge(
 			$this->header,
@@ -178,7 +186,7 @@ class Request implements Api_Requests {
 			'headers'     => $headers,
 			'httpversion' => '1.1',
 			'timeout'     => get_option( 'easy_language_api_timeout', 60 ),
-			'redirection' => 10,
+			'redirection' => 0, // never follow redirects, as the request contains the API key.
 		);
 
 		// set request data.
@@ -210,7 +218,7 @@ class Request implements Api_Requests {
 		$start_time = microtime( true );
 
 		// send the request and get the result-object.
-		$this->result = wp_remote_post( $this->url, $args );
+		$this->result = wp_safe_remote_post( $this->url, $args );
 
 		// secure end-time.
 		$end_time = microtime( true );
@@ -233,7 +241,13 @@ class Request implements Api_Requests {
 		if ( ! $args_json ) {
 			$args_json = '';
 		}
-		Log_Api::get_instance()->add_log( $chatgpt_obj->get_name(), $this->http_status, $args_json, 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
+
+		// add the error message if the request failed (e.g., timeout).
+		$error_message = '';
+		if ( is_wp_error( $result ) ) {
+			$error_message = 'Error: ' . esc_html( $result->get_error_message() ) . '<br>';
+		}
+		Log_Api::get_instance()->add_log( $chatgpt_obj->get_name(), $this->http_status, $args_json, $error_message . 'HTTP-Status: ' . $this->get_http_status() . '<br>' . $this->response );
 
 		// save request and result in the database.
 		$this->save_in_db();
@@ -318,7 +332,7 @@ class Request implements Api_Requests {
 			'time'       => gmdate( 'Y-m-d H:i:s' ),
 			'request'    => wp_json_encode( $this->get_request() ),
 			'response'   => $this->get_response(),
-			'duration'   => $this->duration,
+			'duration'   => round( $this->duration, 3 ),
 			'httpstatus' => $this->get_http_status(),
 			'quota'      => strlen( $this->get_text() ),
 			'blog_id'    => get_current_blog_id(),
@@ -331,6 +345,9 @@ class Request implements Api_Requests {
 			/* translators: %1$s will be replaced by the error code. */
 			Log::get_instance()->add_log( sprintf( __( 'Error during adding API log entry: %1$s', 'easy-language' ), '<code>' . $wpdb->last_error . '</code>' ), 'error' );
 		}
+
+		// remove old entries, so the table does not grow without limit.
+		Api_Request_Table::cleanup( $this->table_requests );
 	}
 
 	/**

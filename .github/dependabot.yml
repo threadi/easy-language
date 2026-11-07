@@ -4,3 +4,23 @@ updates:
     directory: /
     schedule:
       interval: weekly
+
+  # PHP packages, incl. the libraries shipped with the plugin (crypt, dialog, settings, setup, transients).
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # updates of development tools (PHPStan, PHPCS, PHPUnit …) in one pull request.
+      composer-dev:
+        dependency-type: development
+
+  # npm packages for the blocks, the sidebar, the page builder fields and the E2E tests.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      # updates of build and test tools in one pull request.
+      npm-dev:
+        dependency-type: development

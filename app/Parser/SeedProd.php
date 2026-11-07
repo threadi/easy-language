@@ -102,7 +102,7 @@ class SeedProd extends Parser_Base implements Parser {
 		 */
 		$html_widgets = apply_filters( 'easy_language_seedprod_html_widgets', $html_support_widgets );
 
-		return isset( $html_widgets[ $widget_name ] );
+		return ! empty( $html_widgets[ $widget_name ] );
 	}
 
 	/**
@@ -178,6 +178,13 @@ class SeedProd extends Parser_Base implements Parser {
 
 			// save the data for SeedProd, if they have been changed and the JSON could be created.
 			if ( $document !== $data['document'] && is_string( $new_data_json ) ) {
+				// the HTML filter of WordPress (active without the capability "unfiltered_html", e.g. in cron jobs)
+				// would remove the escaped closing tags in the JSON, so disable it for this field while saving.
+				$kses_priority = has_filter( 'content_filtered_save_pre', 'wp_filter_post_kses' );
+				if ( false !== $kses_priority ) {
+					remove_filter( 'content_filtered_save_pre', 'wp_filter_post_kses', $kses_priority );
+				}
+
 				wp_update_post(
 					wp_slash(
 						array(
@@ -186,6 +193,11 @@ class SeedProd extends Parser_Base implements Parser {
 						)
 					)
 				);
+
+				// enable the filter again.
+				if ( false !== $kses_priority ) {
+					add_filter( 'content_filtered_save_pre', 'wp_filter_post_kses', $kses_priority );
+				}
 			}
 		}
 

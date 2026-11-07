@@ -31,6 +31,7 @@ parameters:
     - "#get_fields#"
     - "#get_field_object#"
     - "#update_field#"
+    - "#AiClient#"
     - "#acf_render_field_setting#"
   earlyTerminatingFunctionCalls:
     - wp_send_json

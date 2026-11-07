@@ -67,7 +67,7 @@ class Switcher_Widget extends Widget_Base {
 	 * @return array Widget categories.
 	 */
 	public function get_categories(): array {
-		return array( 'languages', 'menu' );
+		return array( 'general' );
 	}
 
 	/**
@@ -75,7 +75,7 @@ class Switcher_Widget extends Widget_Base {
 	 */
 	public function get_style_depends(): array {
 		return array(
-			'easy-language-elementor-widgets',
+			'easy-language-switcher',
 		);
 	}
 

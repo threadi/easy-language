@@ -409,8 +409,26 @@ class Switcher_Module {
 			if ( ! is_string( $value ) || ! str_contains( $value, '$variable(' ) ) {
 				continue;
 			}
-			$resolved        = Utils::resolve_global_color_to_value( $value );
-			$values[ $name ] = is_string( $resolved ) && ! str_contains( $resolved, '$variable(' ) ? $resolved : Utils::resolve_dynamic_variable( $value );
+
+			// resolve global colors (if Divi supports it).
+			$resolved = null;
+			if ( method_exists( Utils::class, 'resolve_global_color_to_value' ) ) {
+				$resolved = Utils::resolve_global_color_to_value( $value );
+			}
+
+			// use the resolved color.
+			if ( is_string( $resolved ) && ! str_contains( $resolved, '$variable(' ) ) {
+				$values[ $name ] = $resolved;
+				continue;
+			}
+
+			// bail if Divi does not support to resolve dynamic variables.
+			if ( ! method_exists( Utils::class, 'resolve_dynamic_variable' ) ) {
+				continue;
+			}
+
+			// resolve the dynamic variable.
+			$values[ $name ] = Utils::resolve_dynamic_variable( $value );
 		}
 
 		// return the values.

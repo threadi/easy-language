@@ -96,8 +96,9 @@ class SiteOrigin extends PageBuilder_Base {
 		add_action( 'wp_ajax_so_widgets_search_posts', array( $this, 'search_objects' ), 1 );
 		add_action( 'siteorigin_widgets_render_preview_' . self::WIDGET_ID, array( $this, 'enqueue_switcher_style' ) );
 
-		// the classic widget as fallback.
-		add_action( 'widgets_init', array( $this, 'register_plain_widget' ) );
+		// the classic widget for all widget areas and as fallback for Page Builder: after the Widgets Bundle, but before
+		// WordPress registers the widgets for the widget areas (WP_Widget_Factory::_register_widgets() with priority 100).
+		add_action( 'widgets_init', array( $this, 'register_plain_widget' ), 99 );
 
 		// the integration in Page Builder.
 		add_filter( 'siteorigin_panels_widget_class', array( $this, 'map_widget_class' ), 20 );
@@ -203,20 +204,64 @@ class SiteOrigin extends PageBuilder_Base {
 	}
 
 	/**
-	 * Register the classic widget if the Widgets Bundle is not active.
+	 * Register the classic widget for the language switcher.
 	 *
-	 * Then Page Builder by SiteOrigin (and classic widget areas) could still use the language switcher.
+	 * It is available in all classic widget areas (and as legacy widget in the block-based widget editor),
+	 * independent of any page builder. Page Builder by SiteOrigin uses it, if the Widgets Bundle is not active.
+	 *
+	 * If the Widgets Bundle has already registered our widget (same ID), it is used instead in all widget areas.
 	 *
 	 * @return void
 	 */
 	public function register_plain_widget(): void {
-		// bail if Page Builder is not active or the Widgets Bundle is active.
-		if ( ! $this->is_page_builder_active() || $this->is_widgets_bundle_active() ) {
+		// bail if our widget of the Widgets Bundle (another class with our widget ID) is registered.
+		if ( $this->is_widget_id_used_by_other_class() ) {
 			return;
 		}
 
 		// register the widget.
 		register_widget( self::PLAIN_WIDGET_CLASS );
+	}
+
+	/**
+	 * Return whether our widget ID is used by another widget class (e.g. the widget of the Widgets Bundle).
+	 *
+	 * Checks the widget factory and the widgets registered for the widget areas, as WordPress removes widgets
+	 * from the factory, if "widgets_init" runs more than once in a request.
+	 *
+	 * @return bool
+	 */
+	private function is_widget_id_used_by_other_class(): bool {
+		global $wp_widget_factory, $wp_registered_widgets;
+
+		// collect the registered widget objects.
+		$widgets = $wp_widget_factory instanceof \WP_Widget_Factory ? array_values( $wp_widget_factory->widgets ) : array();
+		foreach ( (array) $wp_registered_widgets as $registered_widget ) {
+			if ( is_array( $registered_widget ) && isset( $registered_widget['callback'][0] ) ) {
+				$widgets[] = $registered_widget['callback'][0];
+			}
+		}
+
+		// check each widget.
+		foreach ( $widgets as $widget ) {
+			if ( $widget instanceof \WP_Widget && self::WIDGET_ID === $widget->id_base && ! is_a( $widget, self::PLAIN_WIDGET_CLASS ) ) {
+				return true;
+			}
+		}
+
+		// return false as no other widget uses our ID.
+		return false;
+	}
+
+	/**
+	 * Return whether the widget is used in a layout of Page Builder by SiteOrigin.
+	 *
+	 * @param array<string,mixed> $instance The widget instance.
+	 *
+	 * @return bool
+	 */
+	public function is_page_builder_instance( array $instance ): bool {
+		return isset( $instance['panels_info'] );
 	}
 
 	/**

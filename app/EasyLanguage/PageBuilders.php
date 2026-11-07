@@ -220,7 +220,6 @@ class PageBuilders {
 			'\easyLanguage\PageBuilder\Breakdance',
 			'\easyLanguage\PageBuilder\Bricks',
 			'\easyLanguage\PageBuilder\Brizy',
-			'\easyLanguage\PageBuilder\Colibri',
 			'\easyLanguage\PageBuilder\Divi',
 			'\easyLanguage\PageBuilder\Divi5',
 			'\easyLanguage\PageBuilder\Elementor',

@@ -37,25 +37,8 @@ class TranslatePress_Capito_Machine_Translator extends TRP_Machine_Translator {
 			return new WP_Error( 'error', __( 'No active capito API!', 'easy-language' ) );
 		}
 
-		// build request.
-		$request_obj = $api_object->get_request_object();
-		$request_obj->set_token( $api_object->get_token() );
-		$request_obj->set_url( $api_object->get_api_url() );
-		$request_obj->set_text( $string_to_translate );
-		$request_obj->set_source_language( $source_language );
-		$request_obj->set_target_language( $language_code );
-		/**
-		 * Filter the capito request object.
-		 *
-		 * @since 2.0.0 Available since 2.0.0.
-		 *
-		 * @param Request $request_obj The capito request object.
-		 */
-		$request_obj = apply_filters( 'easy_language_capito_request_object', $request_obj );
-		$request_obj->send();
-
-		// return request result.
-		return $request_obj->get_result();
+		// return request result (array with "translated_text" or empty array on error).
+		return $api_object->get_simplifications_obj()->call_api( (string) $string_to_translate, (string) $source_language, (string) $language_code, false );
 	}
 
 	/**
@@ -74,8 +57,13 @@ class TranslatePress_Capito_Machine_Translator extends TRP_Machine_Translator {
 			return array();
 		}
 
-		$source_language = $this->machine_translation_codes[ $source_language_code ];
-		$target_language = $this->machine_translation_codes[ $target_language_code ];
+		// get the language codes of this plugin (e.g. "de_DE" and "de_LS") for the languages of TranslatePress.
+		$api_object = Apis::get_instance()->get_active_api();
+		if ( false === $api_object || 'capito' !== $api_object->get_name() ) {
+			return array();
+		}
+		$source_language = $this->get_plugin_language_code( $source_language_code, $api_object->get_supported_source_languages() );
+		$target_language = $this->get_plugin_language_code( $target_language_code, $api_object->get_supported_target_languages() );
 
 		$translated_strings = array();
 		foreach ( $new_strings as $key => $string_to_translate ) {
@@ -95,36 +83,20 @@ class TranslatePress_Capito_Machine_Translator extends TRP_Machine_Translator {
 				)
 			);
 
-			/**
-			 * Analyse the response.
-			 *
-			 * HTTP-Code:
-			 * - 200 => ok, its translated.
-			 * - 429 => to many requests => break.
-			 * - 467 => quota exceeded => break.
-			 */
-			if ( is_array( $response ) && ! is_wp_error( $response ) && isset( $response['response'] ) && isset( $response['response']['code'] ) ) {
-				if ( 200 === $response['response']['code'] ) {
+			// bail if the response does not contain a simplified text.
+			if ( ! is_array( $response ) || empty( $response['translated_text'] ) || ! is_string( $response['translated_text'] ) ) {
+				continue;
+			}
 
-					// update simplification count.
-					$this->machine_translator_logger->count_towards_quota( $string_to_translate );
+			// update simplification count.
+			$this->machine_translator_logger->count_towards_quota( $string_to_translate );
 
-					$translation_response = json_decode( $response['body'] );
-					if ( ! empty( $translation_response->translated_text ) ) {
-						// update the simplification string.
-						$translated_strings[ $key ] = wp_kses_post( nl2br( (string) $translation_response->translated_text ) );
-					}
+			// update the simplification string.
+			$translated_strings[ $key ] = wp_kses_post( nl2br( $response['translated_text'] ) );
 
-					// break if configured quota is exceeded.
-					if ( $this->machine_translator_logger->quota_exceeded() ) {
-						break;
-					}
-				}
-
-				// break loop if to many requests or quota exceeded.
-				if ( in_array( $response['response']['code'], array( 429, 467 ), true ) ) {
-					break;
-				}
+			// break if configured quota is exceeded.
+			if ( $this->machine_translator_logger->quota_exceeded() ) {
+				break;
 			}
 		}
 
@@ -133,12 +105,39 @@ class TranslatePress_Capito_Machine_Translator extends TRP_Machine_Translator {
 	}
 
 	/**
+	 * Return the language code of this plugin for the given language code of TranslatePress.
+	 *
+	 * TranslatePress uses the codes of its language list, which could differ in case (e.g. "de_ls" for "de_LS").
+	 *
+	 * @param string              $trp_language_code The language code from TranslatePress.
+	 * @param array<string,mixed> $supported_languages List of supported languages of the API.
+	 *
+	 * @return string
+	 */
+	private function get_plugin_language_code( string $trp_language_code, array $supported_languages ): string {
+		// use the code if it is supported as it is.
+		if ( isset( $supported_languages[ $trp_language_code ] ) ) {
+			return $trp_language_code;
+		}
+
+		// search the code case-insensitive in the codes and URLs of the supported languages.
+		foreach ( $supported_languages as $language_code => $settings ) {
+			if ( strtolower( (string) $language_code ) === strtolower( $trp_language_code ) || ( is_array( $settings ) && isset( $settings['url'] ) && strtolower( (string) $settings['url'] ) === strtolower( $trp_language_code ) ) ) {
+				return (string) $language_code;
+			}
+		}
+
+		// use the code TranslatePress has mapped for this language as fallback.
+		return (string) ( $this->machine_translation_codes[ $trp_language_code ] ?? $trp_language_code );
+	}
+
+	/**
 	 * Send a test request to verify if the functionality is working.
 	 *
 	 * @return WP_Error|array
 	 */
 	public function test_request(): WP_Error|array {
-		return $this->send_request( 'en', 'b1', 'about' );
+		return $this->send_request( 'de_DE', 'de_b1', 'about' );
 	}
 
 	/**
