@@ -647,8 +647,8 @@ class Text {
 			// get the first language from the object.
 			$language = array_key_first( $object->get_language() );
 
-			// bail if language is unknown.
-			if ( empty( $languages[ $language ] ) ) {
+			// bail if the object has no language (array_key_first() returns null for an empty list) or it is unknown.
+			if ( ! is_string( $language ) || empty( $languages[ $language ] ) ) {
 				continue;
 			}
 
