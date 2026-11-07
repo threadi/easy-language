@@ -33,6 +33,8 @@
 
 ### Changed
 
+- Buttons to test and remove the token of SUMM AI, capito and ChatGPT run via AJAX and show their result in a dialog instead of reloading the page; removing a token has to be confirmed
+- The button to update the quota of SUMM AI and capito runs via AJAX and shows its result in a dialog; the page is reloaded after closing it to show the actual quota
 - The choice of the API uses the new field "Cards" of Easy Settings: it looks the same in the classic view and in the DataView; APIs which could not be used could not be chosen
 - Updated dependencies
 - Now requires WordPress 6.6 or newer

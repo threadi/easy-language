@@ -1293,7 +1293,12 @@ class Abilities {
 		// get the IDs of the editable posts of the requested page and the totals.
 		$total       = absint( $results->found_posts );
 		$total_pages = absint( $results->max_num_pages );
-		$post_ids    = array_map( 'absint', $results->get_posts() );
+		$post_ids    = array_map(
+			static function ( int|WP_Post $post ): int {
+				return $post instanceof WP_Post ? $post->ID : absint( $post );
+			},
+			$results->get_posts()
+		);
 		if ( ! $can_edit_others ) {
 			$post_ids    = array_values(
 				array_filter(

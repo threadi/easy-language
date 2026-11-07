@@ -754,6 +754,101 @@ class Helper {
 	}
 
 	/**
+	 * Return the HTML-code for a button to manage the token of an API (e.g. to test or to remove it).
+	 *
+	 * With JavaScript, the action is run via AJAX and its result is shown in a dialog without reloading the page.
+	 * Without JavaScript, the link calls the admin-action with the same name as fallback.
+	 *
+	 * @param string                                 $title The title of the button.
+	 * @param string                                 $action The name of the action (used for the AJAX- and the admin-action).
+	 * @param string                                 $nonce_action The name of the nonce for this action.
+	 * @param array<string,string|array<int,string>> $confirm_dialog Optional dialog to confirm the action (with "title", "texts", "yes" and "no").
+	 * @param string                                 $classes Optional CSS-classes for the button (defaults to the primary settings button).
+	 * @param string                                 $dialog_title Optional title for the dialog while the request is running (defaults to the title of the button).
+	 *
+	 * @return string
+	 */
+	public static function get_token_action_button( string $title, string $action, string $nonce_action, array $confirm_dialog = array(), string $classes = 'button button-primary easy-language-settings-button', string $dialog_title = '' ): string {
+		// create the nonce.
+		$nonce = wp_create_nonce( $nonce_action );
+
+		// create the URL as fallback without JavaScript.
+		$url = add_query_arg(
+			array(
+				'action' => $action,
+				'nonce'  => $nonce,
+			),
+			get_admin_url() . 'admin.php'
+		);
+
+		// collect the attributes for the AJAX-request.
+		$attributes = ' data-action="' . esc_attr( $action ) . '" data-nonce="' . esc_attr( $nonce ) . '"';
+		if ( ! empty( $confirm_dialog ) ) {
+			$attributes .= ' data-confirm-dialog="' . esc_attr( self::get_json( $confirm_dialog ) ) . '"';
+		}
+		if ( ! empty( $dialog_title ) ) {
+			$attributes .= ' data-dialog-title="' . esc_attr( $dialog_title ) . '"';
+		}
+
+		// return the HTML-code for the button.
+		return '<a href="' . esc_url( $url ) . '" class="' . esc_attr( $classes ) . ' easy-language-token-action"' . $attributes . '>' . esc_html( $title ) . '</a>';
+	}
+
+	/**
+	 * Return the configuration to confirm the removal of a token.
+	 *
+	 * The buttons are added via JavaScript, which runs the AJAX-request after confirmation.
+	 *
+	 * @return array<string,string|array<int,string>>
+	 */
+	public static function get_remove_token_confirm_dialog(): array {
+		return array(
+			'title' => __( 'Remove token', 'easy-language' ),
+			'texts' => array(
+				'<p><strong>' . __( 'Do you really want to remove the token?', 'easy-language' ) . '</strong></p>',
+				'<p>' . __( 'You will have to enter it again to use this API with your own token.', 'easy-language' ) . '</p>',
+			),
+			'yes'   => __( 'Yes, remove it', 'easy-language' ),
+			'no'    => __( 'Cancel', 'easy-language' ),
+		);
+	}
+
+	/**
+	 * Return the configuration for the dialog which shows the result of a token action via AJAX.
+	 *
+	 * @param string $title The title of the dialog.
+	 * @param string $message The message (could contain HTML).
+	 * @param bool   $success Whether the action was successful.
+	 * @param bool   $reload Whether the page should be reloaded after closing the dialog (e.g. if settings have been changed).
+	 *
+	 * @return array<string,array<string,mixed>>
+	 */
+	public static function get_token_action_result_dialog( string $title, string $message, bool $success, bool $reload = false ): array {
+		// create the dialog.
+		$dialog = array(
+			'title'   => $title,
+			'texts'   => array(
+				'<p>' . wp_kses_post( $message ) . '</p>',
+			),
+			'buttons' => array(
+				array(
+					'action'  => $reload ? 'location.reload();' : 'closeDialog();',
+					'variant' => 'primary',
+					'text'    => __( 'OK', 'easy-language' ),
+				),
+			),
+		);
+
+		// mark errors.
+		if ( ! $success ) {
+			$dialog['className'] = 'wp-dialog-error';
+		}
+
+		// return the dialog in the format for the event "easy-dialog-for-wordpress".
+		return array( 'detail' => $dialog );
+	}
+
+	/**
 	 * Create JSON from a given array.
 	 *
 	 * @param array<string|int,mixed>|WP_Error $source The source array.

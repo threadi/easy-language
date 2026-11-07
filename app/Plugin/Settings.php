@@ -260,7 +260,7 @@ class Settings {
 		$field = new Cards( $settings_obj );
 		$field->set_title( __( 'Select your API', 'easy-language' ) );
 		$field->set_columns( 3 );
-		$field->set_options( $apis );
+		$field->set_options( $apis ); // @phpstan-ignore argument.type
 		$field->set_sanitize_callback( array( self::get_instance(), 'sanitize_api' ) );
 		$setting->set_field( $field );
 
@@ -605,7 +605,7 @@ class Settings {
 		}
 
 		// set the actual descriptions.
-		$field->set_options( $this->get_api_options() );
+		$field->set_options( $this->get_api_options() );  // @phpstan-ignore argument.type
 	}
 
 	/**

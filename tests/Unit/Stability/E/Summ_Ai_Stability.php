@@ -197,6 +197,9 @@ class Summ_Ai_Stability extends easyLanguageTests {
 	 * @return void
 	 */
 	public function test_validate_api_key_keeps_old_key_on_temporary_error(): void {
+		// the key is only validated if SUMM AI is the active API.
+		add_filter( 'pre_option_easy_language_api', array( self::class, 'get_summ_ai_as_api' ) );
+
 		$this->prepare_settings_errors();
 		self::$status = 503;
 		$this->assertSame( 'old-key', Summ_Ai::get_instance()->validate_api_key( 'new-key', 'old-key' ) );
@@ -204,6 +207,41 @@ class Summ_Ai_Stability extends easyLanguageTests {
 		$this->prepare_settings_errors();
 		self::$status = 401;
 		$this->assertSame( '', Summ_Ai::get_instance()->validate_api_key( 'new-key', 'old-key' ) );
+
+		remove_filter( 'pre_option_easy_language_api', array( self::class, 'get_summ_ai_as_api' ) );
+	}
+
+	/**
+	 * If SUMM AI is not the active API, the key is kept without validation (and not removed).
+	 *
+	 * @return void
+	 */
+	public function test_validate_api_key_keeps_key_if_api_is_not_active(): void {
+		add_filter( 'pre_option_easy_language_api', array( self::class, 'get_capito_as_api' ) );
+
+		$this->prepare_settings_errors();
+		self::$status = 401;
+		$this->assertSame( 'new-key', Summ_Ai::get_instance()->validate_api_key( 'new-key', 'old-key' ) );
+
+		remove_filter( 'pre_option_easy_language_api', array( self::class, 'get_capito_as_api' ) );
+	}
+
+	/**
+	 * Return SUMM AI as the active API.
+	 *
+	 * @return string
+	 */
+	public static function get_summ_ai_as_api(): string {
+		return 'summ_ai';
+	}
+
+	/**
+	 * Return capito as the active API.
+	 *
+	 * @return string
+	 */
+	public static function get_capito_as_api(): string {
+		return 'capito';
 	}
 
 	/**

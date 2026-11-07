@@ -170,7 +170,7 @@ class Language_Icon {
 	 */
 	private function get_own_attachment( string $name ): WP_Post|false {
 		foreach ( array( 'name', 'title' ) as $field ) {
-			$query = array(
+			$query  = array(
 				'posts_per_page' => 1,
 				'post_type'      => 'attachment',
 				'post_status'    => 'inherit',

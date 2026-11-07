@@ -313,11 +313,11 @@ class Switcher_Menu extends Switcher_Tests {
 		$items = $this->get_items();
 
 		ob_start();
-		Switcher::get_instance()->add_menu_options( (int) $items[0]->ID, get_post( (int) $items[0]->ID ) );
+		Switcher::get_instance()->add_menu_options( (int) $items[0]->ID );
 		$this->assertEquals( '', trim( (string) ob_get_clean() ) );
 
 		ob_start();
-		Switcher::get_instance()->add_menu_options( $this->switcher_item_id, get_post( $this->switcher_item_id ) );
+		Switcher::get_instance()->add_menu_options( $this->switcher_item_id );
 		$this->assertStringContainsString( 'easy-language-menu-switcher-settings', (string) ob_get_clean() );
 	}
 }

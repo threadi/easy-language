@@ -199,7 +199,7 @@ class Divi5 extends Parser_Base implements Parser {
 				}
 
 				// replace the text only if the callback returned a string which contains the original text.
-				if ( '' !== $attribute_path && is_string( $text ) && str_contains( $text, $this->get_text() ) ) {
+				if ( is_string( $text ) && str_contains( $text, $this->get_text() ) ) {
 					// make sure the attributes are an array.
 					if ( ! isset( $block['attrs'] ) || ! is_array( $block['attrs'] ) ) {
 						$block['attrs'] = array();
@@ -207,9 +207,6 @@ class Divi5 extends Parser_Base implements Parser {
 
 					// set the simplified text.
 					$block['attrs'] = $this->set_attribute_by_path( $block['attrs'], $attribute_path, str_replace( $this->get_text(), $simplified_part, $text ) );
-				} elseif ( '' === $attribute_path ) {
-					// replace the text in the inner content as we do not know any attribute for this block.
-					$block = $this->replace_text_in_inner_content( $block, $simplified_part );
 				}
 			} elseif ( '' !== $this->get_text_attribute_path( $block, $flow_blocks[ $block['blockName'] ] ) ) {
 				// replace the text in the attribute of the block, where Divi 5 saves the text of its modules.

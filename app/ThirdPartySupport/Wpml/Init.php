@@ -265,7 +265,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 				'flag'           => $language['img'],
 				'flag_upload'    => true,
 			);
-			$result = $icl_edit_languages->insert_one( $data );
+			$result             = $icl_edit_languages->insert_one( $data );
 
 			// bail if the language could not be added.
 			if ( false === $result ) {

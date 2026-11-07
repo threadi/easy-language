@@ -140,7 +140,7 @@ class Divi extends Parser_Base implements Parser {
 					$shortcode_attributes = shortcode_parse_atts( $matches[3][ $key ] );
 
 					// bail if the shortcode has no attributes.
-					if ( ! is_array( $shortcode_attributes ) ) {
+					if ( empty( $shortcode_attributes ) ) {
 						continue;
 					}
 

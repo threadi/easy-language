@@ -124,7 +124,7 @@ class Switcher {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		add_filter( 'wp_get_nav_menu_items', array( $this, 'set_menu_items' ) );
 		add_filter( 'nav_menu_link_attributes', array( $this, 'set_menu_link_attributes' ), 10, 2 );
-		add_action( 'wp_nav_menu_item_custom_fields', array( $this, 'add_menu_options' ), 10, 2 );
+		add_action( 'wp_nav_menu_item_custom_fields', array( $this, 'add_menu_options' ) );
 		add_action( 'wp_update_nav_menu_item', array( $this, 'save_menu_options' ), 10, 2 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'add_menu_scripts' ) );
 		add_shortcode( 'easy-language-switcher', array( $this, 'use_shortcode' ) );
@@ -328,7 +328,7 @@ class Switcher {
 		$post_id = wp_insert_post( $query );
 
 		// bail if the entry could not be created (try it again on the next request).
-		if ( ! is_int( $post_id ) || $post_id <= 0 ) {
+		if ( 0 === $post_id ) {
 			return;
 		}
 
@@ -1741,12 +1741,11 @@ class Switcher {
 	/**
 	 * Add options for language-switcher in classic menu.
 	 *
-	 * @param int          $item_id The ID of the item.
-	 * @param WP_Post|null $menu_item The menu item.
+	 * @param int $item_id The ID of the item.
 	 *
 	 * @return void
 	 */
-	public function add_menu_options( int $item_id, WP_Post|null $menu_item = null ): void {
+	public function add_menu_options( int $item_id ): void {
 		// bail if this is not a language switcher.
 		if ( EASY_LANGUAGE_CPT_SWITCHER !== get_post_meta( $item_id, '_menu_item_object', true ) ) {
 			return;

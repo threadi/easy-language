@@ -108,6 +108,9 @@ class ChatGpt extends Base implements Api_Base {
 
 		// add hook to remove token.
 		add_action( 'admin_action_easy_language_chatgpt_remove_token', array( $this, 'remove_token' ) );
+
+		// add AJAX-hook to remove the token without reloading the page.
+		add_action( 'wp_ajax_easy_language_chatgpt_remove_token', array( $this, 'remove_token_via_ajax' ) );
 	}
 
 	/**
@@ -338,19 +341,10 @@ class ChatGpt extends Base implements Api_Base {
 		/* translators: %1$s will be replaced by the ChatGPT URL */
 		$description = sprintf( __( 'Get your ChatGPT API Token <a href="%1$s" target="_blank">here (open new window)</a>.<br>If you have any questions about the token provided by ChatGpt, please contact their support: <a href="%2$s" target="_blank">%2$s (open new window)</a>', 'easy-language' ), esc_url( $this->get_api_management_url() ), esc_url( $this->get_language_specific_support_page() ) );
 		if ( false !== $this->is_chatgpt_token_set() ) {
-			// set link to remove the token.
-			$remove_token_url = add_query_arg(
-				array(
-					'action' => 'easy_language_chatgpt_remove_token',
-					'nonce'  => wp_create_nonce( 'easy-language-chatgpt-remove-token' ),
-				),
-				get_admin_url() . 'admin.php'
-			);
-
 			// Show other description if token is set.
 			/* translators: %1$s will be replaced by the Chatgpt URL */
 			$description  = sprintf( __( 'If you have any questions about the token provided by ChatGPT, please contact their support: <a href="%1$s" target="_blank">%1$s (open new window)</a>', 'easy-language' ), esc_url( $this->get_language_specific_support_page() ) );
-			$description .= '<br><a href="' . esc_url( $remove_token_url ) . '" class="button button-primary easy-language-settings-button">' . __( 'Remove token', 'easy-language' ) . '</a>';
+			$description .= '<br>' . Helper::get_token_action_button( __( 'Remove token', 'easy-language' ), 'easy_language_chatgpt_remove_token', 'easy-language-chatgpt-remove-token', Helper::get_remove_token_confirm_dialog() );
 		}
 
 		// if foreign simplification-plugin with the API-support is used, hide the language-settings.
@@ -364,14 +358,12 @@ class ChatGpt extends Base implements Api_Base {
 		// add setting.
 		$setting = $settings_obj->add_setting( 'easy_language_chatgpt_api_key' );
 		$setting->set_section( $chatgpt_tab_main );
-		$setting->set_show_in_rest( false );
 		$setting->set_type( 'string' );
 		$setting->set_default( '' );
 		$setting->set_save_callback( array( $this, 'validate_api_key' ) );
 		$setting->prevent_export( true );
 		$field = new Password( $settings_obj );
 		$field->set_title( __( 'ChatGPT API Key', 'easy-language' ) );
-		$field->set_placeholder( __( 'Enter your key here', 'easy-language' ) );
 		$field->set_value( Crypt::get_instance()->get_masked_value( 'easy_language_chatgpt_api_key' ) );
 		$field->set_description( $description );
 		$setting->set_field( $field );
@@ -653,6 +645,11 @@ class ChatGpt extends Base implements Api_Base {
 	 * @noinspection PhpUnused
 	 */
 	public function validate_api_key( ?string $value ): ?string {
+		// bail if this API is not active: keep the given value without validation (null would delete the stored key).
+		if ( ! $this->is_active() ) {
+			return $value;
+		}
+
 		// bail if the key has not been changed (the form returns the mask, the saved key will be kept).
 		if ( Crypt::MASK === $value || Crypt::get_instance()->is_encrypted( $value ) ) {
 			return $value;
@@ -699,6 +696,8 @@ class ChatGpt extends Base implements Api_Base {
 	/**
 	 * Remove token via click.
 	 *
+	 * This is the fallback without JavaScript.
+	 *
 	 * @return void
 	 * @noinspection PhpNoReturnAttributeCanBeAddedInspection
 	 */
@@ -713,6 +712,41 @@ class ChatGpt extends Base implements Api_Base {
 			exit;
 		}
 
+		// remove the token.
+		$this->delete_token();
+
+		// redirect user.
+		wp_safe_redirect( Helper::get_referer_url() );
+		exit;
+	}
+
+	/**
+	 * Remove token via AJAX and return the result as dialog.
+	 *
+	 * @return void
+	 */
+	public function remove_token_via_ajax(): void {
+		// check nonce.
+		check_ajax_referer( 'easy-language-chatgpt-remove-token', 'nonce' );
+
+		// bail if capability is not granted.
+		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
+			wp_send_json( Helper::get_token_action_result_dialog( __( 'Remove token', 'easy-language' ), __( 'You are not allowed to remove the token.', 'easy-language' ), false ) );
+		}
+
+		// remove the token.
+		$this->delete_token();
+
+		// return the result as dialog: the page is reloaded after closing it to show the changed settings.
+		wp_send_json( Helper::get_token_action_result_dialog( __( 'Remove token', 'easy-language' ), __( 'The token has been removed.', 'easy-language' ), true, true ) );
+	}
+
+	/**
+	 * Delete the token and all data depending on it.
+	 *
+	 * @return void
+	 */
+	private function delete_token(): void {
 		// delete settings.
 		delete_option( 'easy_language_chatgpt_api_key' );
 
@@ -720,10 +754,6 @@ class ChatGpt extends Base implements Api_Base {
 		if ( 1 === absint( get_option( 'easy_language_intro_step_2', 0 ) ) ) {
 			delete_option( 'easy_language_intro_step_2' );
 		}
-
-		// redirect user.
-		wp_safe_redirect( Helper::get_referer_url() );
-		exit;
 	}
 
 	/**

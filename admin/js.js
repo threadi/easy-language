@@ -52,6 +52,48 @@ jQuery( document ).ready(
 		});
 
 		/**
+		 * Token actions of the APIs (e.g. test or remove the token): run them via AJAX and show the result in a dialog.
+		 *
+		 * The buttons are part of the field descriptions, which are rendered later in the DataView. So the event is
+		 * delegated to the document.
+		 */
+		$( document ).on( 'click', 'a.easy-language-token-action', function( e ) {
+			e.preventDefault();
+
+			let action = String( $( this ).data( 'action' ) );
+			let nonce = String( $( this ).data( 'nonce' ) );
+			let title = $( this ).data( 'dialog-title' ) ? String( $( this ).data( 'dialog-title' ) ) : $( this ).text();
+			let confirm_dialog = $( this ).data( 'confirm-dialog' );
+
+			// run the action directly if no confirmation is necessary.
+			if ( ! confirm_dialog ) {
+				easy_language_run_token_action( action, nonce, title );
+				return;
+			}
+
+			// ask for confirmation before running the action.
+			let dialog_config = {
+				detail: {
+					title: confirm_dialog.title,
+					texts: confirm_dialog.texts,
+					buttons: [
+						{
+							'action': 'easy_language_run_token_action(' + JSON.stringify( action ) + ', ' + JSON.stringify( nonce ) + ', ' + JSON.stringify( title ) + ');',
+							'variant': 'primary',
+							'text': confirm_dialog.yes
+						},
+						{
+							'action': 'closeDialog();',
+							'variant': 'secondary',
+							'text': confirm_dialog.no
+						}
+					]
+				}
+			}
+			easy_language_create_dialog( dialog_config );
+		});
+
+		/**
 		 * Image handling: choose new icon vor language.
 		 */
 		$('body.settings_page_easy_language_settings a.replace-icon').on( 'click',function(e){
@@ -338,6 +380,80 @@ function easy_language_get_data_deletion_info( deletion_state ) {
 	)
 }
 
+
+/**
+ * Run a token action of an API (e.g. test or remove the token) via AJAX and show the result in a dialog.
+ *
+ * @param action The name of the AJAX-action.
+ * @param nonce The nonce for this action.
+ * @param title The title for the dialogs.
+ */
+function easy_language_run_token_action( action, nonce, title ) {
+	// show a dialog while the request is running.
+	easy_language_create_dialog( {
+		detail: {
+			title: title,
+			texts: [
+				'<p>' + easy_language_escape_html( easyLanguageJsVars.token_action_running ) + '</p>'
+			],
+			progressbar: {
+				// without "progress" the progressbar is shown as indeterminate.
+				active: true,
+				id: 'progress_token_action'
+			}
+		}
+	} );
+
+	// send the request.
+	jQuery.ajax(
+		{
+			type: "POST",
+			url: easyLanguageJsVars.ajax_url,
+			data: {
+				'action': action,
+				'nonce': nonce
+			},
+			success: function( dialog_config ) {
+				// bail if the response does not contain a dialog.
+				if ( ! dialog_config || ! dialog_config.detail ) {
+					easy_language_show_token_action_error( title, '' );
+					return;
+				}
+
+				// show the result.
+				easy_language_create_dialog( dialog_config );
+			},
+			error: function( e ) {
+				easy_language_show_token_action_error( title, e.statusText );
+			}
+		}
+	);
+}
+
+/**
+ * Show an error for a token action.
+ *
+ * @param title The title of the dialog.
+ * @param error The error message.
+ */
+function easy_language_show_token_action_error( title, error ) {
+	easy_language_create_dialog( {
+		detail: {
+			className: 'wp-dialog-error',
+			title: title,
+			texts: [
+				'<p><strong>' + easy_language_escape_html( easyLanguageJsVars.token_action_error ) + '</strong>' + ( error ? ' ' + easy_language_escape_html( error ) : '' ) + '</p>'
+			],
+			buttons: [
+				{
+					'action': 'closeDialog();',
+					'variant': 'primary',
+					'text': 'OK'
+				}
+			]
+		}
+	} );
+}
 
 /**
  * Helper to create a new dialog with given config.

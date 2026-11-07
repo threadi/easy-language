@@ -214,23 +214,21 @@ class Log {
 			$order = 'DESC';
 		}
 
-		// get the limit (all entries if no limit is given).
-		$limit_sql = '';
-		$vars      = array( $this->get_table_name(), get_current_blog_id(), $order_by );
-		if ( $limit > 0 ) {
-			$limit_sql = ' LIMIT %d OFFSET %d';
-			$vars[]    = $limit;
-			$vars[]    = max( 0, $offset );
+		// get the limit: without a limit all entries are returned (the SQL needs a limit if an offset is used, so we use the maximum).
+		if ( $limit <= 0 ) {
+			$limit  = PHP_INT_MAX;
+			$offset = 0;
 		}
+		$offset = max( 0, $offset );
 
 		// get results in ascending order and return them.
 		if ( 'ASC' === $order ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache; the limit is a fixed string with placeholders
-			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM %i WHERE `blog_id` = %d ORDER BY %i ASC, `id` DESC' . $limit_sql, $vars ), ARRAY_A );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
+			return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM %i WHERE `blog_id` = %d ORDER BY %i ASC, `id` DESC LIMIT %d OFFSET %d', $this->get_table_name(), get_current_blog_id(), $order_by, $limit, $offset ), ARRAY_A );
 		}
 
 		// get results in descending order and return them.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache; the limit is a fixed string with placeholders
-		return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM %i WHERE `blog_id` = %d ORDER BY %i DESC, `id` DESC' . $limit_sql, $vars ), ARRAY_A );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- custom log table of this plugin, no WP API available; entries change with every log entry, so no object cache
+		return $wpdb->get_results( $wpdb->prepare( 'SELECT `state`, `time` AS `date`, `log`, `user_id` FROM %i WHERE `blog_id` = %d ORDER BY %i DESC, `id` DESC LIMIT %d OFFSET %d', $this->get_table_name(), get_current_blog_id(), $order_by, $limit, $offset ), ARRAY_A );
 	}
 }

@@ -119,7 +119,7 @@ class Themify extends Parser_Base implements Parser {
 	 *
 	 * Get the themify-content and parse its widgets to get the content of flow-text-widgets.
 	 *
-	 * @return array<string,mixed>
+	 * @return array<int,mixed>
 	 */
 	public function get_parsed_texts(): array {
 		// do nothing if themify is not active.
