@@ -2440,7 +2440,7 @@ class Switcher {
 		return array(
 			'all'     => __( 'Show everywhere', 'easy-language' ),
 			'include' => __( 'Show only on chosen pages and terms', 'easy-language' ),
-			'exclude' => __( 'Show everywhere except on chosen pages and terms', 'easy-language' ),
+			'exclude' => __( 'Show everywhere except on chosen pages and terms', 'easy-language' ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- option of the visibility setting, no query parameter
 		);
 	}
 

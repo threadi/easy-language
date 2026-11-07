@@ -302,7 +302,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 			// check if the table of our own language exist.
 			foreach ( array( $trp_query->get_table_name( strtolower( $language_code ) ), $trp_query->get_gettext_table_name( strtolower( $language_code ) ) ) as $table_name ) {
 				// bail if the table does not exist in the database of this WordPress.
-				if ( empty( $wpdb->get_results( $wpdb->prepare( 'SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s', array( $table_name ) ) ) ) ) {
+				if ( empty( $wpdb->get_results( $wpdb->prepare( 'SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s', array( $table_name ) ) ) ) ) { // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- checks the existence of a table of TranslatePress, no WP API available
 					continue;
 				}
 

@@ -20,6 +20,7 @@ defined( 'ABSPATH' ) || exit;
  * @noinspection PhpUnused
  */
 class TB_Easy_Language_Switcher_Module extends Themify_Builder_Component_Module {
+ // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Themify Builder derives the class name of a module from its file name
 	/**
 	 * Return the name of the module.
 	 *
