@@ -141,7 +141,6 @@ class Log_Fixes extends easyLanguageTests {
 
 		// only the API of this site is in the views.
 		$method = new ReflectionMethod( Log_Api_Table::class, 'get_views' );
-		$method->setAccessible( true );
 		$views = $method->invoke( $log_table );
 		$this->assertArrayHasKey( 'summ_ai', $views );
 		$this->assertArrayNotHasKey( 'capito', $views );

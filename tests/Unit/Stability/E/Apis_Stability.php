@@ -149,7 +149,6 @@ class Apis_Stability extends easyLanguageTests {
 		Log_Api::get_instance()->add_log( 'wp_ai', 500, 'request-for-export', 'response-for-export' );
 
 		$method = new \ReflectionMethod( Apis::get_instance(), 'get_api_log_entries_for_export' );
-		$method->setAccessible( true );
 		$entries = $method->invoke( Apis::get_instance(), 'wp_ai' );
 
 		$this->assertContains( 'request-for-export', wp_list_pluck( $entries, 'request' ) );

@@ -35,6 +35,7 @@
 - Section "External services" in readme.txt with the data sent to SUMM AI (incl. the free proxy of laOlaWeb), capito, OpenAI and the WordPress connectors
 - Filter easy_language_api_requests_max_age for the max age of the entries in the request tables of the APIs
 - Confirmation (or --yes) for the WP CLI commands reset_simplifications and trp_reset_simplifications
+- Unit tests for the lifecycle of the plugin (hooks, their order, multiple runs of init), the output of the language switcher in all page builders, the URLs of simplified objects, the settings callbacks, the tables in the backend, errors of the APIs, the encryption, the block editor parser and the support of Polylang, Sublanguage, WPML, SCF and TranslatePress
 
 ### Changed
 
@@ -133,6 +134,8 @@
 - Export of the API log as CSV: values with leading whitespace or line breaks before a formula character were not protected against formula injection
 - Export of simplifications as po-file had a faulty Content-Disposition header
 - Uninstall: the meta query for language icons used an invalid compare value
+- SUMM AI: an invalid contact email was saved although an error was shown; the former email is kept now
+- Block editor, Kubio and Divi 5: the parts between blocks (without block name) are skipped before they are used as array key (null as array key is deprecated in PHP 8.5)
 
 ## [3.2.3] - 13.09.2026
 

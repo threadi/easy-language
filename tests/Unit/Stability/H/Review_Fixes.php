@@ -488,7 +488,6 @@ class Review_Fixes extends easyLanguageTests {
 	 */
 	public function test_uninstall_removes_lock_option(): void {
 		$method = new \ReflectionMethod( Uninstall::get_instance(), 'get_options' );
-		$method->setAccessible( true );
 		$this->assertContains( \easyLanguage\EasyLanguage\Init::AUTOMATIC_SIMPLIFICATION_LOCK, $method->invoke( Uninstall::get_instance() ) );
 	}
 }

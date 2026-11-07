@@ -51,7 +51,6 @@ class Uninstall extends easyLanguageTests {
 				if ( $property->getDeclaringClass()->getName() !== $class_name ) {
 					continue;
 				}
-				$property->setAccessible( true );
 				if ( ! $property->isInitialized() ) {
 					continue;
 				}
@@ -86,7 +85,6 @@ class Uninstall extends easyLanguageTests {
 				if ( $property->isStatic() || $property->getDeclaringClass()->getName() !== $reflection->getName() ) {
 					continue;
 				}
-				$property->setAccessible( true );
 				if ( ! $property->isInitialized( $obj ) ) {
 					continue;
 				}

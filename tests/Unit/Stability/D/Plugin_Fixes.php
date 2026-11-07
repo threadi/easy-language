@@ -159,7 +159,6 @@ namespace easyLanguage\Tests\Unit\Stability\D {
 		 */
 		public function test_uninstall_removes_abilities_options(): void {
 			$method = new ReflectionMethod( Uninstall::class, 'get_options' );
-			$method->setAccessible( true );
 			$options = $method->invoke( Uninstall::get_instance() );
 
 			$this->assertContains( 'easy_language_abilities_enabled', $options );
@@ -180,7 +179,6 @@ namespace easyLanguage\Tests\Unit\Stability\D {
 
 			foreach ( array( Uninstall::class => Uninstall::get_instance(), \easyLanguage\Plugin\Installer::class => \easyLanguage\Plugin\Installer::get_instance() ) as $class_name => $obj ) {
 				$method = new ReflectionMethod( $class_name, 'get_blogs' );
-				$method->setAccessible( true );
 				$blogs = $method->invoke( $obj );
 				$this->assertContains( $blog_id, $blogs, $class_name );
 				$this->assertContains( get_main_site_id(), $blogs, $class_name );

@@ -1095,8 +1095,12 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return ?string
 	 */
 	public function validate_api_email( ?string $value ): ?string {
+		// keep the saved email if the given one is not valid (it is sent to SUMM AI with each request).
 		if ( ! empty( $value ) && false === is_email( $value ) ) {
-			add_settings_error( 'easy_language_summ_api_email', 'easy_language_summ_api_email', __( 'The given email is not a valid email-address.', 'easy-language' ) );
+			if ( function_exists( 'add_settings_error' ) ) {
+				add_settings_error( 'easy_language_summ_api_email', 'easy_language_summ_api_email', __( 'The given email is not a valid email-address.', 'easy-language' ) );
+			}
+			return (string) get_option( 'easy_language_summ_api_email', '' );
 		}
 		return $value;
 	}

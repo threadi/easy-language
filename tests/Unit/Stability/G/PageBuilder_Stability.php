@@ -41,7 +41,6 @@ class PageBuilder_Stability extends easyLanguageTests {
 	 */
 	public function test_all_listed_page_builder_classes_exist(): void {
 		$method = new ReflectionMethod( \easyLanguage\EasyLanguage\PageBuilders::class, 'get_page_builder' );
-		$method->setAccessible( true );
 		foreach ( $method->invoke( \easyLanguage\EasyLanguage\PageBuilders::get_instance() ) as $class_name ) {
 			$this->assertTrue( class_exists( $class_name ), $class_name . ' does not exist' );
 		}
@@ -133,9 +132,7 @@ class PageBuilder_Stability extends easyLanguageTests {
 		add_filter( 'wp_doing_ajax', '__return_true' );
 
 		$live_composer = new ReflectionMethod( \easyLanguage\PageBuilder\LiveComposer::class, 'is_preview' );
-		$live_composer->setAccessible( true );
 		$nimble = new ReflectionMethod( \easyLanguage\PageBuilder\Nimble::class, 'is_preview' );
-		$nimble->setAccessible( true );
 
 		// visitors.
 		wp_set_current_user( 0 );

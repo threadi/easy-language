@@ -73,7 +73,6 @@ class Update_Fixes extends easyLanguageTests {
 	 */
 	private function run_updates( string $installed, string $db ): void {
 		$method = new ReflectionMethod( Update::class, 'run_updates' );
-		$method->setAccessible( true );
 		$method->invoke( Update::get_instance(), $installed, $db );
 	}
 

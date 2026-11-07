@@ -26,7 +26,6 @@ class Update_Migrations extends easyLanguageTests {
 	 */
 	private function call_private( string $method, array $args = array() ): mixed {
 		$reflection = new ReflectionMethod( Update::class, $method );
-		$reflection->setAccessible( true );
 		return $reflection->invokeArgs( Update::get_instance(), $args );
 	}
 
