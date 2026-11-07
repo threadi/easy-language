@@ -1219,7 +1219,7 @@ Version | Description
 ------- | -----------
 `2.0.0` | Available since 2.0.0.
 
-Source: [app/Apis/Summ_Ai/Summ_Ai.php](Apis/Summ_Ai/Summ_Ai.php), [line 1130](Apis/Summ_Ai/Summ_Ai.php#L1130-L1137)
+Source: [app/Apis/Summ_Ai/Summ_Ai.php](Apis/Summ_Ai/Summ_Ai.php), [line 1134](Apis/Summ_Ai/Summ_Ai.php#L1134-L1141)
 
 ### `easy_language_capito_source_languages`
 
