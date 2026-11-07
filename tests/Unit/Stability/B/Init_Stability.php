@@ -9,6 +9,7 @@ namespace easyLanguage\Tests\Unit\Stability\B;
 
 use easyLanguage\EasyLanguage\Init;
 use easyLanguage\EasyLanguage\Post_Object;
+use easyLanguage\Plugin\Lock;
 use easyLanguage\Tests\easyLanguageTests;
 use WP_HTTP_Requests_Response;
 
@@ -203,6 +204,66 @@ class Init_Stability extends easyLanguageTests {
 
 		$this->assertGreaterThan( 0, $this->requests );
 		$this->assertNull( $copy->get_marker_during_simplification( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING ) );
+	}
+
+	/**
+	 * The automatic simplification does not run while another run holds the lock (overlapping WP-Cron requests).
+	 *
+	 * @return void
+	 */
+	public function test_automatic_simplification_skips_if_locked(): void {
+		update_option( 'easy_language_automatic_simplification_enabled', 1 );
+		$copy = $this->create_simplified_copy();
+		$copy->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING );
+
+		// another run holds the lock.
+		$this->assertTrue( Lock::acquire( Init::AUTOMATIC_SIMPLIFICATION_LOCK, HOUR_IN_SECONDS ) );
+		$this->requests = 0;
+
+		Init::get_instance()->run_automatic_simplification();
+
+		// nothing has been sent and the lock of the other run is kept.
+		$this->assertSame( 0, $this->requests );
+		$this->assertFalse( Lock::acquire( Init::AUTOMATIC_SIMPLIFICATION_LOCK, HOUR_IN_SECONDS ) );
+		Lock::release( Init::AUTOMATIC_SIMPLIFICATION_LOCK );
+	}
+
+	/**
+	 * The automatic simplification releases its lock after the run, so the next run could start.
+	 *
+	 * @return void
+	 */
+	public function test_automatic_simplification_releases_lock(): void {
+		update_option( 'easy_language_automatic_simplification_enabled', 1 );
+		$copy = $this->create_simplified_copy();
+		$copy->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING );
+		$this->requests = 0;
+
+		Init::get_instance()->run_automatic_simplification();
+
+		$this->assertGreaterThan( 0, $this->requests );
+		$this->assertTrue( Lock::acquire( Init::AUTOMATIC_SIMPLIFICATION_LOCK, HOUR_IN_SECONDS ) );
+		Lock::release( Init::AUTOMATIC_SIMPLIFICATION_LOCK );
+	}
+
+	/**
+	 * An orphaned lock (e.g. of a stopped process) does not block the automatic simplification forever.
+	 *
+	 * @return void
+	 */
+	public function test_automatic_simplification_ignores_orphaned_lock(): void {
+		update_option( 'easy_language_automatic_simplification_enabled', 1 );
+		$copy = $this->create_simplified_copy();
+		$copy->cleanup_simplification_marker( EASY_LANGUAGE_OPTION_SIMPLIFICATION_RUNNING );
+
+		// a lock of a run which stopped two days ago.
+		update_option( Init::AUTOMATIC_SIMPLIFICATION_LOCK, (string) ( time() - 2 * DAY_IN_SECONDS ), false );
+		$this->requests = 0;
+
+		Init::get_instance()->run_automatic_simplification();
+
+		$this->assertGreaterThan( 0, $this->requests );
+		$this->assertFalse( get_option( Init::AUTOMATIC_SIMPLIFICATION_LOCK ) );
 	}
 
 	/**

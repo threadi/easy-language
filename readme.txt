@@ -92,6 +92,49 @@ Each release of this plugin will only be published if it fulfills the following 
 * Compliance with WordPress Coding Standards
 * No failures during PHP Compatibility check
 
+== External services ==
+
+This plugin can connect to external services to simplify texts. No data is sent to any of them until you choose the API in the plugin settings and start a simplification (manually, via the automatic simplification in the background, via WP CLI or via an ability). Without an active API ("No API"), no external service is used.
+
+= SUMM AI =
+
+Used if "SUMM AI" is chosen as API. It simplifies texts into Leichte Sprache or Einfache Sprache.
+
+* Sent for each simplification: the text to simplify (incl. HTML), the source and target language, formatting options, the URL of your website and a contact email address (by default the email of the administrator, depending on the settings the email of the editor who started the simplification or a custom address).
+* Sent to check the quota or the API key (only with an own API key): the API key.
+* With an own API key the data is sent directly to SUMM AI: https://backend.summ-ai.com
+* Without an own API key (free quota of 9000 characters) the data is sent to a proxy of laOlaWeb, which forwards it to SUMM AI: https://api.laolaweb.com. A random identifier of your installation is sent as token. The free usage can be disabled in the settings of SUMM AI.
+* Provider: SUMM AI GmbH, https://summ-ai.com
+* Proxy for the free usage: laOlaWeb, https://laolaweb.com
+* Privacy policy SUMM AI: https://summ.ai/datenschutz
+* Privacy policy laOlaWeb: https://laolaweb.com/datenschutzerklaerung/
+
+= capito =
+
+Used if "capito" is chosen as API. It simplifies texts into the language levels A1, A2 and B1.
+
+* Sent for each simplification: the text to simplify (incl. HTML), its language and the target language level, the API key.
+* Sent to check the quota, the subscription or the API key: the API key.
+* Service: https://api.capito.ai
+* Terms of use: https://www.capito.eu/en/terms-and-conditions/
+
+= ChatGPT (OpenAI) =
+
+Used if "ChatGPT" is chosen as API.
+
+* Sent for each simplification: the text to simplify (incl. HTML) together with the instruction for the simplification, the chosen model and the API key.
+* Service: https://api.openai.com
+* Terms of use: https://openai.com/policies/terms-of-use/
+* Privacy policy: https://openai.com/policies/privacy-policy/
+
+= WordPress Connectors =
+
+Used if "WordPress Connectors" is chosen as API (WordPress 7.0 or newer). The texts and the instruction for the simplification are sent via the AI client of WordPress to the AI provider you have connected in Settings > Connectors. Its terms and privacy policy apply.
+
+= Logging =
+
+Requests and responses are saved in the database of your website to show them in the API log. These entries (incl. the texts and the contact email address) are deleted automatically after the number of days set for the logs (default: 50 days).
+
 == Installation ==
 
 1. Upload "easy-language" to the "/wp-content/plugins/" directory.

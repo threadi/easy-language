@@ -11,6 +11,7 @@ namespace easyLanguage\Plugin;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Apis\Capito\Capito;
+use easyLanguage\Apis\ChatGpt\ChatGpt;
 use easyLanguage\Apis\Summ_Ai\Summ_Ai;
 use easyLanguage\Dependencies\easyTransientsForWordPress\Transients;
 use easyLanguage\EasyLanguage\Db;
@@ -82,6 +83,8 @@ class Update {
 		$db_plugin_version = get_option( 'easyLanguageVersion', '1.0.0' );
 
 		// compare version if we are not in development-mode.
+		// Hint: in development mode (WP_DEVELOPMENT_MODE 'plugin' or 'all') the update routines are not run,
+		// see readme.md ("Development mode").
 		if (
 			(
 				(
@@ -594,5 +597,13 @@ class Update {
 		// assign the existing log entries to the main site.
 		Log::get_instance()->migrate_entries_without_site();
 		Log_Api::get_instance()->migrate_entries_without_site();
+
+		// update the request tables of the APIs: the duration is saved with milliseconds now.
+		foreach ( array( Summ_Ai::get_instance()->get_request_table(), Capito::get_instance()->get_request_table(), ChatGpt::get_instance()->get_request_table() ) as $table_name ) {
+			Api_Request_Table::create( $table_name );
+		}
+
+		// remove the unencrypted API key of SUMM AI from the settings of TranslatePress.
+		\easyLanguage\ThirdPartySupport\TranslatePress\Init::get_instance()->remove_legacy_api_key();
 	}
 }

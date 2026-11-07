@@ -16,6 +16,7 @@ use easyLanguage\Plugin\Base;
 use easyLanguage\Plugin\Helper;
 use easyLanguage\Plugin\Intervals;
 use easyLanguage\Plugin\Languages;
+use easyLanguage\Plugin\Lock;
 use easyLanguage\Plugin\Log;
 use easyLanguage\Plugin\Settings;
 use easyLanguage\Plugin\Setup;
@@ -43,6 +44,12 @@ use WP_User;
  * Initializer for this plugin.
  */
 class Init extends Base implements ThirdPartySupport_Base {
+
+	/**
+	 * Name of the option used as lock during the automatic simplification.
+	 */
+	public const AUTOMATIC_SIMPLIFICATION_LOCK = 'easy_language_automatic_simplification_lock';
+
 	/**
 	 * Marker for a foreign plugin (plugins, which are supported by this plugin but not maintained).
 	 *
@@ -2489,6 +2496,30 @@ class Init extends Base implements ThirdPartySupport_Base {
 			$limit = 0;
 		}
 
+		// bail if another run of the automatic simplification is still running (e.g. overlapping WP-Cron requests).
+		// A lock is treated as orphaned after the max. time this run could need for all of its requests.
+		$lock_timeout = $limit > 0 ? max( 10 * MINUTE_IN_SECONDS, ( absint( $limit ) + 1 ) * max( 1, absint( get_option( 'easy_language_api_timeout', 60 ) ) ) ) : HOUR_IN_SECONDS;
+		if ( ! Lock::acquire( self::AUTOMATIC_SIMPLIFICATION_LOCK, $lock_timeout ) ) {
+			return;
+		}
+
+		try {
+			$this->run_automatic_simplification_entries( $api_obj, absint( $limit ) );
+		} finally {
+			// release the lock in every case.
+			Lock::release( self::AUTOMATIC_SIMPLIFICATION_LOCK );
+		}
+	}
+
+	/**
+	 * Simplify the texts of the automatic simplification (the lock is set by run_automatic_simplification()).
+	 *
+	 * @param Api_Base $api_obj The active API.
+	 * @param int      $limit Max count of texts to simplify, 0 for no limit.
+	 *
+	 * @return void
+	 */
+	private function run_automatic_simplification_entries( Api_Base $api_obj, int $limit ): void {
 		// get the texts which could not be simplified in the last runs (e.g. language not supported by the API), to skip them for a day.
 		$skipped_texts = get_option( 'easy_language_automatic_simplification_skipped', array() );
 		if ( ! is_array( $skipped_texts ) ) {
@@ -2931,7 +2962,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -2942,7 +2973,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		}
 
 		// redirect user back to previous page.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -3066,7 +3097,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if capability is missing.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user back to list.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -3076,7 +3107,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if capability is not granted.
 		if ( 0 === $text_id || ! current_user_can( 'edit_el_simplifier' ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -3095,7 +3126,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$transient_obj->save();
 
 		// redirect user back to list.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -3112,7 +3143,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -3136,7 +3167,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		Log::get_instance()->add_log( __( 'All to simplify texts has been deleted', 'easy-language' ), 'success' );
 
 		// redirect user back to list.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -3404,7 +3435,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if capability is missing.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user back to list.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -3414,7 +3445,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		// bail if capability is not granted.
 		if ( 0 === $text_id || ! current_user_can( 'edit_el_simplifier' ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -3433,7 +3464,7 @@ class Init extends Base implements ThirdPartySupport_Base {
 		$transient_obj->save();
 
 		// redirect user back to the list.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 

@@ -30,6 +30,10 @@
 - Filter easy_language_keep_text_on_object_update to keep texts of other plugins (e.g. ACF fields) linked when a simplified object is saved
 - Log and API log are saved per site in multisite; existing entries are assigned to the main site during the update
 - More than 100 additional unit tests, also run in multisite
+- Dependabot also for Composer and npm packages
+- Section "External services" in readme.txt with the data sent to SUMM AI (incl. the free proxy of laOlaWeb), capito, OpenAI and the WordPress connectors
+- Filter easy_language_api_requests_max_age for the max age of the entries in the request tables of the APIs
+- Confirmation (or --yes) for the WP CLI commands reset_simplifications and trp_reset_simplifications
 
 ### Changed
 
@@ -59,6 +63,13 @@
 - ChatGPT: incomplete responses (cut off at the token limit) are no longer saved as simplification
 - Block editor sidebar is only shown to users who are allowed to simplify
 - Request logs of the APIs can save long texts
+- Texts without HTML (e.g. titles and text fields of page builders) returned by SUMM AI, capito and ChatGPT are saved without any HTML (like for WordPress Connectors)
+- Requests to the APIs do not follow redirects anymore, as they contain the API key; capito and ChatGPT use wp_safe_remote_post()
+- The request tables of SUMM AI, capito and ChatGPT are cleaned up like the logs (default: entries older than 50 days); the duration of requests is saved with milliseconds
+- The automatic simplification runs only once at the same time (lock against overlapping WP-Cron requests)
+- Redirects back to the previous page accept only URLs of the own website
+- The API key of SUMM AI is not saved in the settings of TranslatePress anymore; an existing key there is removed during the update
+- TranslatePress: tables are emptied with an escaped identifier
 
 ### Fixed
 
@@ -117,6 +128,9 @@
 - Uninstall left simplified terms, simplified posts of no longer supported post types and some options
 - Export of the API log contained entries which were already cleared
 - Site Health reported the automatic simplification as not running if it was only a few seconds late
+- Export of the API log as CSV: values with leading whitespace or line breaks before a formula character were not protected against formula injection
+- Export of simplifications as po-file had a faulty Content-Disposition header
+- Uninstall: the meta query for language icons used an invalid compare value
 
 ## [3.2.3] - 13.09.2026
 

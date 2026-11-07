@@ -128,6 +128,12 @@ Hint: this check runs against the VIP-GO-platform which is not our target for th
 
 `wp plugin check --error-severity=7 --warning-severity=6 --include-low-severity-errors --categories=plugin_repo --format=json --slug=easy-language .`
 
+## Development mode
+
+If the development mode of WordPress is set to `plugin` or `all` (constant `WP_DEVELOPMENT_MODE`), the update routines of this plugin
+are **not** run: new database columns, tables and migrated settings of a new version are missing then. After switching to a new version
+in development mode, disable the development mode once (or reactivate the plugin) to run the update routines.
+
 ## Unit tests
 
 ### Preparation

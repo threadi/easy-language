@@ -223,7 +223,7 @@ class Uninstall {
 			'meta_query'     => array(
 				array(
 					'key'     => 'easy_language_code',
-					'compare' => 'EXIST',
+					'compare' => 'EXISTS',
 				),
 			),
 			'fields'         => 'ids',
@@ -395,6 +395,7 @@ class Uninstall {
 		return array(
 			'easyLanguageVersion',
 			'easy_language_update_lock',
+			\easyLanguage\EasyLanguage\Init::AUTOMATIC_SIMPLIFICATION_LOCK,
 			'easy_language_wpml_languages_marker',
 			'easy_language_sublanguage_languages_marker',
 			\easyLanguage\EasyLanguage\Abilities::OPTION_ENABLED,

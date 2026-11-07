@@ -172,7 +172,7 @@ class Texts {
 
 				// if no page builder could be loaded, forward to the referer.
 				if ( ! $page_builder_obj ) {
-					wp_safe_redirect( wp_get_referer() );
+					wp_safe_redirect( Helper::get_referer_url() );
 					exit;
 				}
 
@@ -190,7 +190,7 @@ class Texts {
 		Log::get_instance()->add_log( __( 'Faulty request to create new simplified object.', 'easy-language' ), 'error' );
 
 		// redirect user.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -236,7 +236,7 @@ class Texts {
 			$term_obj->add_simplification_object( $target_language, $api_object, false );
 		}
 		// redirect user.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -379,7 +379,7 @@ class Texts {
 		$api_obj = Apis::get_instance()->get_active_api();
 		if ( ! $api_obj ) {
 			// no api active => do nothing and forward user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -400,7 +400,7 @@ class Texts {
 
 		// bail if the API is not configured or its quota is used up.
 		if ( ! $this->is_api_usable_for_simplification( $api_obj ) ) {
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -419,7 +419,7 @@ class Texts {
 		}
 
 		// redirect user back to the editor.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -455,13 +455,13 @@ class Texts {
 		$api_obj = Apis::get_instance()->get_active_api();
 		if ( false === $api_obj ) {
 			// no api active => do nothing and forward user.
-			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
 		// bail if the API is not configured or its quota is used up.
 		if ( ! $this->is_api_usable_for_simplification( $api_obj ) ) {
-			wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -472,7 +472,7 @@ class Texts {
 		}
 
 		// redirect user back to the editor.
-		wp_safe_redirect( isset( $_SERVER['HTTP_REFERER'] ) ? wp_unslash( $_SERVER['HTTP_REFERER'] ) : '' );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -494,26 +494,26 @@ class Texts {
 
 		// bail if no api is active.
 		if ( false === $api_obj ) {
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
 		// bail if no entry ID is given.
 		if ( 0 === $entry_id ) {
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
 		// bail if capability is not granted.
 		if ( ! current_user_can( 'edit_el_simplifier' ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
 		// bail if the API is not configured or its quota is used up.
 		if ( ! $this->is_api_usable_for_simplification( $api_obj ) ) {
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -531,7 +531,7 @@ class Texts {
 			Log::get_instance()->add_log( sprintf( __( 'The requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
 
 			// redirect user back.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -548,7 +548,7 @@ class Texts {
 			Log::get_instance()->add_log( sprintf( __( 'The requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
 
 			// redirect user back.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -574,7 +574,7 @@ class Texts {
 			Log::get_instance()->add_log( sprintf( __( 'The requested object %1$d could not be found for simplification.', 'easy-language' ), $entry_id ), 'error' );
 
 			// redirect user back.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -589,7 +589,7 @@ class Texts {
 			$this->add_simplification_error_hint( sprintf( __( 'Simplification for <i>%1$s</i> is already running.', 'easy-language' ), esc_html( $object->get_title() ) ) );
 
 			// redirect user back.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -606,7 +606,7 @@ class Texts {
 		$object->run_simplification_end_trigger();
 
 		// redirect user back to the editor.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 
@@ -1072,7 +1072,7 @@ class Texts {
 		// bail if capability is not granted.
 		if ( ! current_user_can( Settings::get_instance()->get_settings_object()->get_capability() ) ) {
 			// redirect user.
-			wp_safe_redirect( wp_get_referer() );
+			wp_safe_redirect( Helper::get_referer_url() );
 			exit;
 		}
 
@@ -1119,19 +1119,16 @@ class Texts {
 			// Log event.
 			Log::get_instance()->add_log( __( 'Simplifications exported.', 'easy-language' ), 'success' );
 
-			// get WP Filesystem-handler.
-			$wp_filesystem = Helper::get_wp_filesystem();
-
 			// return header.
 			header( 'Content-Type: application/octet-stream' );
-			header( 'Content-Disposition: inline; filename="' . sanitize_file_name( gmdate( 'YmdHi' ) . '_' . get_option( 'blogname' ) . '.po"' ) );
+			header( 'Content-Disposition: attachment; filename="' . sanitize_file_name( gmdate( 'YmdHi' ) . '_' . get_option( 'blogname' ) . '.po' ) . '"' );
 			header( 'Content-Length: ' . strlen( $po ) );
 			echo $po; // phpcs:ignore WordPress.Security.EscapeOutput -- generated PO file content sent as raw file download, not rendered as HTML.
 			exit;
 		}
 
 		// redirect user back.
-		wp_safe_redirect( wp_get_referer() );
+		wp_safe_redirect( Helper::get_referer_url() );
 		exit;
 	}
 

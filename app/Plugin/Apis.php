@@ -247,17 +247,28 @@ class Apis {
 	 *
 	 * @return string
 	 */
-	private function get_csv_safe_value( mixed $value ): string {
+	public function get_csv_safe_value( mixed $value ): string {
 		// convert the value to string.
 		$value = is_scalar( $value ) ? (string) $value : '';
 
-		// bail if value does not start with a character which could start a formula.
-		if ( '' === $value || ! in_array( $value[0], array( '=', '+', '-', '@', "\t", "\r" ), true ) ) {
+		// bail if value is empty.
+		if ( '' === $value ) {
 			return $value;
 		}
 
-		// prefix the value to prevent its interpretation as formula.
-		return "'" . $value;
+		// values starting with a control character could be interpreted as formula by spreadsheet applications.
+		if ( in_array( $value[0], array( "\t", "\r", "\n" ), true ) ) {
+			return "'" . $value;
+		}
+
+		// check the first character after leading whitespace (spreadsheet applications ignore it), but keep the value itself.
+		$trimmed = ltrim( $value, " \t\r\n\0\x0B" );
+		if ( '' !== $trimmed && in_array( $trimmed[0], array( '=', '+', '-', '@' ), true ) ) {
+			return "'" . $value;
+		}
+
+		// return the value unchanged.
+		return $value;
 	}
 
 	/**

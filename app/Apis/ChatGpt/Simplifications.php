@@ -138,10 +138,8 @@ class Simplifications extends Simplification_Base implements Api_Simplifications
 				 */
 				$simplified_text = apply_filters( 'easy_language_simplified_text', $simplified_text, $request_array, $instance );
 
-				// filter the simplified HTML text to allow only HTML, which is allowed in posts.
-				if ( $is_html ) {
-					$simplified_text = wp_kses_post( $simplified_text );
-				}
+				// allow only HTML, which is allowed in posts, or no HTML at all (e.g. for titles or text fields of page builders).
+				$simplified_text = $is_html ? wp_kses_post( $simplified_text ) : wp_strip_all_tags( $simplified_text );
 
 				// return simplification to plugin which will save it.
 				return array(

@@ -11,6 +11,7 @@ namespace easyLanguage\Apis\Capito;
 defined( 'ABSPATH' ) || exit;
 
 use easyLanguage\Plugin\Api_Base;
+use easyLanguage\Plugin\Api_Request_Table;
 use easyLanguage\Plugin\Api_Requests;
 use easyLanguage\Plugin\Api_Simplifications;
 use easyLanguage\Plugin\Base;
@@ -334,28 +335,20 @@ class Capito extends Base implements Api_Base {
 	 * @return void
 	 */
 	public function install(): void {
-		global $wpdb;
-
-		$charset_collate = $wpdb->get_charset_collate();
-
-		// table for original-texts to translate.
-		$sql = "CREATE TABLE $this->table_requests (
-            `id` mediumint(9) NOT NULL AUTO_INCREMENT,
-            `time` datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
-            `request` longtext DEFAULT '' NOT NULL,
-            `response` longtext DEFAULT '' NOT NULL,
-            `duration` int(11) DEFAULT 0 NOT NULL,
-            `httpstatus` int(11) DEFAULT 0 NOT NULL,
-            `quota` int(11) DEFAULT 0 NOT NULL,
-            `blog_id` int(11) DEFAULT 0 NOT NULL,
-            UNIQUE KEY id (id)
-        ) $charset_collate;";
-
-		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		dbDelta( $sql );
+		// table for the requests and responses of this API.
+		Api_Request_Table::create( $this->table_requests );
 
 		// add the settings.
 		$this->add_settings();
+	}
+
+	/**
+	 * Return the name of the table for the requests and responses of this API.
+	 *
+	 * @return string
+	 */
+	public function get_request_table(): string {
+		return $this->table_requests;
 	}
 
 	/**

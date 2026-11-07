@@ -19,10 +19,20 @@ class Cli {
 	 *
 	 * Hint: on multisite this resets the simplifications of all blogs, as they are saved in tables used by all blogs.
 	 *
+	 *  [--yes]
+	 *  : Answer yes to the confirmation message.
+	 *
+	 * @param array<int,string>    $attributes The positional arguments (not used).
+	 * @param array<string,string> $options List of options.
+	 *
 	 * @return void
 	 * @noinspection PhpUnused
+	 * @noinspection PhpUnusedParameterInspection
 	 */
-	public function reset_simplifications(): void {
+	public function reset_simplifications( array $attributes = array(), array $options = array() ): void {
+		// get confirmation, as this will delete all simplifications (in a multisite of all sites).
+		\WP_CLI::confirm( 'Do you really want to reset all simplifications of Easy Language? In a multisite this affects all sites.', $options );
+
 		// reset the simplifications.
 		Db::get_instance()->reset_simplifications();
 

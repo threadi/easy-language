@@ -123,8 +123,48 @@ class Helper {
 			return self::get_settings_page_url();
 		}
 
+		// bail if the referer is not a URL of this website (also hosts allowed via "allowed_redirect_hosts" are not used).
+		if ( ! self::is_own_url( $referer ) ) {
+			return self::get_settings_page_url();
+		}
+
 		// return the referer.
 		return $referer;
+	}
+
+	/**
+	 * Return whether the given URL is a URL of this website (host of the frontend or of wp-admin).
+	 *
+	 * Relative URLs are treated as own URLs.
+	 *
+	 * @param string $url The URL to check.
+	 *
+	 * @return bool
+	 */
+	public static function is_own_url( string $url ): bool {
+		// get the host of the URL.
+		$host = wp_parse_url( $url, PHP_URL_HOST );
+
+		// bail if the URL could not be parsed.
+		if ( false === $host ) {
+			return false;
+		}
+
+		// relative URLs (without host) are own URLs, unless they are protocol-relative or use another scheme.
+		if ( null === $host ) {
+			return str_starts_with( $url, '/' ) && ! str_starts_with( $url, '//' );
+		}
+
+		// get the hosts of this website.
+		$own_hosts = array_filter(
+			array(
+				wp_parse_url( home_url(), PHP_URL_HOST ),
+				wp_parse_url( admin_url(), PHP_URL_HOST ),
+			)
+		);
+
+		// return whether the host is one of them (hosts are case-insensitive).
+		return in_array( strtolower( $host ), array_map( 'strtolower', $own_hosts ), true );
 	}
 
 	/**
