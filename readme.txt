@@ -148,23 +148,26 @@ Requests and responses are saved in the database of your website to show them in
 2. Configure your SUMM AI API Key
 3. Request simplification of a text
 
+== Upgrade Notice ==
+
+= 4.0.0 =
+Major update: language switchers created before 4.0.0 run in compatibility mode. API keys will be encrypted during the update. Please test on a staging site first.
+
 == Changelog ==
 
 = @@VersionNumber@@ =
-- Added toggle as new display for the language switcher (with adjustable colors, size and rounding)
-- Added visibility settings for each language switcher (chosen pages, posts and terms)
-- Added icon size for each language switcher and as default in the settings
-- Added all switcher settings to the classic menu
-- Added the language switcher as widget for Avada, Beaver Builder, Bold Page Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Enfold, Fusion, Live Composer, Nimble Builder, Oxygen 6, SiteOrigin, Themify Builder, Visual Composer, WPBakery (also Salient) and Zion Builder
-- Fixed several wrong links of the language switcher on blog homepage, archives and drafts
-- Added encryption of API keys, existing keys are migrated automatically
-- Now requires WordPress 6.6 or newer
-- Simplification requests now also check the permission for the respective object
-- Reset of the plugin only affects the actual site in multisite
-- Fixed API tokens in the request log
-- Fixed possible damage to page builder data when saving simplified texts
-- Fixed scheduling of the automatic simplification after updates
-- Fixed many smaller bugs and PHP warnings
-- Updated dependencies
+* Added language switcher as native widget for 18 page builders (incl. Elementor, Divi 4/5, Bricks, Beaver Builder, Avada, Breakdance, WPBakery) and as classic widget
+* Added new switcher display "Toggle", visibility rules, icon sizes and fallback behavior on archives and search
+* Added support for the WordPress Abilities API (WordPress 6.9+): AI clients can use Easy Language via MCP
+* Added new API "WordPress Connectors" to simplify texts with the AI connectors of WordPress (WordPress 7.0+)
+* Added encryption for saved API keys (existing keys are migrated automatically)
+* Added modern settings view (DataView) as new default
+* Added multisite support for log and API log
+* Optimized token test, token removal and quota update now run via AJAX with dialogs
+* Optimized security: stricter sanitizing of API responses, no redirects for API requests, stricter checks for redirects
+* Optimized stability: automatic simplification can no longer run twice at the same time, request logs are cleaned up automatically
+* Optimized readme with a description of all external services used by this plugin
+* Fixed many bugs in simplification, page builder support, language links and uninstallation
+* More than 100 additional unit tests and new E2E tests
 
-[older changes](https://github.com/threadi/easy-language/blob/master/changelog.md)
+[full changelog](https://github.com/threadi/easy-language/blob/master/changelog.md)

@@ -56,63 +56,19 @@ jobs:
 
       # --- install and compile -------------------------------------------------------------------------
 
-      - name: Install PHP packages
+      # all steps of the release run via bin/build-release.sh, which is also used by "ant build" and
+      # "task release". So all of them create the same zip.
+      - name: Install PHP packages and build blocks, sidebar, page builder fields and react-dialog
         # also runs Mozart, which copies easy-transients-for-wordpress to app/Dependencies.
-        run: composer install --no-interaction --no-progress
-
-      - name: Build blocks, sidebar and Divi field
-        run: |
-          npm ci
-          npm run build
-
-      - name: Build react-dialog
-        working-directory: vendor/threadi/react-dialog
-        run: |
-          # the package ships no lock file, so npm ci is not possible here.
-          npm install --no-audit --no-fund
-          npm run build
+        run: bash bin/build-release.sh init
 
       - name: Remove dev packages and generate the release autoloader
-        run: |
-          composer install --no-dev --no-scripts --no-interaction --no-progress
-          # its classes are shipped in app/Dependencies (see above). Without this line the
-          # autoloader would also know them under their original names.
-          rm -rf vendor/threadi/easy-transients-for-wordpress
-          composer dump-autoload -oa --no-dev
+        run: bash bin/build-release.sh prepare
 
       # --- collect the release, check it, zip it -------------------------------------------------------
 
       - name: Collect the files of the release and set the version number
-        run: |
-          DIST="dist/${RELEASE_SLUG}"
-          mkdir -p "$DIST"
-
-          # only what is listed here ends up in the zip. Nothing is deleted from the checkout.
-          # rsync stops with an error if one of these paths does not exist.
-          rsync -aR --exclude='.*' --exclude='node_modules/' \
-            "${RELEASE_SLUG}.php" uninstall.php index.php readme.txt wpml-config.xml composer.json \
-            admin app css gfx inc templates \
-            blocks/*/block.json blocks/*/build \
-            js/generated \
-            legacy-classes/Divi/build legacy-classes/Divi/divi.js legacy-classes/Divi/Switcher_Module.php \
-            legacy-classes/BoldBuilder legacy-classes/Breakdance legacy-classes/LiveComposer legacy-classes/Nimble \
-            legacy-classes/Themify legacy-classes/VisualComposer legacy-classes/Avia legacy-classes/BeaverBuilder legacy-classes/SiteOrigin \
-            brizy/build brizy/editor-icon.css divi5/build divi5/module \
-            vendor/autoload.php vendor/composer \
-            vendor/gettext \
-            vendor/threadi/crypt-for-wordpress/src \
-            vendor/threadi/easy-dialog-for-wordpress/build \
-            vendor/threadi/easy-settings-for-wordpress \
-            vendor/threadi/easy-setup-for-wordpress/build \
-            vendor/threadi/easy-setup-for-wordpress/lib \
-            vendor/threadi/react-dialog/build \
-            "$DIST/"
-
-          # instructions for AI agents of the settings library: not needed on a website.
-          rm -rf "$DIST/vendor/threadi/easy-settings-for-wordpress/skills"
-
-          # set the version number - in the copy only.
-          sed -i "s/@@VersionNumber@@/${VERSION}/g" "$DIST/${RELEASE_SLUG}.php" "$DIST/uninstall.php" "$DIST/readme.txt"
+        run: bash bin/build-release.sh collect "$VERSION"
 
       - name: Run Plugin Check
         uses: wordpress/plugin-check-action@10857da14b6c2246d15402b3e69f777edcf8c12e # v1.1.9
@@ -127,8 +83,7 @@ jobs:
           include-low-severity-errors: true
 
       - name: Create the zip
-        working-directory: dist
-        run: zip -rqX "../${RELEASE_SLUG}.zip" "$RELEASE_SLUG"
+        run: bash bin/build-release.sh zip "${RELEASE_SLUG}.zip"
 
       - name: Create SBOM
         uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
@@ -142,32 +97,7 @@ jobs:
           upload-release-assets: false
 
       - name: Smoke test the zip in WordPress Playground
-        run: |
-          set -o pipefail
-          SMOKE="$RUNNER_TEMP/smoke"
-          rm -rf "$SMOKE"
-          mkdir -p "$SMOKE"
-          unzip -q "${RELEASE_SLUG}.zip" -d "$SMOKE"
-
-          # check the zip itself first, so a wrong zip is not mistaken for a problem of Playground.
-          if [ ! -f "$SMOKE/${RELEASE_SLUG}/${RELEASE_SLUG}.php" ]; then
-            ls -la "$SMOKE"
-            echo "::error::The zip does not contain ${RELEASE_SLUG}/${RELEASE_SLUG}.php - see the listing above."
-            exit 1
-          fi
-
-          # "--no": use the version from package-lock.json, never download another one.
-          npx --no -- @wp-playground/cli run-blueprint \
-            --blueprint=./.github/blueprints/smoke.json \
-            --mount="$SMOKE/${RELEASE_SLUG}:/wordpress/wp-content/plugins/${RELEASE_SLUG}" \
-            --verbosity=debug \
-            --debug \
-            2>&1 | tee "$RUNNER_TEMP/smoke.log"
-
-          if ! grep -qs "SMOKE_OK" "$SMOKE/${RELEASE_SLUG}/smoke-result.txt"; then
-            echo "::error::SMOKE_OK not found in smoke-result.txt - check the log above."
-            exit 1
-          fi
+        run: bash bin/build-release.sh smoke "${RELEASE_SLUG}.zip"
 
       - name: Read the release notes from changelog.md
         if: github.event_name == 'push'
@@ -209,21 +139,9 @@ jobs:
           node-version: 24
 
       # the tests need the PHP packages, the blocks, the sidebar and react-dialog - the same as the release.
-      - name: Install PHP packages
-        # also runs Mozart, which copies easy-transients-for-wordpress to app/Dependencies.
-        run: composer install --no-interaction --no-progress
-
-      - name: Build blocks, sidebar and Divi field
-        run: |
-          npm ci
-          npm run build
-
-      - name: Build react-dialog
-        working-directory: vendor/threadi/react-dialog
-        run: |
-          # the package ships no lock file, so npm ci is not possible here.
-          npm install --no-audit --no-fund
-          npm run build
+      - name: Install PHP packages and build blocks, sidebar, page builder fields and react-dialog
+        # the same step as for the release (also runs Mozart).
+        run: bash bin/build-release.sh init
 
       - name: Cache Playwright browsers
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0

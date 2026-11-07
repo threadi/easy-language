@@ -22,24 +22,32 @@ After checkout go through the following steps:
 
 ## Release
 
+All ways to create a release use the same script _bin/build-release.sh_. So they all create a zip with the same content.
+The script needs bash, composer, npm, rsync and zip. Its steps (see the comment at the beginning of the script):
+
+1. `init` - install the PHP packages and build blocks, sidebar, page builder fields and react-dialog
+2. `prepare` - remove the dev packages and generate the release autoloader
+3. `collect <version>` - copy the files of the release to _dist/easy-language/_ and set the version number
+4. `zip <file>` - create the zip
+5. `smoke <file>` - optional: test the zip in WordPress Playground (needs Node 24 and internet access)
+6. `restore` - install the dev packages again
+
 ### from local environment with ant (fallback for GitHub)
 
-Runs the same steps as the GitHub action and creates a zip with the same content.
 Not available locally: the Plugin Check (PCP), the SBOM and the GitHub release itself.
 
 1. set the version number in _build/build.properties_.
 2. optional: set _npx.path_ there to run the smoke test in WordPress Playground (needs Node 24).
-3. execute the following command in _build/_: `ant build`
-4. after that you will find the zip in _releases/<version>/easy-language.zip_.
+3. execute the following command in _build/_: `ant build` (or `ant release-zip` to skip checks and tests)
+4. after that you will find the zip in _releases/easy-language_<version>.zip_, e.g. _releases/easy-language_4.0.0.zip_.
 
 ### from local environment with Taskfile
 
-Runs the same steps as the GitHub action and creates a zip with the same content (needs composer, npm, php, rsync and zip).
 Not available locally: the Plugin Check (PCP), the SBOM and the GitHub release itself.
 
-1. execute the following command in main directory: `task release -- 3.3.0` - adjust the version number.
+1. execute the following command in main directory: `task release -- 4.0.0` - adjust the version number.
 2. optional: prefix it with `SKIP_CHECKS=true` to skip PHPStan and PHPCS, or with `SMOKE=true` to run the smoke test in WordPress Playground (needs Node 24).
-3. after that you will find the zip in _releases/<version>/easy-language.zip_.
+3. after that you will find the zip in _releases/easy-language_<version>.zip_, e.g. _releases/easy-language_4.0.0.zip_.
 
 ### on GitHub
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * File for the classic language switcher widget for Page Builder by SiteOrigin without the Widgets Bundle.
+ * File for the classic language switcher widget (all widget areas and Page Builder by SiteOrigin without the Widgets Bundle).
  *
  * @package easy-language
  */
@@ -17,8 +17,11 @@ use WP_Widget;
 /**
  * Object for the classic language switcher widget.
  *
- * Used by Page Builder by SiteOrigin (and classic widget areas) if the SiteOrigin Widgets Bundle is not active. The
- * form is kept simple: selects, checkboxes and text fields for all settings, without conditions.
+ * Available in all classic widget areas (also as legacy widget in the block-based widget editor), independent of any
+ * page builder. Page Builder by SiteOrigin uses it if the SiteOrigin Widgets Bundle is not active. The form is kept
+ * simple: selects, checkboxes and text fields for all settings, without conditions.
+ *
+ * Hint: the class name is saved in layouts of Page Builder by SiteOrigin, so it must not be changed.
  *
  * @noinspection PhpUnused
  */
@@ -31,7 +34,7 @@ class Switcher_Widget extends WP_Widget {
 			SiteOrigin::WIDGET_ID,
 			__( 'Language Switcher', 'easy-language' ),
 			array(
-				'description' => __( 'Easy Language', 'easy-language' ),
+				'description' => __( 'Language switcher of Easy Language.', 'easy-language' ),
 				'classname'   => 'easy-language-switcher-widget',
 			)
 		);
@@ -46,8 +49,14 @@ class Switcher_Widget extends WP_Widget {
 	 * @return void
 	 */
 	public function widget( $args, $instance ) {
-		// get the output of the switcher.
-		$html = SiteOrigin::get_instance()->render( (array) $instance );
+		// get the output of the switcher: in layouts of Page Builder like its other widgets, otherwise as classic widget.
+		$instance   = (array) $instance;
+		$siteorigin = SiteOrigin::get_instance();
+		if ( $siteorigin->is_page_builder_instance( $instance ) ) {
+			$html = $siteorigin->render( $instance );
+		} else {
+			$html = Switcher::get_instance()->render_widget( $siteorigin->get_values( $instance ), 'widget', $this->is_widget_editor_preview() );
+		}
 
 		// bail if the switcher should not be visible.
 		if ( '' === $html ) {
@@ -56,6 +65,33 @@ class Switcher_Widget extends WP_Widget {
 
 		// output the widget.
 		echo $args['before_widget'] . $html . $args['after_widget']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	}
+
+	/**
+	 * Return whether the widget is rendered as preview in the widget editor (then it is always visible).
+	 *
+	 * The block-based widget editor shows legacy widgets in an iframe of wp-admin/widgets.php or via the REST API.
+	 *
+	 * @return bool
+	 */
+	private function is_widget_editor_preview(): bool {
+		// bail if the user could not edit widgets.
+		if ( ! current_user_can( 'edit_theme_options' ) ) {
+			return false;
+		}
+
+		// the preview of the legacy widget block.
+		if ( is_admin() && isset( $_GET['legacy-widget-preview'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return true;
+		}
+
+		// the rendering via the REST API of the widget editor.
+		if ( ! function_exists( 'wp_is_serving_rest_request' ) || ! wp_is_serving_rest_request() ) {
+			return false;
+		}
+		global $wp;
+		$route = $wp instanceof \WP && isset( $wp->query_vars['rest_route'] ) && is_string( $wp->query_vars['rest_route'] ) ? $wp->query_vars['rest_route'] : '';
+		return str_starts_with( $route, '/wp/v2/widget-types/' ) || str_starts_with( $route, '/wp/v2/widgets' );
 	}
 
 	/**

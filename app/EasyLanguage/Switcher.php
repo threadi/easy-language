@@ -319,7 +319,7 @@ class Switcher {
 		}
 
 		// add the single entry for language-switcher to use in classic menus.
-		$query = array(
+		$query   = array(
 			'post_title'   => __( 'Language Switcher', 'easy-language' ),
 			'post_content' => '',
 			'post_status'  => 'publish',

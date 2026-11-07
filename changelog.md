@@ -1,6 +1,6 @@
 # Changelog
 
-## [4.0.0] - unreleased
+## [4.0.0] - 07.11.2026
 
 ### Added
 
@@ -12,6 +12,7 @@
 - Design settings for the toggle: colors (on, off, thumb), size and rounding
 - Language switcher as native widget in Avada, Beaver Builder, Bold Page Builder, Breakdance, Bricks, Brizy, Divi 4, Divi 5, Enfold, Fusion, Live Composer, Nimble Builder, Oxygen 6, SiteOrigin, Themify Builder, Visual Composer, WPBakery (also Salient) and Zion Builder (with the same settings as the block)
 - Filter easy_language_switcher_widget_fields to change the settings of the page builder widgets
+- Classic widget for the language switcher in all widget areas (also as legacy widget in the block-based widget editor), independent of any page builder
 - Visibility settings for each language switcher: show it only on (or hide it on) chosen pages, posts and terms, optionally with child pages/terms and contents assigned to the chosen terms
 - Setting for the behavior on pages without own language versions (archives, search results, blog homepage, 404)
 - Icon size for each language switcher and a default icon size in the plugin settings (Icons tab)
@@ -70,6 +71,7 @@
 - Redirects back to the previous page accept only URLs of the own website
 - The API key of SUMM AI is not saved in the settings of TranslatePress anymore; an existing key there is removed during the update
 - TranslatePress: tables are emptied with an escaped identifier
+- The release zip is created by one script (bin/build-release.sh) for the GitHub workflow, Ant and Taskfile; local builds are saved as releases/easy-language_<version>.zip
 
 ### Fixed
 
