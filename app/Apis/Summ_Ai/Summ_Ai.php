@@ -227,7 +227,7 @@ class Summ_Ai extends Base implements Api_Base {
 	 * @return string
 	 */
 	public function get_logo_url(): string {
-		return Helper::get_plugin_url() . 'app/Apis/Summ_Ai/gfx/logo.jpg';
+		return Helper::get_plugin_url() . 'app/Apis/Summ_Ai/gfx/logo.svg';
 	}
 
 	/**
