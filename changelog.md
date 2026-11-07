@@ -136,6 +136,7 @@
 - Uninstall: the meta query for language icons used an invalid compare value
 - SUMM AI: an invalid contact email was saved although an error was shown; the former email is kept now
 - Block editor, Kubio and Divi 5: the parts between blocks (without block name) are skipped before they are used as array key (null as array key is deprecated in PHP 8.5)
+- Tables of simplified texts and API log: PHP 8.5 deprecation notice if the table is not sorted by the user
 
 ## [3.2.3] - 13.09.2026
 

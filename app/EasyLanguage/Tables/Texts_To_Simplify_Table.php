@@ -57,7 +57,7 @@ class Texts_To_Simplify_Table extends WP_List_Table {
 	 */
 	private function table_data( int $per_page, int $offset ): array {
 		// order table.
-		$order_by = filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$order_by = (string) filter_input( INPUT_GET, 'orderby', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		if ( ! array_key_exists( $order_by, $this->get_sortable_columns() ) ) {
 			$order_by = 'date';
 		}
