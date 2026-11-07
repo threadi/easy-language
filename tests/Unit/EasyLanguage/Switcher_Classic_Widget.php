@@ -16,20 +16,28 @@ use easyLanguage\Tests\Switcher_Tests;
 class Switcher_Classic_Widget extends Switcher_Tests {
 
 	/**
-	 * Return the registered widgets with our widget ID.
+	 * Return whether our classic widget is usable in widget areas.
 	 *
-	 * @return array<int,\WP_Widget>
+	 * WordPress removes widgets from the widget factory, if "widgets_init" runs more than once (as in this test
+	 * environment), but keeps them in the list of widgets for the widget areas. So both lists are checked.
+	 *
+	 * @return bool
 	 */
-	private function get_registered_switcher_widgets(): array {
-		global $wp_widget_factory;
-		return array_values(
-			array_filter(
-				$wp_widget_factory->widgets,
-				function ( $widget ) {
-					return $widget instanceof \WP_Widget && SiteOrigin::WIDGET_ID === $widget->id_base;
-				}
-			)
-		);
+	private function is_classic_widget_registered(): bool {
+		global $wp_widget_factory, $wp_registered_widgets;
+
+		// check the widget factory.
+		if ( ( $wp_widget_factory->widgets[ SiteOrigin::PLAIN_WIDGET_CLASS ] ?? null ) instanceof \WP_Widget ) {
+			return true;
+		}
+
+		// check the widgets for the widget areas.
+		foreach ( $wp_registered_widgets as $widget ) {
+			if ( isset( $widget['callback'][0] ) && is_a( $widget['callback'][0], SiteOrigin::PLAIN_WIDGET_CLASS ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -40,6 +48,13 @@ class Switcher_Classic_Widget extends Switcher_Tests {
 	 * @return string
 	 */
 	private function get_widget_output( array $instance ): string {
+		global $wp_widget_factory;
+
+		// the_widget() needs the widget in the widget factory (see is_classic_widget_registered()).
+		if ( ! ( $wp_widget_factory->widgets[ SiteOrigin::PLAIN_WIDGET_CLASS ] ?? null ) instanceof \WP_Widget ) {
+			register_widget( SiteOrigin::PLAIN_WIDGET_CLASS );
+		}
+
 		ob_start();
 		the_widget(
 			SiteOrigin::PLAIN_WIDGET_CLASS,
@@ -53,26 +68,49 @@ class Switcher_Classic_Widget extends Switcher_Tests {
 	}
 
 	/**
-	 * The classic widget is registered without any page builder.
+	 * The classic widget is registered without any page builder, before WordPress registers the widgets for the
+	 * widget areas.
 	 *
 	 * @return void
 	 */
 	public function test_widget_is_registered_without_page_builder(): void {
-		$widgets = $this->get_registered_switcher_widgets();
-		$this->assertCount( 1, $widgets );
-		$this->assertInstanceOf( SiteOrigin::PLAIN_WIDGET_CLASS, $widgets[0] );
+		global $wp_widget_factory;
+
+		$priority = has_action( 'widgets_init', array( SiteOrigin::get_instance(), 'register_plain_widget' ) );
+		$this->assertIsInt( $priority );
+		$this->assertLessThan( has_action( 'widgets_init', array( $wp_widget_factory, '_register_widgets' ) ), $priority );
+
+		$this->assertTrue( $this->is_classic_widget_registered() );
 	}
 
 	/**
-	 * The widget is registered only once (e.g. if the Widgets Bundle has registered our widget ID before).
+	 * The widget is not registered, if another widget uses its ID (e.g. the widget of the Widgets Bundle).
 	 *
 	 * @return void
 	 */
-	public function test_widget_is_not_registered_twice(): void {
-		SiteOrigin::get_instance()->register_plain_widget();
-		SiteOrigin::get_instance()->register_plain_widget();
+	public function test_widget_is_not_registered_if_id_is_used(): void {
+		global $wp_widget_factory;
 
-		$this->assertCount( 1, $this->get_registered_switcher_widgets() );
+		// another widget with our ID.
+		$other = new class() extends \WP_Widget {
+			/**
+			 * Constructor.
+			 */
+			public function __construct() {
+				parent::__construct( SiteOrigin::WIDGET_ID, 'Other' );
+			}
+		};
+		unregister_widget( SiteOrigin::PLAIN_WIDGET_CLASS );
+		register_widget( $other );
+
+		SiteOrigin::get_instance()->register_plain_widget();
+		$this->assertArrayNotHasKey( SiteOrigin::PLAIN_WIDGET_CLASS, $wp_widget_factory->widgets );
+
+		// without the other widget our widget is registered (also if it is registered again).
+		unregister_widget( $other );
+		SiteOrigin::get_instance()->register_plain_widget();
+		SiteOrigin::get_instance()->register_plain_widget();
+		$this->assertInstanceOf( SiteOrigin::PLAIN_WIDGET_CLASS, $wp_widget_factory->widgets[ SiteOrigin::PLAIN_WIDGET_CLASS ] ?? null );
 	}
 
 	/**

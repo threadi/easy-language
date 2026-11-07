@@ -96,8 +96,9 @@ class SiteOrigin extends PageBuilder_Base {
 		add_action( 'wp_ajax_so_widgets_search_posts', array( $this, 'search_objects' ), 1 );
 		add_action( 'siteorigin_widgets_render_preview_' . self::WIDGET_ID, array( $this, 'enqueue_switcher_style' ) );
 
-		// the classic widget for all widget areas and as fallback for Page Builder (late, after the Widgets Bundle).
-		add_action( 'widgets_init', array( $this, 'register_plain_widget' ), 100 );
+		// the classic widget for all widget areas and as fallback for Page Builder: after the Widgets Bundle, but before
+		// WordPress registers the widgets for the widget areas (WP_Widget_Factory::_register_widgets() with priority 100).
+		add_action( 'widgets_init', array( $this, 'register_plain_widget' ), 99 );
 
 		// the integration in Page Builder.
 		add_filter( 'siteorigin_panels_widget_class', array( $this, 'map_widget_class' ), 20 );
@@ -213,8 +214,8 @@ class SiteOrigin extends PageBuilder_Base {
 	 * @return void
 	 */
 	public function register_plain_widget(): void {
-		// bail if our widget of the Widgets Bundle is registered.
-		if ( $this->is_widget_id_registered() ) {
+		// bail if our widget of the Widgets Bundle (another class with our widget ID) is registered.
+		if ( $this->is_widget_id_used_by_other_class() ) {
 			return;
 		}
 
@@ -223,26 +224,32 @@ class SiteOrigin extends PageBuilder_Base {
 	}
 
 	/**
-	 * Return whether a widget with our widget ID is already registered (e.g. by the Widgets Bundle).
+	 * Return whether our widget ID is used by another widget class (e.g. the widget of the Widgets Bundle).
+	 *
+	 * Checks the widget factory and the widgets registered for the widget areas, as WordPress removes widgets
+	 * from the factory, if "widgets_init" runs more than once in a request.
 	 *
 	 * @return bool
 	 */
-	private function is_widget_id_registered(): bool {
-		global $wp_widget_factory;
+	private function is_widget_id_used_by_other_class(): bool {
+		global $wp_widget_factory, $wp_registered_widgets;
 
-		// bail if the widget factory is not available.
-		if ( ! $wp_widget_factory instanceof \WP_Widget_Factory ) {
-			return false;
+		// collect the registered widget objects.
+		$widgets = $wp_widget_factory instanceof \WP_Widget_Factory ? array_values( $wp_widget_factory->widgets ) : array();
+		foreach ( (array) $wp_registered_widgets as $registered_widget ) {
+			if ( is_array( $registered_widget ) && isset( $registered_widget['callback'][0] ) ) {
+				$widgets[] = $registered_widget['callback'][0];
+			}
 		}
 
-		// check each registered widget.
-		foreach ( $wp_widget_factory->widgets as $widget ) {
-			if ( $widget instanceof \WP_Widget && self::WIDGET_ID === $widget->id_base ) { // @phpstan-ignore instanceof.alwaysTrue
+		// check each widget.
+		foreach ( $widgets as $widget ) {
+			if ( $widget instanceof \WP_Widget && self::WIDGET_ID === $widget->id_base && ! is_a( $widget, self::PLAIN_WIDGET_CLASS ) ) {
 				return true;
 			}
 		}
 
-		// return false as no widget with our ID is registered.
+		// return false as no other widget uses our ID.
 		return false;
 	}
 
