@@ -378,16 +378,16 @@
         },
         {
             "name": "threadi/react-dialog",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/threadi/react-dialog.git",
-                "reference": "17c097e34f285d7a1999303863dfdd5ad22fed82"
+                "reference": "acdf05db2160a672cc8aba1f9a179c6750c31f77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/threadi/react-dialog/zipball/17c097e34f285d7a1999303863dfdd5ad22fed82",
-                "reference": "17c097e34f285d7a1999303863dfdd5ad22fed82",
+                "url": "https://api.github.com/repos/threadi/react-dialog/zipball/acdf05db2160a672cc8aba1f9a179c6750c31f77",
+                "reference": "acdf05db2160a672cc8aba1f9a179c6750c31f77",
                 "shasum": ""
             },
             "type": "library",
@@ -404,9 +404,9 @@
             "description": "Provides a simple react-driven dialog-modal for WordPress-frontend.",
             "support": {
                 "issues": "https://github.com/threadi/react-dialog/issues",
-                "source": "https://github.com/threadi/react-dialog/tree/1.1.0"
+                "source": "https://github.com/threadi/react-dialog/tree/1.1.1"
             },
-            "time": "2026-03-16T14:53:46+00:00"
+            "time": "2026-11-08T15:02:19+00:00"
         }
     ],
     "packages-dev": [
