@@ -157,16 +157,16 @@
         },
         {
             "name": "threadi/crypt-for-wordpress",
-            "version": "4.0.0",
+            "version": "4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/threadi/crypt-for-wordpress.git",
-                "reference": "6bfd9610b8da72a1b501245abc6a47b5eab54562"
+                "reference": "0b9e2af0764c1dbd95d5570fe71472d18a63fa92"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/threadi/crypt-for-wordpress/zipball/6bfd9610b8da72a1b501245abc6a47b5eab54562",
-                "reference": "6bfd9610b8da72a1b501245abc6a47b5eab54562",
+                "url": "https://api.github.com/repos/threadi/crypt-for-wordpress/zipball/0b9e2af0764c1dbd95d5570fe71472d18a63fa92",
+                "reference": "0b9e2af0764c1dbd95d5570fe71472d18a63fa92",
                 "shasum": ""
             },
             "require": {
@@ -199,9 +199,9 @@
             ],
             "support": {
                 "issues": "https://github.com/threadi/crypt-for-wordpress/issues",
-                "source": "https://github.com/threadi/crypt-for-wordpress/tree/4.0.0"
+                "source": "https://github.com/threadi/crypt-for-wordpress/tree/4.2.0"
             },
-            "time": "2026-10-03T12:26:20+00:00"
+            "time": "2026-11-12T14:47:21+00:00"
         },
         {
             "name": "threadi/easy-dialog-for-wordpress",
