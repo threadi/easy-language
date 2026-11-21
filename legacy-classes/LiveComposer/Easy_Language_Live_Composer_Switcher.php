@@ -71,7 +71,7 @@ class Easy_Language_Live_Composer_Switcher extends DSLC_Module {
 		 * @param array<int,array<string,mixed>> $options The options.
 		 * @param string $module_id The ID of the module.
 		 */
-		return apply_filters( 'dslc_module_options', $options, $this->module_id );
+		return apply_filters( 'dslc_module_options', $options, $this->module_id ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- hook of Live Composer
 	}
 
 	/**

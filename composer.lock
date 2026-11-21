@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6eb6bfd5bc36121080b7434304bc1dab",
+    "content-hash": "4bf1cb589eedf15a093567d3e96b2c1e",
     "packages": [
         {
             "name": "gettext/gettext",
@@ -157,16 +157,16 @@
         },
         {
             "name": "threadi/crypt-for-wordpress",
-            "version": "4.0.0",
+            "version": "4.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/threadi/crypt-for-wordpress.git",
-                "reference": "6bfd9610b8da72a1b501245abc6a47b5eab54562"
+                "reference": "e1c22e92d5a4c5a0449c276e379ea17511a83a12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/threadi/crypt-for-wordpress/zipball/6bfd9610b8da72a1b501245abc6a47b5eab54562",
-                "reference": "6bfd9610b8da72a1b501245abc6a47b5eab54562",
+                "url": "https://api.github.com/repos/threadi/crypt-for-wordpress/zipball/e1c22e92d5a4c5a0449c276e379ea17511a83a12",
+                "reference": "e1c22e92d5a4c5a0449c276e379ea17511a83a12",
                 "shasum": ""
             },
             "require": {
@@ -199,22 +199,22 @@
             ],
             "support": {
                 "issues": "https://github.com/threadi/crypt-for-wordpress/issues",
-                "source": "https://github.com/threadi/crypt-for-wordpress/tree/4.0.0"
+                "source": "https://github.com/threadi/crypt-for-wordpress/tree/4.1.2"
             },
-            "time": "2026-10-03T12:26:20+00:00"
+            "time": "2026-11-09T19:36:42+00:00"
         },
         {
             "name": "threadi/easy-dialog-for-wordpress",
-            "version": "2.0.5",
+            "version": "2.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/threadi/easy-dialog-for-wordpress.git",
-                "reference": "e2f8ffddb8cbafc9977d4c23dccd4a154b79c595"
+                "reference": "a711c22885a4aceca4d8e69a1d832b2f1894610e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/threadi/easy-dialog-for-wordpress/zipball/e2f8ffddb8cbafc9977d4c23dccd4a154b79c595",
-                "reference": "e2f8ffddb8cbafc9977d4c23dccd4a154b79c595",
+                "url": "https://api.github.com/repos/threadi/easy-dialog-for-wordpress/zipball/a711c22885a4aceca4d8e69a1d832b2f1894610e",
+                "reference": "a711c22885a4aceca4d8e69a1d832b2f1894610e",
                 "shasum": ""
             },
             "type": "library",
@@ -231,9 +231,9 @@
             "description": "Provides a simple react-driven dialog-modal for the WordPress-backend.",
             "support": {
                 "issues": "https://github.com/threadi/easy-dialog-for-wordpress/issues",
-                "source": "https://github.com/threadi/easy-dialog-for-wordpress/tree/2.0.5"
+                "source": "https://github.com/threadi/easy-dialog-for-wordpress/tree/2.0.6"
             },
-            "time": "2026-10-18T13:02:22+00:00"
+            "time": "2026-11-09T19:39:11+00:00"
         },
         {
             "name": "threadi/easy-settings-for-wordpress",
@@ -378,16 +378,16 @@
         },
         {
             "name": "threadi/react-dialog",
-            "version": "1.1.0",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/threadi/react-dialog.git",
-                "reference": "17c097e34f285d7a1999303863dfdd5ad22fed82"
+                "reference": "acdf05db2160a672cc8aba1f9a179c6750c31f77"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/threadi/react-dialog/zipball/17c097e34f285d7a1999303863dfdd5ad22fed82",
-                "reference": "17c097e34f285d7a1999303863dfdd5ad22fed82",
+                "url": "https://api.github.com/repos/threadi/react-dialog/zipball/acdf05db2160a672cc8aba1f9a179c6750c31f77",
+                "reference": "acdf05db2160a672cc8aba1f9a179c6750c31f77",
                 "shasum": ""
             },
             "type": "library",
@@ -404,9 +404,9 @@
             "description": "Provides a simple react-driven dialog-modal for WordPress-frontend.",
             "support": {
                 "issues": "https://github.com/threadi/react-dialog/issues",
-                "source": "https://github.com/threadi/react-dialog/tree/1.1.0"
+                "source": "https://github.com/threadi/react-dialog/tree/1.1.1"
             },
-            "time": "2026-03-16T14:53:46+00:00"
+            "time": "2026-11-08T15:02:19+00:00"
         }
     ],
     "packages-dev": [
@@ -4977,16 +4977,16 @@
         },
         {
             "name": "wp-phpunit/wp-phpunit",
-            "version": "7.1.3",
+            "version": "6.9.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-phpunit/wp-phpunit.git",
-                "reference": "797edc710afc958854852d859c93d9aa1de6447d"
+                "reference": "15fd216bf6516670d8d07b938675925bfa5c15b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/797edc710afc958854852d859c93d9aa1de6447d",
-                "reference": "797edc710afc958854852d859c93d9aa1de6447d",
+                "url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/15fd216bf6516670d8d07b938675925bfa5c15b0",
+                "reference": "15fd216bf6516670d8d07b938675925bfa5c15b0",
                 "shasum": ""
             },
             "type": "library",
@@ -5021,30 +5021,30 @@
                 "issues": "https://github.com/wp-phpunit/issues",
                 "source": "https://github.com/wp-phpunit/wp-phpunit"
             },
-            "time": "2026-08-20T00:59:59+00:00"
+            "time": "2026-02-04T01:48:23+00:00"
         },
         {
             "name": "yoast/phpunit-polyfills",
-            "version": "4.0.0",
+            "version": "1.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Yoast/PHPUnit-Polyfills.git",
-                "reference": "134921bfca9b02d8f374c48381451da1d98402f9"
+                "reference": "41aaac462fbd80feb8dd129e489f4bbc53fe26b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Yoast/PHPUnit-Polyfills/zipball/134921bfca9b02d8f374c48381451da1d98402f9",
-                "reference": "134921bfca9b02d8f374c48381451da1d98402f9",
+                "url": "https://api.github.com/repos/Yoast/PHPUnit-Polyfills/zipball/41aaac462fbd80feb8dd129e489f4bbc53fe26b0",
+                "reference": "41aaac462fbd80feb8dd129e489f4bbc53fe26b0",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.1",
-                "phpunit/phpunit": "^7.5 || ^8.0 || ^9.0 || ^11.0 || ^12.0"
+                "php": ">=5.4",
+                "phpunit/phpunit": "^4.8.36 || ^5.7.21 || ^6.0 || ^7.0 || ^8.0 || ^9.0"
             },
             "require-dev": {
                 "php-parallel-lint/php-console-highlighter": "^1.0.0",
                 "php-parallel-lint/php-parallel-lint": "^1.4.0",
-                "yoast/yoastcs": "^3.1.0"
+                "yoast/yoastcs": "^3.2.0"
             },
             "type": "library",
             "extra": {
@@ -5084,7 +5084,7 @@
                 "security": "https://github.com/Yoast/PHPUnit-Polyfills/security/policy",
                 "source": "https://github.com/Yoast/PHPUnit-Polyfills"
             },
-            "time": "2025-02-09T18:58:54+00:00"
+            "time": "2025-08-10T04:54:36+00:00"
         }
     ],
     "aliases": [],

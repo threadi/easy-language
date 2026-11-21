@@ -2,7 +2,7 @@
 Contributors: laolaweb, threadi
 Tags: easy language, leichte sprache, simplify, summ ai, capito
 Requires at least: 6.6
-Tested up to: 7.1
+Tested up to: 7.2
 Requires PHP: 8.2
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -156,18 +156,7 @@ Major update: language switchers created before 4.0.0 run in compatibility mode.
 == Changelog ==
 
 = @@VersionNumber@@ =
-* Added language switcher as native widget for 18 page builders (incl. Elementor, Divi 4/5, Bricks, Beaver Builder, Avada, Breakdance, WPBakery) and as classic widget
-* Added new switcher display "Toggle", visibility rules, icon sizes and fallback behavior on archives and search
-* Added support for the WordPress Abilities API (WordPress 6.9+): AI clients can use Easy Language via MCP
-* Added new API "WordPress Connectors" to simplify texts with the AI connectors of WordPress (WordPress 7.0+)
-* Added encryption for saved API keys (existing keys are migrated automatically)
-* Added modern settings view (DataView) as new default
-* Added multisite support for log and API log
-* Optimized token test, token removal and quota update now run via AJAX with dialogs
-* Optimized security: stricter sanitizing of API responses, no redirects for API requests, stricter checks for redirects
-* Optimized stability: automatic simplification can no longer run twice at the same time, request logs are cleaned up automatically
-* Optimized readme with a description of all external services used by this plugin
-* Fixed many bugs in simplification, page builder support, language links and uninstallation
-* More than 100 additional unit tests and new E2E tests
+- Set compatibility for WordPress 7.2
+- Updated dependencies
 
 [full changelog](https://github.com/threadi/easy-language/blob/master/changelog.md)

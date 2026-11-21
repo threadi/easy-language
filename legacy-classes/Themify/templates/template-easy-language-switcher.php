@@ -33,8 +33,8 @@ if ( '' === $easy_language_output && false === Themify_Builder::$frontedit_activ
 }
 
 // collect the classes of the module like other modules of Themify Builder.
-$easy_language_classes = apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-	'themify_builder_module_classes',
+$easy_language_classes = apply_filters(
+	'themify_builder_module_classes', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- hook of Themify Builder
 	array(
 		'module',
 		'module-' . $easy_language_mod_name,
@@ -50,8 +50,8 @@ if ( ! empty( $easy_language_settings['global_styles'] ) && false === Themify_Bu
 }
 
 // collect the attributes of the module container (incl. animations and sticky settings).
-$easy_language_props = apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-	'themify_builder_module_container_props',
+$easy_language_props = apply_filters(
+	'themify_builder_module_container_props', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- hook of Themify Builder
 	Themify_Builder_Component_Module::parse_animation_effect(
 		$easy_language_settings,
 		array(

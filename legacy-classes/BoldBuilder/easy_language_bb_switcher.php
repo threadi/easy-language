@@ -37,7 +37,7 @@ class easy_language_bb_switcher extends BT_BB_Element {
 
 		// get the general attributes of Bold Page Builder elements.
 		$general = shortcode_atts(
-			apply_filters( 'bt_bb_extract_atts_' . $this->shortcode, array() ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
+			apply_filters( 'bt_bb_extract_atts_' . $this->shortcode, array() ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound, WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- hook of Bold Page Builder
 			$atts,
 			$this->shortcode
 		);
@@ -66,8 +66,8 @@ class easy_language_bb_switcher extends BT_BB_Element {
 			$this->responsive_data_override_class(
 				$class,
 				$data_override_class,
-				apply_filters( // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound
-					$this->shortcode . '_responsive_data_override',
+				apply_filters(
+					$this->shortcode . '_responsive_data_override', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound, WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- hook of Bold Page Builder
 					array(
 						'prefix' => $this->prefix,
 						'param'  => $param,
