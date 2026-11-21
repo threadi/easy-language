@@ -29,11 +29,11 @@
   },
   "devDependencies": {
     "@playwright/test": "1.64.1",
-    "@wordpress/scripts": "^34.2",
-    "@wp-playground/cli": "^3.1.57",
+    "@wordpress/scripts": "^37.1",
+    "@wp-playground/cli": "^3.1.62",
     "concurrently": "^10.0.6"
   },
   "dependencies": {
-    "@wordpress/i18n": "^6.30.0"
+    "@wordpress/i18n": "^7.1.0"
   }
 }
